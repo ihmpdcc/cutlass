@@ -4,6 +4,7 @@ import json
 import logging
 from iHMPSession import iHMPSession
 from Base import Base
+from aspera import aspera
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -22,6 +23,9 @@ class SixteenSRawSeqSet(Base):
         self._version = None
         self._links = {}
         self._tags = []
+
+        self._local_file = None
+        self._remote_path = None
 
         self._checksums = None
         self._comment = None
@@ -49,6 +53,12 @@ class SixteenSRawSeqSet(Base):
             self.logger.info("Validation did not succeed for " + __name__ + ".")
             problems.append(error_message)
 
+        if self._local_file is None:
+            problems.append("Local file is not yet set.")
+
+        if self._remote_path is None:
+            problems.append("Remote path is not yet set.")
+
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link to a 16s_dna_prep.")
 
@@ -64,6 +74,14 @@ class SixteenSRawSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         (valid, error_message) = session.get_osdf().validate_node(document)
+
+        if self._local_file is None:
+            self.logger.error("Must set the local file of the sequence set.")
+            valid = False
+
+        if self._remote_path is None:
+            self.logger.error("Must set the remote path for the sequence set.")
+            valid = False
 
         if 'sequenced_from' not in self._links.keys():
             self.logger.error("Must have of 'sequenced_from' linkage.")
@@ -137,6 +155,30 @@ class SixteenSRawSeqSet(Base):
         self.logger.debug("In format_doc setter.")
 
         self._format_doc = format_doc
+
+    @property
+    def local_file(self):
+        self.logger.debug("In local_file getter.")
+
+        return self._local_file
+
+    @local_file.setter
+    def local_file(self, local_file):
+        self.logger.debug("In local_file setter.")
+
+        self._local_file = local_file
+
+    @property
+    def remote_path(self):
+        self.logger.debug("In remote_path getter.")
+
+        return self._remote_path
+
+    @remote_path.setter
+    def remote_path(self, remote_path):
+        self.logger.debug("In remote_path setter.")
+
+        self._remote_path = remote_path
 
     @property
     def seq_model(self):
@@ -325,6 +367,18 @@ class SixteenSRawSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         success = False
+
+        # Upload the file to the iHMP aspera server
+        upload_result = aspera.upload_file('aspera.ihmpdcc.org',
+                                           session.username,
+                                           session.password,
+                                           self._local_file,
+                                           self._remote_path)
+
+        if not upload_result:
+            self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
+            raise Exception("Unable to upload file to aspera server.")
+            return success
 
         if self.id is None:
             # The document has not yet been save
