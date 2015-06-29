@@ -65,14 +65,14 @@ def run_ascp(ascp_cmd, password):
 
         if not re.match(r"Completed: \S+ bytes transferred in", s_out):
             if re.match(r"^.*failed to authenticate", s_err):
-                print "Aspera authentication failure"
+                print(("Aspera authentication failure"))
             else:
                 if stderr != None:
-                    print "unexpected output from ascp on stderr:", s_err
+                    print(("unexpected output from ascp on stderr:", s_err))
                 if stdout != None:
-                    print "unexpected output from ascp on stdout:", s_out
+                    print(("unexpected output from ascp on stdout:", s_out))
             return False
-    except subprocess.CalledProcessError, cpe:
+    except subprocess.CalledProcessError as cpe:
         return False
     return True
     
@@ -87,7 +87,7 @@ def upload_file(server, username, password, local_file, remote_path):
     check_ascp_version(ASCP_COMMAND)
     # check that local file exists
     if not os.path.isfile(local_file):
-        print "local file " + local_file + " does not exist"
+        print(("local file " + local_file + " does not exist"))
         return False
     ascp_cmd = [ASCP_COMMAND, "-T", "-v", "-l", "300M", local_file, username + "@" + server + ":" + remote_path ]
     return run_ascp(ascp_cmd, password)
