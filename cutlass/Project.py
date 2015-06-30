@@ -92,16 +92,25 @@ class Project(object):
     @name.setter
     def name(self, name):
         self.logger.debug("In name setter.")
+
+        if type(name) != str:
+            raise ValueError("'name' must be a string.")
+
         self._name = name
 
     @property
     def description(self):
         self.logger.debug("In description getter.")
+
         return self._description
 
     @description.setter
     def description(self, description):
         self.logger.debug("In description setter.")
+
+        if type(description) != str:
+            raise ValueError("'description' must be a string.")
+
         self._description = description
 
     @property
@@ -114,7 +123,7 @@ class Project(object):
         self.logger.debug("In mixs setter.")
         valid_dictionary = MIXS.check_dict(mixs)
 
-        # Validate the incoming MIMARKS data
+        # Validate the incoming MIXS data
         if valid_dictionary:
             self.logger.debug("MIXS data seems correct.")
             self._mixs = mixs
