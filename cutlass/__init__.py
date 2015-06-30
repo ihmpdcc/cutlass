@@ -6,8 +6,8 @@ from .Subject import Subject
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .aspera import aspera
-from .mixs import MIXS
-from .mims import MIMS
-from .mimarks import MIMARKS
+from .mixs import MIXS, MixsException
+from .mims import MIMS, MimsException
+from .mimarks import MIMARKS, MimarksException
 
 #__all__ = ["iHMPSession", "Project", "Study", "Visit", "Subject", "Sample", "SixteenSDnaPrep", "SixteenSRawSeqSet", "MIXS", "MIMS", "MIMARKS"]
