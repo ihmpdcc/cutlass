@@ -4,18 +4,18 @@ import os
 import re
 import subprocess
 
-# Test wrapper code for ascp 
+# Test wrapper code for ascp
 
 # download example command(s):
 #
 # only getting ~ 10Mb/s (on 20-30Mb connection): with defaults:
-#   ascp -T -v -L . testuser@aspera.hmpdacc.org:test2.fsa ./
-#   ascp -T -v -L . testuser@aspera.hmpdacc.org:50MB ./
+#   ascp -T -v -L . testuser@aspera.ihmpdcc.org:test2.fsa ./
+#   ascp -T -v -L . testuser@aspera.ihmpdcc.org:50MB ./
 # closer to 20Mb/s with this option:
-#   ascp -T -v -l 200M -L . testuser@aspera.hmpdacc.org:50MB ./
-# 
+#   ascp -T -v -l 200M -L . testuser@aspera.ihmpdcc.org:50MB ./
+#
 # upload example command(s):
-#   ascp -T -v -L . testuser@aspera.hmpdacc.org:
+#   ascp -T -v -L . testuser@aspera.ihmpdcc.org:
 #
 
 ASCP_COMMAND = "ascp"
@@ -75,7 +75,7 @@ def run_ascp(ascp_cmd, password):
     except subprocess.CalledProcessError as cpe:
         return False
     return True
-    
+
 # download a single file via Aspera. return True if successful, False if not
 def download_file(server, username, password, remote_path, local_path):
     check_ascp_version(ASCP_COMMAND)
