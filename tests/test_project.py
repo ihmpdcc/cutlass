@@ -127,6 +127,23 @@ class ProjectTest(unittest.TestCase):
 
         self.assertEqual(project_data['meta']['description'],
                          description, "'description' in JSON had expected value.")
+    def testId(self):
+        project = session.create_project()
+
+        self.assertTrue(project.id is None,
+                        "New template project has no ID.")
+
+        with self.assertRaises(AttributeError):
+            project.id = "test"
+
+    def testVersion(self):
+        project = session.create_project()
+
+        self.assertTrue(project.version is None,
+                        "New template project has no version.")
+
+        with self.assertRaises(ValueError):
+            project.version = "test"
 
     def testMixs(self):
         project = session.create_project()
@@ -176,6 +193,49 @@ class ProjectTest(unittest.TestCase):
         biome = project.mixs['biome']
         self.assertEqual(biome, valid_mixs["biome"],
                          "Retrieved MIXS data appears to be okay.")
+
+    def testTags(self):
+        project = session.create_project()
+
+        tags = project.tags
+        self.assertTrue(type(tags) == list, "Project tags() method returns a list.")
+        self.assertEqual(len(tags), 0, "Template project tags list is empty.")
+
+        new_tags = [ "tagA", "tagB" ]
+
+        project.tags = new_tags
+        self.assertEqual(project.tags, new_tags, "Can set tags on a project.")
+
+        json_str = project.to_json()
+        doc = json.loads(json_str)
+        self.assertTrue('tags' in doc['meta'],
+                        "JSON representation has 'tags' field in 'meta'.")
+
+        self.assertEqual(doc['meta']['tags'], new_tags,
+                         "JSON representation had correct tags after setter.")
+
+
+    def testAddTag(self):
+        project = session.create_project()
+
+        project.add_tag("test")
+        self.assertEqual(project.tags, [ "test" ], "Can add a tag to a project.")
+
+        json_str = project.to_json()
+        doc = json.loads(json_str)
+
+        self.assertEqual(doc['meta']['tags'], [ "test" ],
+                         "JSON representation had correct tags after add_tag().")
+
+        # Try adding the same tag yet again, shouldn't get a duplicate
+        with self.assertRaises(ValueError):
+            project.add_tag("test")
+
+        json_str = project.to_json()
+        doc2 = json.loads(json_str)
+
+        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+                         "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
         required = Project.required_fields()

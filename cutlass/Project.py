@@ -5,13 +5,14 @@ import json
 import logging
 from iHMPSession import iHMPSession
 from mixs import MIXS, MixsException
+from Base import Base
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Project(object):
+class Project(Base):
     namespace = "ihmp"
 
     def __init__(self):
@@ -26,63 +27,6 @@ class Project(object):
         self._name = None
         self._description = None
         self._mixs = None
-
-    @property
-    def id(self):
-        self.logger.debug("In id getter.")
-        return self._id
-
-    def _set_id(self, node_id):
-        self.logger.debug("In private _set_id.")
-        self._id = node_id
-
-    @property
-    def version(self):
-        self.logger.debug("In version getter.")
-        return self._version
-
-    @version.setter
-    def version(self, version):
-        self.logger.debug("In version setter.")
-
-        if version <= 0:
-            raise ValueError("Invalid version. Must be a postive integer.")
-
-        self._version = version
-
-    @property
-    def links(self):
-        self.logger.debug("In links getter.")
-        return self._links
-
-    @links.setter
-    def links(self, links):
-        self.logger.debug("In links setter.")
-        return self._links
-
-    @property
-    def tags(self):
-        self.logger.debug("In tags getter.")
-        return self._tags
-
-    @tags.setter
-    def tags(self, tags):
-        self.logger.debug("In tags setter.")
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
-
-    def add_tag(self, tag):
-        self.logger.debug("In add_tag. New tag: %s" % tag)
-        if tag not in self._tags:
-            self._tags.append(tag)
-        else:
-            raise ValueError("Tag already present for this project.")
-
-    def remove_tag(self, tag):
-        self.logger.debug("In remove_tag. Removing tag: %s" % tag)
-        self._tags.remove(tag)
 
     @property
     def name(self):
@@ -134,38 +78,6 @@ class Project(object):
     def required_fields():
         fields = ('name', 'description', 'mixs', 'tags')
         return fields
-
-    def validate(self):
-        self.logger.debug("In validate.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        problems = []
-        if not valid:
-            self.logger.info("Validation did not succeed for Project.")
-            problems.append(error_message)
-
-        self.logger.debug("Number of validation problems: %s." % len(problems))
-        return problems
-
-    def is_valid(self):
-        self.logger.debug("In is_valid.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        self.logger.debug("Valid? %s" + str(valid))
-
-        return valid
 
     def save(self):
         # Use the create_osdf_node if the node has ID = -1
@@ -313,16 +225,3 @@ class Project(object):
             project_doc['ver'] = self._version
 
         return project_doc
-
-    def to_json(self, indent=4):
-        self.logger.debug("In to_json.")
-
-        doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str

@@ -41,6 +41,9 @@ class Base(object):
     def version(self, version):
         self.logger.debug("In version setter.")
 
+        if type(version) != int:
+            raise ValueError("Version must be an integer.")
+
         if version <= 0:
             raise ValueError("Invalid version. Must be a postive integer.")
 
