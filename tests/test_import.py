@@ -87,6 +87,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSRawSeqSet is None)
 
+    def testImport16STrimmedSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import SixteenSTrimmedSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(SixteenSTrimmedSeqSet is None)
+
     def testImportMIMS(self):
         success = False
 

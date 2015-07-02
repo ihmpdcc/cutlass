@@ -66,6 +66,12 @@ class iHMPSession(object):
         seq_set = SixteenRawSeqSet()
         return seq_set
 
+    def create_16s_trimmed_seq_set(self):
+        self.logger.debug("In create_16s_trimmed_seq_set.")
+        from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
+        seq_set = SixteenTrimmedSeqSet()
+        return seq_set
+
     def create_object(self, node_type):
         self.logger.debug("In create_object. Type: %s" % node_type)
 
@@ -102,6 +108,14 @@ class iHMPSession(object):
             from SixteenSRawSeqSet import SixteenSRawSeqSet
             self.logger.debug("Creating a SixteenSRawSeqSet.")
             node = SixteenSRawSeqSet()
+        elif node_type == "wgs_raw_seq_set":
+            from WgsRawSeqSet import WgsRawSeqSet
+            self.logger.debug("Creating a WgsRawSeqSet.")
+            node = WgsRawSeqSet()
+        elif node_type == "16s_trimmed_seq_set":
+            from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
+            self.logger.debug("Creating a SixteenSTrimmedSeqSet.")
+            node = SixteenSTrimmedSeqSet()
         else:
             raise ValueError("Invalid node type specified: %" % node_type)
 
