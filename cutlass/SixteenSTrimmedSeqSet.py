@@ -82,7 +82,7 @@ class SixteenSTrimmedSeqSet(Base):
             self.logger.error("Must have of 'sequenced_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 
@@ -111,6 +111,9 @@ class SixteenSTrimmedSeqSet(Base):
     def comment(self, comment):
         self.logger.debug("In comment setter.")
 
+        if type(comment) != str:
+            raise ValueError("comment must be a string.")
+
         self._comment = comment
 
     @property
@@ -122,8 +125,9 @@ class SixteenSTrimmedSeqSet(Base):
     @exp_length.setter
     def exp_length(self, exp_length):
         self.logger.debug("In exp_length setter.")
-        if exp_length < 0:
-            raise ValueError("The exp_length must be non-negative.")
+
+        if type(exp_length) != int or exp_length < 0:
+            raise ValueError("The exp_length must a non-negative integer.")
 
         self._exp_length = exp_length
 
@@ -137,6 +141,9 @@ class SixteenSTrimmedSeqSet(Base):
     def format(self, format_str):
         self.logger.debug("In format setter.")
 
+        if type(format_str) != str:
+            raise ValueError("format_str must be a string.")
+
         self._format = format_str
 
     @property
@@ -148,6 +155,9 @@ class SixteenSTrimmedSeqSet(Base):
     @format_doc.setter
     def format_doc(self, format_doc):
         self.logger.debug("In format_doc setter.")
+
+        if type(format_doc) != str:
+            raise ValueError("format_doc must be a string.")
 
         self._format_doc = format_doc
 
@@ -161,6 +171,9 @@ class SixteenSTrimmedSeqSet(Base):
     def local_file(self, local_file):
         self.logger.debug("In local_file setter.")
 
+        if type(local_file) != str:
+            raise ValueError("local_file must be a string.")
+
         self._local_file = local_file
 
     @property
@@ -172,6 +185,9 @@ class SixteenSTrimmedSeqSet(Base):
     @seq_model.setter
     def seq_model(self, seq_model):
         self.logger.debug("In seq_model setter.")
+
+        if type(seq_model) != str:
+            raise ValueError("seq_model must be a string.")
 
         self._seq_model = seq_model
 
@@ -185,6 +201,9 @@ class SixteenSTrimmedSeqSet(Base):
     def sequence_type(self, sequence_type):
         self.logger.debug("In sequence_type setter.")
 
+        if type(seq_model) != str:
+            raise ValueError("sequence_type must be a string.")
+
         self._sequence_type = sequence_type
 
     @property
@@ -196,8 +215,8 @@ class SixteenSTrimmedSeqSet(Base):
     @size.setter
     def size(self, size):
         self.logger.debug("In size setter.")
-        if size < 0:
-            raise ValueError("The size must be non-negative.")
+        if not (type(size) == int and size >= 0):
+            raise ValueError("The size must be a non-negative integer.")
 
         self._size = size
 
@@ -210,6 +229,9 @@ class SixteenSTrimmedSeqSet(Base):
     @study.setter
     def study(self, study):
         self.logger.debug("In study setter.")
+
+        if type(study) != str:
+            raise ValueError("study must be a string.")
 
         self._study = study
 
@@ -237,11 +259,11 @@ class SixteenSTrimmedSeqSet(Base):
         sixteen_s_doc = {
             'acl': {
                 'read': [ 'all' ],
-                'write': [ SixteenSRawSeqSet.namespace ]
+                'write': [ SixteenSTrimmedSeqSet.namespace ]
             },
             'linkage': self._links,
-            'ns': SixteenSRawSeqSet.namespace,
-            'node_type': '16s_raw_seq_set',
+            'ns': SixteenSTrimmedSeqSet.namespace,
+            'node_type': '16s_trimmed_seq_set',
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,
@@ -285,7 +307,7 @@ class SixteenSTrimmedSeqSet(Base):
         seq_set_data = session.get_osdf().get_node(seq_set_id)
 
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = SixteenSRawSeqSet()
+        seq_set = SixteenSTrimmedSeqSet()
 
         module_logger.debug("Filling in " + __name__ + " details.")
 
@@ -294,7 +316,7 @@ class SixteenSTrimmedSeqSet(Base):
         seq_set._version = seq_set_data['ver']
         seq_set._links = seq_set_data['linkage']
 
-        # The attributes that are particular to SixteenSDnaPrep documents
+        # The attributes that are particular to SixteenSTrimmedSeqSet documents
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
         seq_set._exp_length = seq_set_data['meta']['exp_length']
@@ -318,14 +340,15 @@ class SixteenSTrimmedSeqSet(Base):
         aspera_server = "aspera.ihmpdcc.org"
 
         if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid")
+            self.logger.error("Cannot save, data is invalid.")
             return False
 
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
         study = self._study
-        remote_path = "/".join("/" + study, "16s_trimmed_seq_set", os.path.basename(self._local_file))
+        remote_path = "/".join("/" + study, "16s_trimmed_seq_set",
+                               os.path.basename(self._local_file))
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         success = False
@@ -339,7 +362,6 @@ class SixteenSTrimmedSeqSet(Base):
 
         if not upload_result:
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
-            raise Exception("Unable to upload file to aspera server.")
             return success
 
         logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
@@ -357,7 +379,7 @@ class SixteenSTrimmedSeqSet(Base):
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
                 self._version = 1
-                self.urls = [ "fasp://" + aspera_server + remote_path ]
+                self._urls = [ "fasp://" + aspera_server + remote_path ]
 
                 success = True
             except Exception as e:
@@ -370,9 +392,12 @@ class SixteenSTrimmedSeqSet(Base):
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
                 session.get_osdf().edit_node(seq_set_data)
                 self.logger.info("Update for " + __name__ + " %s successful." % self._d)
+
                 success = True
             except Exception as e:
                 self.logger.error("An error occurred while updating " +
                                   __name__ + " %s. Reason: %s" % self._d, e)
+
+        logger.debug("Returning " + success)
 
         return success

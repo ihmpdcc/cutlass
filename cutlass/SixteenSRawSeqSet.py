@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
@@ -24,17 +25,17 @@ class SixteenSRawSeqSet(Base):
         self._links = {}
         self._tags = []
 
-        self._local_file = None
-        self._remote_path = None
 
         self._checksums = None
         self._comment = None
         self._exp_length = None
         self._format = None
         self._format_doc = None
+        self._local_file = None
         self._seq_model = None
         self._sequence_type = None
         self._size = None
+        self._study = None
         self._urls = None
 
     def validate(self):
@@ -55,14 +56,14 @@ class SixteenSRawSeqSet(Base):
 
         if self._local_file is None:
             problems.append("Local file is not yet set.")
-
-        if self._remote_path is None:
-            problems.append("Remote path is not yet set.")
+        elif not os.path.isfile(self._local_file):
+            problems.append("Local file does not point to an actual file.")
 
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link to a 16s_dna_prep.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
+
         return problems
 
     def is_valid(self):
@@ -78,16 +79,15 @@ class SixteenSRawSeqSet(Base):
         if self._local_file is None:
             self.logger.error("Must set the local file of the sequence set.")
             valid = False
-
-        if self._remote_path is None:
-            self.logger.error("Must set the remote path for the sequence set.")
+        elif not os.path.isfile(self._local_file):
+            self.logger.error("Local file does not point to an actual file.")
             valid = False
 
         if 'sequenced_from' not in self._links.keys():
             self.logger.error("Must have of 'sequenced_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 
@@ -116,6 +116,9 @@ class SixteenSRawSeqSet(Base):
     def comment(self, comment):
         self.logger.debug("In comment setter.")
 
+        if type(comment) != str:
+            raise ValueError("comment must be a string.")
+
         self._comment = comment
 
     @property
@@ -142,6 +145,9 @@ class SixteenSRawSeqSet(Base):
     def format(self, format_str):
         self.logger.debug("In format setter.")
 
+        if type(format_str) != str:
+            raise ValueError("format must be a string.")
+
         self._format = format_str
 
     @property
@@ -153,6 +159,9 @@ class SixteenSRawSeqSet(Base):
     @format_doc.setter
     def format_doc(self, format_doc):
         self.logger.debug("In format_doc setter.")
+
+        if type(format_doc) != str:
+            raise ValueError("format_doc must be a string.")
 
         self._format_doc = format_doc
 
@@ -166,19 +175,10 @@ class SixteenSRawSeqSet(Base):
     def local_file(self, local_file):
         self.logger.debug("In local_file setter.")
 
+        if type(local_file) != str:
+            raise ValueError("local_file must be a string.")
+
         self._local_file = local_file
-
-    @property
-    def remote_path(self):
-        self.logger.debug("In remote_path getter.")
-
-        return self._remote_path
-
-    @remote_path.setter
-    def remote_path(self, remote_path):
-        self.logger.debug("In remote_path setter.")
-
-        self._remote_path = remote_path
 
     @property
     def seq_model(self):
@@ -189,6 +189,9 @@ class SixteenSRawSeqSet(Base):
     @seq_model.setter
     def seq_model(self, seq_model):
         self.logger.debug("In seq_model setter.")
+
+        if type(seq_model) != str:
+            raise ValueError("seq_model must be a string.")
 
         self._seq_model = seq_model
 
@@ -201,6 +204,9 @@ class SixteenSRawSeqSet(Base):
     @sequence_type.setter
     def sequence_type(self, sequence_type):
         self.logger.debug("In sequence_type setter.")
+
+        if type(sequence_type) != str:
+            raise ValueError("sequence_type must be a string.")
 
         self._sequence_type = sequence_type
 
@@ -219,6 +225,21 @@ class SixteenSRawSeqSet(Base):
         self._size = size
 
     @property
+    def study(self):
+        self.logger.debug("In study getter.")
+
+        return self._study
+
+    @study.setter
+    def study(self, study):
+        self.logger.debug("In study setter.")
+
+        if type(study) != str:
+            raise ValueError("study must be a string.")
+
+        self._study = study
+
+    @property
     def urls(self):
         self.logger.debug("In urls getter.")
 
@@ -234,7 +255,7 @@ class SixteenSRawSeqSet(Base):
     def required_fields():
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "seq_model", "size", "tags", "urls")
+                "local_file", "seq_model", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
         self.logger.debug("In _get_raw_doc.")
@@ -255,6 +276,7 @@ class SixteenSRawSeqSet(Base):
                 "format_doc": self._format_doc,
                 "seq_model": self.seq_model,
                 "size": self._size,
+                "study": self._study,
                 "urls": self._urls,
                 'tags': self._tags
             }
@@ -337,7 +359,7 @@ class SixteenSRawSeqSet(Base):
         seq_set._version = seq_set_data['ver']
         seq_set._links = seq_set_data['linkage']
 
-        # The attributes that are particular to SixteenSDnaPrep documents
+        # The attributes that are particular to SixteenSRawSeqSet documents
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
         seq_set._exp_length = seq_set_data['meta']['exp_length']
@@ -368,17 +390,20 @@ class SixteenSRawSeqSet(Base):
 
         success = False
 
+        study = self._study
+        remote_path = "/".join(["/" + study, "16s_raw_seq_set", os.path.basename(self._local_file)])
+        self.logger.debug("Remote path for this file will be %s." % remote_path)
+
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file('aspera.ihmpdcc.org',
                                            session.username,
                                            session.password,
                                            self._local_file,
-                                           self._remote_path)
+                                           remote_path)
 
         if not upload_result:
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
-            raise Exception("Unable to upload file to aspera server.")
-            return success
+            return False
 
         if self.id is None:
             # The document has not yet been save
@@ -391,6 +416,7 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
+                self._urls = [ "fasp://" + aspera_server + remote_path ]
                 self._version = 1
                 success = True
             except Exception as e:
