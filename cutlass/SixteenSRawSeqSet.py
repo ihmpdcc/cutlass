@@ -14,6 +14,7 @@ module_logger.addHandler(logging.NullHandler())
 
 class SixteenSRawSeqSet(Base):
     namespace = "ihmp"
+    aspera_server = "aspera.ihmpdcc.org"
 
     def __init__(self):
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
@@ -395,7 +396,7 @@ class SixteenSRawSeqSet(Base):
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         # Upload the file to the iHMP aspera server
-        upload_result = aspera.upload_file('aspera.ihmpdcc.org',
+        upload_result = aspera.upload_file(SixteenSRawSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
@@ -416,7 +417,7 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
-                self._urls = [ "fasp://" + aspera_server + remote_path ]
+                self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
                 self._version = 1
                 success = True
             except Exception as e:
@@ -433,5 +434,7 @@ class SixteenSRawSeqSet(Base):
             except Exception as e:
                 self.logger.error("An error occurred while updating " +
                                   __name__ + " %s. Reason: %s" % self._d, e)
+
+        self.logger.debug("Returning " + str(success))
 
         return success
