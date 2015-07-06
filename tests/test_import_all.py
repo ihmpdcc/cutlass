@@ -23,6 +23,9 @@ class ImportTest(unittest.TestCase):
     def testImport16SDnaPrep(self):
         self.failIf(SixteenSDnaPrep is None)
 
+    def testImportWgsDnaPrep(self):
+        self.failIf(WgsDnaPrep is None)
+
     def testImport16SRawSeqSet(self):
         self.failIf(SixteenSRawSeqSet is None)
 

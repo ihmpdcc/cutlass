@@ -4,6 +4,7 @@ from .Study import Study
 from .Visit import Visit
 from .Subject import Subject
 from .SixteenSDnaPrep import SixteenSDnaPrep
+from .WgsDnaPrep import WgsDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from .aspera import aspera

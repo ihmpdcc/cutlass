@@ -75,6 +75,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSDnaPrep is None)
 
+    def testImportWgsDnaPrep(self):
+        success = False
+
+        try:
+            from cutlass import WgsDnaPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(WgsDnaPrep is None)
+
     def testImport16SRawSeqSet(self):
         success = False
 
