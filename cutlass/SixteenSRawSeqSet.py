@@ -21,12 +21,13 @@ class SixteenSRawSeqSet(Base):
 
         self.logger.addHandler(logging.NullHandler())
 
+        # These are common to all objects
         self._id = None
         self._version = None
         self._links = {}
         self._tags = []
 
-
+        # These are particular to SixteenSRawSeqSet objects
         self._checksums = None
         self._comment = None
         self._exp_length = None
@@ -37,7 +38,7 @@ class SixteenSRawSeqSet(Base):
         self._sequence_type = None
         self._size = None
         self._study = None
-        self._urls = None
+        self._urls = ['']
 
     def validate(self):
         self.logger.debug("In validate.")
@@ -246,17 +247,11 @@ class SixteenSRawSeqSet(Base):
 
         return self._urls
 
-    @urls.setter
-    def urls(self, urls):
-        self.logger.debug("In urls setter.")
-
-        self._urls = urls
-
     @staticmethod
     def required_fields():
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "local_file", "seq_model", "size", "study", "tags", "urls")
+                "local_file", "seq_model", "size", "study", "tags")
 
     def _get_raw_doc(self):
         self.logger.debug("In _get_raw_doc.")
