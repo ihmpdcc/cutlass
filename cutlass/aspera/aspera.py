@@ -64,9 +64,12 @@ def get_ascp_env(password):
     logger.debug("In get_ascp_env.")
 
     e = os.environ.copy()
-    if password != None:
-        logger.info("Setting ASPERA_SCP_PASS environment variable.")
-        e['ASPERA_SCP_PASS'] = password
+    if 'ASPERA_SCP_PASS' in e:
+        logger.info("Honoring previously set ASPERA_SCP_PASS environment variable.")
+    else:
+        if password != None:
+            logger.info("Setting ASPERA_SCP_PASS environment variable.")
+            e['ASPERA_SCP_PASS'] = password
 
     return e
 
@@ -75,12 +78,16 @@ def run_ascp(ascp_cmd, password):
     logger.debug("In run_ascp.")
 
     try:
-        p = subprocess.Popen(ascp_cmd, stdout=subprocess.PIPE,
+        logger.debug("Command: " + " ".join(ascp_cmd))
+        process = subprocess.Popen(ascp_cmd, stdout=subprocess.PIPE,
                              stdin=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              universal_newlines = True,
                              env = get_ascp_env(password))
-        (s_out, s_err) = p.communicate()
+
+        logger.info("Beginning transfer.")
+        (s_out, s_err) = process.communicate()
+        logger.info("Invocation of ascp complete.")
 
         if not re.match(r"Completed: \S+ bytes transferred in", s_out):
             if re.match(r"^.*failed to authenticate", s_err):
