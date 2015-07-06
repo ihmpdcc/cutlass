@@ -134,8 +134,8 @@ class Base(object):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Visit with no ID.")
-            raise Exception("Visit does not have an ID.")
+            self.logger.warn("Attempt to delete a node with no ID.")
+            raise Exception("Node does not have an ID.")
 
         visit_node_id = self._id
 
@@ -146,11 +146,11 @@ class Base(object):
         success = False
 
         try:
-            self.logger.info("Deleting Visit with OSDF ID %s." % visit_node_id)
+            self.logger.info("Deleting node with OSDF ID %s." % visit_node_id)
             session.get_osdf().delete_node(visit_node_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting Visit %s." +
+            self.logger.error("An error occurred when deleting node %s." +
                               "Reason: %s" % visit_node_id, e.strerror)
 
         return success
