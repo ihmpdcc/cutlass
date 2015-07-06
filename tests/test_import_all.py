@@ -29,6 +29,9 @@ class ImportTest(unittest.TestCase):
     def testImport16SRawSeqSet(self):
         self.failIf(SixteenSRawSeqSet is None)
 
+    def testImportWgsRawSeqSet(self):
+        self.failIf(SixteenSRawSeqSet is None)
+
     def testImport16STrimmedSeqSet(self):
         self.failIf(SixteenSTrimmedSeqSet is None)
 

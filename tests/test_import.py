@@ -99,6 +99,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSRawSeqSet is None)
 
+    def testImportWgsRawSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import WgsRawSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(WgsRawSeqSet is None)
+
     def testImport16STrimmedSeqSet(self):
         success = False
 
