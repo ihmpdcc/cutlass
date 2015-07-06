@@ -35,7 +35,7 @@ class SixteenSTrimmedSeqSet(Base):
         self._sequence_type = None
         self._size = None
         self._study = None
-        self._urls = None
+        self._urls = ['']
 
     def validate(self):
         self.logger.debug("In validate.")
@@ -208,12 +208,6 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.debug("In urls getter.")
 
         return self._urls
-
-    @urls.setter
-    def urls(self, urls):
-        self.logger.debug("In urls setter.")
-
-        self._urls = urls
 
     @staticmethod
     def required_fields():
