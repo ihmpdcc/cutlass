@@ -73,7 +73,7 @@ class WgsDnaPrep(Base):
             self.logger.error("Must have of 'prepared_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 
@@ -335,7 +335,7 @@ class WgsDnaPrep(Base):
                 success = True
             except Exception as e:
                 self.logger.error("An error occurred while inserting WgsDnaPrep %s." +
-                                  "Reason: %s" % self._name, e.strerror)
+                                  "Reason: %s" % self._id, e)
         else:
             prep_data = self._get_raw_doc()
 
