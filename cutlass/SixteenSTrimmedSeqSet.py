@@ -29,11 +29,9 @@ class SixteenSTrimmedSeqSet(Base):
         # These are particular to SixteenSTrimmedSeqSet objects
         self._checksums = None
         self._comment = None
-        self._exp_length = None
         self._format = None
         self._format_doc = None
         self._local_file = None
-        self._seq_model = None
         self._sequence_type = None
         self._size = None
         self._study = None
@@ -58,8 +56,8 @@ class SixteenSTrimmedSeqSet(Base):
         if self._local_file is None:
             problems.append("Local file is not yet set.")
 
-        if 'sequenced_from' not in self._links.keys():
-            problems.append("Must add a 'sequenced_from' link to a 16s_dna_prep.")
+        if 'computed_from' not in self._links.keys():
+            problems.append("Must add a 'computed_from' link to a 16s_raw_seq_set.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
         return problems
@@ -78,8 +76,8 @@ class SixteenSTrimmedSeqSet(Base):
             self.logger.error("Must set the local file of the sequence set.")
             valid = False
 
-        if 'sequenced_from' not in self._links.keys():
-            self.logger.error("Must have of 'sequenced_from' linkage.")
+        if 'computed_from' not in self._links.keys():
+            self.logger.error("Must have of 'computed_from' linkage.")
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -115,21 +113,6 @@ class SixteenSTrimmedSeqSet(Base):
             raise ValueError("comment must be a string.")
 
         self._comment = comment
-
-    @property
-    def exp_length(self):
-        self.logger.debug("In exp_length getter.")
-
-        return self._exp_length
-
-    @exp_length.setter
-    def exp_length(self, exp_length):
-        self.logger.debug("In exp_length setter.")
-
-        if type(exp_length) != int or exp_length < 0:
-            raise ValueError("The exp_length must a non-negative integer.")
-
-        self._exp_length = exp_length
 
     @property
     def format(self):
@@ -177,21 +160,6 @@ class SixteenSTrimmedSeqSet(Base):
         self._local_file = local_file
 
     @property
-    def seq_model(self):
-        self.logger.debug("In seq_model getter.")
-
-        return self._seq_model
-
-    @seq_model.setter
-    def seq_model(self, seq_model):
-        self.logger.debug("In seq_model setter.")
-
-        if type(seq_model) != str:
-            raise ValueError("seq_model must be a string.")
-
-        self._seq_model = seq_model
-
-    @property
     def sequence_type(self):
         self.logger.debug("In sequence_type getter.")
 
@@ -201,7 +169,7 @@ class SixteenSTrimmedSeqSet(Base):
     def sequence_type(self, sequence_type):
         self.logger.debug("In sequence_type setter.")
 
-        if type(seq_model) != str:
+        if type(sequence_type) != str:
             raise ValueError("sequence_type must be a string.")
 
         self._sequence_type = sequence_type
@@ -250,8 +218,8 @@ class SixteenSTrimmedSeqSet(Base):
     @staticmethod
     def required_fields():
         module_logger.debug("In required fields.")
-        return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "local_file", "seq_model", "size", "study", "tags", "urls")
+        return ("checksums", "comment", "format", "format_doc",
+                "local_file", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
         self.logger.debug("In _get_raw_doc.")
@@ -267,11 +235,10 @@ class SixteenSTrimmedSeqSet(Base):
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,
-                "exp_length": self._exp_length,
                 "format": self._format,
                 "format_doc": self._format_doc,
-                "seq_model": self.seq_model,
                 "size": self._size,
+                "study": self._study,
                 "urls": self._urls,
                 'tags': self._tags
             }
@@ -319,10 +286,8 @@ class SixteenSTrimmedSeqSet(Base):
         # The attributes that are particular to SixteenSTrimmedSeqSet documents
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
         seq_set._format = seq_set_data['meta']['format']
         seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
@@ -347,8 +312,8 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         study = self._study
-        remote_path = "/".join("/" + study, "16s_trimmed_seq_set",
-                               os.path.basename(self._local_file))
+        remote_path = "/".join(["/" + study, "16s_trimmed_seq_set",
+                               os.path.basename(self._local_file)])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         success = False
@@ -364,7 +329,7 @@ class SixteenSTrimmedSeqSet(Base):
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return success
 
-        logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
+        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
                     (self._local_file, aspera_server))
 
         if self.id is None:
@@ -398,6 +363,6 @@ class SixteenSTrimmedSeqSet(Base):
                 self.logger.error("An error occurred while updating " +
                                   __name__ + " %s. Reason: %s" % self._d, e)
 
-        logger.debug("Returning " + success)
+        self.logger.debug("Returning " + str(success))
 
         return success
