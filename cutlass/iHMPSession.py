@@ -6,7 +6,7 @@ import logging
 class iHMPSession(object):
     _single = None
 
-    def __init__(self, username, password, server="localhost", port=8123):
+    def __init__(self, username, password, server="osdf.ihmpdcc.org", port=8123):
         self._username = username
         self._password = password
         self._server = server
