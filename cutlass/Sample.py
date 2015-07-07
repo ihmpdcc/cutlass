@@ -4,13 +4,14 @@ import json
 import logging
 from iHMPSession import iHMPSession
 from mixs import MIXS, MixsException
+from Base import Base
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Sample(object):
+class Sample(Base):
     namespace = "ihmp"
 
     def __init__(self):
@@ -25,33 +26,6 @@ class Sample(object):
         self._mixs = {}
         self._fma_body_site = None
         self._links = {}
-
-    @property
-    def id(self):
-        self.logger.debug("In id getter.")
-        return self._id
-
-    @id.setter
-    def id(self, node_id):
-        self._id = node_id
-
-    def _set_id(self, node_id):
-        self.logger.debug("In private _set_id.")
-        self._id = node_id
-
-    @property
-    def version(self):
-        self.logger.debug("In version getter.")
-        return self._version
-
-    @version.setter
-    def version(self, version):
-        self.logger.debug("In version setter.")
-
-        if version <= 0:
-            raise ValueError("Invalid version. Must be a postive integer.")
-
-        self._version = version
 
     @property
     def body_site(self):
@@ -91,37 +65,6 @@ class Sample(object):
             self._mixs = mixs
         else:
             raise MixsException("Invalid MIXS data detected.")
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def links(self):
-        self.logger.debug("In links getter.")
-        return self._links
-
-    @links.setter
-    def links(self, links):
-        self.logger.debug("In links setter.")
-        self._links = links
-
-    @tags.setter
-    def tags(self, tags):
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
-
-    def add_tag(self, tag):
-        self.logger.debug("In add_tag. New tag: %s" % tag)
-        if tag not in self._tags:
-            self._tags.append(tag)
-        else:
-            raise ValueError("Tag already present for this subject")
-
-    def remove_tag(self, tag):
-        self._tags.remove(tag)
 
     @staticmethod
     def required_fields():
@@ -236,31 +179,6 @@ class Sample(object):
         module_logger.debug("Returning loaded Sample.")
         return sample
 
-    def delete(self):
-        self.logger.debug("In delete.")
-
-        if self._id is None:
-            self.logger.warn("Attempt to delete a Sample with no ID.")
-            raise Exception("Sample does not have an ID.")
-
-        sample_id = self._id
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        # Assume failure
-        success = False
-
-        try:
-            self.logger.info("Deleting Sample with ID %s." % sample_id)
-            session.get_osdf().delete_node(sample_id)
-            success = True
-        except Exception as e:
-            self.logger.error("An error occurred when deleting Sample %s." +
-                              "Reason: %s" % sample_id, e.strerror)
-
-        return success
-
     def search(self, dictionary):
         #query using this dictionary
         #formulate the query in this location
@@ -302,16 +220,3 @@ class Sample(object):
             sample_doc['meta']['supersite'] = self._supersite
 
         return sample_doc
-
-    def to_json(self, indent=4):
-        self.logger.debug("In to_json.")
-
-        subject_doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(subject_doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str
