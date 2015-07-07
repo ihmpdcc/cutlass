@@ -20,3 +20,4 @@ recursive-include tests *.py
 include tests/__init__.py
 include setup.py
 include README.md
+recursive-include examples *.py
