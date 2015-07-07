@@ -9,6 +9,8 @@ include cutlass/Sample.py
 include cutlass/SixteenSDnaPrep.py
 include cutlass/SixteenSRawSeqSet.py
 include cutlass/SixteenSTrimmedSeqSet.py
+include cutlass/WgsDnaPrep.py
+include cutlass/WgsRawSeqSet.py
 include cutlass/mimarks.py
 include cutlass/mims.py
 include cutlass/mixs.py
