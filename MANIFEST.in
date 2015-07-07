@@ -16,10 +16,7 @@ include cutlass/mims.py
 include cutlass/mixs.py
 include cutlass/aspera/__init__.py
 include cutlass/aspera/aspera.py
-include cutlass/aspera/round_trip_test.py
-include tests/test_aspera.py
-include tests/test_project.py
-include tests/test_import.py
-include tests/test_import_all.py
+recursive-include tests *.py
+include tests/__init__.py
 include setup.py
 include README.md
