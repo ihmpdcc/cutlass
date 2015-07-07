@@ -88,7 +88,7 @@ if test_prep.is_valid():
         if deletion_success:
             print("Deleted prep with ID %s" % prep_id)
         else:
-            print("Deletion of prep %s failed." % prep_id)
+           print("Deletion of prep %s failed." % prep_id)
     else:
         print("Save failed")
 else:

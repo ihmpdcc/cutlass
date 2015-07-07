@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import logging
-from Subject import Subject
-from iHMPSession import iHMPSession
 import json
+import logging
+from cutlass import Subject
+from cutlass import iHMPSession
 from pprint import pprint
 
 username = "test"
@@ -22,6 +22,8 @@ test_subject.add_tag("and_another")
 
 test_subject.links =  { "participates_in" : [ "610a4911a5ca67de12cdc1e4b4006f5d" ] }
 
+print(test_subject.to_json())
+
 if test_subject.is_valid():
     print("Valid!")
 
@@ -37,7 +39,7 @@ if test_subject.is_valid():
 
         deletion_success = test_subject.delete()
 
-        if deletion_success:
+       if deletion_success:
             print("Deleted subject with ID %s" % subject_id)
         else:
             print("Deletion of subject %s failed." % subject_id)

@@ -5,6 +5,7 @@ import logging
 from cutlass import SixteenSRawSeqSet
 from cutlass import iHMPSession
 from pprint import pprint
+import tempfile
 import sys
 
 username = "test"
@@ -25,7 +26,13 @@ seq_set.format_doc = "url"
 seq_set.seq_model = "a machine"
 seq_set.sequence_type = "nucleotide"
 seq_set.size = 3000
-seq_set.urls = [ "a", "b" ]
+seq_set.study = "prediabetes"
+
+print("Creating a temp file for example/testing purposes.")
+temp_file = tempfile.NamedTemporaryFile(delete=False).name
+print("Local file: %s" % temp_file)
+
+seq_set.local_file = temp_file
 
 seq_set.links = { "sequenced_from": [ "610a4911a5ca67de12cdc1e4b4014133" ] }
 

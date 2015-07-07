@@ -57,7 +57,7 @@ if proj.is_valid():
 
         deletion_success = proj.delete()
 
-        if deletion_success:
+       if deletion_success:
             print("Deleted project with ID %s" % project_id)
         else:
             print("Deletion of project %s failed." % project_id)

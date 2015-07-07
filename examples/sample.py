@@ -2,9 +2,9 @@
 
 import json
 import logging
-from log import applog
 from cutlass import Sample
 from cutlass import iHMPSession
+from pprint import pprint
 
 username = "test"
 password = "test"
@@ -13,8 +13,6 @@ session = iHMPSession(username, password)
 
 print("Required fields:")
 print(Sample.required_fields())
-
-applog.debug('Creating sample.')
 
 sample = Sample()
 
@@ -47,8 +45,6 @@ sample.add_tag("another")
 sample.add_tag("and_another")
 sample.links = { "collected_during": [ "610a4911a5ca67de12cdc1e4b400f121" ] }
 
-applog.debug("Test Sample created.")
-
 print(sample.to_json(indent=2))
 
 if sample.is_valid():
@@ -75,5 +71,4 @@ if sample.is_valid():
 else:
     print("Invalid...")
     validation_errors = sample.validate()
-    from pprint import pprint
     pprint(validation_errors)

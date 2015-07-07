@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 import json
 import logging
@@ -12,39 +12,42 @@ password = "test"
 
 session = iHMPSession(username, password)
 
-mimarks = {
-      "adapters": "blah",
-      "biome": "blah",
-      "collection_date": "blah",
-      "experimental_factor": "blah",
-      "feature": "blah",
-      "findex": "blah",
-      "geo_loc_name": "blah",
-      "investigation_type": "blah",
-      "isol_growth_condt": "blah",
-      "lat_lon": "blah",
-      "lib_const_meth": "blah",
-      "lib_reads_seqd": "blah",
-      "lib_size": 500,
-      "lib_vector": "blah",
-      "material": "blah",
-      "nucl_acid_amp": "blah",
-      "nucl_acid_ext": "blah",
-      "pcr_primers": "blah",
-      "pcr_cond": "blah",
-      "project_name": "blah",
-      "rel_to_oxygen": "blah",
-      "rindex": "blah",
-      "samp_collect_device": "blah",
-      "samp_mat_process": "blah",
-      "samp_size": "blah",
-      "seq_meth": "blah",
-      "sop": ["a", "b", "c"],
-      "source_mat_id": ["a", "b", "c"],
-      "submitted_to_insdc": True,
-      "target_gene": "blah",
-      "target_subfragment": "blah",
-      "url": ["a", "b", "c"]
+mims = {
+        "adapters": "test",
+        "annot_source": "test",
+        "assembly": "test",
+        "assembly_name": "test",
+        "biome": "test",
+        "collection_date": "test",
+        "env_package": "test",
+        "extrachrom_elements": "test",
+        "encoded_traits": "test",
+        "experimental_factor": "test",
+        "feature": "test",
+        "findex": "test",
+        "finishing_strategy": "test",
+        "geo_loc_name": "test",
+        "investigation_type": "test",
+        "lat_lon": "test",
+        "lib_const_meth": "test",
+        "lib_reads_seqd": "test",
+        "lib_screen": "test",
+        "lib_size": 2000,
+        "lib_vector": "test",
+        "material": "test",
+        "nucl_acid_amp": "test",
+        "nucl_acid_ext": "test",
+        "project_name": "test",
+        "rel_to_oxygen": "test",
+        "rindex": "test",
+        "samp_collect_device": "test",
+        "samp_mat_process": "test",
+        "samp_size": "test",
+        "seq_meth": "test",
+        "sop": ["a", "b", "c"],
+        "source_mat_id": ["a", "b", "c"],
+        "submitted_to_insdc": True,
+        "url": ["a", "b", "c"]
     }
 
 print("Required fields: ")
@@ -56,7 +59,7 @@ test_prep.comment = "test comment. Hello world!"
 test_prep.frag_size = 2
 test_prep.lib_layout = "test lib_layout"
 test_prep.lib_selection = "test lib_selection"
-test_prep.mimarks = mimarks
+test_prep.mims = mims
 test_prep.storage_duration = 3
 test_prep.sequencing_center = "test center"
 test_prep.sequencing_contact = "test contact"
