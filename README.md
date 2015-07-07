@@ -108,19 +108,19 @@ written in Python, we use the unittest module. To invoke any of the
 tests, we recommend that you first change directories into the base
 of the cutlass code
 
-    <pre>
-    $ cd cutlass
-    </pre>
+  <pre>
+  $ cd cutlass
+  </pre>
 
 Then, to invoke the a single test script (in this case test_project.py can
 be found in the tests/ directory):
 
-    <pre>
-    $ python -m unittest tests.test_project
-    </pre>
+  <pre>
+  $ python -m unittest tests.test_project
+  </pre>
 
 To autodiscover all tests and run them all:
 
-    <pre>
-    $ python -m unittest discover
-    </pre>
+  <pre>
+  $ python -m unittest discover
+  </pre>
