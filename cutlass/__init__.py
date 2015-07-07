@@ -2,6 +2,7 @@ from .iHMPSession import iHMPSession
 from .Project import Project
 from .Study import Study
 from .Visit import Visit
+from .Sample import Sample
 from .Subject import Subject
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .WgsDnaPrep import WgsDnaPrep
