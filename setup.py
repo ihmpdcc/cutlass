@@ -13,7 +13,7 @@ setup(name='cutlass',
   author_email='victor73@github.com',
   url='http://ihmpdcc.org',
   license='MIT',
-  packages=['cutlass'],
+  packages=['cutlass','cutlass.aspera'],
   requires=['osdf'],
   classifiers=[
     "Development Status :: 4 - Beta",
