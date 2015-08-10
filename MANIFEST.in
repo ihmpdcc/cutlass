@@ -19,5 +19,7 @@ include cutlass/aspera/aspera.py
 recursive-include tests *.py
 include tests/__init__.py
 include setup.py
+include CHANGES
+include LICENSE
 include README.md
 recursive-include examples *.py
