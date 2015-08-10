@@ -12,8 +12,9 @@ module_logger.addHandler(logging.NullHandler())
 
 class Base(object):
     """
-    The parent class from which all objects inherit specific features from. This class contains
-    all the fields required to all sub-classes (ID, version, links, and tags).
+    The parent class from which all objects inherit specific features from.
+    This class contains all the fields required to all sub-classes
+    (ID, version, links, and tags).
 
     Attributes:
         namespace (str): The namespace this class will use in the OSDF instance
@@ -21,8 +22,9 @@ class Base(object):
     namespace = "ihmp"
 
     """
-    Constructor for the Base class. This should not be called from the user, so the user should instantiate
-    an instance of the Base class. This initializes the OSDF ID, Version, Links, and Tags for all sub-classes
+    Constructor for the Base class. This should not be called from the
+    user, so the user should instantiate an instance of the Base class. This
+    initializes the OSDF ID, Version, Links, and Tags for all sub-classes
 
     Args:
         None
@@ -39,14 +41,17 @@ class Base(object):
 
     @property
     def id(self):
-        """ str: An alpha numeric indicating the specific ID assigned to the document in the OSDF instance """
+        """
+        str: Analpha numeric indicating the specific ID assigned to the
+        document in the OSDF instance
+        """
         self.logger.debug("In id getter.")
         return self._id
 
     def _set_id(self, node_id):
         """
-        The setter for the OSDF ID. This is a private method, so the user should not call this.
-        In property form.
+        The setter for the OSDF ID. This is a private method, so the user
+        should not call this. In property form.
 
         Args:
             node_id (str): The new node ID to assign to this instance
