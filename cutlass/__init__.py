@@ -9,7 +9,7 @@ from .WgsDnaPrep import WgsDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .WgsRawSeqSet import WgsRawSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
-from .cutlass.aspera import aspera
+from .aspera import aspera
 from .mixs import MIXS, MixsException
 from .mims import MIMS, MimsException
 from .mimarks import MIMARKS, MimarksException
