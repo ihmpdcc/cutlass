@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 import unittest
 import json
 import sys
@@ -7,6 +6,8 @@ import sys
 from cutlass import iHMPSession
 from cutlass import Project
 from cutlass import MIXS, MixsException
+from test_config import BaseConfig
+
 session = iHMPSession("foo", "bar")
 
 class ProjectTest(unittest.TestCase):
@@ -245,6 +246,92 @@ class ProjectTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
+        
+    def testSaveProject(self):
+        #attempt to save the project at all points before and after adding the required fields
+        project = session.create_project()
+        #self.assertFalse(project.save(), "Project not saved successfully, no required fields")
+        project.name = "Test Project"
+        #self.assertFalse(project.save(), "Project not saved successfully, missing description, tags, and MIXS")
+        project.description = "Test description"
+        #self.assertFalse(project.save(), "Project not saved successfully, missing tags and MIXS")
+        project.add_tag("First test tag")
+        fields = {
+            "biome": "ASDSADSA",
+            "body_product": "ASDFASF",
+            "collection_date": "SADSAGRGFEWR",
+            "env_package": "HJRJRE",
+            "feature": "EKPFOMEPW",
+            "geo_loc_name": "AEKEPDMPEWDE",
+            "lat_lon": "EPDEWIPDFMEW",
+            "material": "AMDPISACMSA",
+            "project_name": "ASDMSAPDSA",
+            "rel_to_oxygen": "WQPRJEP",
+            "samp_collect_device": "#@)D#J*)",
+            "samp_mat_process": "ASDSA",
+            "samp_size": "DF)GIP$R$GMPRWG",
+            "source_mat_id": ['asdfasfds', 'epowfjiegw']
+        }        
+        self.assertFalse(project.save(), "Project not saved successfully, missing MIXS")
+        project.mixs = fields
+        
+        #make sure project does not delete if it does not exist 
+        with self.assertRaises(Exception):
+            project.delete()
+        self.assertTrue(project.save() == True, "project saved successfully")
+        
+        return project.id
+    
+    def testLoadSaveDeleteProject(self):
+        #attempt to save the project at all points before and after adding the required fields
+        project = session.create_project()
+        self.assertFalse(project.save(), "Project not saved successfully, no required fields")
+        project.name = "Test Project"
+        self.assertFalse(project.save(), "Project not saved successfully, missing description, tags, and MIXS")
+        project.description = "Test description"
+        self.assertFalse(project.save(), "Project not saved successfully, missing tags and MIXS")
+        project.add_tag("First test tag")
+        fields = {
+            "biome": "ASDSADSA",
+            "body_product": "ASDFASF",
+            "collection_date": "SADSAGRGFEWR",
+            "env_package": "HJRJRE",
+            "feature": "EKPFOMEPW",
+            "geo_loc_name": "AEKEPDMPEWDE",
+            "lat_lon": "EPDEWIPDFMEW",
+            "material": "AMDPISACMSA",
+            "project_name": "ASDMSAPDSA",
+            "rel_to_oxygen": "WQPRJEP",
+            "samp_collect_device": "#@)D#J*)",
+            "samp_mat_process": "ASDSA",
+            "samp_size": "DF)GIP$R$GMPRWG",
+            "source_mat_id": ['asdfasfds', 'epowfjiegw']
+        }        
+        self.assertFalse(project.save(), "Project not saved successfully, missing MIXS")
+        project.mixs = fields
+        
+        #make sure project does not delete if it does not exist 
+        with self.assertRaises(Exception):
+            project.delete()
+        self.assertTrue(project.save() == True, "project saved successfully")
+        
+        #load the project that was just saved from the OSDF instance        
+        project_loaded = session.create_project()
+        project_loaded = project_loaded.load(project.id)
+        
+        #check all fields were saved and loaded successfully 
+        self.assertEqual(project.name, project_loaded.name, "Project name not saved & loaded successfully")
+        self.assertEqual(project.description, project_loaded.description, "Project description not saved & loaded successfully")
+        self.assertEqual(project.tags[0], project_loaded.tags[0], "Project tags not saved & loaded successfully")
+        self.assertEqual(project.mixs['biome'], project_loaded.mixs['biome'], "Project MIXS not saved & loaded successfully")
+        
+        #project is deleted successfully 
+        self.assertTrue(project.delete(), "Project was not deleted successfully")        
+        
+        #the project of the initial ID should not load successfully 
+        load_test = session.create_project()
+        with self.assertRaises(Exception):
+            load_test = load_test.load(project.id)
 
 if __name__ == '__main__':
     unittest.main()

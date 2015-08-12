@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 # Unit tests (sort of - has some dependencies on the environment!)
-
 import unittest
 import aspera
 
