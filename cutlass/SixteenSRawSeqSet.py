@@ -14,24 +14,24 @@ module_logger.addHandler(logging.NullHandler())
 
 class SixteenSRawSeqSet(Base):
     """
-    The class encapsulating the project data for an iHMP instance.
-    This class contains all the fields required to save a project object in
-    the OSDF instance.
-    
+    The class encapsulates the SixteenSRawSeqSet data for the iHMP project.
+    It contains all the fields required to save a SixteenSRawSeqSet object in
+    the iHMP OSDF instance.
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
-    
+
     aspera_server = "aspera.ihmpdcc.org"
 
     def __init__(self):
         """
         Constructor for the SixteenSRawSeqSet class. This initializes the fields
-        specific to the SixteenSRawSeqSet class, and inherits from the Base class. 
-    
+        specific to the SixteenSRawSeqSet class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -58,16 +58,14 @@ class SixteenSRawSeqSet(Base):
 
     def validate(self):
         """
-        Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required        
-        fields for that specific object must be present.
-        
+        Validates the current object's data against the schema in the OSDF instance.
+
         Args:
             None
-            
+
         Returns:
-            A list of strings, where each string is the error that the
-            validation raised during OSDF validation 
+            A list of strings, where each string is a validation error that the
+            OSDF instance identified.
         """
         self.logger.debug("In validate.")
 
@@ -100,12 +98,12 @@ class SixteenSRawSeqSet(Base):
         """
         Validates the current object's data/JSON against the current schema
         in the OSDF instance for the specific object. However, unlike
-        validates(), this method does not provide exact error messages,
-        it states if the validation was successful or not.
-        
+        validate(), this method does not provide exact error messages,
+        it simply returns whether the data is valid or not.
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -136,7 +134,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def checksums(self):
-        """ str: One or more checksums used to ensure file integrity. """
+        """
+        str: One or more checksums used to ensure file integrity.
+        """
         self.logger.debug("In checksums getter.")
 
         return self._checksums
@@ -145,12 +145,12 @@ class SixteenSRawSeqSet(Base):
     def checksums(self, checksums):
         """
         The setter for the SixteenSRawSeqSet checksums.
-        
+
         Args:
             checksums (dict): The checksums for the SixteenSRawSeqSet.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In checksums setter.")
 
@@ -170,19 +170,19 @@ class SixteenSRawSeqSet(Base):
     def comment(self, comment):
         """
         The setter for the SixteenSRawSeqSet comment. The comment must be a string,
-        and less than 512 characters. 
-        
+        and less than 512 characters.
+
         Args:
-            comment (str): The new comment to add to the string. 
-            
+            comment (str): The new comment to add to the string.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In comment setter.")
 
         if type(comment) != str:
             raise ValueError("comment must be a string.")
-    
+
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
 
@@ -190,8 +190,10 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def exp_length(self):
-        """ int: The number of raw bases or color space calls expected for the read,
-            includes both mate pairs and all technical portions. """
+        """
+        int: The number of raw bases or color space calls expected for the read,
+        includes both mate pairs and all technical portions.
+        """
         self.logger.debug("In exp_length getter.")
 
         return self._exp_length
@@ -200,12 +202,12 @@ class SixteenSRawSeqSet(Base):
     def exp_length(self, exp_length):
         """
         The setter for the SixteenSRawSeqSet exp length.
-        
+
         Args:
-            exp_length (int): The new exp_length for the current instance. 
-            
+            exp_length (int): The new exp_length for the current instance.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In exp_length setter.")
         if exp_length < 0:
@@ -215,7 +217,7 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """ 
+        """ str: The file format of the sequence file """
         self.logger.debug("In format getter.")
 
         return self._format
@@ -223,25 +225,25 @@ class SixteenSRawSeqSet(Base):
     @format.setter
     def format(self, format_str):
         """
-        The setter for the SixteenSRawSeqSet format. This must be either fasta or fastq. 
-        
+        The setter for the SixteenSRawSeqSet format. This must be either fasta or fastq.
+
         Args:
-            format_str (str): The new format string for the current object. 
-            
+            format_str (str): The new format string for the current object.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In format setter.")
 
         if type(format_str) != str:
             raise ValueError("format must be a string.")
-        
+
         formats = ["fasta", "fastq"]
         if format_str in formats:
             self._format = format_str
         else:
-            raise Exception("Format must be fasta or fastq only.")
-        
+            raise Exception("Format must be either 'fasta' or 'fastq'.")
+
     @property
     def format_doc(self):
         """ str: URL for documentation of file format. """
@@ -252,13 +254,13 @@ class SixteenSRawSeqSet(Base):
     @format_doc.setter
     def format_doc(self, format_doc):
         """
-        The setter for the SixteenSRawSeqSet format doc. 
-        
+        The setter for the SixteenSRawSeqSet format doc.
+
         Args:
-            format_doc (str): The new format_doc for the current object. 
-            
+            format_doc (str): The new format_doc for the current object.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In format_doc setter.")
 
@@ -269,7 +271,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """ 
+        """
+        str: The path to the local file to upload to the iHMP DCC.
+        """
         self.logger.debug("In local_file getter.")
 
         return self._local_file
@@ -277,14 +281,14 @@ class SixteenSRawSeqSet(Base):
     @local_file.setter
     def local_file(self, local_file):
         """
-        The setter for the SixteenSRawSeqSet local file. 
-        
+        The setter for the SixteenSRawSeqSet local file.
+
         Args:
             local_file (str): The URL to the local file that should be uploaded to the
-                              server. 
-            
+                              server.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In local_file setter.")
 
@@ -295,7 +299,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def seq_model(self):
-        """ str: Sequencing instrument model. """ 
+        """
+        str: Sequencing instrument model.
+        """
         self.logger.debug("In seq_model getter.")
 
         return self._seq_model
@@ -303,13 +309,13 @@ class SixteenSRawSeqSet(Base):
     @seq_model.setter
     def seq_model(self, seq_model):
         """
-        The setter for the SixteenSRawSeqSet seq model. 
-        
+        The setter for the SixteenSRawSeqSet seq model.
+
         Args:
-            seq_model (str): The new seq model. 
-            
+            seq_model (str): The new seq model.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In seq_model setter.")
 
@@ -320,7 +326,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def sequence_type(self):
-        """ str: Specifies whether the file contains peptide or nucleotide data. """ 
+        """
+        str: Specifies whether the file contains peptide or nucleotide data.
+        """
         self.logger.debug("In sequence_type getter.")
 
         return self._sequence_type
@@ -329,19 +337,19 @@ class SixteenSRawSeqSet(Base):
     def sequence_type(self, sequence_type):
         """
         The setter for the SixteenSRawSeqSet sequence type. This must be either
-        peptide or nucleotide. 
-        
+        peptide or nucleotide.
+
         Args:
-            sequence_type (str): The new sequence type. 
-            
+            sequence_type (str): The new sequence type.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In sequence_type setter.")
 
         if type(sequence_type) != str:
             raise ValueError("sequence_type must be a string.")
-        
+
         types = ["peptide", "nucleotide"]
         if sequence_type in types:
             self._sequence_type = sequence_type
@@ -350,7 +358,7 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """ 
+        """ int: The size of the file in bytes. """
         self.logger.debug("In size getter.")
 
         return self._size
@@ -358,13 +366,13 @@ class SixteenSRawSeqSet(Base):
     @size.setter
     def size(self, size):
         """
-        The setter for the SixteenSRawSeqSet size. 
-        
+        The setter for the SixteenSRawSeqSet size.
+
         Args:
-            size (int): The size of the seq set. 
-            
+            size (int): The size of the seq set.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In size setter.")
         if size < 0:
@@ -374,7 +382,7 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """ 
+        """ str: One of the 3 studies that are part of the iHMP. """
         self.logger.debug("In study getter.")
 
         return self._study
@@ -382,23 +390,23 @@ class SixteenSRawSeqSet(Base):
     @study.setter
     def study(self, study):
         """
-        The setter for the SixteenSRawSeqSet study. This is restricted to be either
-        preg_preterm, ibd, or prediabetes. 
-        
+        The setter for the SixteenSRawSeqSet study. This is restricted to one
+        of preg_preterm, ibd, or prediabetes.
+
         Args:
-            study (str): The study of the seq set. 
-            
+            study (str): The study of the seq set.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In study setter.")
 
         studies = ["preg_preterm","ibd","prediabetes"]
-        
+
         if type(study) != str:
             raise ValueError("study must be a string.")
-        
-        if study in studies: 
+
+        if study in studies:
             self._study = study
         else:
             raise Exception("Not a valid study")
@@ -406,14 +414,14 @@ class SixteenSRawSeqSet(Base):
     @property
     def urls(self):
         """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """ 
+                   http, ftp, fasp, etc... """
         self.logger.debug("In urls getter.")
 
         return self._urls
-    
+
     def add_url(self, url):
         self.logger.debug("In the add URL")
-        
+
         if url not in self._urls:
             self._urls.append(url)
         else:
@@ -422,8 +430,8 @@ class SixteenSRawSeqSet(Base):
     @staticmethod
     def required_fields():
         """
-        A static method. The required fields for the class.
-        
+        A static method. Returns a list of the required fields for the class.
+
         Args:
             None
         Returns:
@@ -440,10 +448,10 @@ class SixteenSRawSeqSet(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -487,14 +495,13 @@ class SixteenSRawSeqSet(Base):
 
     def to_json(self, indent=4):
         """
-        Converts the raw JSON doc (the dictionary representation) to a printable
-        JSON string.
-        
+        Converts the object to JSON string representation.
+
         Args:
-            indent (int): The indent for each successive line of the JSON string output
-        
+            indent (int): The indent for each successive line of the JSON string
+
         Returns:
-            A printable JSON string 
+            A JSON string (str)
         """
         self.logger.debug("In to_json.")
 
@@ -521,12 +528,12 @@ class SixteenSRawSeqSet(Base):
         will be logged stating the object was not deleted. If the ID is set, and
         exists in the OSDF instance, then the object will be deleted from the
         OSDF instance, and this object must be re-saved in order to use it again.
-        
+
         Args:
             None
-            
+
         Returns:
-            True upon successful deletion, False otherwise. 
+            True upon successful deletion, False otherwise.
         """
         self.logger.debug("In delete.")
 
@@ -555,15 +562,16 @@ class SixteenSRawSeqSet(Base):
     @staticmethod
     def load(seq_set_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
-        
+        Loads the data for the specified ID from OSDF instance.  If the
+        provided ID does not exist, then an error message is provided stating
+        the project does not exist.
+
         Args:
-            seq_set_id (str): The OSDF ID for the document to load.
-        
+            seq_set_id (str): The OSDF ID for the SixteenSRawSeqSet to load.
+
         Returns:
-            A SixteenSRawSeqSet object with all the available OSDF data loaded into it. 
+            A SixteenSRawSeqSet object with all the available OSDF data loaded
+            into it.
         """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
 
@@ -603,20 +611,20 @@ class SixteenSRawSeqSet(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
-        
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function, so if the data
+        is invalid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon success, will be assigned an alphanumeric ID. Also, the version is
+        updated as the data is saved in the OSDF instance.
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
 
