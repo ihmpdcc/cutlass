@@ -9,7 +9,6 @@ import sys
 from cutlass import iHMPSession
 from cutlass import WgsDnaPrep
 from cutlass import MIMS, MimsException
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 

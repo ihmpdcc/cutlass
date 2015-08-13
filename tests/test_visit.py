@@ -7,7 +7,6 @@ import sys
 from cutlass import iHMPSession
 from cutlass import Visit
 from cutlass import MIXS, MixsException
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 

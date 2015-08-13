@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import unittest
 from cutlass import MIMS
 
@@ -6,9 +7,11 @@ class MimsTest(unittest.TestCase):
     def testRequiredFields(self):
         required = MIMS.required_fields()
 
-        self.assertEqual(type(required), tuple, "required_fields() returns a list.")
+        self.assertEqual(type(required), tuple,
+                         "required_fields() returns a list.")
 
-        self.assertTrue(len(required) > 0, "required_fields() return is not empty.")
+        self.assertTrue(len(required) > 0,
+                        "required_fields() return is not empty.")
 
     def testInsufficientData(self):
         too_little = { "adapters": "test_adapters" }
@@ -106,3 +109,6 @@ class MimsTest(unittest.TestCase):
         valid = MIMS.check_dict(just_right)
 
         self.assertTrue(valid, "True result for valid data.")
+
+if __name__ == '__main__':
+    unittest.main()

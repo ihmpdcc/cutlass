@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Unit tests (sort of - has some dependencies on the environment!)
 import unittest
 import aspera
 
-class AsperaTestCase (unittest.TestCase):
+class AsperaTestCase(unittest.TestCase):
 
     # ------------------------------------------------
     # version_cmp
@@ -33,7 +33,7 @@ class AsperaTestCase (unittest.TestCase):
     # valid path--to something other than ascp--is passed in - should raise an exception
     def test_get_ascp_version_path_is_something_else(self):
         self.assertRaises(Exception, aspera.get_ascp_version, "ls")
-        
+
     # valid path - should return something, assuming ascp is installed and in the path
     def test_get_ascp_version_path_is_valid(self):
         ver = aspera.get_ascp_version("ascp")

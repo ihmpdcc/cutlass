@@ -1,18 +1,17 @@
+#!/usr/bin/env python
+
 import unittest
 import json
 import sys
 
-
 from cutlass import iHMPSession
 from cutlass import Sample
 from cutlass import MIXS, MixsException
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 
-#do it this way with inheritance? Or do it with just 'unittest.TestCase'?
 class SampleTest(unittest.TestCase):
-    
+
     def testImport(self):
         success = False
         try:
@@ -37,7 +36,7 @@ class SampleTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(sample is None)
-    
+
     def testFmaBodySite(self):
         sample = session.create_sample()
         success = False
@@ -51,7 +50,11 @@ class SampleTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use 'fma_body_site' setter.")
 
-        self.assertEqual(sample.fma_body_site, fma_body_site, "Property getter for 'fma_body_site' works.")
+        self.assertEqual(
+                sample.fma_body_site,
+                fma_body_site,
+                "Property getter for 'fma_body_site' works."
+                )
 
     def testFmaBodySiteInt(self):
         sample = session.create_sample()
@@ -64,46 +67,54 @@ class SampleTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             sample.fma_body_site = [ "a", "b", "c" ]
-    
+
     def testBodySiteIllegal(self):
         sample = session.create_sample()
         with self.assertRaises(Exception):
             sample.body_site = "abhishek"
-            
+
     def testBodySiteLegal(self):
         sample = session.create_sample()
         success = False
         body_site = "wound"
-        try: 
+        try:
             sample.body_site = body_site
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the body_site setter")
-        
-        self.assertEqual(sample.body_site, body_site, "Property getter for 'body_site' works.")
-        
+
+        self.assertEqual(
+                sample.body_site,
+                body_site,
+                "Property getter for 'body_site' works."
+                )
+
     def testSupersiteIllegal(self):
         sample = session.create_sample()
-        
+
         with self.assertRaises(Exception):
             sample.supersite = "hear"
-            
+
     def testSupersiteLegal(self):
         sample = session.create_sample()
         success = False
         supersite = "heart"
-        try: 
+        try:
             sample.supersite = supersite
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the supersite setter")
-        
-        self.assertEqual(sample.supersite, supersite, "Property getter for 'supersite' works.")
-    
+
+        self.assertEqual(
+                sample.supersite,
+                supersite,
+                "Property getter for 'supersite' works."
+                )
+
     def testToJson(self):
         sample = session.create_sample()
         success = False
@@ -129,14 +140,18 @@ class SampleTest(unittest.TestCase):
         except:
             pass
 
-        self.assertTrue(parse_success, "to_json() did not throw an exception.")
-        self.assertTrue(sample_data is not None, "to_json() returned parsable JSON.")
+        self.assertTrue(parse_success,
+                        "to_json() did not throw an exception.")
+        self.assertTrue(sample_data is not None,
+                        "to_json() returned parsable JSON.")
 
         self.assertTrue('meta' in sample_data, "JSON has 'meta' key in it.")
 
         self.assertEqual(sample_data['meta']['fma_body_site'],
-                         fma_body_site, "'fma_body_site' in JSON had expected value.")
-        
+                         fma_body_site,
+                         "'fma_body_site' in JSON had expected value."
+                         )
+
     def testId(self):
         sample = session.create_sample()
 
@@ -255,17 +270,25 @@ class SampleTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
-        
+
     def testLoadSaveDeleteSample(self):
-        #attempt to save the sample at all points before and after adding the required fields
+        # Attempt to save the sample at all points before and after adding
+        # the required fields
         sample = session.create_sample()
-        self.assertFalse(sample.save(), "Sample not saved successfully, no required fields")
+        self.assertFalse(
+                sample.save(),
+                "Sample not saved successfully, no required fields"
+                )
+
         sample.fma_body_site = "Test FMA BODY SITE "
-        
-        self.assertFalse(sample.save(), "Sample not saved successfully, missing fma_body_site, tags, and MIXS")
-        
+
+        self.assertFalse(
+            sample.save(),
+            "Sample not saved successfully, missing fma_body_site, tags, and MIXS"
+            )
+
         sample.links = {"collected_during":[]}
-        
+
         sample.add_tag("First test tag")
         fields = {
             "biome": "ASDSADSA",
@@ -282,32 +305,36 @@ class SampleTest(unittest.TestCase):
             "samp_mat_process": "ASDSA",
             "samp_size": "DF)GIP$R$GMPRWG",
             "source_mat_id": ['asdfasfds', 'epowfjiegw']
-        }        
-        self.assertFalse(sample.save(), "Sample not saved successfully, missing MIXS")
+        }
+        self.assertFalse(sample.save(),
+                         "Sample not saved successfully, missing MIXS")
         sample.mixs = fields
-        
-        #make sure sample does not delete if it does not exist 
+
+        # Make sure sample does not delete if it does not exist
         with self.assertRaises(Exception):
             sample.delete()
-        
-        self.assertTrue(sample.save() == True, "Sample was not saved successfully")
-        
-        #load the sample that was just saved from the OSDF instance        
+
+        self.assertTrue(sample.save() == True, "Sample was saved successfully")
+
+        # Load the sample that was just saved from the OSDF instance
         sample_loaded = session.create_sample()
         sample_loaded = sample_loaded.load(sample.id)
-        
-        #check all fields were saved and loaded successfully 
-        self.assertEqual(sample.fma_body_site, sample_loaded.fma_body_site, "Sample fma_body_site not saved & loaded successfully")        
-        self.assertEqual(sample.tags[0], sample_loaded.tags[0], "Sample tags not saved & loaded successfully")
-        self.assertEqual(sample.mixs['biome'], sample_loaded.mixs['biome'], "Sample MIXS not saved & loaded successfully")
-        
-        #sample is deleted successfully 
-        self.assertTrue(sample.delete(), "Sample was not deleted successfully")        
-        
-        #the sample of the initial ID should not load successfully 
+
+        # Check all fields were saved and loaded successfully
+        self.assertEqual(sample.fma_body_site, sample_loaded.fma_body_site,
+                         "Sample fma_body_site not saved & loaded successfully")
+        self.assertEqual(sample.tags[0], sample_loaded.tags[0],
+                         "Sample tags not saved & loaded successfully")
+        self.assertEqual(sample.mixs['biome'], sample_loaded.mixs['biome'],
+                         "Sample MIXS not saved & loaded successfully")
+
+        # Sample is deleted successfully
+        self.assertTrue(sample.delete(), "Sample was deleted successfully")
+
+        #the sample of the initial ID should not load successfully
         load_test = session.create_sample()
         with self.assertRaises(Exception):
             load_test = load_test.load(sample.id)
-    
+
 if __name__ == '__main__':
     unittest.main()

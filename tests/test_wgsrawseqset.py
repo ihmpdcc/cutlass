@@ -8,7 +8,6 @@ import sys
 
 from cutlass import iHMPSession
 from cutlass import WgsRawSeqSet
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 

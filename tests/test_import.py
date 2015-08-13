@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 import unittest
 import sys
 
@@ -169,7 +170,6 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(aspera is None)
-
 
 if __name__ == '__main__':
     unittest.main()
