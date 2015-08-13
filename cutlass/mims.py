@@ -8,7 +8,13 @@ module_logger = logging.getLogger(__name__)
 module_logger.addHandler(logging.NullHandler())
 
 class MimsException(Exception):
-
+    """
+    Exception for the MIMS
+    
+    Attributes:
+        key (str): The key for the exception.
+        message (str): The error message to provide for when the exception is thrown. 
+    """
     def __init__(self, message, key=None):
         self.key = key
         self.message = message
@@ -20,6 +26,13 @@ class MimsException(Exception):
             return "Error: %s" % self.message
 
 class MIMS(object):
+    """
+    The MIMS class. This class contains all required fields, as well as validation
+    of the passed in dictionary to ensure all fields are there.
+    
+    Attributes:
+        fields (dict): The required fields and their specific type. 
+    """
     _fields = {
         "adapters": str,
         "annot_source": str,
@@ -60,10 +73,29 @@ class MIMS(object):
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            Tuple containing the required fields. 
+        """
         return tuple(MIMS._fields.keys())
 
     @staticmethod
     def check_dict(candidate):
+        """
+        A static method. Validates to ensure that the provided
+        candidate dictionary contains all the necessary fields to
+        save and ensure data validation when inserted to the OSDF
+        instance. 
+        
+        Args:
+            candidate (dict): The possible MIMS dictionary passed in. 
+        Returns:
+            True if the candidate is valid, False otherwise. 
+        """
         valid = True
 
         for mims_key in MIMS.required_fields():

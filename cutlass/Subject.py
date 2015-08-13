@@ -3,13 +3,22 @@
 import json
 import logging
 from iHMPSession import iHMPSession
+from Base import Base
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Subject(object):
+class Subject(Base):
+    """
+    The class encapsulating the subject data for an iHMP instance.
+    This class contains all the fields required to save a subject object in
+    the OSDF instance.
+    
+    Attributes:
+        namespace (str): The namespace this class will use in the OSDF instance 
+    """
     namespace = "ihmp"
 
     valid_races = ( "african_american", "american_indian_or_alaska_native",
@@ -20,6 +29,13 @@ class Subject(object):
 
 
     def __init__(self):
+        """
+        Constructor for the Subject class. This initializes the fields specific to the
+        Subject class, and inherits from the Base class. 
+    
+        Args:
+            None 
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         self.logger.addHandler(logging.NullHandler())
@@ -34,65 +50,23 @@ class Subject(object):
         self._race = None
 
     @property
-    def id(self):
-        self.logger.debug("In id getter.")
-        return self._id
-
-    def _set_id(self, node_id):
-        self.logger.debug("In private _set_id.")
-        self._id = node_id
-
-    @property
-    def version(self):
-        self.logger.debug("In version getter.")
-        return self._version
-
-    @version.setter
-    def version(self, version):
-        self.logger.debug("In version setter.")
-
-        if version <= 0:
-            raise ValueError("Invalid version. Must be a postive integer.")
-
-        self._version = version
-
-    @property
-    def links(self):
-        self.logger.debug("In links getter.")
-        return self._links
-
-    @links.setter
-    def links(self, links):
-        self.logger.debug("In links setter.")
-        self._links = links
-
-    @property
-    def tags(self):
-        self.logger.debug("In tags getter.")
-        return self._tags
-
-    @tags.setter
-    def tags(self, tags):
-        self.logger.debug("In tags setter.")
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
-
-    def add_tag(self, tag):
-        self.logger.debug("In add_tag. New tag: %s" % tag)
-        if tag not in self._tags:
-            self._tags.append(tag)
-        else:
-            raise ValueError("Tag already present for this subject")
-
-    @property
     def gender(self):
+        """ str: The subject's sex. """ 
         self.logger.debug("In gender getter.")
         return self._gender
 
     @gender.setter
     def gender(self, gender):
+        """
+        The setter for the Subject's gender.
+        The gender must be male, female, or unknown. 
+        
+        Args:
+            gender (str): The new gender.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In gender setter.")
         if gender not in Subject.valid_genders:
             raise ValueError("Invalid gender: %s" % gender)
@@ -101,11 +75,28 @@ class Subject(object):
 
     @property
     def race(self):
+        """ str: The subbject's race/ethnicity. """ 
         self.logger.debug("In race getter.")
         return self._race
 
     @race.setter
     def race(self, race):
+        """
+        The setter for the Subject's race. The race must be one of the following:
+        
+        "african_american",
+        "american_indian_or_alaska_native",
+        "asian", "caucasian",
+        "hispanic_or_latino",
+        "native_hawaiian",
+        "ethnic_other"
+        
+        Args:
+            race (str): The new race.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In race setter.")
         if race not in Subject.valid_races:
             raise ValueError("Invalid race: %s" % race)
@@ -114,15 +105,38 @@ class Subject(object):
 
     @property
     def rand_subject_id(self):
+        """ str: Randomized subject id used to anonymize subject identity. """ 
         self.logger.debug("In rand_subject_id getter.")
         return self._rand_subject_id
 
     @rand_subject_id.setter
     def rand_subject_id(self, rand_subject_id):
+        """
+        The setter for the Subject's random ID.
+        The ID must be between 1 and 10 characters. 
+        
+        Args:
+            rand_subject_id (str): The new random subject ID.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In rand_subject_id setter.")
         self._rand_subject_id = rand_subject_id
 
     def validate(self):
+        """
+        Validates the current object's data/JSON against the current
+        schema in the OSDF instance for that specific object. All required        
+        fields for that specific object must be present.
+        
+        Args:
+            None
+            
+        Returns:
+            A list of strings, where each string is the error that the
+            validation raised during OSDF validation 
+        """
         self.logger.debug("In validate.")
 
         document = self._get_raw_doc()
@@ -144,6 +158,19 @@ class Subject(object):
         return problems
 
     def is_valid(self):
+        """
+        Validates the current object's data/JSON against the current schema
+        in the OSDF instance for the specific object. However, unlike
+        validates(), this method does not provide exact error messages,
+        it states if the validation was successful or not.
+        
+        Args:
+            None
+        
+        Returns:
+            True if the data validates, False if the current state of
+            fields in the instance do not validate with the OSDF instance
+        """
         self.logger.debug("In is_valid.")
 
         document = self._get_raw_doc()
@@ -161,6 +188,19 @@ class Subject(object):
         return valid
 
     def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
+        
+        Args:
+            None
+            
+        Returns:
+            A dictionary representation of the JSON document.
+        """
         self.logger.debug("In _get_raw_doc.")
 
         subject_doc = {
@@ -194,10 +234,28 @@ class Subject(object):
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         module_logger.debug("In required fields.")
         return ("rand_subject_id", "gender", "tags")
 
     def to_json(self, indent=4):
+        """
+        Converts the raw JSON doc (the dictionary representation)
+        to a printable JSON string.
+        
+        Args:
+            indent (int): The indent for each successive line of the JSON string output
+        
+        Returns:
+            A printable JSON string 
+        """
         self.logger.debug("In to_json.")
 
         subject_doc = self._get_raw_doc()
@@ -217,6 +275,19 @@ class Subject(object):
         self.logger.info("Got iHMP session.")
 
     def delete(self):
+        """
+        Deletes the current object (self) from the OSDF instance. If the object
+        has not been saved previously (node ID is not set), then an error message
+        will be logged stating the object was not deleted. If the ID is set, and
+        exists in the OSDF instance, then the object will be deleted from the
+        OSDF instance, and this object must be re-saved in order to use it again.
+        
+        Args:
+            None
+            
+        Returns:
+            True upon successful deletion, False otherwise. 
+        """
         self.logger.debug("In delete.")
 
         if self._id is None:
@@ -243,6 +314,17 @@ class Subject(object):
 
     @staticmethod
     def load(subject_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+        
+        Args:
+            subject_id (str): The OSDF ID for the document to load.
+        
+        Returns:
+            A Subject object with all the available OSDF data loaded into it. 
+        """
         module_logger.debug("In load. Specified ID: %s" % subject_id)
 
         session = iHMPSession.get_session()
@@ -268,8 +350,31 @@ class Subject(object):
         return subject
 
     def save(self):
+        """
+        Saves the data in the current instance. The JSON form of the current data
+        for the instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously, then
+        the node ID is assigned the alpha numeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful, will be
+        assigned to the alpha numeric ID found in the OSDF instance. Also, the
+        version is updated as the data is saved in the OSDF instance.
+        
+        Args:
+            None
+        
+        Returns;
+            True if successful, False otherwise. 
+        
+        """
         self.logger.debug("In save.")
-
+        
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+        
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 

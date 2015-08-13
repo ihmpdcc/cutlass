@@ -13,9 +13,24 @@ module_logger = logging.getLogger(__name__)
 module_logger.addHandler(logging.NullHandler())
 
 class Project(Base):
+    """
+    The class encapsulating the project data for an iHMP instance.
+    This class contains all the fields required to save a project object in
+    the OSDF instance.
+    
+    Attributes:
+        namespace (str): The namespace this class will use in the OSDF instance 
+    """
     namespace = "ihmp"
 
     def __init__(self):
+        """
+        Constructor for the Project class. This initializes the fields specific to the
+        Project class, and inherits from the Base class. 
+    
+        Args:
+            None 
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
         self.logger.addHandler(logging.NullHandler())
 
@@ -30,11 +45,21 @@ class Project(Base):
 
     @property
     def name(self):
+        """ str: The name of the project within which the sequencing was organized. """
         self.logger.debug("In name getter.")
         return self._name
 
     @name.setter
     def name(self, name):
+        """
+        The setter for the Project name.
+        
+        Args:
+            name (str): The new name to assign to this instance.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In name setter.")
 
         if type(name) != str:
@@ -44,12 +69,22 @@ class Project(Base):
 
     @property
     def description(self):
+        """ str: A longer description of the project """
         self.logger.debug("In description getter.")
 
         return self._description
 
     @description.setter
     def description(self, description):
+        """
+        The setter for the Project description.
+        
+        Args:
+            description (str): The new description to assign to this instance.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In description setter.")
 
         if type(description) != str:
@@ -59,11 +94,23 @@ class Project(Base):
 
     @property
     def mixs(self):
+        """ dict: Minimal information for any system. "project_name" is the minimal
+            required field for this dictionary. """
         self.logger.debug("In mixs getter.")
         return self._mixs
 
     @mixs.setter
     def mixs(self, mixs):
+        """
+        The setter for the Project's MIXS. The MIXS dictionary input must validate
+        with the MIXS class, and all minimal/required fields must be included. 
+        
+        Args:
+            mixs (dict): The new MIXS dictionary to assign to this instance.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In mixs setter.")
         valid_dictionary = MIXS.check_dict(mixs)
 
@@ -76,10 +123,34 @@ class Project(Base):
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         fields = ('name', 'description', 'mixs', 'tags')
         return fields
 
     def save(self):
+        """
+        Saves the data in the current instance. The JSON form of the current data
+        for the instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously, then
+        the node ID is assigned the alpha numeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful, will be
+        assigned to the alpha numeric ID found in the OSDF instance. Also, the
+        version is updated as the data is saved in the OSDF instance.
+        
+        Args:
+            None
+        
+        Returns;
+            True if successful, False otherwise. 
+        
+        """
         # Use the create_osdf_node if the node has ID = -1
         # if saving the first time, must also use create_osdf_node
         # if node previously saved, use edit_node instead since ID is given
@@ -139,6 +210,17 @@ class Project(Base):
 
     @staticmethod
     def load(project_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+        
+        Args:
+            project_id (str): The OSDF ID for the document to load.
+        
+        Returns:
+            A Project object with all the available OSDF data loaded into it. 
+        """
         module_logger.debug("In load. Specified ID: %s" % project_id)
 
         # use the OSDF get_node() to load the data
@@ -168,6 +250,19 @@ class Project(Base):
         return project
 
     def delete(self):
+        """
+        Deletes the current object (self) from the OSDF instance. If the object
+        has not been saved previously (node ID is not set), then an error message
+        will be logged stating the object was not deleted. If the ID is set, and
+        exists in the OSDF instance, then the object will be deleted from the
+        OSDF instance, and this object must be re-saved in order to use it again.
+        
+        Args:
+            None
+            
+        Returns:
+            True upon successful deletion, False otherwise. 
+        """
         self.logger.debug("In delete.")
 
         if self._id is None:
@@ -198,6 +293,19 @@ class Project(Base):
         pass
 
     def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
+        
+        Args:
+            None
+            
+        Returns:
+            A dictionary representation of the JSON document.
+        """
         self.logger.debug("In _get_raw_doc.")
 
         project_doc = {

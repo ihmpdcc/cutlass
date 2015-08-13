@@ -4,17 +4,34 @@ from datetime import datetime
 import json
 import logging
 from iHMPSession import iHMPSession
+from Base import Base
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Visit(object):
+class Visit(Base):
+    """
+    The class encapsulating the visit data for an iHMP instance.
+    This class contains all the fields required to save a visit object in
+    the OSDF instance.
+    
+    Attributes:
+        namespace (str): The namespace this class will use in the OSDF instance 
+    """
     namespace = "ihmp"
+    
     date_format = '%Y-%m-%d'
 
     def __init__(self):
+        """
+        Constructor for the Visit class. This initializes the fields specific to
+        the Visit class, and inherits from the Base class. 
+    
+        Args:
+            None 
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         self.logger.addHandler(logging.NullHandler())
@@ -31,128 +48,84 @@ class Visit(object):
         self._clinic_id = None
 
     @property
-    def id(self):
-        self.logger.debug("In id getter.")
-        return self._id
-
-    def _set_id(self, node_id):
-        self.logger.debug("In private _set_id.")
-        self._id = node_id
-
-    @property
-    def version(self):
-        self.logger.debug("In version getter.")
-        return self._version
-
-    @version.setter
-    def version(self, version):
-        self.logger.debug("In version setter.")
-
-        if version <= 0:
-            raise ValueError("Invalid version. Must be a postive integer.")
-
-        self._version = version
-
-    @property
-    def links(self):
-        self.logger.debug("In links getter.")
-        return self._links
-
-    @links.setter
-    def links(self, links):
-        self.logger.debug("In links setter.")
-        self._links = links
-
-    @property
-    def tags(self):
-        self.logger.debug("In tags getter.")
-        return self._tags
-
-    @tags.setter
-    def tags(self, tags):
-        self.logger.debug("In tags setter.")
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
-
-    def add_tag(self, tag):
-        self.logger.debug("In add_tag. New tag: %s" % tag)
-        if tag not in self._tags:
-            self._tags.append(tag)
-        else:
-            raise ValueError("Tag already present for this visit.")
-
-    def validate(self):
-        self.logger.debug("In validate.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        problems = []
-        if not valid:
-            self.logger.info("Validation did not succeed for visit.")
-            problems.append(error_message)
-
-        if 'by' not in self._links.keys():
-            problems.append("Must have a 'by' link to a Subject.")
-
-        self.logger.debug("Number of validation problems: %s." % len(problems))
-        return problems
-
-    def is_valid(self):
-        self.logger.debug("In is_valid.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'by' not in self._links.keys():
-            valid = False
-
-        self.logger.debug("Valid? %s" + str(valid))
-
-        return valid
-
-    @property
     def visit_id(self):
+        """ str: The identifier used by the sequence center to uniquely
+                 identify the visit. """
         self.logger.debug("In visit_id getter.")
 
         return self._visit_id
 
     @visit_id.setter
     def visit_id(self, visit_id):
+        """
+        The setter for the Visit's ID 
+        
+        Args:
+            visit_id (str): The new visit ID 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In visit_id setter.")
-
+        
+        if type(visit_id) != str:
+            raise ValueError("'visit_id' must be a string.")
+        
         self._visit_id = visit_id
 
     @property
     def visit_number(self):
+        """ int: A sequential number that is assigned as visits occur for
+                 that subject. """ 
         self.logger.debug("In visit_number getter.")
 
         return self._visit_number
-
+    
+    def increment_visit_number(self):
+        """ Increments the visit number by 1. """
+        self._visit_number = self._visit_number + 1
+    
     @visit_number.setter
     def visit_number(self, visit_number):
+        """
+        The setter for the Visit's visit number
+        
+        Args:
+            visit_number (str): The new visit number. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In visit_number setter.")
-
+        
+        if type(visit_number) != int:
+            raise ValueError("'visit_number' must be an integer.")
+        
+        if visit_number < 1:
+            raise ValueError("'visit_number' must be greater than or equal to 1.")
+        
         self._visit_number = visit_number
 
     @property
     def date(self):
+        """ str: Date when the visit occurred. Can be different from sample dates,
+                 a visit may encompass a set of sampling points. """ 
         self.logger.debug("In date getter.")
 
         return self._date
 
     @date.setter
     def date(self, date):
+        """
+        The setter for the Visit's most recent visit date.
+        The date must follow the format YYYY-MM-DD. 
+        
+        Args:
+            date (str): The new date. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In date setter.")
 
         try:
@@ -165,13 +138,28 @@ class Visit(object):
 
     @property
     def interval(self):
+        """ int: The amount of time since the last visit (in days).
+                 Use 0 for the first visit. """ 
         self.logger.debug("In interval getter.")
 
         return self._interval
 
     @interval.setter
     def interval(self, interval):
+        """
+        The setter for the Visit's interval since the last visit for this subject.
+        The interval must be non-negative. 
+        
+        Args:
+            interval (int): The new interval. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In interval setter.")
+
+        if type(interval) != int:
+            raise ValueError("'interval' must be a integer.")
 
         if interval < 0:
             raise ValueError("Invalid interval. Must be positive.")
@@ -180,22 +168,57 @@ class Visit(object):
 
     @property
     def clinic_id(self):
+        """ str: The identifier used by the sequence center to uniquely identify
+                 where the visit occurred. """
         self.logger.debug("In clinic_id getter.")
 
         return self._clinic_id
 
     @clinic_id.setter
     def clinic_id(self, clinic_id):
+        """
+        The setter for the Visit's clinic ID.
+        
+        Args:
+            clinic_id (str): The new clinic ID. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In clinic_id setter.")
-
+        
+        if type(clinic_id) != str:
+            raise ValueError("'interval' must be a integer.")
+        
         self._clinic_id = clinic_id
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         module_logger.debug("In required fields.")
         return ("visit_id", "visit_number", "date", "interval", "tags")
 
     def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
+        
+        Args:
+            None
+            
+        Returns:
+            A dictionary representation of the JSON document.
+        """
         self.logger.debug("In _get_raw_doc.")
 
         visit_doc = {
@@ -207,7 +230,6 @@ class Visit(object):
             'ns': Visit.namespace,
             'node_type': 'visit',
             'meta': {
-                'visit_id': self._visit_id,
                 'visit_number': self._visit_number,
                 'date': self._date,
                 'interval': self._interval,
@@ -229,10 +251,54 @@ class Visit(object):
         if self._clinic_id is not None:
            self.logger.debug("Visit object has the clinic_id set.")
            visit_doc['meta']['clinic_id'] = self._clinic_id
+           
+        if self._visit_id is not None:
+           self.logger.debug("Visit object has the visit_id set.")
+           visit_doc['meta']['visit_id'] = self._visit_id
 
         return visit_doc
 
+    def is_valid(self):
+        """
+        Validates the current object's data/JSON against the current schema
+        in the OSDF instance for the specific object. However, unlike
+        validates(), this method does not provide exact error messages,
+        it states if the validation was successful or not.
+        
+        Args:
+            None
+        
+        Returns:
+            True if the data validates, False if the current state of
+            fields in the instance do not validate with the OSDF instance
+        """
+        self.logger.debug("In is_valid.")
+
+        document = self._get_raw_doc()
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        (valid, error_message) = session.get_osdf().validate_node(document)
+
+        if 'by' not in self._links.keys():
+            valid = False
+        
+        self.logger.debug("Valid? %s" + str(valid))
+
+        return valid
+
     def to_json(self, indent=4):
+        """
+        Converts the raw JSON doc (the dictionary representation)
+        to a printable JSON string.
+        
+        Args:
+            indent (int): The indent for each successive line of the JSON string output
+        
+        Returns:
+            A printable JSON string 
+        """
         self.logger.debug("In to_json.")
 
         visit_doc = self._get_raw_doc()
@@ -252,6 +318,19 @@ class Visit(object):
         self.logger.info("Got iHMP session.")
 
     def delete(self):
+        """
+        Deletes the current object (self) from the OSDF instance. If the object
+        has not been saved previously (node ID is not set), then an error message
+        will be logged stating the object was not deleted. If the ID is set, and
+        exists in the OSDF instance, then the object will be deleted from the
+        OSDF instance, and this object must be re-saved in order to use it again.
+        
+        Args:
+            None
+            
+        Returns:
+            True upon successful deletion, False otherwise. 
+        """
         self.logger.debug("In delete.")
 
         if self._id is None:
@@ -278,6 +357,17 @@ class Visit(object):
 
     @staticmethod
     def load(visit_node_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+        
+        Args:
+            visit_node_id (str): The OSDF ID for the document to load.
+        
+        Returns:
+            A Visit object with all the available OSDF data loaded into it. 
+        """
         module_logger.debug("In load. Specified ID: %s" % visit_node_id)
 
         session = iHMPSession.get_session()
@@ -314,6 +404,22 @@ class Visit(object):
         return visit
 
     def save(self):
+        """
+        Saves the data in the current instance. The JSON form of the current data
+        for the instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously, then
+        the node ID is assigned the alpha numeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful, will be
+        assigned to the alpha numeric ID found in the OSDF instance. Also, the
+        version is updated as the data is saved in the OSDF instance.
+        
+        Args:
+            None
+        
+        Returns;
+            True if successful, False otherwise. 
+        
+        """
         self.logger.debug("In save.")
 
         if not self.is_valid():
