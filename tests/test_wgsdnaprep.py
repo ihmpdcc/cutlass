@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+
 import unittest
 import json
+import random
+import string
 import sys
-
 
 from cutlass import iHMPSession
 from cutlass import WgsDnaPrep
@@ -10,8 +13,11 @@ from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 
+def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 class WgsDnaPrepTest(unittest.TestCase):
-    
+
     def testImport(self):
         success = False
         try:
@@ -35,8 +41,8 @@ class WgsDnaPrepTest(unittest.TestCase):
             pass
 
         self.failUnless(success)
-        self.failIf(wgsDnaPrep is None)        
-    
+        self.failIf(wgsDnaPrep is None)
+
     def testToJson(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
@@ -69,7 +75,7 @@ class WgsDnaPrepTest(unittest.TestCase):
 
         self.assertEqual(wgsDnaPrep_data['meta']['comment'],
                          comment, "'comment' in JSON had expected value.")
-        
+
     def testId(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
 
@@ -87,37 +93,38 @@ class WgsDnaPrepTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             wgsDnaPrep.version = "test"
-        
+
     def testCommentIllegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-        
+
         with self.assertRaises(Exception):
             wgsDnaPrep.comment = 1
-    
+
     def testCommentTooLong(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-        
+
         with self.assertRaises(Exception):
-            wgsDnaPrep.comment = "j3qpBLpr50hIyIvZyZ0ic0960suKSEV1G9MbQ5kxwKTk9XjymJpDDXEFAxD6vF6X64uZWqRvuOyiQRtmWrCWXRo4hoszEYHoFgLXcSSpBrLFpKi2RtFvK32LuJYm7r46OzF7iaoctizmFQjuDKoGQZNHyhFgAKpMeahVjOBT6M4vSm7D8uX3OzTMJqAgXP0fT2QfyrQVDLxF7OnG3OrsxLfmsQJ25mRUVt4xDjcpInc6mTeTuf6EMCsYQxlOUYrnSqXGgA9NiJ97gUEQ9M45ca1EgMTl2CecPiPofB4mqJS3fmlMt6s2gRqOjitB1DxkFsroszQqqLNNpb3V9ng1z2jc3hLcvkvkUv5ZRgjoSOYRaV6fV4P2cza3jKVRNoWNWpUBa3woSGg1bN5x3CS3ZtpwzleGCri9RRzTUsL4ctkAol4eORGFmnDWoC9PTHC8DoiuzKKjCmbpviLulfI9SlECK3zq24QPIGYkH87E76ViPNR3aLl2xQ1ljJJQjiI1kEbZbL3l"
-            
+            wgsDnaPrep.comment = rand_generator(750)
+
     def testCommentLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         comment = "This is a test comment"
-        
-        try: 
+
+        try:
             wgsDnaPrep.comment = comment
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the comment setter")
-        
-        self.assertEqual(wgsDnaPrep.comment, comment, "Property getter for 'comment' works.")
-    
+
+        self.assertEqual(wgsDnaPrep.comment, comment,
+                         "Property getter for 'comment' works.")
+
     def testFragSizeIllegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-        
+
         with self.assertRaises(Exception):
             wgsDnaPrep.frag_size = "wrong frag size variable type"
 
@@ -125,146 +132,154 @@ class WgsDnaPrepTest(unittest.TestCase):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         frag_size = 1020
-        
-        try: 
+
+        try:
             wgsDnaPrep.frag_size = frag_size
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the frag_size setter")
-        
-        self.assertEqual(wgsDnaPrep.frag_size, frag_size, "Property getter for 'frag_size' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.frag_size, frag_size,
+                         "Property getter for 'frag_size' works.")
+
     def testLibLayoutLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         lib_layout = "A test Lib Layout for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.lib_layout = lib_layout
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the lib_layout setter")
-        
-        self.assertEqual(wgsDnaPrep.lib_layout, lib_layout, "Property getter for 'lib_layout' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.lib_layout, lib_layout,
+                         "Property getter for 'lib_layout' works.")
+
     def testLibSelectionLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         lib_selection = "A test Lib selection for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.lib_selection = lib_selection
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the lib_selection setter")
-        
-        self.assertEqual(wgsDnaPrep.lib_selection, lib_selection, "Property getter for 'lib_selection' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.lib_selection, lib_selection,
+                         "Property getter for 'lib_selection' works.")
+
     def testNCBITaxonIDLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.ncbi_taxon_id = ncbi_taxon_id
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the ncbi_taxon_id setter")
-        
-        self.assertEqual(wgsDnaPrep.ncbi_taxon_id, ncbi_taxon_id, "Property getter for 'ncbi_taxon_id' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.ncbi_taxon_id, ncbi_taxon_id,
+                         "Property getter for 'ncbi_taxon_id' works.")
+
     def testPrepIDLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         prep_id = "A test prep id for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.prep_id = prep_id
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the prep_id setter")
-        
+
         self.assertEqual(wgsDnaPrep.prep_id, prep_id, "Property getter for 'prep_id' works.")
-        
+
     def testSequencingCenterLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         sequencing_center = "A test seq center for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.sequencing_center = sequencing_center
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the sequencing_center setter")
-        
-        self.assertEqual(wgsDnaPrep.sequencing_center, sequencing_center, "Property getter for 'sequencing_center' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.sequencing_center, sequencing_center,
+                         "Property getter for 'sequencing_center' works.")
+
     def testSequencingContactLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         sequencing_contact = "A test seq contact for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.sequencing_contact = sequencing_contact
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the sequencing_contact setter")
-        
-        self.assertEqual(wgsDnaPrep.sequencing_contact, sequencing_contact, "Property getter for 'sequencing_contact' works.")
-    
+
+        self.assertEqual(wgsDnaPrep.sequencing_contact, sequencing_contact,
+                         "Property getter for 'sequencing_contact' works.")
+
     def testSRSIDLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         srs_id = "A test prep id for the test class"
-        
-        try: 
+
+        try:
             wgsDnaPrep.srs_id = srs_id
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the srs_id setter")
-        
-        self.assertEqual(wgsDnaPrep.srs_id, srs_id, "Property getter for 'srs_id' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.srs_id, srs_id,
+                         "Property getter for 'srs_id' works.")
+
     def testSRSIDIllegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-        
+
         with self.assertRaises(Exception):
             wgsDnaPrep.srs_id = 1
-            
+
     def testStorageDurationLegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False
         storage_duration = 12
-        
-        try: 
+
+        try:
             wgsDnaPrep.storage_duration = storage_duration
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the storage_duration setter")
-        
-        self.assertEqual(wgsDnaPrep.storage_duration, storage_duration, "Property getter for 'storage_duration' works.")
-        
+
+        self.assertEqual(wgsDnaPrep.storage_duration, storage_duration,
+                         "Property getter for 'storage_duration' works.")
+
     def testStorageDurationIllegal(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-        
+
         with self.assertRaises(Exception):
             wgsDnaPrep.storage_duration = "ASDASDSAD"
 
@@ -389,13 +404,13 @@ class WgsDnaPrepTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
-        
+
     def testLoadSaveDeleteWgsDnaPrep(self):
-        #attempt to save the wgsDnaPrep at all points before and after adding the required fields
-        #project_id = super(WgsDnaPrepTest, self).testSaveProject()
-        
+        # attempt to save the wgsDnaPrep at all points before and after adding the required fields
+        # project_id = super(WgsDnaPrepTest, self).testSaveProject()
+
         wgsDnaPrep = session.create_object("wgs_dna_prep")
-                
+
         test_comment = "Test comment"
         frag_size = 10
         lib_layout = "asdfads"
@@ -443,22 +458,22 @@ class WgsDnaPrepTest(unittest.TestCase):
         sequencing_contact = "me right now"
         srs_id = "the id for the srs"
         storage_duration = 10
-        test_links = {"prepared_from":[]}                        
-        
+        test_links = {"prepared_from":[]}
+
         self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully, no required fields")
-        
+
         wgsDnaPrep.comment = test_comment
-        
+
         self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
-        
+
         wgsDnaPrep.frag_size = frag_size
-        
+
         self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
-        
-        wgsDnaPrep.links = test_links         
-        
+
+        wgsDnaPrep.links = test_links
+
         self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
-        
+
         wgsDnaPrep.lib_layout = lib_layout
         wgsDnaPrep.lib_selection = lib_selection
         wgsDnaPrep.mims = mims
@@ -468,28 +483,28 @@ class WgsDnaPrepTest(unittest.TestCase):
         wgsDnaPrep.sequencing_contact = sequencing_contact
         wgsDnaPrep.srs_id = srs_id
         wgsDnaPrep.storage_duration = storage_duration
-        
-        #make sure wgsDnaPrep does not delete if it does not exist 
+
+        # make sure wgsDnaPrep does not delete if it does not exist
         with self.assertRaises(Exception):
             wgsDnaPrep.delete()
-        
+
         self.assertTrue(wgsDnaPrep.save() == True, "WgsDnaPrep was not saved successfully")
-        
-        #load the wgsDnaPrep that was just saved from the OSDF instance        
+
+        # load the wgsDnaPrep that was just saved from the OSDF instance
         wgsDnaPrep_loaded = session.create_object("wgs_dna_prep")
         wgsDnaPrep_loaded = wgsDnaPrep_loaded.load(wgsDnaPrep.id)
-        
-        #check all fields were saved and loaded successfully 
-        self.assertEqual(wgsDnaPrep.comment, wgsDnaPrep_loaded.comment, "WgsDnaPrep comment not saved & loaded successfully")                
+
+        # check all fields were saved and loaded successfully
+        self.assertEqual(wgsDnaPrep.comment, wgsDnaPrep_loaded.comment, "WgsDnaPrep comment not saved & loaded successfully")
         self.assertEqual(wgsDnaPrep.mims["biome"], wgsDnaPrep_loaded.mims["biome"], "WgsDnaPrep mims not saved & loaded successfully")
-        
-        #wgsDnaPrep is deleted successfully 
-        self.assertTrue(wgsDnaPrep.delete(), "WgsDnaPrep was not deleted successfully")        
-        
-        #the wgsDnaPrep of the initial ID should not load successfully 
+
+        # wgsDnaPrep is deleted successfully
+        self.assertTrue(wgsDnaPrep.delete(), "WgsDnaPrep was not deleted successfully")
+
+        # the wgsDnaPrep of the initial ID should not load successfully
         load_test = session.create_object("wgs_dna_prep")
         with self.assertRaises(Exception):
             load_test = load_test.load(wgsDnaPrep.id)
-    
+
 if __name__ == '__main__':
     unittest.main()
