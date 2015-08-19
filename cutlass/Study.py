@@ -3,16 +3,32 @@
 import json
 import logging
 from iHMPSession import iHMPSession
+from Base import Base
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Study(object):
+class Study(Base):
+    """
+    The class encapsulating the study data for an iHMP instance.
+    This class contains all the fields required to save a study object in
+    the OSDF instance.
+    
+    Attributes:
+        namespace (str): The namespace this class will use in the OSDF instance 
+    """
     namespace = "ihmp"
 
     def __init__(self):
+        """
+        Constructor for the Study class. This initializes the fields specific to the
+        Study class, and inherits from the Base class. 
+    
+        Args:
+            None 
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         self.logger.addHandler(logging.NullHandler())
@@ -26,163 +42,172 @@ class Study(object):
         self._description = None
         self._center = None
         self._contact = None
-        self._srp_id = None
-
-    @property
-    def id(self):
-        self.logger.debug("In id getter.")
-        return self._id
-
-    def _set_id(self, node_id):
-        self.logger.debug("In private _set_id.")
-        self._id = node_id
-
-    @property
-    def version(self):
-        self.logger.debug("In version getter.")
-        return self._version
-
-    @version.setter
-    def version(self, version):
-        self.logger.debug("In version setter.")
-
-        if version <= 0:
-            raise ValueError("Invalid version. Must be a postive integer.")
-
-        self._version = version
-
-    @property
-    def links(self):
-        self.logger.debug("In links getter.")
-        return self._links
-
-    @links.setter
-    def links(self, links):
-        self.logger.debug("In links setter.")
-        self._links = links
-
-    @property
-    def tags(self):
-        self.logger.debug("In tags getter.")
-        return self._tags
-
-    @tags.setter
-    def tags(self, tags):
-        self.logger.debug("In tags setter.")
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
-
-    def add_tag(self, tag):
-        self.logger.debug("In add_tag. New tag: %s" % tag)
-        if tag not in self._tags:
-            self._tags.append(tag)
-        else:
-            raise ValueError("Tag already present for this subject")
-
-    def validate(self):
-        self.logger.debug("In validate.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        problems = []
-        if not valid:
-            self.logger.info("Validation did not succeed for Study.")
-            problems.append(error_message)
-
-        if 'part_of' not in self._links.keys():
-            problems.append("Must have a 'part_of' link to a project.")
-
-        self.logger.debug("Number of validation problems: %s." % len(problems))
-        return problems
-
-    def is_valid(self):
-        self.logger.debug("In is_valid.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-        if 'part_of' not in self._links.keys():
-            valid = False
-
-        self.logger.debug("Valid? %s" + str(valid))
-
-        return valid
+        self._srp_id = None        
 
     @property
     def name(self):
+        """ str: The name of the project within which the sequencing was organized. """
         self.logger.debug("In name getter.")
-
         return self._name
 
     @name.setter
     def name(self, name):
+        """
+        The setter for the Project name.
+        
+        Args:
+            name (str): The new name to assign to this instance.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In name setter.")
+
+        if type(name) != str:
+            raise ValueError("'name' must be a string.")
 
         self._name = name
 
     @property
     def description(self):
+        """ str: A longer description of the project """
         self.logger.debug("In description getter.")
 
         return self._description
 
     @description.setter
     def description(self, description):
+        """
+        The setter for the Project description.
+        
+        Args:
+            description (str): The new description to assign to this instance.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In description setter.")
+
+        if type(description) != str:
+            raise ValueError("'description' must be a string.")
 
         self._description = description
 
     @property
     def center(self):
+        """ str: The center the study was performed at. """ 
         self.logger.debug("In center getter.")
 
         return self._center
 
     @center.setter
     def center(self, center):
+        """
+        The setter for the Study center. The center must be one of the following:
+        
+        Virginia Commonwealth University,
+        Broad Institute,
+        Stanford University / Jackson Laboratory,
+        Stanford University,
+        Jackson Laboratory. 
+        
+        Args:
+            center (str): The new center.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In center setter.")
-
-        self._center = center
+        centers = ["Virginia Commonwealth University", "Broad Institute", "Stanford University / Jackson Laboratory", "Stanford University", "Jackson Laboratory"]
+        
+        if center in centers:
+            self._center = center
+        else:
+            raise Exception("Please provide a valid center for the study.")
 
     @property
     def contact(self):
+        """ str: The study's primary contact at the sequencing center """ 
         self.logger.debug("In contact getter.")
 
         return self._contact
 
     @contact.setter
     def contact(self, contact):
+        """
+        The setter for the Study contact. The contact information must
+        be between 3 and 128 characters. 
+        
+        Args:
+            contact (str): The new contact for the study.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In contact setter.")
-
+        
+        if type(contact) != str:
+            raise ValueError("'contact' must be a string.")
+        
+        if len(contact) < 3:
+            raise ValueError("'contact' must be more than 3 characters.")
+        
+        if len(contact) > 128:
+            raise ValueError("'contact' must be less than 128 characters.")
+        
         self._contact = contact
 
     @property
     def srp_id(self):
+        """ str: NCBI Sequence Read Archive (SRA) project ID """ 
         self.logger.debug("In srp_id getter.")
         return self._srp_id
 
     @srp_id.setter
     def srp_id(self, srp_id):
+        """
+        The setter for the Study srp_id.
+        
+        Args:
+            srp_id (str): The new srp ID for the study.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In srp_id setter.")
+
+        if type(srp_id) != str:
+            raise ValueError("'description' must be a string.")
 
         self._srp_id = srp_id
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         module_logger.debug("In required fields.")
         return ("name", "description", "center", "contact", "tags")
 
     def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
+        
+        Args:
+            None
+            
+        Returns:
+            A dictionary representation of the JSON document.
+        """
         self.logger.debug("In _get_raw_doc.")
 
         study_doc = {
@@ -217,6 +242,17 @@ class Study(object):
         return study_doc
 
     def to_json(self, indent=4):
+        """
+        Converts the raw JSON doc (the dictionary representation) to a printable
+        JSON string.
+        
+        Args:
+            indent (int): The indent for each successive line of the JSON string output
+        
+        Returns:
+            A printable JSON string 
+        """
+        
         self.logger.debug("In to_json.")
 
         study_doc = self._get_raw_doc()
@@ -236,6 +272,19 @@ class Study(object):
         self.logger.info("Got iHMP session.")
 
     def delete(self):
+        """
+        Deletes the current object (self) from the OSDF instance. If the object
+        has not been saved previously (node ID is not set), then an error message
+        will be logged stating the object was not deleted. If the ID is set, and
+        exists in the OSDF instance, then the object will be deleted from the
+        OSDF instance, and this object must be re-saved in order to use it again.
+        
+        Args:
+            None
+            
+        Returns:
+            True upon successful deletion, False otherwise. 
+        """
         self.logger.debug("In delete.")
 
         if self._id is None:
@@ -262,6 +311,17 @@ class Study(object):
 
     @staticmethod
     def load(study_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+        
+        Args:
+            study_id (str): The OSDF ID for the document to load.
+        
+        Returns:
+            A Study object with all the available OSDF data loaded into it. 
+        """
         module_logger.debug("In load. Specified ID: %s" % study_id)
 
         session = iHMPSession.get_session()
@@ -294,6 +354,22 @@ class Study(object):
         return study
 
     def save(self):
+        """
+        Saves the data in the current instance. The JSON form of the current data
+        for the instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously, then
+        the node ID is assigned the alpha numeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful, will be
+        assigned to the alpha numeric ID found in the OSDF instance. Also, the
+        version is updated as the data is saved in the OSDF instance.
+        
+        Args:
+            None
+        
+        Returns;
+            True if successful, False otherwise. 
+        
+        """
         self.logger.debug("In save.")
 
         # If node previously saved, use edit_node instead since ID
@@ -306,12 +382,13 @@ class Study(object):
         # Before save, make sure that linkage is non-empty, the key should be collected-during
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
-
+        
         success = False
 
         if self._id is None:
             # The document has not yet been saved
             study_data = self._get_raw_doc()
+            
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -326,6 +403,7 @@ class Study(object):
             except Exception as e:
                 self.logger.error("An error occurred while inserting Study. " +
                                   "Reason: %s" % e)
+                
         else:
             study_data = self._get_raw_doc()
             try:
@@ -340,3 +418,36 @@ class Study(object):
                                   "Reason: %s" % self._id, e)
 
         return success
+
+    def is_valid(self):
+        """
+        Validates the current object's data/JSON against the current schema
+        in the OSDF instance for the specific object. However, unlike
+        validates(), this method does not provide exact error messages,
+        it states if the validation was successful or not.
+        
+        Args:
+            None
+        
+        Returns:
+            True if the data validates, False if the current state of
+            fields in the instance do not validate with the OSDF instance
+        """
+        self.logger.debug("In is_valid.")
+
+        document = self._get_raw_doc()
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        (valid, error_message) = session.get_osdf().validate_node(document)
+
+        if 'part_of' not in self._links.keys():
+            valid = False
+        
+        if 'subset_of' not in self._links.keys():
+            valid = False
+        
+        self.logger.debug("Valid? %s" + str(valid))
+
+        return valid

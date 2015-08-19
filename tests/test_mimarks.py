@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import unittest
 from cutlass import MIMARKS
 
@@ -119,3 +120,6 @@ class testMimarks(unittest.TestCase):
         valid = MIMARKS.check_dict(just_right)
 
         self.assertTrue(valid, "True return for valid data.")
+
+if __name__ == '__main__':
+    unittest.main()

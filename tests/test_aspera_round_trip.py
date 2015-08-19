@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 import argparse
 import os
 import random
@@ -25,7 +26,7 @@ def get_md5(f):
     if m:
         return m.group(1)
     else:
-        return None        
+        return None
 
 ## main program
 

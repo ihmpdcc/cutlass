@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import unittest
 from cutlass import MIXS
 
@@ -66,3 +67,6 @@ class MixsTest(unittest.TestCase):
         valid = MIXS.check_dict(just_right)
 
         self.assertTrue(valid, "True return for valid data.")
+
+if __name__ == '__main__':
+    unittest.main()

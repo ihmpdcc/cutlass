@@ -1,17 +1,17 @@
+#!/usr/bin/env python
+
 import unittest
 import json
 import sys
 
-
 from cutlass import iHMPSession
 from cutlass import Subject
 from cutlass import MIXS, MixsException
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 
 class SubjectTest(unittest.TestCase):
-    
+
     def testImport(self):
         success = False
         try:
@@ -35,14 +35,14 @@ class SubjectTest(unittest.TestCase):
             pass
 
         self.failUnless(success)
-        self.failIf(subject is None)        
-    
+        self.failIf(subject is None)
+
     def testToJson(self):
         subject = session.create_subject()
         success = False
         rand_subject_id = "1hwuejd837"
 
-        subject.rand_subject_id = rand_subject_id 
+        subject.rand_subject_id = rand_subject_id
         subject_json = None
 
         try:
@@ -63,13 +63,15 @@ class SubjectTest(unittest.TestCase):
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
-        self.assertTrue(subject_data is not None, "to_json() returned parsable JSON.")
+        self.assertTrue(subject_data is not None,
+                        "to_json() returned parsable JSON.")
 
         self.assertTrue('meta' in subject_data, "JSON has 'meta' key in it.")
 
         self.assertEqual(subject_data['meta']['rand_subject_id'],
-                         rand_subject_id, "'rand_subject_id' in JSON had expected value.")
-        
+                         rand_subject_id,
+                         "'rand_subject_id' in JSON had expected value.")
+
     def testId(self):
         subject = session.create_subject()
 
@@ -90,51 +92,54 @@ class SubjectTest(unittest.TestCase):
 
     def testGenderIllegal(self):
         subject = session.create_subject()
-        
+
         with self.assertRaises(Exception):
             subject.gender = "abhishek"
-            
+
     def testGenderLegal(self):
         subject = session.create_subject()
         success = False
         gender = "male"
-        
-        try: 
+
+        try:
             subject.gender = gender
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the gender setter")
-        
-        self.assertEqual(subject.gender, gender, "Property getter for 'gender' works.")
-        
+
+        self.assertEqual(subject.gender,
+                         gender,
+                         "Property getter for 'gender' works.")
+
     def testRaceIllegal(self):
         subject = session.create_subject()
-        
+
         with self.assertRaises(Exception):
             subject.race = "abhishek"
-            
+
     def testRaceLegal(self):
         subject = session.create_subject()
         success = False
         race = "asian"
-        
-        try: 
+
+        try:
             subject.race = race
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the race setter")
-        
+
         self.assertEqual(subject.race, race, "Property getter for 'race' works.")
 
     def testTags(self):
         subject = session.create_subject()
 
         tags = subject.tags
-        self.assertTrue(type(tags) == list, "Subject tags() method returns a list.")
+        self.assertTrue(type(tags) == list,
+                        "Subject tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template subject tags list is empty.")
 
         new_tags = [ "tagA", "tagB" ]
@@ -149,7 +154,6 @@ class SubjectTest(unittest.TestCase):
 
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
-
 
     def testAddTag(self):
         subject = session.create_subject()
@@ -181,53 +185,58 @@ class SubjectTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
-        
+
     def testLoadSaveDeleteSubject(self):
-        #attempt to save the subject at all points before and after adding the required fields
-        #project_id = super(SubjectTest, self).testSaveProject()
-        
+        # Attempt to save the subject at all points before and after
+        # adding the required fields
+
         subject = session.create_subject()
-                
+
         test_rand_subject_id = "128ieurjnf"
-        test_gender = "male"        
-        test_links = {"participates_in":[]}        
+        test_gender = "male"
+        test_links = {"participates_in":[]}
         test_tag = "New tag added to subject"
-        
-        self.assertFalse(subject.save(), "Subject not saved successfully, no required fields")
-        
+
+        self.assertFalse(subject.save(),
+                         "Subject not saved successfully, no required fields")
+
         subject.rand_subject_id = test_rand_subject_id
-        
+
         self.assertFalse(subject.save(), "Subject not saved successfully")
-        
+
         subject.gender = test_gender
-        
+
         self.assertFalse(subject.save(), "Subject not saved successfully")
-        
-        subject.links = test_links         
+
+        subject.links = test_links
         subject.add_tag(test_tag)
-        
-        #make sure subject does not delete if it does not exist 
+
+        # Make sure subject does not delete if it does not exist
         with self.assertRaises(Exception):
             subject.delete()
-        
-        self.assertTrue(subject.save() == True, "Subject was not saved successfully")
-        
-        #load the subject that was just saved from the OSDF instance        
+
+        self.assertTrue(subject.save() == True,
+                        "Subject was not saved successfully")
+
+        # Load the subject that was just saved from the OSDF instance
         subject_loaded = session.create_subject()
         subject_loaded = subject_loaded.load(subject.id)
-        
-        #check all fields were saved and loaded successfully 
-        self.assertEqual(subject.rand_subject_id, subject_loaded.rand_subject_id, "Subject rand_subject_id not saved & loaded successfully")        
-        self.assertEqual(subject.tags[0], subject_loaded.tags[0], "Subject tags not saved & loaded successfully")
-        self.assertEqual(subject.gender, subject_loaded.gender, "Subject gender not saved & loaded successfully")
-        
-        #subject is deleted successfully 
-        self.assertTrue(subject.delete(), "Subject was not deleted successfully")        
-        
-        #the subject of the initial ID should not load successfully 
+
+        # Check all fields were saved and loaded successfully
+        self.assertEqual(subject.rand_subject_id, subject_loaded.rand_subject_id,
+                         "Subject rand_subject_id not saved & loaded successfully")
+        self.assertEqual(subject.tags[0], subject_loaded.tags[0],
+                         "Subject tags not saved & loaded successfully")
+        self.assertEqual(subject.gender, subject_loaded.gender,
+                         "Subject gender not saved & loaded successfully")
+
+        # Subject is deleted successfully
+        self.assertTrue(subject.delete(), "Subject was not deleted successfully")
+
+        # The subject of the initial ID should not load successfully
         load_test = session.create_subject()
         with self.assertRaises(Exception):
             load_test = load_test.load(subject.id)
-    
+
 if __name__ == '__main__':
     unittest.main()

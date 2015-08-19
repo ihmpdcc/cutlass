@@ -13,10 +13,26 @@ module_logger = logging.getLogger(__name__)
 module_logger.addHandler(logging.NullHandler())
 
 class WgsRawSeqSet(Base):
+    """
+    The class encapsulating the Wgs Raw Sequence Set data for an iHMP instance.
+    This class contains all the fields required to save a Wgs Raw Sequence Set
+    object in the OSDF instance.
+    
+    Attributes:
+        namespace (str): The namespace this class will use in the OSDF instance 
+    """
     namespace = "ihmp"
+    
     aspera_server = "aspera.ihmpdcc.org"
 
     def __init__(self):
+        """
+        Constructor for the WgsRawSeqSet class. This initializes the fields specific
+        to the WgsRawSeqSet class, and inherits from the Base class. 
+    
+        Args:
+            None 
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         self.logger.addHandler(logging.NullHandler())
@@ -41,6 +57,18 @@ class WgsRawSeqSet(Base):
         self._urls = ['']
 
     def validate(self):
+        """
+        Validates the current object's data/JSON against the current
+        schema in the OSDF instance for that specific object. All required        
+        fields for that specific object must be present.
+        
+        Args:
+            None
+            
+        Returns:
+            A list of strings, where each string is the error that the
+            validation raised during OSDF validation 
+        """
         self.logger.debug("In validate.")
 
         document = self._get_raw_doc()
@@ -69,6 +97,19 @@ class WgsRawSeqSet(Base):
         return problems
 
     def is_valid(self):
+        """
+        Validates the current object's data/JSON against the current schema
+        in the OSDF instance for the specific object. However, unlike
+        validates(), this method does not provide exact error messages,
+        it states if the validation was successful or not.
+        
+        Args:
+            None
+        
+        Returns:
+            True if the data validates, False if the current state of
+            fields in the instance do not validate with the OSDF instance
+        """
         self.logger.debug("In is_valid.")
 
         document = self._get_raw_doc()
@@ -95,12 +136,22 @@ class WgsRawSeqSet(Base):
 
     @property
     def checksums(self):
+        """ str: One or more checksums used to ensure file integrity. """
         self.logger.debug("In checksums getter.")
 
         return self._checksums
 
     @checksums.setter
     def checksums(self, checksums):
+        """
+        The setter for the WgsRawSeqSet checksums.
+        
+        Args:
+            checksums (dict): The checksums for the WgsRawSeqSet.
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In checksums setter.")
 
         if 'md5' not in checksums:
@@ -110,27 +161,52 @@ class WgsRawSeqSet(Base):
 
     @property
     def comment(self):
+        """ str: Free-text comment. """
         self.logger.debug("In comment getter.")
 
         return self._comment
 
     @comment.setter
     def comment(self, comment):
+        """
+        The setter for the WgsRawSeqSet comment. The comment must be a string,
+        and less than 512 characters. 
+        
+        Args:
+            comment (str): The new comment to add to the string. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In comment setter.")
 
         if type(comment) != str:
             raise ValueError("comment must be a string.")
+    
+        if len(comment) > 512:
+            raise Exception("Comment is too long, must be less than 512 characters.")
 
         self._comment = comment
 
     @property
     def exp_length(self):
+        """ int: The number of raw bases or color space calls expected for the read,
+                 includes both mate pairs and all technical portions. """
         self.logger.debug("In exp_length getter.")
 
         return self._exp_length
 
     @exp_length.setter
     def exp_length(self, exp_length):
+        """
+        The setter for the WgsRawSeqSet exp length.
+        
+        Args:
+            exp_length (int): The new exp_length for the current instance. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In exp_length setter.")
         if exp_length < 0:
             raise ValueError("The exp_length must be non-negative.")
@@ -139,27 +215,51 @@ class WgsRawSeqSet(Base):
 
     @property
     def format(self):
+        """ str: The file format of the sequence file """ 
         self.logger.debug("In format getter.")
 
         return self._format
 
     @format.setter
     def format(self, format_str):
+        """
+        The setter for the WgsRawSeqSet format. This must be either fasta or fastq. 
+        
+        Args:
+            format_str (str): The new format string for the current object. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In format setter.")
 
         if type(format_str) != str:
             raise ValueError("format must be a string.")
-
-        self._format = format_str
-
+        
+        formats = ["fasta", "fastq"]
+        if format_str in formats:
+            self._format = format_str
+        else:
+            raise Exception("Format must be fasta or fastq only.")
+        
     @property
     def format_doc(self):
+        """ str: URL for documentation of file format. """
         self.logger.debug("In format_doc getter.")
 
         return self._format_doc
 
     @format_doc.setter
     def format_doc(self, format_doc):
+        """
+        The setter for the WgsRawSeqSet format doc. 
+        
+        Args:
+            format_doc (str): The new format_doc for the current object. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In format_doc setter.")
 
         if type(format_doc) != str:
@@ -169,12 +269,23 @@ class WgsRawSeqSet(Base):
 
     @property
     def local_file(self):
+        """ str: URL to the local file to upload to the server. """ 
         self.logger.debug("In local_file getter.")
 
         return self._local_file
 
     @local_file.setter
     def local_file(self, local_file):
+        """
+        The setter for the WgsRawSeqSet local file. 
+        
+        Args:
+            local_file (str): The URL to the local file that should
+                              be uploaded to the server. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In local_file setter.")
 
         if type(local_file) != str:
@@ -184,12 +295,22 @@ class WgsRawSeqSet(Base):
 
     @property
     def seq_model(self):
+        """ str: Sequencing instrument model. """ 
         self.logger.debug("In seq_model getter.")
 
         return self._seq_model
 
     @seq_model.setter
     def seq_model(self, seq_model):
+        """
+        The setter for the WgsRawSeqSet seq model. 
+        
+        Args:
+            seq_model (str): The new seq model. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In seq_model setter.")
 
         if type(seq_model) != str:
@@ -199,27 +320,52 @@ class WgsRawSeqSet(Base):
 
     @property
     def sequence_type(self):
+        """ str: Specifies whether the file contains peptide or nucleotide data. """ 
         self.logger.debug("In sequence_type getter.")
 
         return self._sequence_type
 
     @sequence_type.setter
     def sequence_type(self, sequence_type):
+        """
+        The setter for the WgsRawSeqSet sequence type. This must be either
+        peptide or nucleotide. 
+        
+        Args:
+            sequence_type (str): The new sequence type. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In sequence_type setter.")
 
         if type(sequence_type) != str:
             raise ValueError("sequence_type must be a string.")
-
-        self._sequence_type = sequence_type
+        
+        types = ["peptide", "nucleotide"]
+        if sequence_type in types:
+            self._sequence_type = sequence_type
+        else:
+            raise Exception("Sequence type must be either peptide or nucleotide")
 
     @property
     def size(self):
+        """ int: The size of the file in bytes. """ 
         self.logger.debug("In size getter.")
 
         return self._size
 
     @size.setter
     def size(self, size):
+        """
+        The setter for the WgsRawSeqSet size. 
+        
+        Args:
+            size (int): The size of the seq set. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In size setter.")
         if size < 0:
             raise ValueError("The size must be non-negative.")
@@ -228,32 +374,71 @@ class WgsRawSeqSet(Base):
 
     @property
     def study(self):
+        """ str: One of the 3 studies that are part of the iHMP. """ 
         self.logger.debug("In study getter.")
 
         return self._study
 
     @study.setter
     def study(self, study):
+        """
+        The setter for the WgsRawSeqSet study. This is restricted to be either
+        preg_preterm, ibd, or prediabetes. 
+        
+        Args:
+            study (str): The study of the seq set. 
+            
+        Returns:
+            None 
+        """
         self.logger.debug("In study setter.")
 
+        studies = ["preg_preterm","ibd","prediabetes"]
+        
         if type(study) != str:
             raise ValueError("study must be a string.")
-
-        self._study = study
+        
+        if study in studies: 
+            self._study = study
+        else:
+            raise Exception("Not a valid study")
 
     @property
     def urls(self):
+        """ array: An array of URL from where the file can be obtained,
+                   http, ftp, fasp, etc... """ 
         self.logger.debug("In urls getter.")
 
         return self._urls
 
     @staticmethod
     def required_fields():
+        """
+        A static method. The required fields for the class.
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
                 "local_file", "seq_model", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
+        
+        Args:
+            None
+            
+        Returns:
+            A dictionary representation of the JSON document.
+        """
         self.logger.debug("In _get_raw_doc.")
 
         sixteen_s_doc = {
@@ -293,6 +478,16 @@ class WgsRawSeqSet(Base):
         return sixteen_s_doc
 
     def to_json(self, indent=4):
+        """
+        Converts the raw JSON doc (the dictionary representation)
+        to a printable JSON string.
+        
+        Args:
+            indent (int): The indent for each successive line of the JSON string output
+        
+        Returns:
+            A printable JSON string 
+        """
         self.logger.debug("In to_json.")
 
         visit_doc = self._get_raw_doc()
@@ -313,6 +508,17 @@ class WgsRawSeqSet(Base):
 
     @staticmethod
     def load(seq_set_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+        
+        Args:
+            seq_set_id (str): The OSDF ID for the document to load.
+        
+        Returns:
+            A WgsRawSeqSet object with all the available OSDF data loaded into it. 
+        """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
 
         session = iHMPSession.get_session()
@@ -350,6 +556,22 @@ class WgsRawSeqSet(Base):
         return seq_set
 
     def save(self):
+        """
+        Saves the data in the current instance. The JSON form of the current data
+        for the instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously, then
+        the node ID is assigned the alpha numeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful, will be
+        assigned to the alpha numeric ID found in the OSDF instance. Also, the
+        version is updated as the data is saved in the OSDF instance.
+        
+        Args:
+            None
+        
+        Returns;
+            True if successful, False otherwise. 
+        
+        """
         self.logger.debug("In save.")
 
         if not self.is_valid():

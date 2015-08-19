@@ -8,7 +8,7 @@ def read(fname):
 setup(name='cutlass',
   description='A iHMP domain specific API using osdf-python',
   long_description=read('README.md'),
-  version='0.0.2',
+  version='0.1',
   author='Victor F',
   author_email='victor73@github.com',
   url='http://ihmpdcc.org',

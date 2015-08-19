@@ -1,17 +1,17 @@
+#!/usr/bin/env python
+
 import unittest
 import json
 import sys
 
-
 from cutlass import iHMPSession
 from cutlass import Study
 from cutlass import MIXS, MixsException
-from test_config import BaseConfig
 
 session = iHMPSession("foo", "bar")
 
 class StudyTest(unittest.TestCase):
-    
+
     def testImport(self):
         success = False
         try:
@@ -36,7 +36,7 @@ class StudyTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(study is None)
-    
+
     def testName(self):
         study = session.create_study()
         success = False
@@ -50,7 +50,8 @@ class StudyTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use 'name' setter.")
 
-        self.assertEqual(study.name, test_name, "Property getter for 'name' works.")
+        self.assertEqual(study.name, test_name,
+                         "Property getter for 'name' works.")
 
     def testIntName(self):
         study = session.create_study()
@@ -91,25 +92,26 @@ class StudyTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             study.description = 3
-    
+
     def testCenterIllegal(self):
         study = session.create_study()
         with self.assertRaises(Exception):
             study.center = "abhishek"
-            
+
     def testCenterLegal(self):
         study = session.create_study()
         success = False
         center = "Broad Institute"
-        try: 
+        try:
             study.center = center
             success = True
         except:
             pass
-        
+
         self.assertTrue(success, "Able to use the body_site setter")
-        
-        self.assertEqual(study.center, center, "Property getter for 'body_site' works.")
+
+        self.assertEqual(study.center, center,
+                         "Property getter for 'body_site' works.")
 
     def testSRPID(self):
         study = session.create_study()
@@ -124,7 +126,8 @@ class StudyTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use 'srp_id' setter.")
 
-        self.assertEqual(study.srp_id, test_srp_id, "Property getter for 'srp_id' works.")
+        self.assertEqual(study.srp_id, test_srp_id,
+                         "Property getter for 'srp_id' works.")
 
     def testIntSRPID(self):
         study = session.create_study()
@@ -143,7 +146,7 @@ class StudyTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             study.srp_id = None
-            
+
     def testContact(self):
         study = session.create_study()
         success = False
@@ -157,7 +160,8 @@ class StudyTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use 'contact' setter.")
 
-        self.assertEqual(study.contact, test_contact, "Property getter for 'contact' works.")
+        self.assertEqual(study.contact, test_contact,
+                         "Property getter for 'contact' works.")
 
     def testIntContact(self):
         study = session.create_study()
@@ -176,13 +180,13 @@ class StudyTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             study.contact = None
-    
+
     def testToJson(self):
         study = session.create_study()
         success = False
         name = "Tested name"
 
-        study.name = name 
+        study.name = name
         study_json = None
 
         try:
@@ -209,7 +213,7 @@ class StudyTest(unittest.TestCase):
 
         self.assertEqual(study_data['meta']['name'],
                          name, "'name' in JSON had expected value.")
-        
+
     def testId(self):
         study = session.create_study()
 
@@ -279,57 +283,61 @@ class StudyTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
-        
+
     def testLoadSaveDeleteStudy(self):
-        #attempt to save the study at all points before and after adding the required fields
-        #project_id = super(StudyTest, self).testSaveProject()
-        
+        # Attempt to save the study at all points before and after
+        # adding the required fields
+
         study = session.create_study()
-                
+
         test_name = "Test name"
         test_description = "Test description"
         test_contact = "Test contacts"
         test_links = {"part_of":[], "subset_of":[]}
         test_center = "Jackson Laboratory"
         test_tag = "New tag added to study"
-        
-        self.assertFalse(study.save(), "Study not saved successfully, no required fields")
-        
+
+        self.assertFalse(study.save(),
+                         "Study not saved successfully, no required fields")
+
         study.name = test_name
         study.description = test_description
-        
+
         self.assertFalse(study.save(), "Study not saved successfully")
-        
-        study.contact = test_contact 
-        study.links = test_links 
-        
+
+        study.contact = test_contact
+        study.links = test_links
+
         self.assertFalse(study.save(), "Study not saved successfully")
-        
+
         study.center = test_center
         study.add_tag(test_tag)
-        
-        #make sure study does not delete if it does not exist 
+
+        # Make sure study does not delete if it does not exist
         with self.assertRaises(Exception):
             study.delete()
-        
+
         self.assertTrue(study.save() == True, "Study was not saved successfully")
-        
-        #load the study that was just saved from the OSDF instance        
+
+        # Load the study that was just saved from the OSDF instance
         study_loaded = session.create_study()
         study_loaded = study_loaded.load(study.id)
-        
-        #check all fields were saved and loaded successfully 
-        self.assertEqual(study.name, study_loaded.name, "Study name not saved & loaded successfully")        
-        self.assertEqual(study.tags[0], study_loaded.tags[0], "Study tags not saved & loaded successfully")
-        self.assertEqual(study.center, study_loaded.center, "Study MIXS not saved & loaded successfully")
-        
-        #study is deleted successfully 
-        self.assertTrue(study.delete(), "Study was not deleted successfully")        
-        
-        #the study of the initial ID should not load successfully 
+
+        # Check all fields were saved and loaded successfully
+        self.assertEqual(study.name, study_loaded.name,
+                         "Study name not saved & loaded successfully")
+        self.assertEqual(study.tags[0], study_loaded.tags[0],
+                         "Study tags not saved & loaded successfully")
+        self.assertEqual(study.center, study_loaded.center,
+                         "Study MIXS not saved & loaded successfully")
+
+        # Study is deleted successfully
+        self.assertTrue(study.delete(), "Study was not deleted successfully")
+
+        # The study of the initial ID should not load successfully
         load_test = session.create_study()
         with self.assertRaises(Exception):
             load_test = load_test.load(study.id)
-    
+
 if __name__ == '__main__':
     unittest.main()
