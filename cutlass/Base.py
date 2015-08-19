@@ -227,9 +227,11 @@ class Base(object):
         
         """
         self.logger.debug("In search.")
-
+        
+        #searching without any parameters will return all different results 
+        
         session = iHMPSession.get_session()
-        session.get_osdf().oql_query(query)
+        
         self.logger.info("Got iHMP session.")
 
     def delete(self):

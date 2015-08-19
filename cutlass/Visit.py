@@ -311,11 +311,86 @@ class Visit(Base):
 
         return json_str
 
-    def search(self, query):
-        self.logger.debug("In search.")
-
+    @staticmethod
+    def search(query = "\"visit\"[node_type]"):        
+        """
+        Searches the OSDF database through all Visit node types. Any criteria
+        the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a Visit instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         Visit node type.
+        
+        Returns:
+            Returns an array of Visit objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"visit\"[node_type]":
+            query = query + " && \"visit\"[node_type]"
+        
+        visit_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = visit_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                visit_result = Visit.load_visit(i)
+                result_list.append(visit_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_visit(visit_data):
+        """
+        Takes the provided JSON string and converts it to a Visit object
+        
+        Args:
+            visit_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a Visit instance. 
+        """
+        module_logger.info("Creating a template Visit.")
+        visit = Visit()
+
+        module_logger.debug("Filling in Visit details.")
+
+        # The attributes commmon to all iHMP nodes
+        visit._set_id(visit_data['id'])
+        visit._version = visit_data['ver']
+        visit._links = visit_data['linkage']
+
+        # The attributes that are particular to Visit objects
+        visit._visit_id = visit_data['meta']['visit_id']
+        visit._visit_number = visit_data['meta']['visit_number']
+        visit._date = visit_data['meta']['date']
+        visit._interval = visit_data['meta']['interval']
+
+        if 'clinic_id' in visit_data['meta']:
+            module_logger.info("Visit data has 'clinic_id' present.")
+            visit._clinic_id = visit_data['meta']['clinic_id']
+
+        if 'tags' in visit_data['meta']:
+            module_logger.info("Visit data has 'tags' present.")
+            visit._tags= visit_data['meta']['tags']
+
+        module_logger.debug("Returning loaded Visit.")
+
+        return visit
 
     def delete(self):
         """

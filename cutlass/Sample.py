@@ -309,11 +309,51 @@ class Sample(Base):
         module_logger.debug("Returning loaded Sample.")
         return sample
 
-    def search(self, dictionary):
-        #query using this dictionary
-        #formulate the query in this location
-        #use query or query_all_pages
-        pass
+    @staticmethod
+    def search(query = "\"subject\"[node_type]"):
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"sample\"[node_type]":
+            query = query + " && \"sample\"[node_type]"
+        
+        sample_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = sample_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                sample_result = Sample.load_sample(i)
+                result_list.append(sample_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_sample(sample_data):        
+        module_logger.info("Creating a template Sample.")
+        sample = Sample()
+
+        module_logger.debug("Filling in Sample details.")
+
+        sample._set_id(sample_data['id'])
+        # ver, not version for the key
+        sample._version = sample_data['ver']
+        sample._tags = sample_data['meta']['tags']
+        sample._mixs = sample_data['meta']['mixs']
+        sample._fma_body_site = sample_data['meta']['fma_body_site']
+
+        if 'body_site' in sample_data['meta']:
+            sample._body_site = sample_data['meta']['body_site']
+
+        if 'supersite' in sample_data['meta']:
+            sample._supersite= sample_data['meta']['supersite']
+
+        module_logger.debug("Returning loaded Sample.")
+        return sample
 
     def _get_raw_doc(self):
         """

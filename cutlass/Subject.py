@@ -266,13 +266,7 @@ class Subject(Base):
 
         self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
 
-        return json_str
-
-    def search(self, query):
-        self.logger.debug("In search.")
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        return json_str    
 
     def delete(self):
         """
@@ -311,6 +305,77 @@ class Subject(Base):
                               "Reason: %s" % subject_id, e.strerror)
 
         return success
+
+    @staticmethod
+    def search(query = "\"subject\"[node_type]"):        
+        """
+        Searches the OSDF database through all Subject node types. Any criteria
+        the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a Subject instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         Subject node type.
+        
+        Returns:
+            Returns an array of Subject objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"subject\"[node_type]":
+            query = query + " && \"subject\"[node_type]"
+        
+        subject_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = subject_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                subject_result = Subject.load_subject(i)
+                result_list.append(subject_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_subject(subject_data):
+        """
+        Takes the provided JSON string and converts it to a Subject object
+        
+        Args:
+            subject_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a Subject instance. 
+        """
+        module_logger.info("Creating a template Subject.")
+        subject = Subject()
+
+        module_logger.debug("Filling in Subject details.")
+        subject._set_id(subject_data['id'])
+        subject._links = subject_data['linkage']
+        subject._version = subject_data['ver']
+
+        subject._gender = subject_data['meta']['gender']
+        subject._rand_subject_id = subject_data['meta']['rand_subject_id']
+        subject._tags = subject_data['meta']['tags']
+
+        if 'race' in subject_data['meta']:
+            subject._race = subject_data['meta']['race']
+
+        module_logger.debug("Returning loaded Subject.")
+        return subject
 
     @staticmethod
     def load(subject_id):

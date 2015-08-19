@@ -286,11 +286,49 @@ class Project(Base):
                               "Reason: %s" % project_id, e)
         return success
 
-    def search(self, dictionary):
-        # query using this dictionary
-        # formulate the query in this location
-        # use query or query_all_pages
-        pass
+    @staticmethod
+    def search(query = "\"subject\"[node_type]"):
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"project\"[node_type]":
+            query = query + " && \"project\"[node_type]"
+        
+        project_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = project_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                project_result = Project.load_project(i)
+                result_list.append(project_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_project(project_data):        
+        module_logger.info("Creating a template project.")
+
+        project = Project()
+
+        module_logger.debug("Filling in project details.")
+
+        project._set_id(project_data['id'])
+
+        # For version, the key to use is simply 'ver'
+        project._links = project_data['linkage']
+        project._version = project_data['ver']
+        project._tags = project_data['meta']['tags']
+        project._mixs = project_data['meta']['mixs']
+        project._description = project_data['meta']['description']
+        project._name = project_data['meta']['name']
+
+        module_logger.debug("Returning loaded project.")
+        return project
 
     def _get_raw_doc(self):
         """
