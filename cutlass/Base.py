@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import logging
 from iHMPSession import iHMPSession
+from osdf import OSDF
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -231,6 +232,7 @@ class Base(object):
         self.logger.debug("In search.")
 
         session = iHMPSession.get_session()
+        session.get_osdf().oql_query(query)
         self.logger.info("Got iHMP session.")
 
     def delete(self):
