@@ -288,6 +288,25 @@ class Project(Base):
 
     @staticmethod
     def search(query = "\"subject\"[node_type]"):
+        """
+        Searches the OSDF database through all Project node types. Any
+        criteria the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a Project instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         Project node type.
+        
+        Returns:
+            Returns an array of Project objects. It returns an empty list if
+            there are no results.
+        """
         module_logger.debug("In search.")
         #searching without any parameters will return all different results 
         session = iHMPSession.get_session()
@@ -310,7 +329,16 @@ class Project(Base):
         return result_list
     
     @staticmethod
-    def load_project(project_data):        
+    def load_project(project_data):
+        """
+        Takes the provided JSON string and converts it to a Project object
+        
+        Args:
+            project_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a Project instance. 
+        """
         module_logger.info("Creating a template project.")
 
         project = Project()
