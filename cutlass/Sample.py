@@ -310,7 +310,7 @@ class Sample(Base):
         return sample
 
     @staticmethod
-    def search(query = "\"subject\"[node_type]"):
+    def search(query = "\"sample\"[node_type]"):
         module_logger.debug("In search.")
         #searching without any parameters will return all different results 
         session = iHMPSession.get_session()

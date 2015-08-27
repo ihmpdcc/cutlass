@@ -287,7 +287,7 @@ class Project(Base):
         return success
 
     @staticmethod
-    def search(query = "\"subject\"[node_type]"):
+    def search(query = "\"project\"[node_type]"):
         """
         Searches the OSDF database through all Project node types. Any
         criteria the user wishes to add is provided by the user in the query language
