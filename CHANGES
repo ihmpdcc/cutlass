@@ -1,3 +1,10 @@
+cutlass 0.2
+
+ * Merged pull request providing search() implemnentation for each
+   node type.
+
+ - Victor <victor73@github.com>  Sat, 30 Aug 2015 12:00:00 -0400
+
 cutlass 0.1
 
  * Added pydoc documentation for the various classes
