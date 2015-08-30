@@ -468,11 +468,92 @@ class WgsDnaPrep(Base):
 
         return wgs_doc
 
-    def search(self, query):
-        self.logger.debug("In search.")
-
+    @staticmethod
+    def search(query = "\"wgs_dna_prep\"[node_type]"):
+        """
+        Searches the OSDF database through all WgsDnaPrep node types. Any criteria
+        the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a WgsDnaPrep instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         WgsDnaPrep node type.
+        
+        Returns:
+            Returns an array of WgsDnaPrep objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"wgs_dna_prep\"[node_type]":
+            query = query + " && \"wgs_dna_prep\"[node_type]"
+        
+        wgsDnaPrep_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = wgsDnaPrep_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                wgsDnaPrep_result = WgsDnaPrep.load_wgsDnaPrep(i)
+                result_list.append(wgsDnaPrep_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_wgsDnaPrep(prep_data):
+        """
+        Takes the provided JSON string and converts it to a WgsDnaPrep object
+        
+        Args:
+            subject_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a WgsDnaPrep instance. 
+        """
+        module_logger.info("Creating a template " + __name__ + ".")
+        prep = WgsDnaPrep()
+
+        module_logger.debug("Filling in " + __name__ + " details.")
+
+        # The attributes commmon to all iHMP nodes
+        prep._set_id(prep_data['id'])
+        prep._version = prep_data['ver']
+        prep._links = prep_data['linkage']
+
+        # The attributes that are particular to WgsDnaPrep documents
+        prep._comment = prep_data['meta']['comment']
+        prep._lib_layout = prep_data['meta']['lib_layout']
+        prep._lib_selection = prep_data['meta']['lib_selection']
+        prep._mims = prep_data['meta']['mims']
+        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
+        prep._prep_id = prep_data['meta']['prep_id']
+        prep._sequencing_center = prep_data['meta']['sequencing_center']
+        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
+        prep._storage_duration = prep_data['meta']['storage_duration']
+        prep._tags = prep_data['meta']['tags']
+
+        if 'frag_size' in prep_data['meta']:
+            module_logger.info(__name__ + " data has 'frag_size' present.")
+            prep._frag_size = prep_data['meta']['frag_size']
+
+        if 'srs_id' in prep_data['meta']:
+            module_logger.info(__name__ + " data has 'srs_id' present.")
+            prep._srs_id = prep_data['meta']['srs_id']
+
+        module_logger.debug("Returning loaded " + __name__)
+
+        return prep
 
     @staticmethod
     def load(prep_id):

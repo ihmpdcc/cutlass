@@ -560,6 +560,89 @@ class SixteenSRawSeqSet(Base):
         return success
 
     @staticmethod
+    def search(query = "\"16s_raw_seq_set\"[node_type]"):        
+        """
+        Searches the OSDF database through all SixteenSRawSeqSet node types. Any
+        criteria the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a SixteenSRawSeqSet instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         SixteenSRawSeqSet node type.
+        
+        Returns:
+            Returns an array of SixteenSRawSeqSet objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"16s_raw_seq_set\"[node_type]":
+            query = query + " && \"16s_raw_seq_set\"[node_type]"
+        
+        sixteenSRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = sixteenSRawSeqSet_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                sixteenSRawSeqSet_result = SixteenSRawSeqSet.load_sixteenSRawSeqSet(i)
+                result_list.append(sixteenSRawSeqSet_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_sixteenSRawSeqSet(seq_set_data):
+        """
+        Takes the provided JSON string and converts it to a SixteenSRawSeqSet
+        object
+        
+        Args:
+            seq_set_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a SixteenSRawSeqSet instance. 
+        """
+        module_logger.info("Creating a template " + __name__ + ".")
+        seq_set = SixteenSRawSeqSet()
+
+        module_logger.debug("Filling in " + __name__ + " details.")
+
+        # The attributes commmon to all iHMP nodes
+        seq_set._set_id(seq_set_data['id'])
+        seq_set._version = seq_set_data['ver']
+        seq_set._links = seq_set_data['linkage']
+
+        # The attributes that are particular to SixteenSRawSeqSet documents
+        seq_set._checksums = seq_set_data['meta']['checksums']
+        seq_set._comment = seq_set_data['meta']['comment']
+        seq_set._exp_length = seq_set_data['meta']['exp_length']
+        seq_set._format = seq_set_data['meta']['format']
+        seq_set._format_doc = seq_set_data['meta']['format_doc']
+        seq_set._seq_model = seq_set_data['meta']['seq_model']
+        seq_set._size = seq_set_data['meta']['size']
+        seq_set._urls = seq_set_data['meta']['urls']
+        seq_set._tags = seq_set_data['meta']['tags']
+
+        if 'sequence_type' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'sequence_type' present.")
+            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+
+        module_logger.debug("Returning loaded " + __name__)
+
+        return seq_set
+
+    @staticmethod
     def load(seq_set_id):
         """
         Loads the data for the specified ID from OSDF instance.  If the

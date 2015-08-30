@@ -265,11 +265,82 @@ class Study(Base):
 
         return json_str
 
-    def search(self, query):
-        self.logger.debug("In search.")
-
+    @staticmethod
+    def search(query = "\"study\"[node_type]"):        
+        """
+        Searches the OSDF database through all Study node types. Any criteria
+        the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+        
+        "search criteria"[field to search]
+        
+        If there are any results, they are returned as a Study instance,
+        otherwise an empty list will be returned. 
+        
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         Study node type.
+        
+        Returns:
+            Returns an array of Study objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+        #searching without any parameters will return all different results 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        module_logger.info("Got iHMP session.")
+        
+        if query != "\"study\"[node_type]":
+            query = query + " && \"study\"[node_type]"
+        
+        study_data = session.get_osdf().oql_query("ihmp", query)
+        
+        all_results = study_data['results']
+        
+        result_list = list()
+        
+        if len(all_results) > 0: 
+            for i in all_results:
+                study_result = Study.load_study(i)
+                result_list.append(study_result)
+        
+        return result_list
+    
+    @staticmethod
+    def load_study(study_data):
+        """
+        Takes the provided JSON string and converts it to a Study object
+        
+        Args:
+            study_data (str): The JSON string to convert 
+        
+        Returns:
+            Returns a Study instance. 
+        """
+        module_logger.info("Creating a template Study.")
+
+        study = Study()
+
+        module_logger.debug("Filling in Study details.")
+
+        study._set_id(study_data['id'])
+        # For version, the key to use is simply 'ver'
+        study._version = study_data['ver']
+        study._links = study_data['linkage']
+
+        # The attributes that are particular to Study objects
+        study._name = study_data['meta']['name']
+        study._description = study_data['meta']['description']
+        study._center = study_data['meta']['center']
+        study._contact = study_data['meta']['contact']
+        study._tags = study_data['meta']['tags']
+
+        if 'srp_id' in study_data['meta']:
+            study._srp_id = study_data['meta']['srp_id']
+
+        module_logger.debug("Returning loaded Study.")
+        return study
 
     def delete(self):
         """
