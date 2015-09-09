@@ -5,10 +5,17 @@ from distutils.core import setup
 def read(fname):
       return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+def get_version():
+    version_fh = open("CHANGES", "r")
+    first_line = version_fh.readline().strip()
+    version_fh.close()
+    version = first_line.split()[1]
+    return version
+
 setup(name='cutlass',
-  description='A iHMP domain specific API using osdf-python',
+  description='An iHMP domain specific API using osdf-python',
   long_description=read('README.md'),
-  version='0.1',
+  version=get_version(),
   author='Victor F',
   author_email='victor73@github.com',
   url='http://ihmpdcc.org',
