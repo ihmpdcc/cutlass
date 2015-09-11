@@ -8,23 +8,23 @@ class iHMPSession(object):
     The iHMP Session class. This class allows you to connect with an OSDF instance and
     begin analysis of iHMP data. It produces skeletons of all objects in the iHMP OSDF
     database. Each object contains its own save, load, delete feature
-    
+
     Attributes:
         _single (iHMPSession): The iHMP Session that is currently live. None otherwise.
     """
-    
+
     _single = None
 
     def __init__(self, username, password, server="osdf.ihmpdcc.org", port=8123):
         """
         The initialization of the iHMPSession for the user.
-        
+
         Args:
             username (str): The username for OSDF access
             password (str): The password for OSDF access
             server (str): The server domain name containing the OSDF instance. Defaults
                 to 'osdf.ihmpdcc.org'.
-            port (int): The port allowing access to the OSDF instance. 
+            port (int): The port allowing access to the OSDF instance.
         """
         self._username = username
         self._password = password
@@ -42,12 +42,12 @@ class iHMPSession(object):
     def get_session():
         """
         Returns the current iHMP session if any is instantiated.
-        
+
         Args:
             None
-            
+
         Returns:
-            The current iHMP session. 
+            The current iHMP session.
         """
         if iHMPSession._single is None:
             raise Exception("A session has not yet been created.")
@@ -57,25 +57,25 @@ class iHMPSession(object):
     def get_osdf(self):
         """
         Returns the OSDF object with access to the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns:
-            An OSDF object. 
+            An OSDF object.
         """
         self.logger.debug("In get_osdf.")
         return self._osdf
 
     def create_project(self):
         """
-        Returns an empty Project object. 
-        
+        Returns an empty Project object.
+
         Args:
             None
-        
+
         Returns:
-            A Project object. 
+            A Project object.
         """
         self.logger.debug("In create_project.")
         from Project import Project
@@ -84,28 +84,28 @@ class iHMPSession(object):
 
     def create_sample(self):
         """
-        Returns an empty Sample object. 
-        
+        Returns an empty Sample object.
+
         Args:
             None
-        
+
         Returns:
-            A Sample object. 
+            A Sample object.
         """
         self.logger.debug("In create_sample.")
         from Sample import Sample
         sample = Sample()
         return sample
-    
+
     def create_visit(self):
         """
-        Returns an empty Visit object. 
-        
+        Returns an empty Visit object.
+
         Args:
             None
-        
+
         Returns:
-            A Visit object. 
+            A Visit object.
         """
         self.logger.debug("In create_visit.")
         from Visit import Visit
@@ -114,13 +114,13 @@ class iHMPSession(object):
 
     def create_subject(self):
         """
-        Returns an empty Subject object. 
-        
+        Returns an empty Subject object.
+
         Args:
             None
-        
+
         Returns:
-            A Subject object. 
+            A Subject object.
         """
         self.logger.debug("In create_subject.")
         from Subject import Subject
@@ -129,13 +129,13 @@ class iHMPSession(object):
 
     def create_study(self):
         """
-        Returns an empty Study object. 
-        
+        Returns an empty Study object.
+
         Args:
             None
-        
+
         Returns:
-            A Study object. 
+            A Study object.
         """
         self.logger.debug("In create_study.")
         from Study import Study
@@ -144,13 +144,13 @@ class iHMPSession(object):
 
     def create_16s_dna_prep(self):
         """
-        Returns an empty 16S DNA Prep object. 
-        
+        Returns an empty 16S DNA Prep object.
+
         Args:
             None
-        
+
         Returns:
-            A 16S DNA Prep object. 
+            A 16S DNA Prep object.
         """
         self.logger.debug("In create_16s_dna_prep.")
         from SixteenSDnaPrep import SixteenSDnaPrep
@@ -159,13 +159,13 @@ class iHMPSession(object):
 
     def create_16s_raw_seq_set(self):
         """
-        Returns an empty 16S Raw Sequence Set object. 
-        
+        Returns an empty 16S Raw Sequence Set object.
+
         Args:
             None
-        
+
         Returns:
-            A 16S Raw Sequence Set object. 
+            A 16S Raw Sequence Set object.
         """
         self.logger.debug("In create_16s_raw_seq_set.")
         from SixteenSRawSeqSet import SixteenSRawSeqSet
@@ -174,44 +174,59 @@ class iHMPSession(object):
 
     def create_16s_trimmed_seq_set(self):
         """
-        Returns an empty 16S Trimmed Sequence Set object. 
-        
+        Returns an empty 16S Trimmed Sequence Set object.
+
         Args:
             None
-        
+
         Returns:
-            A 16S Trimmed Sequence Set object. 
+            A 16S Trimmed Sequence Set object.
         """
         self.logger.debug("In create_16s_trimmed_seq_set.")
         from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
         seq_set = SixteenSTrimmedSeqSet()
         return seq_set
-    
-    def create_wgs_dna_prep(self):
+
+    def create_wgs_raw_seq_set(self):
         """
-        Returns an empty WGS DNA Prep object. 
-        
+        Returns an empty WGS Raw Seq Set object.
+
         Args:
             None
-        
+
         Returns:
-            A WGS Dna Prep object. 
+            A WGS Raw Sequence Set object.
+        """
+        self.logger.debug("In create_wgs_raw_seq_set.")
+        from WgsRawSeqSet import WgsRawSeqSet
+        wgs_raw_seq_set = WgsRawSeqSet()
+        return wgs_raw_seq_set
+
+    def create_wgs_dna_prep(self):
+        """
+        Returns an empty WGS DNA Prep object.
+
+        Args:
+            None
+
+        Returns:
+            A WGS Dna Prep object.
         """
         self.logger.debug("In create_16s_trimmed_seq_set.")
         from WgsDnaPrep import WgsDnaPrep
         wgs_dna_prep = WgsDnaPrep()
         return wgs_dna_prep
-    
+
     def create_object(self, node_type):
         """
         Returns an empty object of the node_type provided. It must be a valid object,
-        or else an exception is raised. 
-        
+        or else an exception is raised.
+
         Args:
-            node_type (str): The type of object desired. 
-        
+            node_type (str): The type of object desired.
+
         Returns:
-            A object of the specified type. 
+            A object of the specified type.
         """
         self.logger.debug("In create_object. Type: %s" % node_type)
 
@@ -271,10 +286,10 @@ class iHMPSession(object):
     def password(self, password):
         """
         The password setter
-        
+
         Args:
             password (str): The new password for OSDF access.
-        
+
         Returns:
             None
         """
@@ -286,7 +301,7 @@ class iHMPSession(object):
 
     @property
     def port(self):
-        """ int: The port for access to the OSDF instance on the server. """ 
+        """ int: The port for access to the OSDF instance on the server. """
         self.logger.debug("In port getter.")
         return self._port
 
@@ -294,10 +309,10 @@ class iHMPSession(object):
     def port(self, port):
         """
         The port setter
-        
+
         Args:
             port (int): The new port for OSDF access.
-        
+
         Returns:
             None
         """
@@ -317,10 +332,10 @@ class iHMPSession(object):
     def server(self, server):
         """
         The server setter
-        
+
         Args:
             server (str): The new server for OSDF access.
-        
+
         Returns:
             None
         """
@@ -340,10 +355,10 @@ class iHMPSession(object):
     def username(self, username):
         """
         The username setter
-        
+
         Args:
             username (str): The new username for OSDF access.
-        
+
         Returns:
             None
         """
