@@ -4,7 +4,7 @@ import unittest
 import sys
 from cutlass import *
 
-class ImportTest(unittest.TestCase):
+class ImportAllTest(unittest.TestCase):
     def testImportSession(self):
         self.failIf(iHMPSession is None)
 
@@ -30,7 +30,7 @@ class ImportTest(unittest.TestCase):
         self.failIf(SixteenSRawSeqSet is None)
 
     def testImportWgsRawSeqSet(self):
-        self.failIf(SixteenSRawSeqSet is None)
+        self.failIf(WgsRawSeqSet is None)
 
     def testImport16STrimmedSeqSet(self):
         self.failIf(SixteenSTrimmedSeqSet is None)
