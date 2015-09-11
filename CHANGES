@@ -1,6 +1,15 @@
+cutlass 0.3
+
+ * Altered server-side upload/download paths for certain node
+   types to conform with updated tree structure/storage.
+ * Added missing create_wgs_raw_seq_set() method in the iHMPSession
+   class.
+
+ - Victor <victor73@github.com>  Wed, 10 Sep 2015 12:00:00 -0400
+ 
 cutlass 0.2
 
- * Merged pull request providing search() implemnentation for each
+ * Merged pull request providing search() implementation for each
    node type.
 
  - Victor <victor73@github.com>  Sat, 30 Aug 2015 12:00:00 -0400
