@@ -5,7 +5,7 @@ cutlass 0.3
  * Added missing create_wgs_raw_seq_set() method in the iHMPSession
    class.
 
- - Victor <victor73@github.com>  Wed, 10 Sep 2015 12:00:00 -0400
+ - Victor <victor73@github.com>  Mon, 14 Sep 2015 12:00:00 -0400
  
 cutlass 0.2
 
