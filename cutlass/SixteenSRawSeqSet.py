@@ -560,58 +560,58 @@ class SixteenSRawSeqSet(Base):
         return success
 
     @staticmethod
-    def search(query = "\"16s_raw_seq_set\"[node_type]"):        
+    def search(query = "\"16s_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all SixteenSRawSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a SixteenSRawSeqSet instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          SixteenSRawSeqSet node type.
-        
+
         Returns:
             Returns an array of SixteenSRawSeqSet objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+        #searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"16s_raw_seq_set\"[node_type]":
             query = query + " && \"16s_raw_seq_set\"[node_type]"
-        
+
         sixteenSRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
-        
+
         all_results = sixteenSRawSeqSet_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 sixteenSRawSeqSet_result = SixteenSRawSeqSet.load_sixteenSRawSeqSet(i)
                 result_list.append(sixteenSRawSeqSet_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_sixteenSRawSeqSet(seq_set_data):
         """
         Takes the provided JSON string and converts it to a SixteenSRawSeqSet
         object
-        
+
         Args:
-            seq_set_data (str): The JSON string to convert 
-        
+            seq_set_data (str): The JSON string to convert
+
         Returns:
-            Returns a SixteenSRawSeqSet instance. 
+            Returns a SixteenSRawSeqSet instance.
         """
         module_logger.info("Creating a template " + __name__ + ".")
         seq_set = SixteenSRawSeqSet()
@@ -721,9 +721,27 @@ class SixteenSRawSeqSet(Base):
         success = False
 
         study = self._study
-        remote_path = "/".join(["/" + study, "16s_raw_seq_set", os.path.basename(self._local_file)])
+
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
+
+        if study not in study2dir:
+            raise ValueError("Invalid study. No directory mapping for %s" % study)
+
+        study_dir = study2dir[study]
+
+        remote_base = os.path.basename(self._local_file);
+
+        valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+        remote_base = ''.join(c for c in remote_base if c in valid_chars)
+        remote_base = remote_base.replace(' ', '_') # No spaces in filenames
+
+        remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
+                                "raw", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
-        #print remote_path
+
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(SixteenSRawSeqSet.aspera_server,
                                            session.username,

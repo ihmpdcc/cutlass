@@ -2,6 +2,7 @@
 
 import json
 import logging
+import string
 import os
 from iHMPSession import iHMPSession
 from Base import Base
@@ -17,19 +18,19 @@ class SixteenSTrimmedSeqSet(Base):
     The class encapsulating the 16S Trimmed Sequence set data for an iHMP instance.
     This class contains all the fields required to save a 16S Trimmed sequence set
     object in the OSDF instance.
-    
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
 
     def __init__(self):
         """
         Constructor for the SixteenSTrimmedSeqSet class. This initializes the fields
-        specific to the SixteenSTrimmedSeqSet class, and inherits from the Base class. 
-    
+        specific to the SixteenSTrimmedSeqSet class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -55,15 +56,15 @@ class SixteenSTrimmedSeqSet(Base):
     def validate(self):
         """
         Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required        
+        schema in the OSDF instance for that specific object. All required
         fields for that specific object must be present.
-        
+
         Args:
             None
-            
+
         Returns:
             A list of strings, where each string is the error that the
-            validation raised during OSDF validation 
+            validation raised during OSDF validation
         """
         self.logger.debug("In validate.")
 
@@ -95,10 +96,10 @@ class SixteenSTrimmedSeqSet(Base):
         in the OSDF instance for the specific object. However, unlike
         validates(), this method does not provide exact error messages,
         it states if the validation was successful or not.
-        
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -135,12 +136,12 @@ class SixteenSTrimmedSeqSet(Base):
     def checksums(self, checksums):
         """
         The setter for the SixteenSTrimmedSeqSet checksums.
-        
+
         Args:
             checksums (dict): The checksums for the SixteenSTrimmedSeqSet.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In checksums setter.")
 
@@ -160,19 +161,19 @@ class SixteenSTrimmedSeqSet(Base):
     def comment(self, comment):
         """
         The setter for the SixteenSTrimmedSeqSet comment. The comment must be a string,
-        and less than 512 characters. 
-        
+        and less than 512 characters.
+
         Args:
-            comment (str): The new comment to add to the string. 
-            
+            comment (str): The new comment to add to the string.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In comment setter.")
 
         if type(comment) != str:
             raise ValueError("comment must be a string.")
-    
+
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
 
@@ -180,7 +181,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """ 
+        """ str: The file format of the sequence file """
         self.logger.debug("In format getter.")
 
         return self._format
@@ -189,24 +190,24 @@ class SixteenSTrimmedSeqSet(Base):
     def format(self, format_str):
         """
         The setter for the SixteenSTrimmedSeqSet format. This must be either
-        fasta or fastq. 
-        
+        fasta or fastq.
+
         Args:
-            format_str (str): The new format string for the current object. 
-            
+            format_str (str): The new format string for the current object.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In format setter.")
 
         if type(format_str) != str:
             raise ValueError("format must be a string.")
-        
+
         formats = ["fasta", "fastq"]
         if format_str in formats:
             self._format = format_str
         else:
-            raise Exception("Format must be fasta or fastq only.")
+            raise Exception("Format must be one of 'fasta' or 'fastq'.")
 
     @property
     def format_doc(self):
@@ -218,13 +219,13 @@ class SixteenSTrimmedSeqSet(Base):
     @format_doc.setter
     def format_doc(self, format_doc):
         """
-        The setter for the SixteenSTrimmedSeqSet format doc. 
-        
+        The setter for the SixteenSTrimmedSeqSet format doc.
+
         Args:
-            format_doc (str): The new format_doc for the current object. 
-            
+            format_doc (str): The new format_doc for the current object.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In format_doc setter.")
 
@@ -235,7 +236,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """ 
+        """ str: URL to the local file to upload to the server. """
         self.logger.debug("In local_file getter.")
 
         return self._local_file
@@ -243,14 +244,14 @@ class SixteenSTrimmedSeqSet(Base):
     @local_file.setter
     def local_file(self, local_file):
         """
-        The setter for the SixteenSTrimmedSeqSet local file. 
-        
+        The setter for the SixteenSTrimmedSeqSet local file.
+
         Args:
             local_file (str): The URL to the local file that should be uploaded
-            to the server. 
-            
+            to the server.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In local_file setter.")
 
@@ -261,7 +262,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def sequence_type(self):
-        """ str: Specifies whether the file contains peptide or nucleotide data. """ 
+        """ str: Specifies whether the file contains peptide or nucleotide data. """
         self.logger.debug("In sequence_type getter.")
 
         return self._sequence_type
@@ -270,28 +271,28 @@ class SixteenSTrimmedSeqSet(Base):
     def sequence_type(self, sequence_type):
         """
         The setter for the SixteenSTrimmedSeqSet sequence type. This must be either
-        peptide or nucleotide. 
-        
+        peptide or nucleotide.
+
         Args:
-            sequence_type (str): The new sequence type. 
-            
+            sequence_type (str): The new sequence type.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In sequence_type setter.")
 
         if type(sequence_type) != str:
             raise ValueError("sequence_type must be a string.")
-        
+
         types = ["peptide", "nucleotide"]
         if sequence_type in types:
             self._sequence_type = sequence_type
         else:
-            raise Exception("Sequence type must be either peptide or nucleotide")    
+            raise Exception("Sequence type must be either peptide or nucleotide")
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """ 
+        """ int: The size of the file in bytes. """
         self.logger.debug("In size getter.")
 
         return self._size
@@ -299,13 +300,13 @@ class SixteenSTrimmedSeqSet(Base):
     @size.setter
     def size(self, size):
         """
-        The setter for the SixteenSTrimmedSeqSet size. 
-        
+        The setter for the SixteenSTrimmedSeqSet size.
+
         Args:
-            size (int): The size of the seq set. 
-            
+            size (int): The size of the seq set.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In size setter.")
         if not (type(size) == int and size >= 0):
@@ -315,7 +316,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """ 
+        """ str: One of the 3 studies that are part of the iHMP. """
         self.logger.debug("In study getter.")
 
         return self._study
@@ -324,22 +325,22 @@ class SixteenSTrimmedSeqSet(Base):
     def study(self, study):
         """
         The setter for the SixteenSTrimmedSeqSet study. This is restricted to be either
-        preg_preterm, ibd, or prediabetes. 
-        
+        preg_preterm, ibd, or prediabetes.
+
         Args:
-            study (str): The study of the seq set. 
-            
+            study (str): The study of the seq set.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In study setter.")
 
         studies = ["preg_preterm","ibd","prediabetes"]
-        
+
         if type(study) != str:
             raise ValueError("study must be a string.")
-        
-        if study in studies: 
+
+        if study in studies:
             self._study = study
         else:
             raise Exception("Not a valid study")
@@ -347,7 +348,7 @@ class SixteenSTrimmedSeqSet(Base):
     @property
     def urls(self):
         """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """ 
+                   http, ftp, fasp, etc... """
         self.logger.debug("In urls getter.")
 
         return self._urls
@@ -356,7 +357,7 @@ class SixteenSTrimmedSeqSet(Base):
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -373,10 +374,10 @@ class SixteenSTrimmedSeqSet(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -417,57 +418,57 @@ class SixteenSTrimmedSeqSet(Base):
         return sixteen_s_doc
 
     @staticmethod
-    def search(query = "\"16s_trimmed_seq_set\"[node_type]"):        
+    def search(query = "\"16s_trimmed_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all SixteenSTrimmedSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a SixteenSTrimmedSeqSet instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          SixteenSTrimmedSeqSet node type.
-        
+
         Returns:
             Returns an array of SixteenSTrimmedSeqSet objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+        #searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"16s_trimmed_seq_set\"[node_type]":
             query = query + " && \"16s_trimmed_seq_set\"[node_type]"
-        
+
         sixteenSTrimmedSeqSet_data = session.get_osdf().oql_query("ihmp", query)
-        
+
         all_results = sixteenSTrimmedSeqSet_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 sixteenSTrimmedSeqSet_result = SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(i)
                 result_list.append(sixteenSTrimmedSeqSet_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_sixteenSTrimmedSeqSet(seq_set_data):
         """
         Takes the provided JSON string and converts it to a SixteenSTrimmedSeqSet object
-        
+
         Args:
-            seq_set_data (str): The JSON string to convert 
-        
+            seq_set_data (str): The JSON string to convert
+
         Returns:
-            Returns a SixteenSTrimmedSeqSet instance. 
+            Returns a SixteenSTrimmedSeqSet instance.
         """
         module_logger.info("Creating a template " + __name__ + ".")
         seq_set = SixteenSTrimmedSeqSet()
@@ -502,13 +503,13 @@ class SixteenSTrimmedSeqSet(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             seq_set_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
             A SixteenSTrimmedSeqSet object with all the available OSDF data loaded into
-            it. 
+            it.
         """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
 
@@ -553,13 +554,13 @@ class SixteenSTrimmedSeqSet(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
         aspera_server = "aspera.ihmpdcc.org"
@@ -572,8 +573,25 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         study = self._study
-        remote_path = "/".join(["/" + study, "16s_trimmed_seq_set",
-                               os.path.basename(self._local_file)])
+
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
+
+        if study not in study2dir:
+            raise ValueError("Invalid study. No directory mapping for %s" % study)
+
+        study_dir = study2dir[study]
+
+        remote_base = os.path.basename(self._local_file);
+
+        valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+        remote_base = ''.join(c for c in remote_base if c in valid_chars)
+        remote_base = remote_base.replace(' ','_') # No spaces in filenames
+
+        remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
+                                "hm16str", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         success = False
