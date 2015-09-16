@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import string
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
