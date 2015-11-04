@@ -3,8 +3,10 @@
 from datetime import datetime
 import json
 import logging
+from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
+from Sample import Sample
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -535,3 +537,18 @@ class Visit(Base):
                                   "Reason: %s" % self._id, e)
 
         return success
+
+
+    def samples(self):
+        """Return iterator of all samples collected during this visit """
+        q = '"{}"[linkage.collected_during]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+        for page_no in count(1):
+            res = query("ihmp", q, page=page_no)
+            res_count = res['result_count']
+            for doc in res['results']:
+                yield Sample.load_sample(doc)
+            res_count -= len(res['results'])
+            if res_count < 1:
+                break
+    

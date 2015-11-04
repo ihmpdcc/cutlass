@@ -3,9 +3,11 @@
 from datetime import datetime
 import json
 import logging
+from itertools import count
 from iHMPSession import iHMPSession
 from mims import MIMS, MimsException
 from Base import Base
+from WgsRawSeqSet import WgsRawSeqSet
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -666,3 +668,19 @@ class WgsDnaPrep(Base):
                                   __name__ + " %s. Reason: %s" % self._d, e)
 
         return success
+
+
+    def raw_seq_sets(self):
+        """Return iterator of all raw_seq_sets sequenced from this prep """
+        q = '"{}"[linkage.sequenced_from]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+        for page_no in count(1):
+            res = query("ihmp", q, page=page_no)
+            res_count = res['result_count']
+            for doc in res['results']:
+                yield WgsRawSeqSet.load_wgsRawSeqSet(doc)
+            res_count -= len(res['results'])
+            if res_count < 1:
+                break
+
+

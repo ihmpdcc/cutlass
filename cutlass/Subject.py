@@ -2,8 +2,10 @@
 
 import json
 import logging
+from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
+from Visit import Visit
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -482,3 +484,17 @@ class Subject(Base):
                 self.logger.error("Unable to update " + __name__ + ". Reason: %s" % e.strerror)
 
         return success
+
+
+    def visits(self):
+        """Return iterator of all visits by this subject """
+        q = '"{}"[linkage.by]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+        for page_no in count(1):
+            res = query("ihmp", q, page=page_no)
+            res_count = res['result_count']
+            for doc in res['results']:
+                yield Visit.load_visit(doc)
+            res_count -= len(res['results'])
+            if res_count < 1:
+                break
