@@ -3,9 +3,11 @@
 import re
 import json
 import logging
+from itertools import count
 from iHMPSession import iHMPSession
 from mixs import MIXS, MixsException
 from Base import Base
+from Study import Study
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -399,3 +401,18 @@ class Project(Base):
             project_doc['ver'] = self._version
 
         return project_doc
+
+
+    def studies(self):
+        """Return iterator of all studies part of this project """
+        linkage_query = '"{}"[linkage.part_of]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+        for page_no in count(1):
+            res = query("ihmp", linkage_query, page=page_no)
+            res_count = res['result_count']
+            for doc in res['results']:
+                yield Study.load_study(doc)
+            res_count -= len(res['results'])
+            if res_count < 1:
+                break
+    

@@ -4,9 +4,12 @@ import json
 import logging
 import os
 import string
+from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
+from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from aspera import aspera
+
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -786,3 +789,20 @@ class SixteenSRawSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
+
+
+    def trimmed_seq_sets(self):
+        """Return iterator of all trimmed seq sets that were computed from
+        this seq set
+        
+        """
+        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+        for page_no in count(1):
+            res = query("ihmp", linkage_query, page=page_no)
+            res_count = res['result_count']
+            for doc in res['results']:
+                yield SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(doc)
+            res_count -= len(res['results'])
+            if res_count < 1:
+                break
