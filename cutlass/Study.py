@@ -527,10 +527,10 @@ class Study(Base):
 
     def studies(self):
         """Return iterator of all studies that are subsets of this study """
-        q = '"{}"[linkage.subset_of]'.format(self.id)
+        linkage_query = '"{}"[linkage.subset_of]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield Study.load_study(doc)
@@ -541,10 +541,10 @@ class Study(Base):
 
     def subjects(self):
         """Return iterator of all subjects that participate in this study"""
-        q = '"{}"[linkage.participates_in]'.format(self.id)
+        linkage_query = '"{}"[linkage.participates_in]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield Subject.load_subject(doc)

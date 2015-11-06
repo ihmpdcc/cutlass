@@ -488,10 +488,10 @@ class Subject(Base):
 
     def visits(self):
         """Return iterator of all visits by this subject """
-        q = '"{}"[linkage.by]'.format(self.id)
+        linkage_query = '"{}"[linkage.by]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield Visit.load_visit(doc)

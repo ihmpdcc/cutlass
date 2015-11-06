@@ -541,10 +541,10 @@ class Visit(Base):
 
     def samples(self):
         """Return iterator of all samples collected during this visit """
-        q = '"{}"[linkage.collected_during]'.format(self.id)
+        linkage_query = '"{}"[linkage.collected_during]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield Sample.load_sample(doc)

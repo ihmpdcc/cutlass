@@ -405,10 +405,10 @@ class Project(Base):
 
     def studies(self):
         """Return iterator of all studies part of this project """
-        q = '"{}"[linkage.part_of]'.format(self.id)
+        linkage_query = '"{}"[linkage.part_of]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield Study.load_study(doc)

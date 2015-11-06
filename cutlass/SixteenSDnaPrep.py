@@ -735,10 +735,10 @@ class SixteenSDnaPrep(Base):
 
     def raw_seq_sets(self):
         """Return iterator of all raw_seq_sets sequenced from this prep """
-        q = '"{}"[linkage.sequenced_from]'.format(self.id)
+        linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield SixteenSRawSeqSet.load_sixteenSRawSeqSet(doc)

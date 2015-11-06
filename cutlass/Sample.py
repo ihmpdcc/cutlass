@@ -409,10 +409,10 @@ class Sample(Base):
 
 
     def _prep_docs(self):
-        q = '"{}"[linkage.prepared_from]'.format(self.id)
+        linkage_query = '"{}"[linkage.prepared_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", q, page=page_no)
+            res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
             for doc in res['results']:
                 yield doc
