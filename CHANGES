@@ -1,3 +1,10 @@
+cutlass 0.5
+
+ * Fixed requirement for both 'part_of' and 'subset_of' linkages
+   in the Study class.
+
+ - Victor <victor73@github.com>  Thu, l2 Nov 2015 12:00:00 -0400
+
 cutlass 0.4
 
  * Added convenience methods for several classes to easy retrieval

@@ -17,19 +17,19 @@ class Study(Base):
     The class encapsulating the study data for an iHMP instance.
     This class contains all the fields required to save a study object in
     the OSDF instance.
-    
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
 
     def __init__(self):
         """
         Constructor for the Study class. This initializes the fields specific to the
-        Study class, and inherits from the Base class. 
-    
+        Study class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -44,7 +44,7 @@ class Study(Base):
         self._description = None
         self._center = None
         self._contact = None
-        self._srp_id = None        
+        self._srp_id = None
 
     @property
     def name(self):
@@ -56,12 +56,12 @@ class Study(Base):
     def name(self, name):
         """
         The setter for the Project name.
-        
+
         Args:
             name (str): The new name to assign to this instance.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In name setter.")
 
@@ -81,12 +81,12 @@ class Study(Base):
     def description(self, description):
         """
         The setter for the Project description.
-        
+
         Args:
             description (str): The new description to assign to this instance.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In description setter.")
 
@@ -97,7 +97,7 @@ class Study(Base):
 
     @property
     def center(self):
-        """ str: The center the study was performed at. """ 
+        """ str: The center the study was performed at. """
         self.logger.debug("In center getter.")
 
         return self._center
@@ -106,22 +106,22 @@ class Study(Base):
     def center(self, center):
         """
         The setter for the Study center. The center must be one of the following:
-        
+
         Virginia Commonwealth University,
         Broad Institute,
         Stanford University / Jackson Laboratory,
         Stanford University,
-        Jackson Laboratory. 
-        
+        Jackson Laboratory.
+
         Args:
             center (str): The new center.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In center setter.")
         centers = ["Virginia Commonwealth University", "Broad Institute", "Stanford University / Jackson Laboratory", "Stanford University", "Jackson Laboratory"]
-        
+
         if center in centers:
             self._center = center
         else:
@@ -129,7 +129,7 @@ class Study(Base):
 
     @property
     def contact(self):
-        """ str: The study's primary contact at the sequencing center """ 
+        """ str: The study's primary contact at the sequencing center """
         self.logger.debug("In contact getter.")
 
         return self._contact
@@ -138,30 +138,30 @@ class Study(Base):
     def contact(self, contact):
         """
         The setter for the Study contact. The contact information must
-        be between 3 and 128 characters. 
-        
+        be between 3 and 128 characters.
+
         Args:
             contact (str): The new contact for the study.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In contact setter.")
-        
+
         if type(contact) != str:
             raise ValueError("'contact' must be a string.")
-        
+
         if len(contact) < 3:
             raise ValueError("'contact' must be more than 3 characters.")
-        
+
         if len(contact) > 128:
             raise ValueError("'contact' must be less than 128 characters.")
-        
+
         self._contact = contact
 
     @property
     def srp_id(self):
-        """ str: NCBI Sequence Read Archive (SRA) project ID """ 
+        """ str: NCBI Sequence Read Archive (SRA) project ID """
         self.logger.debug("In srp_id getter.")
         return self._srp_id
 
@@ -169,12 +169,12 @@ class Study(Base):
     def srp_id(self, srp_id):
         """
         The setter for the Study srp_id.
-        
+
         Args:
             srp_id (str): The new srp ID for the study.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In srp_id setter.")
 
@@ -187,7 +187,7 @@ class Study(Base):
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -203,10 +203,10 @@ class Study(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -247,14 +247,14 @@ class Study(Base):
         """
         Converts the raw JSON doc (the dictionary representation) to a printable
         JSON string.
-        
+
         Args:
             indent (int): The indent for each successive line of the JSON string output
-        
+
         Returns:
-            A printable JSON string 
+            A printable JSON string
         """
-        
+
         self.logger.debug("In to_json.")
 
         study_doc = self._get_raw_doc()
@@ -268,57 +268,57 @@ class Study(Base):
         return json_str
 
     @staticmethod
-    def search(query = "\"study\"[node_type]"):        
+    def search(query = "\"study\"[node_type]"):
         """
         Searches the OSDF database through all Study node types. Any criteria
         the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a Study instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          Study node type.
-        
+
         Returns:
             Returns an array of Study objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+        #searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"study\"[node_type]":
             query = query + " && \"study\"[node_type]"
-        
+
         study_data = session.get_osdf().oql_query("ihmp", query)
-        
+
         all_results = study_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 study_result = Study.load_study(i)
                 result_list.append(study_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_study(study_data):
         """
         Takes the provided JSON string and converts it to a Study object
-        
+
         Args:
-            study_data (str): The JSON string to convert 
-        
+            study_data (str): The JSON string to convert
+
         Returns:
-            Returns a Study instance. 
+            Returns a Study instance.
         """
         module_logger.info("Creating a template Study.")
 
@@ -351,12 +351,12 @@ class Study(Base):
         will be logged stating the object was not deleted. If the ID is set, and
         exists in the OSDF instance, then the object will be deleted from the
         OSDF instance, and this object must be re-saved in order to use it again.
-        
+
         Args:
             None
-            
+
         Returns:
-            True upon successful deletion, False otherwise. 
+            True upon successful deletion, False otherwise.
         """
         self.logger.debug("In delete.")
 
@@ -388,12 +388,12 @@ class Study(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             study_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
-            A Study object with all the available OSDF data loaded into it. 
+            A Study object with all the available OSDF data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % study_id)
 
@@ -435,13 +435,13 @@ class Study(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
 
@@ -455,13 +455,13 @@ class Study(Base):
         # Before save, make sure that linkage is non-empty, the key should be collected-during
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
-        
+
         success = False
 
         if self._id is None:
             # The document has not yet been saved
             study_data = self._get_raw_doc()
-            
+
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -476,7 +476,7 @@ class Study(Base):
             except Exception as e:
                 self.logger.error("An error occurred while inserting Study. " +
                                   "Reason: %s" % e)
-                
+
         else:
             study_data = self._get_raw_doc()
             try:
@@ -498,10 +498,10 @@ class Study(Base):
         in the OSDF instance for the specific object. However, unlike
         validates(), this method does not provide exact error messages,
         it states if the validation was successful or not.
-        
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -515,20 +515,21 @@ class Study(Base):
 
         (valid, error_message) = session.get_osdf().validate_node(document)
 
-        if 'part_of' not in self._links.keys():
+        if 'subset_of' not in self._links.key() and 'part_of' not in self._links.keys():
+            self.logger.debug("Doesn't have the subset_of or the part_of linkage.")
             valid = False
-        
-        if 'subset_of' not in self._links.keys():
-            valid = False
-        
+
         self.logger.debug("Valid? %s" + str(valid))
 
         return valid
 
     def studies(self):
         """Return iterator of all studies that are subsets of this study """
+        self.logger.debug("In studies.")
+
         linkage_query = '"{}"[linkage.subset_of]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
             res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
@@ -541,8 +542,11 @@ class Study(Base):
 
     def subjects(self):
         """Return iterator of all subjects that participate in this study"""
+        self.logger.debug("In subjects.")
+
         linkage_query = '"{}"[linkage.participates_in]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
             res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
@@ -551,4 +555,4 @@ class Study(Base):
             res_count -= len(res['results'])
             if res_count < 1:
                 break
-            
+
