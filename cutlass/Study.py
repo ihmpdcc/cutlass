@@ -515,7 +515,7 @@ class Study(Base):
 
         (valid, error_message) = session.get_osdf().validate_node(document)
 
-        if 'subset_of' not in self._links.key() and 'part_of' not in self._links.keys():
+        if 'subset_of' not in self._links and 'part_of' not in self._links:
             self.logger.debug("Doesn't have the subset_of or the part_of linkage.")
             valid = False
 
