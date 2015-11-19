@@ -271,3 +271,31 @@ class Base(object):
                               "Reason: %s" % visit_node_id, e.strerror)
 
         return success
+
+
+    def __str__(self):
+        _id = "no ID" if not self._id else self._id[-8:]
+        name = None
+        for attr in ("_name", "_rand_subject_id", "_date", "_local_file"):
+            if hasattr(self, attr):
+                name = getattr(self, attr)
+                break
+        if name:
+            return "<{} `{}' ({})>".format(self.__class__.__name__, name, _id)
+        else:
+            return "<{} ({})>".format(self.__class__.__name__, _id)
+
+
+    __repr__ = __str__
+
+
+    def __hash__(self):
+        if not self._id:
+            raise TypeError("unhashable; must have ID: '{}')".format(str(self)))
+        return hash(self._id)
+
+
+    def __eq__(self, other):
+        if self._id and other._id:
+            return self._id == other._id
+        return False
