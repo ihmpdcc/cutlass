@@ -661,11 +661,11 @@ class WgsDnaPrep(Base):
             try:
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
                 session.get_osdf().edit_node(prep_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._d)
+                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
                 success = True
             except Exception as e:
                 self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._d, e)
+                                  __name__ + " %s. Reason: %s" % self._id, e)
 
         return success
 
