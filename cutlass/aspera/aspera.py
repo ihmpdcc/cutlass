@@ -74,9 +74,16 @@ def get_ascp_env(password):
     return e
 
 # run ascp command, returning True for success or False for failure
-def run_ascp(ascp_cmd, password):
+def run_ascp(ascp_cmd, password, keyfile=None):
     logger.debug("In run_ascp.")
 
+    if keyfile:
+        if not os.path.exists(keyfile):
+            raise IOError(
+                "Can't use private key. No such file or directory: "+keyfile)
+        ascp_cmd = [ascp_cmd[0], "-i", keyfile] + ascp_cmd[1:]
+
+        
     try:
         logger.debug("Command: " + " ".join(ascp_cmd))
         process = subprocess.Popen(ascp_cmd, stdout=subprocess.PIPE,
@@ -105,16 +112,18 @@ def run_ascp(ascp_cmd, password):
     return True
 
 # download a single file via Aspera. return True if successful, False if not
-def download_file(server, username, password, remote_path, local_path):
+def download_file(server, username, password, remote_path, local_path,
+                  keyfile=None):
     logger.debug("In download_file.")
 
     check_ascp_version(ASCP_COMMAND)
     ascp_cmd = [ ASCP_COMMAND, "-T", "-v", "-l", "300M", username + "@" +
                  server + ":" + remote_path, local_path ]
-    return run_ascp(ascp_cmd, password)
+    return run_ascp(ascp_cmd, password, keyfile)
 
 # upload a single file via Aspera. return True if successful, False if not
-def upload_file(server, username, password, local_file, remote_path):
+def upload_file(server, username, password, local_file, remote_path,
+                keyfile=None):
     logger.debug("In upload_file.")
     check_ascp_version(ASCP_COMMAND)
 
@@ -126,4 +135,4 @@ def upload_file(server, username, password, local_file, remote_path):
     ascp_cmd = [ ASCP_COMMAND, "-T", "-v", "-l", "300M", local_file,
                  username + "@" + server + ":" + remote_path ]
 
-    return run_ascp(ascp_cmd, password)
+    return run_ascp(ascp_cmd, password, keyfile)
