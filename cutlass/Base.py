@@ -5,6 +5,7 @@ import json
 import logging
 from iHMPSession import iHMPSession
 from osdf import OSDF
+from itertools import islice
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -271,6 +272,25 @@ class Base(object):
                               "Reason: %s" % visit_node_id, e.strerror)
 
         return success
+
+
+    def children(self, flatten=False):
+        # local imports to avoid cyclic imports
+        from .dependency import dependency_methods
+        from .dependency import generator_flatten
+
+        def _children(obj):
+            yield obj
+            name = obj.__class__.__name__
+            dep_method = getattr(obj, dependency_methods.get(name, ''), None)
+            if dep_method:
+                for child in dep_method():
+                    yield _children(child)
+        cs = islice(_children(self), 1, None)
+        if flatten:
+            return generator_flatten(cs)
+        else:
+            return cs
 
 
     def __str__(self):
