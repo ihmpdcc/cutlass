@@ -284,8 +284,8 @@ class Subject(Base):
             session.get_osdf().delete_node(subject_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting Subject %s." +
-                              "Reason: %s" % subject_id, e.strerror)
+            self.logger.exception(e)
+            self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
@@ -444,7 +444,8 @@ class Subject(Base):
                 self._version = 1
                 success = True
             except Exception as e:
-                self.logger.error("Unable to save " + __name__ + ". Reason: %s" % e.strerror)
+                self.logger.exception(e)
+                self.logger.error("An error occurred when saving %s.", self)
         else:
             self.logger.info("Subject already has an ID, so we do an update (not an insert).")
 
@@ -462,7 +463,8 @@ class Subject(Base):
                 self._version = latest_version
                 success = True
             except Exception as e:
-                self.logger.error("Unable to update " + __name__ + ". Reason: %s" % e.strerror)
+                self.logger.exception(e)
+                self.logger.error("An error occurred when updating %s.", self)
 
         return success
 

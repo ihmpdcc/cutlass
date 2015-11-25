@@ -558,8 +558,9 @@ class SixteenSRawSeqSet(Base):
             session.get_osdf().delete_node(prep_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting " + __name__ + " %s." +
-                              "Reason: %s" % prep_id, e.strerror)
+            self.logger.exception(e)
+            self.logger.error("An error occurred when deleting %s.", self)
+
 
         return success
 

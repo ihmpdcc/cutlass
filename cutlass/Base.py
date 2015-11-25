@@ -268,8 +268,8 @@ class Base(object):
             session.get_osdf().delete_node(visit_node_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting node %s." +
-                              "Reason: %s" % visit_node_id, e.strerror)
+            self.logger.exception(e)
+            self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 

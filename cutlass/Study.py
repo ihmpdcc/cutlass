@@ -395,8 +395,8 @@ class Study(Base):
             session.get_osdf().delete_node(study_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting Study %s." +
-                              "Reason: %s" % study_id, e.strerror)
+            self.logger.exception(e)
+            self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
@@ -505,8 +505,9 @@ class Study(Base):
                 success = True
 
             except Exception as e:
-                self.logger.error("An error occurred while updating Study %s. " +
-                                  "Reason: %s" % self._id, e)
+                self.logger.exception(e)
+                self.logger.error("An error occurred while updating %s.", self)
+
 
         return success
 

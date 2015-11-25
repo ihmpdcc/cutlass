@@ -594,8 +594,8 @@ class SixteenSDnaPrep(Base):
             session.get_osdf().delete_node(prep_id)
             success = True
         except Exception as e:
-            self.logger.error("An error occurred when deleting " + __name__ + " %s." +
-                              "Reason: %s" % prep_id, e.strerror)
+            self.logger.exception(e)
+            self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
@@ -695,7 +695,9 @@ class SixteenSDnaPrep(Base):
                 self._version = 1
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while inserting sixteensdnaprep %s." + "Reason: %s" % self._name, e.strerror)
+                self.logger.exception(e)
+                self.logger.error("An error occurred when inserting %s.", self)
+
         else:
             prep_data = self._get_raw_doc()
 
