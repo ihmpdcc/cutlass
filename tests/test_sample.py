@@ -68,12 +68,12 @@ class SampleTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             sample.fma_body_site = [ "a", "b", "c" ]
 
-    def testBodySiteIllegal(self):
+    def testIllegalBodySite(self):
         sample = session.create_sample()
         with self.assertRaises(Exception):
             sample.body_site = "random"
 
-    def testBodySiteLegal(self):
+    def testLegalBodySite(self):
         sample = session.create_sample()
         success = False
         body_site = "wound"
@@ -91,13 +91,13 @@ class SampleTest(unittest.TestCase):
                 "Property getter for 'body_site' works."
                 )
 
-    def testSupersiteIllegal(self):
+    def testIllegalSupersite(self):
         sample = session.create_sample()
 
         with self.assertRaises(Exception):
             sample.supersite = "hear"
 
-    def testSupersiteLegal(self):
+    def testLegalSupersite(self):
         sample = session.create_sample()
         success = False
         supersite = "heart"
