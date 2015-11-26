@@ -15,24 +15,24 @@ module_logger.addHandler(logging.NullHandler())
 
 class Visit(Base):
     """
-    The class encapsulating the visit data for an iHMP instance.
-    This class contains all the fields required to save a visit object in
-    the OSDF instance.
-    
+    The class encapsulating the data for an iHMP visit by a subject.
+    This class contains all the fields required to save a visit in
+    OSDF.
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
-    
+
     date_format = '%Y-%m-%d'
 
     def __init__(self):
         """
         Constructor for the Visit class. This initializes the fields specific to
-        the Visit class, and inherits from the Base class. 
-    
+        the Visit class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -60,58 +60,58 @@ class Visit(Base):
     @visit_id.setter
     def visit_id(self, visit_id):
         """
-        The setter for the Visit's ID 
-        
+        The setter for the Visit's ID
+
         Args:
-            visit_id (str): The new visit ID 
-            
+            visit_id (str): The new visit ID
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In visit_id setter.")
-        
+
         if type(visit_id) != str:
             raise ValueError("'visit_id' must be a string.")
-        
+
         self._visit_id = visit_id
 
     @property
     def visit_number(self):
         """ int: A sequential number that is assigned as visits occur for
-                 that subject. """ 
+                 that subject. """
         self.logger.debug("In visit_number getter.")
 
         return self._visit_number
-    
+
     def increment_visit_number(self):
         """ Increments the visit number by 1. """
         self._visit_number = self._visit_number + 1
-    
+
     @visit_number.setter
     def visit_number(self, visit_number):
         """
         The setter for the Visit's visit number
-        
+
         Args:
-            visit_number (str): The new visit number. 
-            
+            visit_number (str): The new visit number.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In visit_number setter.")
-        
+
         if type(visit_number) != int:
             raise ValueError("'visit_number' must be an integer.")
-        
+
         if visit_number < 1:
             raise ValueError("'visit_number' must be greater than or equal to 1.")
-        
+
         self._visit_number = visit_number
 
     @property
     def date(self):
         """ str: Date when the visit occurred. Can be different from sample dates,
-                 a visit may encompass a set of sampling points. """ 
+                 a visit may encompass a set of sampling points. """
         self.logger.debug("In date getter.")
 
         return self._date
@@ -120,13 +120,13 @@ class Visit(Base):
     def date(self, date):
         """
         The setter for the Visit's most recent visit date.
-        The date must follow the format YYYY-MM-DD. 
-        
+        The date must follow the format YYYY-MM-DD.
+
         Args:
-            date (str): The new date. 
-            
+            date (str): The new date.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In date setter.")
 
@@ -141,7 +141,7 @@ class Visit(Base):
     @property
     def interval(self):
         """ int: The amount of time since the last visit (in days).
-                 Use 0 for the first visit. """ 
+                 Use 0 for the first visit. """
         self.logger.debug("In interval getter.")
 
         return self._interval
@@ -150,13 +150,13 @@ class Visit(Base):
     def interval(self, interval):
         """
         The setter for the Visit's interval since the last visit for this subject.
-        The interval must be non-negative. 
-        
+        The interval must be non-negative.
+
         Args:
-            interval (int): The new interval. 
-            
+            interval (int): The new interval.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In interval setter.")
 
@@ -180,25 +180,25 @@ class Visit(Base):
     def clinic_id(self, clinic_id):
         """
         The setter for the Visit's clinic ID.
-        
+
         Args:
-            clinic_id (str): The new clinic ID. 
-            
+            clinic_id (str): The new clinic ID.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In clinic_id setter.")
-        
+
         if type(clinic_id) != str:
             raise ValueError("'interval' must be a integer.")
-        
+
         self._clinic_id = clinic_id
 
     @staticmethod
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -214,10 +214,10 @@ class Visit(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -234,6 +234,7 @@ class Visit(Base):
             'meta': {
                 'visit_number': self._visit_number,
                 'date': self._date,
+                'subtype': "visit",
                 'interval': self._interval,
             }
         }
@@ -253,7 +254,7 @@ class Visit(Base):
         if self._clinic_id is not None:
            self.logger.debug("Visit object has the clinic_id set.")
            visit_doc['meta']['clinic_id'] = self._clinic_id
-           
+
         if self._visit_id is not None:
            self.logger.debug("Visit object has the visit_id set.")
            visit_doc['meta']['visit_id'] = self._visit_id
@@ -266,10 +267,10 @@ class Visit(Base):
         in the OSDF instance for the specific object. However, unlike
         validates(), this method does not provide exact error messages,
         it states if the validation was successful or not.
-        
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -285,7 +286,7 @@ class Visit(Base):
 
         if 'by' not in self._links.keys():
             valid = False
-        
+
         self.logger.debug("Valid? %s" + str(valid))
 
         return valid
@@ -294,12 +295,12 @@ class Visit(Base):
         """
         Converts the raw JSON doc (the dictionary representation)
         to a printable JSON string.
-        
+
         Args:
             indent (int): The indent for each successive line of the JSON string output
-        
+
         Returns:
-            A printable JSON string 
+            A printable JSON string
         """
         self.logger.debug("In to_json.")
 
@@ -314,57 +315,57 @@ class Visit(Base):
         return json_str
 
     @staticmethod
-    def search(query = "\"visit\"[node_type]"):        
+    def search(query = "\"visit\"[node_type]"):
         """
         Searches the OSDF database through all Visit node types. Any criteria
         the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a Visit instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          Visit node type.
-        
+
         Returns:
             Returns an array of Visit objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"visit\"[node_type]":
             query = query + " && \"visit\"[node_type]"
-        
-        visit_data = session.get_osdf().oql_query("ihmp", query)
-        
+
+        visit_data = session.get_osdf().oql_query(Visit.namespace, query)
+
         all_results = visit_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 visit_result = Visit.load_visit(i)
                 result_list.append(visit_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_visit(visit_data):
         """
         Takes the provided JSON string and converts it to a Visit object
-        
+
         Args:
-            visit_data (str): The JSON string to convert 
-        
+            visit_data (str): The JSON string to convert
+
         Returns:
-            Returns a Visit instance. 
+            Returns a Visit instance.
         """
         module_logger.info("Creating a template Visit.")
         visit = Visit()
@@ -401,12 +402,12 @@ class Visit(Base):
         will be logged stating the object was not deleted. If the ID is set, and
         exists in the OSDF instance, then the object will be deleted from the
         OSDF instance, and this object must be re-saved in order to use it again.
-        
+
         Args:
             None
-            
+
         Returns:
-            True upon successful deletion, False otherwise. 
+            True upon successful deletion, False otherwise.
         """
         self.logger.debug("In delete.")
 
@@ -438,12 +439,12 @@ class Visit(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             visit_node_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
-            A Visit object with all the available OSDF data loaded into it. 
+            A Visit object with all the available OSDF data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % visit_node_id)
 
@@ -489,13 +490,13 @@ class Visit(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
 
@@ -540,15 +541,20 @@ class Visit(Base):
 
 
     def samples(self):
-        """Return iterator of all samples collected during this visit """
+        """
+        Return iterator of all samples collected during this visit.
+        """
         linkage_query = '"{}"[linkage.collected_during]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(Visit.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield Sample.load_sample(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break
-    
+

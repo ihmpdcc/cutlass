@@ -16,22 +16,22 @@ module_logger.addHandler(logging.NullHandler())
 
 class WgsDnaPrep(Base):
     """
-    The class encapsulating the Wgs DNA Prep data for an iHMP instance.
-    This class contains all the fields required to save a Wgs DNA Prep object in
-    the OSDF instance.
-    
+    The class encapsulates an iHMP WGS DNA Prep for iHMP.
+    The class contains all the fields required to save a WGS DNA Prep in
+    OSDF.
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
 
     def __init__(self):
         """
         Constructor for the WgsDnaPrep class. This initializes the fields specific
-        to the WgsDnaPrep class, and inherits from the Base class. 
-    
+        to the WgsDnaPrep class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -57,15 +57,15 @@ class WgsDnaPrep(Base):
     def validate(self):
         """
         Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required        
+        schema in the OSDF instance for that specific object. All required
         fields for that specific object must be present.
-        
+
         Args:
             None
-            
+
         Returns:
             A list of strings, where each string is the error that the
-            validation raised during OSDF validation 
+            validation raised during OSDF validation
         """
         self.logger.debug("In validate.")
 
@@ -94,10 +94,10 @@ class WgsDnaPrep(Base):
         in the OSDF instance for the specific object. However, unlike
         validates(), this method does not provide exact error messages,
         it states if the validation was successful or not.
-        
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -130,26 +130,26 @@ class WgsDnaPrep(Base):
     def comment(self, comment):
         """
         The setter for the WgsRawSeqSet comment. The comment must be a string,
-        and less than 512 characters. 
-        
+        and less than 512 characters.
+
         Args:
-            comment (str): The new comment to add to the string. 
-            
+            comment (str): The new comment to add to the string.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In comment setter.")
         if type(comment) != str:
             raise ValueError("Invalid comment, must be a string.")
-        
+
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
-        
+
         self._comment = comment
 
     @property
     def frag_size(self):
-        """ int: Target library fragment size after shearing. """ 
+        """ int: Target library fragment size after shearing. """
         self.logger.debug("In frag_size getter.")
 
         return self._frag_size
@@ -158,19 +158,19 @@ class WgsDnaPrep(Base):
     def frag_size(self, frag_size):
         """
         The setter for the WgsDnaPrep fragment size. The size must be an
-        integer, and greater than 0. 
-        
+        integer, and greater than 0.
+
         Args:
             frag_size (int): The new fragment size.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In frag_size setter.")
-        
+
         if type(frag_size) != int:
             raise ValueError("Invalid comment, must be a string.")
-        
+
         if frag_size < 0:
             raise ValueError("Invalid frag_size. Must be non-negative.")
 
@@ -179,7 +179,7 @@ class WgsDnaPrep(Base):
     @property
     def lib_layout(self):
         """ str: Specification of the layout: fragment/paired, and if paired,
-                 then nominal insert size and standard deviation. """ 
+                 then nominal insert size and standard deviation. """
         self.logger.debug("In lib_layout getter.")
 
         return self._lib_layout
@@ -188,12 +188,12 @@ class WgsDnaPrep(Base):
     def lib_layout(self, lib_layout):
         """
         The setter for the WgsDnaPrep lib layout.
-        
+
         Args:
             lib_layout (str): The new lib layout.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In lib_layout setter.")
 
@@ -203,7 +203,7 @@ class WgsDnaPrep(Base):
     def lib_selection(self):
         """ str: A controlled vocabulary of terms describing selection or reduction
                  method used in library construction. Terms used by TCGA include
-                 (random, hybrid selection) """ 
+                 (random, hybrid selection) """
         self.logger.debug("In lib_selection getter.")
 
         return self._lib_selection
@@ -211,13 +211,13 @@ class WgsDnaPrep(Base):
     @lib_selection.setter
     def lib_selection(self, lib_selection):
         """
-        The setter for the WgsDnaPrep lib selection. 
-        
+        The setter for the WgsDnaPrep lib selection.
+
         Args:
-            lib_selection (str): The new lib selection. 
-            
+            lib_selection (str): The new lib selection.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In lib_selection setter.")
 
@@ -234,13 +234,13 @@ class WgsDnaPrep(Base):
     def mims(self, mims):
         """
         The setter for the WgsDnaPrep MIMARKS. The provided dictionary
-        must validate based on the MIMARKS class. 
-        
+        must validate based on the MIMARKS class.
+
         Args:
-            mimars (dict): The new MIMARKS dictionary. 
-            
+            mimars (dict): The new MIMARKS dictionary.
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In mims setter.")
 
@@ -255,7 +255,7 @@ class WgsDnaPrep(Base):
 
     @property
     def ncbi_taxon_id(self):
-        """ str: NCBI taxon id. """ 
+        """ str: NCBI taxon id. """
         self.logger.debug("In ncbi_taxon_id getter.")
 
         return self._ncbi_taxon_id
@@ -263,13 +263,13 @@ class WgsDnaPrep(Base):
     @ncbi_taxon_id.setter
     def ncbi_taxon_id(self, ncbi_taxon_id):
         """
-        The setter for the WgsDnaPrep NCBI Taxon ID. 
-        
+        The setter for the WgsDnaPrep NCBI Taxon ID.
+
         Args:
             ncbi_taxon_id (str): The new NCBI Taxon ID.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In ncbi_taxon_id setter.")
 
@@ -285,13 +285,13 @@ class WgsDnaPrep(Base):
     @prep_id.setter
     def prep_id(self, prep_id):
         """
-        The setter for the WgsDnaPrep Prep ID. 
-        
+        The setter for the WgsDnaPrep Prep ID.
+
         Args:
             prep_id (str): The new Prep ID.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In prep_id setter.")
 
@@ -299,7 +299,7 @@ class WgsDnaPrep(Base):
 
     @property
     def sequencing_center(self):
-        """ str: The center responsible for generating the 16S DNA Prep. """ 
+        """ str: The center responsible for generating the 16S DNA Prep. """
         self.logger.debug("In sequencing_center getter.")
 
         return self._sequencing_center
@@ -307,13 +307,13 @@ class WgsDnaPrep(Base):
     @sequencing_center.setter
     def sequencing_center(self, sequencing_center):
         """
-        The setter for the WgsDnaPrep sequencing center. 
-        
+        The setter for the WgsDnaPrep sequencing center.
+
         Args:
             sequencing_center (str): The new sequencing center.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In sequencing_center setter.")
 
@@ -329,13 +329,13 @@ class WgsDnaPrep(Base):
     @sequencing_contact.setter
     def sequencing_contact(self, sequencing_contact):
         """
-        The setter for the WgsDnaPrep sequencing_contact. 
-        
+        The setter for the WgsDnaPrep sequencing_contact.
+
         Args:
             sequencing_contact (str): The new sequencing_contact.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In sequencing_contact setter.")
 
@@ -352,19 +352,19 @@ class WgsDnaPrep(Base):
     def storage_duration(self, storage_duration):
         """
         The setter for the WgsDnaPrep storage duration. The duration must
-        be an integer, and greater than 0. 
-        
+        be an integer, and greater than 0.
+
         Args:
             storage_duration (int): The new storage duration.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In storage_duration setter.")
 
         if type(storage_duration) != int:
             raise ValueError("Invalid storage duration, must be a integer.")
-        
+
         if storage_duration < 0:
             raise ValueError("Invalid storage_duration. Must be non-negative.")
 
@@ -372,7 +372,7 @@ class WgsDnaPrep(Base):
 
     @property
     def srs_id(self):
-        """ str: NCBI Sequence Read Archive sample ID of the form SRS012345. """ 
+        """ str: NCBI Sequence Read Archive sample ID of the form SRS012345. """
         self.logger.debug("In srs_id getter.")
 
         return self._srs_id
@@ -381,29 +381,29 @@ class WgsDnaPrep(Base):
     def srs_id(self, srs_id):
         """
         The setter for the WgsDnaPrep SRS ID. The ID must be a string, and
-        greater than 3 characters long. 
-        
+        greater than 3 characters long.
+
         Args:
             srs_id (str): The new SRS ID.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In srs_id setter.")
-        
+
         if type(srs_id) != str:
             raise ValueError("Invalid comment, must be a string.")
-        
+
         if len(srs_id) < 3:
             raise Exception("SRS ID is too short, must be more than 3 characters.")
-        
+
         self._srs_id = srs_id
 
     @staticmethod
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -421,10 +421,10 @@ class WgsDnaPrep(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -448,6 +448,7 @@ class WgsDnaPrep(Base):
                 'sequencing_center': self._sequencing_center,
                 'sequencing_contact': self._sequencing_contact,
                 'storage_duration': self._storage_duration,
+                'subtype': "wgs",
                 'tags': self._tags
             }
         }
@@ -477,51 +478,52 @@ class WgsDnaPrep(Base):
         the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a WgsDnaPrep instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          WgsDnaPrep node type.
-        
+
         Returns:
             Returns an array of WgsDnaPrep objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"wgs_dna_prep\"[node_type]":
             query = query + " && \"wgs_dna_prep\"[node_type]"
-        
-        wgsDnaPrep_data = session.get_osdf().oql_query("ihmp", query)
-        
+
+        wgsDnaPrep_data = session.get_osdf().oql_query(WgsDnaPrep.namespace, query)
+
         all_results = wgsDnaPrep_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 wgsDnaPrep_result = WgsDnaPrep.load_wgsDnaPrep(i)
                 result_list.append(wgsDnaPrep_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_wgsDnaPrep(prep_data):
         """
         Takes the provided JSON string and converts it to a WgsDnaPrep object
-        
+
         Args:
-            subject_data (str): The JSON string to convert 
-        
+            subject_data (str): The JSON string to convert
+
         Returns:
-            Returns a WgsDnaPrep instance. 
+            Returns a WgsDnaPrep instance.
         """
         module_logger.info("Creating a template " + __name__ + ".")
         prep = WgsDnaPrep()
@@ -563,12 +565,12 @@ class WgsDnaPrep(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             prep_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
-            A WgsDnaPrep object with all the available OSDF data loaded into it. 
+            A WgsDnaPrep object with all the available OSDF data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % prep_id)
 
@@ -620,13 +622,13 @@ class WgsDnaPrep(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
 
@@ -671,15 +673,20 @@ class WgsDnaPrep(Base):
 
 
     def raw_seq_sets(self):
-        """Return iterator of all raw_seq_sets sequenced from this prep """
+        """
+        Return iterator of all raw_seq_sets sequenced from this prep.
+        """
         linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(WgsDnaPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield WgsRawSeqSet.load_wgsRawSeqSet(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break
 
