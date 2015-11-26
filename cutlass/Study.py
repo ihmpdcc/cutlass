@@ -19,7 +19,7 @@ class Study(Base):
     OSDF.
 
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance
+        namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
 
