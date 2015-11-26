@@ -19,19 +19,19 @@ class Project(Base):
     The class encapsulating the project data for an iHMP instance.
     This class contains all the fields required to save a project object in
     the OSDF instance.
-    
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
 
     def __init__(self):
         """
         Constructor for the Project class. This initializes the fields specific to the
-        Project class, and inherits from the Base class. 
-    
+        Project class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
         self.logger.addHandler(logging.NullHandler())
@@ -55,12 +55,12 @@ class Project(Base):
     def name(self, name):
         """
         The setter for the Project name.
-        
+
         Args:
             name (str): The new name to assign to this instance.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In name setter.")
 
@@ -80,12 +80,12 @@ class Project(Base):
     def description(self, description):
         """
         The setter for the Project description.
-        
+
         Args:
             description (str): The new description to assign to this instance.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In description setter.")
 
@@ -105,13 +105,13 @@ class Project(Base):
     def mixs(self, mixs):
         """
         The setter for the Project's MIXS. The MIXS dictionary input must validate
-        with the MIXS class, and all minimal/required fields must be included. 
-        
+        with the MIXS class, and all minimal/required fields must be included.
+
         Args:
             mixs (dict): The new MIXS dictionary to assign to this instance.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In mixs setter.")
         valid_dictionary = MIXS.check_dict(mixs)
@@ -127,7 +127,7 @@ class Project(Base):
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -145,13 +145,13 @@ class Project(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         # Use the create_osdf_node if the node has ID = -1
         # if saving the first time, must also use create_osdf_node
@@ -216,12 +216,12 @@ class Project(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             project_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
-            A Project object with all the available OSDF data loaded into it. 
+            A Project object with all the available OSDF data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % project_id)
 
@@ -258,12 +258,12 @@ class Project(Base):
         will be logged stating the object was not deleted. If the ID is set, and
         exists in the OSDF instance, then the object will be deleted from the
         OSDF instance, and this object must be re-saved in order to use it again.
-        
+
         Args:
             None
-            
+
         Returns:
-            True upon successful deletion, False otherwise. 
+            True upon successful deletion, False otherwise.
         """
         self.logger.debug("In delete.")
 
@@ -295,51 +295,52 @@ class Project(Base):
         criteria the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a Project instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          Project node type.
-        
+
         Returns:
             Returns an array of Project objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"project\"[node_type]":
             query = query + " && \"project\"[node_type]"
-        
-        project_data = session.get_osdf().oql_query("ihmp", query)
-        
+
+        project_data = session.get_osdf().oql_query(Project.namespace, query)
+
         all_results = project_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 project_result = Project.load_project(i)
                 result_list.append(project_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_project(project_data):
         """
         Takes the provided JSON string and converts it to a Project object
-        
+
         Args:
-            project_data (str): The JSON string to convert 
-        
+            project_data (str): The JSON string to convert
+
         Returns:
-            Returns a Project instance. 
+            Returns a Project instance.
         """
         module_logger.info("Creating a template project.")
 
@@ -363,14 +364,14 @@ class Project(Base):
     def _get_raw_doc(self):
         """
         Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
+        filled into the JSON document, regardless if they are set or not. Any remaining
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -384,6 +385,7 @@ class Project(Base):
             'linkage': self._links,
             'ns': Project.namespace,
             'node_type': 'project',
+            'subtype': 'ihmp',
             'meta': {
                 'name': self._name,
                 'mixs': self._mixs,
@@ -407,12 +409,16 @@ class Project(Base):
         """Return iterator of all studies part of this project """
         linkage_query = '"{}"[linkage.part_of]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(Project.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield Study.load_study(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break
-    
+
