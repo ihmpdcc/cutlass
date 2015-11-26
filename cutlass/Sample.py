@@ -214,7 +214,7 @@ class Sample(Base):
         if 'collected_during' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 

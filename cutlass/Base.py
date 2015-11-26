@@ -191,7 +191,7 @@ class Base(object):
 
         (valid, error_message) = session.get_osdf().validate_node(document)
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 

@@ -538,7 +538,7 @@ class Study(Base):
             self.logger.debug("Doesn't have the subset_of or the part_of linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" + str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 
