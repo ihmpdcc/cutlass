@@ -90,13 +90,13 @@ class SubjectTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             subject.version = "test"
 
-    def testGenderIllegal(self):
+    def testIllegalGender(self):
         subject = session.create_subject()
 
         with self.assertRaises(Exception):
             subject.gender = "random"
 
-    def testGenderLegal(self):
+    def testLegalGender(self):
         subject = session.create_subject()
         success = False
         gender = "male"
@@ -113,13 +113,13 @@ class SubjectTest(unittest.TestCase):
                          gender,
                          "Property getter for 'gender' works.")
 
-    def testRaceIllegal(self):
+    def testIllegalRace(self):
         subject = session.create_subject()
 
         with self.assertRaises(Exception):
             subject.race = "random"
 
-    def testRaceLegal(self):
+    def testLegalRace(self):
         subject = session.create_subject()
         success = False
         race = "asian"

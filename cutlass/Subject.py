@@ -17,15 +17,15 @@ class Subject(Base):
     The class encapsulating the subject data for an iHMP instance.
     This class contains all the fields required to save a subject object in
     the OSDF instance.
-    
+
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance 
+        namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
 
     valid_races = ( "african_american", "american_indian_or_alaska_native",
                     "asian", "caucasian", "hispanic_or_latino", "native_hawaiian",
-                    "ethnic_other")
+                    "ethnic_other", "unknown")
 
     valid_genders = ("male", "female", "unknown")
 
@@ -33,10 +33,10 @@ class Subject(Base):
     def __init__(self):
         """
         Constructor for the Subject class. This initializes the fields specific to the
-        Subject class, and inherits from the Base class. 
-    
+        Subject class, and inherits from the Base class.
+
         Args:
-            None 
+            None
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
@@ -53,7 +53,7 @@ class Subject(Base):
 
     @property
     def gender(self):
-        """ str: The subject's sex. """ 
+        """ str: The subject's sex. """
         self.logger.debug("In gender getter.")
         return self._gender
 
@@ -61,13 +61,13 @@ class Subject(Base):
     def gender(self, gender):
         """
         The setter for the Subject's gender.
-        The gender must be male, female, or unknown. 
-        
+        The gender must be male, female, or unknown.
+
         Args:
             gender (str): The new gender.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In gender setter.")
         if gender not in Subject.valid_genders:
@@ -77,7 +77,7 @@ class Subject(Base):
 
     @property
     def race(self):
-        """ str: The subbject's race/ethnicity. """ 
+        """ str: The subbject's race/ethnicity. """
         self.logger.debug("In race getter.")
         return self._race
 
@@ -85,19 +85,20 @@ class Subject(Base):
     def race(self, race):
         """
         The setter for the Subject's race. The race must be one of the following:
-        
+
         "african_american",
         "american_indian_or_alaska_native",
         "asian", "caucasian",
         "hispanic_or_latino",
         "native_hawaiian",
-        "ethnic_other"
-        
+        "ethnic_other",
+        "unknown"
+
         Args:
             race (str): The new race.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In race setter.")
         if race not in Subject.valid_races:
@@ -107,7 +108,9 @@ class Subject(Base):
 
     @property
     def rand_subject_id(self):
-        """ str: Randomized subject id used to anonymize subject identity. """ 
+        """
+        Randomized subject id used to anonymize subject identity.
+        """
         self.logger.debug("In rand_subject_id getter.")
         return self._rand_subject_id
 
@@ -115,13 +118,13 @@ class Subject(Base):
     def rand_subject_id(self, rand_subject_id):
         """
         The setter for the Subject's random ID.
-        The ID must be between 1 and 10 characters. 
-        
+        The ID must be between 1 and 10 characters.
+
         Args:
             rand_subject_id (str): The new random subject ID.
-            
+
         Returns:
-            None 
+            None
         """
         self.logger.debug("In rand_subject_id setter.")
         self._rand_subject_id = rand_subject_id
@@ -129,15 +132,15 @@ class Subject(Base):
     def validate(self):
         """
         Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required        
+        schema in the OSDF instance for that specific object. All required
         fields for that specific object must be present.
-        
+
         Args:
             None
-            
+
         Returns:
             A list of strings, where each string is the error that the
-            validation raised during OSDF validation 
+            validation raised during OSDF validation
         """
         self.logger.debug("In validate.")
 
@@ -165,10 +168,10 @@ class Subject(Base):
         in the OSDF instance for the specific object. However, unlike
         validates(), this method does not provide exact error messages,
         it states if the validation was successful or not.
-        
+
         Args:
             None
-        
+
         Returns:
             True if the data validates, False if the current state of
             fields in the instance do not validate with the OSDF instance
@@ -196,10 +199,10 @@ class Subject(Base):
         fields are included only if they are set. This allows the user to visualize
         the JSON to ensure fields are set appropriately before saving into the
         database.
-        
+
         Args:
             None
-            
+
         Returns:
             A dictionary representation of the JSON document.
         """
@@ -216,6 +219,7 @@ class Subject(Base):
             'meta': {
                 'gender': self._gender,
                 'rand_subject_id': self._rand_subject_id,
+                'subtype': self._gender,
                 'tags': self._tags
             }
         }
@@ -238,7 +242,7 @@ class Subject(Base):
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
@@ -247,29 +251,6 @@ class Subject(Base):
         module_logger.debug("In required fields.")
         return ("rand_subject_id", "gender", "tags")
 
-    def to_json(self, indent=4):
-        """
-        Converts the raw JSON doc (the dictionary representation)
-        to a printable JSON string.
-        
-        Args:
-            indent (int): The indent for each successive line of the JSON string output
-        
-        Returns:
-            A printable JSON string 
-        """
-        self.logger.debug("In to_json.")
-
-        subject_doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(subject_doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str    
-
     def delete(self):
         """
         Deletes the current object (self) from the OSDF instance. If the object
@@ -277,12 +258,12 @@ class Subject(Base):
         will be logged stating the object was not deleted. If the ID is set, and
         exists in the OSDF instance, then the object will be deleted from the
         OSDF instance, and this object must be re-saved in order to use it again.
-        
+
         Args:
             None
-            
+
         Returns:
-            True upon successful deletion, False otherwise. 
+            True upon successful deletion, False otherwise.
         """
         self.logger.debug("In delete.")
 
@@ -309,57 +290,57 @@ class Subject(Base):
         return success
 
     @staticmethod
-    def search(query = "\"subject\"[node_type]"):        
+    def search(query = "\"subject\"[node_type]"):
         """
         Searches the OSDF database through all Subject node types. Any criteria
         the user wishes to add is provided by the user in the query language
         specifications provided in the OSDF documentation. A general format
         is (including the quotes and brackets):
-        
+
         "search criteria"[field to search]
-        
+
         If there are any results, they are returned as a Subject instance,
-        otherwise an empty list will be returned. 
-        
+        otherwise an empty list will be returned.
+
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          Subject node type.
-        
+
         Returns:
             Returns an array of Subject objects. It returns an empty list if
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results 
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        
+
         if query != "\"subject\"[node_type]":
             query = query + " && \"subject\"[node_type]"
-        
-        subject_data = session.get_osdf().oql_query("ihmp", query)
-        
+
+        subject_data = session.get_osdf().oql_query(Subject.namespace, query)
+
         all_results = subject_data['results']
-        
+
         result_list = list()
-        
-        if len(all_results) > 0: 
+
+        if len(all_results) > 0:
             for i in all_results:
                 subject_result = Subject.load_subject(i)
                 result_list.append(subject_result)
-        
+
         return result_list
-    
+
     @staticmethod
     def load_subject(subject_data):
         """
         Takes the provided JSON string and converts it to a Subject object
-        
+
         Args:
-            subject_data (str): The JSON string to convert 
-        
+            subject_data (str): The JSON string to convert
+
         Returns:
-            Returns a Subject instance. 
+            Returns a Subject instance.
         """
         module_logger.info("Creating a template Subject.")
         subject = Subject()
@@ -385,12 +366,12 @@ class Subject(Base):
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
-        
+
         Args:
             subject_id (str): The OSDF ID for the document to load.
-        
+
         Returns:
-            A Subject object with all the available OSDF data loaded into it. 
+            A Subject object with all the available OSDF data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % subject_id)
 
@@ -425,23 +406,23 @@ class Subject(Base):
         saved previously, then the node ID is 'None', and upon a successful, will be
         assigned to the alpha numeric ID found in the OSDF instance. Also, the
         version is updated as the data is saved in the OSDF instance.
-        
+
         Args:
             None
-        
+
         Returns;
-            True if successful, False otherwise. 
-        
+            True if successful, False otherwise.
+
         """
         self.logger.debug("In save.")
-        
+
         # If node previously saved, use edit_node instead since ID
         # is given (an update in a way)
         # can also use get_node to check if the node already exists
         if not self.is_valid():
             self.logger.error("Cannot save, data is invalid.")
             return False
-        
+
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
@@ -487,14 +468,20 @@ class Subject(Base):
 
 
     def visits(self):
-        """Return iterator of all visits by this subject """
+        """
+        Return iterator of all visits by this subject.
+        """
         linkage_query = '"{}"[linkage.by]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(Subject.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield Visit.load_visit(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break
