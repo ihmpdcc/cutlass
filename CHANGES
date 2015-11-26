@@ -1,3 +1,10 @@
+cutlass 0.8.1
+
+ * Cherry picked code from PR #20 contributed by schwager-hsph@github.com
+   for improved logging in various areas.
+
+ - Victor <victor73@github.com>  Wed, 25 Nov 2015 12:00:00 -0400
+
 cutlass 0.8
 
  * Cherry picked code from PR #21 contributed by schwager-hsph@github.com
