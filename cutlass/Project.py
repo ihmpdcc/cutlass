@@ -385,12 +385,12 @@ class Project(Base):
             'linkage': self._links,
             'ns': Project.namespace,
             'node_type': 'project',
-            'subtype': 'ihmp',
             'meta': {
                 'name': self._name,
                 'mixs': self._mixs,
                 'tags': self._tags,
-                'description': self._description
+                'description': self._description,
+                'subtype': Project.namespace
             }
         }
 
