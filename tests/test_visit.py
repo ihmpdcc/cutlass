@@ -93,7 +93,7 @@ class VisitTest(unittest.TestCase):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
-            visit.visit_number = "abhishek"
+            visit.visit_number = "random"
 
     def testVisitNumLegal(self):
         visit = session.create_visit()
@@ -121,7 +121,7 @@ class VisitTest(unittest.TestCase):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
-            visit.interval = "abhishek"
+            visit.interval = "random"
 
     def testIntervalLegal(self):
         visit = session.create_visit()
@@ -142,7 +142,7 @@ class VisitTest(unittest.TestCase):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
-            visit.date = "abhishek"
+            visit.date = "random"
 
     def testDateLegal(self):
         visit = session.create_visit()
