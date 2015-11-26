@@ -94,7 +94,7 @@ class SubjectTest(unittest.TestCase):
         subject = session.create_subject()
 
         with self.assertRaises(Exception):
-            subject.gender = "abhishek"
+            subject.gender = "random"
 
     def testGenderLegal(self):
         subject = session.create_subject()
@@ -117,7 +117,7 @@ class SubjectTest(unittest.TestCase):
         subject = session.create_subject()
 
         with self.assertRaises(Exception):
-            subject.race = "abhishek"
+            subject.race = "random"
 
     def testRaceLegal(self):
         subject = session.create_subject()

@@ -71,7 +71,7 @@ class SampleTest(unittest.TestCase):
     def testBodySiteIllegal(self):
         sample = session.create_sample()
         with self.assertRaises(Exception):
-            sample.body_site = "abhishek"
+            sample.body_site = "random"
 
     def testBodySiteLegal(self):
         sample = session.create_sample()

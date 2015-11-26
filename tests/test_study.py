@@ -96,7 +96,7 @@ class StudyTest(unittest.TestCase):
     def testCenterIllegal(self):
         study = session.create_study()
         with self.assertRaises(Exception):
-            study.center = "abhishek"
+            study.center = "random"
 
     def testCenterLegal(self):
         study = session.create_study()
