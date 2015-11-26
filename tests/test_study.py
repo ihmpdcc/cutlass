@@ -93,12 +93,32 @@ class StudyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             study.description = 3
 
-    def testCenterIllegal(self):
+    def testIllegalSubtype(self):
+        study = session.create_study()
+        with self.assertRaises(Exception):
+            study.subtype = "random"
+
+    def testLegalSubtype(self):
+        study = session.create_study()
+        success = False
+        subtype = "prediabetes"
+        try:
+            study.subtype = subtype
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use the subtype setter")
+
+        self.assertEqual(study.subtype, subtype,
+                         "Property getter for 'subtype' works.")
+
+    def testIllegalCenter(self):
         study = session.create_study()
         with self.assertRaises(Exception):
             study.center = "random"
 
-    def testCenterLegal(self):
+    def testLegalCenter(self):
         study = session.create_study()
         success = False
         center = "Broad Institute"
@@ -108,10 +128,10 @@ class StudyTest(unittest.TestCase):
         except:
             pass
 
-        self.assertTrue(success, "Able to use the body_site setter")
+        self.assertTrue(success, "Able to use the center setter")
 
         self.assertEqual(study.center, center,
-                         "Property getter for 'body_site' works.")
+                         "Property getter for 'center' works.")
 
     def testSRPID(self):
         study = session.create_study()
@@ -293,9 +313,10 @@ class StudyTest(unittest.TestCase):
         test_name = "Test name"
         test_description = "Test description"
         test_contact = "Test contacts"
-        test_links = {"part_of":[], "subset_of":[]}
+        test_links = {"part_of":[]}
         test_center = "Jackson Laboratory"
         test_tag = "New tag added to study"
+        test_subtype = "prediabetes"
 
         self.assertFalse(study.save(),
                          "Study not saved successfully, no required fields")
@@ -306,6 +327,7 @@ class StudyTest(unittest.TestCase):
         self.assertFalse(study.save(), "Study not saved successfully")
 
         study.contact = test_contact
+        study.subtype = test_subtype
         study.links = test_links
 
         self.assertFalse(study.save(), "Study not saved successfully")

@@ -14,9 +14,9 @@ module_logger.addHandler(logging.NullHandler())
 
 class Study(Base):
     """
-    The class encapsulating the study data for an iHMP instance.
-    This class contains all the fields required to save a study object in
-    the OSDF instance.
+    The class encapsulating the data for an iHMP Study.
+    This class contains all the fields required to save a study into
+    OSDF.
 
     Attributes:
         namespace (str): The namespace this class will use in the OSDF instance
@@ -44,11 +44,14 @@ class Study(Base):
         self._description = None
         self._center = None
         self._contact = None
+        self._subtype = None
         self._srp_id = None
 
     @property
     def name(self):
-        """ str: The name of the project within which the sequencing was organized. """
+        """
+        The name of the project within which the sequencing was organized.
+        """
         self.logger.debug("In name getter.")
         return self._name
 
@@ -120,7 +123,11 @@ class Study(Base):
             None
         """
         self.logger.debug("In center setter.")
-        centers = ["Virginia Commonwealth University", "Broad Institute", "Stanford University / Jackson Laboratory", "Stanford University", "Jackson Laboratory"]
+        centers = ["Virginia Commonwealth University",
+                   "Broad Institute",
+                   "Stanford University / Jackson Laboratory",
+                   "Stanford University",
+                   "Jackson Laboratory"]
 
         if center in centers:
             self._center = center
@@ -183,6 +190,41 @@ class Study(Base):
 
         self._srp_id = srp_id
 
+    @property
+    def subtype(self):
+        """
+        The study subtype. One of "prediabetes", "ibd", or "preterm"
+        """
+        self.logger.debug("In subtype getter.")
+        return self._subtype
+
+    @subtype.setter
+    def subtype(self, subtype):
+        """
+        The setter for the Study subtype.
+
+        Args:
+            subtype (str): The subtype for the study.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In subtype setter.")
+
+        if type(subtype) != str:
+            raise ValueError("'subtype' must be a string.")
+
+        subtypes = ["preg_preterm","ibd","prediabetes"]
+
+        if type(subtype) != str:
+            raise ValueError("subtype must be a string.")
+
+        if subtype in subtypes:
+            self._subtype = subtype
+        else:
+            raise Exception("Not a valid subtype.")
+
+
     @staticmethod
     def required_fields():
         """
@@ -194,15 +236,14 @@ class Study(Base):
             None
         """
         module_logger.debug("In required fields.")
-        return ("name", "description", "center", "contact", "tags")
+        return ("name", "description", "center", "contact", "subtype", "tags")
 
     def _get_raw_doc(self):
         """
         Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
+        filled into the JSON document, regardless of whether they are set or not. Any remaining
         fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        the JSON to ensure fields are set appropriately before saving.
 
         Args:
             None
@@ -225,6 +266,7 @@ class Study(Base):
                 'description': self._description,
                 'center': self._center,
                 'contact': self._contact,
+                'subtype': self._subtype,
                 'tags': self._tags
             }
         }
@@ -242,30 +284,6 @@ class Study(Base):
             study_doc['srp_id'] = self._srp_id
 
         return study_doc
-
-    def to_json(self, indent=4):
-        """
-        Converts the raw JSON doc (the dictionary representation) to a printable
-        JSON string.
-
-        Args:
-            indent (int): The indent for each successive line of the JSON string output
-
-        Returns:
-            A printable JSON string
-        """
-
-        self.logger.debug("In to_json.")
-
-        study_doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(study_doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str
 
     @staticmethod
     def search(query = "\"study\"[node_type]"):
@@ -531,10 +549,12 @@ class Study(Base):
         query = iHMPSession.get_session().get_osdf().oql_query
 
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(Study.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield Study.load_study(doc)
+
             res_count -= len(res['results'])
             if res_count < 1:
                 break
@@ -548,11 +568,14 @@ class Study(Base):
         query = iHMPSession.get_session().get_osdf().oql_query
 
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(Study.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield Subject.load_subject(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break
 
