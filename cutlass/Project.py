@@ -21,7 +21,7 @@ class Project(Base):
     the OSDF instance.
 
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance
+        namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
 
