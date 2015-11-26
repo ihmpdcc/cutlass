@@ -89,13 +89,13 @@ class VisitTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             visit.version = "test"
 
-    def testVisitNumIllegal(self):
+    def testIllegalVisitNum(self):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
             visit.visit_number = "random"
 
-    def testVisitNumLegal(self):
+    def testLegalVisitNum(self):
         visit = session.create_visit()
         success = False
         visit_number = 1
@@ -138,13 +138,13 @@ class VisitTest(unittest.TestCase):
 
         self.assertEqual(visit.interval, interval, "Property getter for 'interval' works.")
 
-    def testDateIllegal(self):
+    def testIllegalDate(self):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
             visit.date = "random"
 
-    def testDateLegal(self):
+    def testLegalDate(self):
         visit = session.create_visit()
         success = False
         date = "2015-07-27"
@@ -159,13 +159,13 @@ class VisitTest(unittest.TestCase):
 
         self.assertEqual(visit.date, date, "Property getter for 'date' works.")
 
-    def testVisitIDIllegal(self):
+    def testIllegalVisitID(self):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
             visit.visit_id = 1
 
-    def testVisitIDLegal(self):
+    def testLegalVisitID(self):
         visit = session.create_visit()
         success = False
         new_id = "Test ID"
@@ -180,13 +180,13 @@ class VisitTest(unittest.TestCase):
 
         self.assertEqual(visit.visit_id, new_id, "Property getter for 'visit_id' works.")
 
-    def testClinicIDIllegal(self):
+    def testIllegalClinicID(self):
         visit = session.create_visit()
 
         with self.assertRaises(Exception):
             visit.clinic_id = 1
 
-    def testClinicIDLegal(self):
+    def testLegalClinicID(self):
         visit = session.create_visit()
         success = False
         clinic_id = "Test ID"
