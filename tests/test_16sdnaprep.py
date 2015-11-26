@@ -98,7 +98,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             sixteenSDnaPrep.version = "test"
 
-    def testCommentIllegal(self):
+    def testIllegalComment(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
@@ -110,7 +110,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         with self.assertRaises(Exception):
             sixteenSDnaPrep.comment = rand_generator(750)
 
-    def testCommentLegal(self):
+    def testLegalComment(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         comment = "This is a test comment"
@@ -126,13 +126,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.comment, comment,
                          "Property getter for 'comment' works.")
 
-    def testFragSizeIllegal(self):
+    def testIllegalFragSize(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.frag_size = "wrong frag size variable type"
 
-    def testFragSizeLegal(self):
+    def testLegalFragSize(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         frag_size = 1020
@@ -148,7 +148,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.frag_size, frag_size,
                          "Property getter for 'frag_size' works.")
 
-    def testLibLayoutLegal(self):
+    def testLegalLibLayout(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         lib_layout = "A test Lib Layout for the test class"
@@ -164,7 +164,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.lib_layout, lib_layout,
                          "Property getter for 'lib_layout' works.")
 
-    def testLibSelectionLegal(self):
+    def testLegalLibSelection(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         lib_selection = "A test Lib selection for the test class"
@@ -180,7 +180,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.lib_selection, lib_selection,
                          "Property getter for 'lib_selection' works.")
 
-    def testNCBITaxonIDLegal(self):
+    def testLegalNCBITaxonID(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
@@ -196,7 +196,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.ncbi_taxon_id, ncbi_taxon_id,
                          "Property getter for 'ncbi_taxon_id' works.")
 
-    def testPrepIDLegal(self):
+    def testLegalPrepID(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         prep_id = "A test prep id for the test class"
@@ -212,7 +212,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.prep_id, prep_id,
                          "Property getter for 'prep_id' works.")
 
-    def testSequencingCenterLegal(self):
+    def testLegalSequencingCenter(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         sequencing_center = "A test seq center for the test class"
@@ -228,7 +228,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.sequencing_center, sequencing_center,
                          "Property getter for 'sequencing_center' works.")
 
-    def testSequencingContactLegal(self):
+    def testLegalSequencingContact(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         sequencing_contact = "A test seq contact for the test class"
@@ -244,7 +244,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.sequencing_contact, sequencing_contact,
                          "Property getter for 'sequencing_contact' works.")
 
-    def testSRSIDLegal(self):
+    def testLegalSRSID(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         srs_id = "A test prep id for the test class"
@@ -259,13 +259,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
 
         self.assertEqual(sixteenSDnaPrep.srs_id, srs_id, "Property getter for 'srs_id' works.")
 
-    def testSRSIDIllegal(self):
+    def testIllegalSRSID(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.srs_id = 1
 
-    def testStorageDurationLegal(self):
+    def testLegalStorageDuration(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False
         storage_duration = 12
@@ -281,7 +281,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.storage_duration, storage_duration,
                          "Property getter for 'storage_duration' works.")
 
-    def testStorageDurationIllegal(self):
+    def testIllegalStorageDuration(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
