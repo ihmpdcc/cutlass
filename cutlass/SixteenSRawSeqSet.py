@@ -479,6 +479,7 @@ class SixteenSRawSeqSet(Base):
                 "size": self._size,
                 "study": self._study,
                 "urls": self._urls,
+                "subtype": "16s",
                 'tags': self._tags
             }
         }
