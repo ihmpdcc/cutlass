@@ -461,7 +461,7 @@ class WgsRawSeqSet(Base):
                 "size": self._size,
                 "study": self._study,
                 "urls": self._urls,
-                'subtype': "wgs",
+                "subtype": "wgs",
                 'tags': self._tags
             }
         }
