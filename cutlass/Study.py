@@ -50,7 +50,7 @@ class Study(Base):
     @property
     def name(self):
         """
-        The name of the project within which the sequencing was organized.
+        The name of the study within which the sequencing was organized.
         """
         self.logger.debug("In name getter.")
         return self._name
@@ -58,7 +58,7 @@ class Study(Base):
     @name.setter
     def name(self, name):
         """
-        The setter for the Project name.
+        The setter for the study name.
 
         Args:
             name (str): The new name to assign to this instance.
@@ -75,7 +75,9 @@ class Study(Base):
 
     @property
     def description(self):
-        """ str: A longer description of the project """
+        """
+        A longer description of the study.
+        """
         self.logger.debug("In description getter.")
 
         return self._description
@@ -83,7 +85,7 @@ class Study(Base):
     @description.setter
     def description(self, description):
         """
-        The setter for the Project description.
+        The setter for the study description.
 
         Args:
             description (str): The new description to assign to this instance.
@@ -100,7 +102,9 @@ class Study(Base):
 
     @property
     def center(self):
-        """ str: The center the study was performed at. """
+        """
+        The center/organization where the study was performed.
+        """
         self.logger.debug("In center getter.")
 
         return self._center
@@ -108,7 +112,8 @@ class Study(Base):
     @center.setter
     def center(self, center):
         """
-        The setter for the Study center. The center must be one of the following:
+        The setter for the Study center. The center must be one of the
+        following:
 
         Virginia Commonwealth University,
         Broad Institute,
@@ -136,7 +141,9 @@ class Study(Base):
 
     @property
     def contact(self):
-        """ str: The study's primary contact at the sequencing center """
+        """
+        The study's primary contact at the sequencing center.
+        """
         self.logger.debug("In contact getter.")
 
         return self._contact
@@ -193,7 +200,7 @@ class Study(Base):
     @property
     def subtype(self):
         """
-        The study subtype. One of "prediabetes", "ibd", or "preterm"
+        The study subtype. One of "prediabetes", "ibd", or "preg_preterm",
         """
         self.logger.debug("In subtype getter.")
         return self._subtype
@@ -214,7 +221,7 @@ class Study(Base):
         if type(subtype) != str:
             raise ValueError("'subtype' must be a string.")
 
-        subtypes = ["preg_preterm","ibd","prediabetes"]
+        subtypes = ["preg_preterm", "ibd", "prediabetes"]
 
         if type(subtype) != str:
             raise ValueError("subtype must be a string.")
@@ -240,10 +247,11 @@ class Study(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless of whether they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless of whether they
+        are set or not. Any remaining fields are included only if they are set.
+        This allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving.
 
         Args:
             None
@@ -307,14 +315,15 @@ class Study(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results
+
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         if query != "\"study\"[node_type]":
             query = query + " && \"study\"[node_type]"
 
-        study_data = session.get_osdf().oql_query("ihmp", query)
+        study_data = session.get_osdf().oql_query(Study.namespace, query)
 
         all_results = study_data['results']
 
@@ -365,10 +374,11 @@ class Study(Base):
     def delete(self):
         """
         Deletes the current object (self) from the OSDF instance. If the object
-        has not been saved previously (node ID is not set), then an error message
-        will be logged stating the object was not deleted. If the ID is set, and
-        exists in the OSDF instance, then the object will be deleted from the
-        OSDF instance, and this object must be re-saved in order to use it again.
+        has not been saved previously (node ID is not set), then an error
+        message will be logged stating the object was not deleted. If the ID is
+        set, and exists in the OSDF instance, then the object will be deleted
+        from the OSDF instance, and this object must be re-saved in order to
+        use it again.
 
         Args:
             None
@@ -403,9 +413,9 @@ class Study(Base):
     @staticmethod
     def load(study_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+        Loads the data for the specified input ID from the OSDF instance to
+        this object.  If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             study_id (str): The OSDF ID for the document to load.
@@ -446,13 +456,14 @@ class Study(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        the OSDF instance. Also, the version is updated as the data is saved in
+        the OSDF instance.
 
         Args:
             None
@@ -470,7 +481,8 @@ class Study(Base):
             self.logger.error("Cannot save, data is invalid.")
             return False
 
-        # Before save, make sure that linkage is non-empty, the key should be collected-during
+        # Before save, make sure that linkage is non-empty, the key should be
+        # collected-during
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
@@ -543,7 +555,9 @@ class Study(Base):
         return valid
 
     def studies(self):
-        """Return iterator of all studies that are subsets of this study """
+        """
+        Return iterator of all studies that are subsets of this study.
+        """
         self.logger.debug("In studies.")
 
         linkage_query = '"{}"[linkage.subset_of]'.format(self.id)
@@ -562,7 +576,9 @@ class Study(Base):
 
 
     def subjects(self):
-        """Return iterator of all subjects that participate in this study"""
+        """
+        Return iterator of all subjects that participate in this study.
+        """
         self.logger.debug("In subjects.")
 
         linkage_query = '"{}"[linkage.participates_in]'.format(self.id)
