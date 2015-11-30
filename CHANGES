@@ -1,3 +1,11 @@
+cutlass 0.9
+
+ * Some documentation fixes.
+ * Subtype fixes to 16S related classes contributed by
+   @jonathancrabtree.
+
+ - Victor <victor73@github.com>  Mon, 30 Nov 2015 12:00:00 -0400
+
 cutlass 0.8.1
 
  * Cherry picked code from PR #20 contributed by schwager-hsph@github.com
