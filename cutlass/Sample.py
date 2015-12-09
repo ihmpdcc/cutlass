@@ -302,6 +302,7 @@ class Sample(Base):
         sample._set_id(sample_data['id'])
         # ver, not version for the key
         sample._version = sample_data['ver']
+        sample._links = sample_data['linkage']
         sample._tags = sample_data['meta']['tags']
         sample._mixs = sample_data['meta']['mixs']
         sample._fma_body_site = sample_data['meta']['fma_body_site']
