@@ -577,6 +577,7 @@ class WgsRawSeqSet(Base):
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
 
         if 'sequence_type' in seq_set_data['meta']:
             module_logger.info(__name__ + " data has 'sequence_type' present.")
@@ -626,6 +627,7 @@ class WgsRawSeqSet(Base):
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
 
         if 'sequence_type' in seq_set_data['meta']:
             module_logger.info(__name__ + " data has 'sequence_type' present.")
