@@ -761,6 +761,9 @@ class SixteenSRawSeqSet(Base):
         if not upload_result:
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return False
+        else:
+            self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
+
 
         if self.id is None:
             # The document has not yet been save
@@ -773,7 +776,6 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
-                self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
                 self._version = 1
                 success = True
             except Exception as e:
