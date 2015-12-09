@@ -785,8 +785,9 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Update for " + __name__ + " %s successful." % self._id)
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+                self.logger.exception(e)
+                self.logger.error("An error occurred while updating %s %s.",
+                                    __name__, self._id)
 
         self.logger.debug("Returning " + str(success))
 
