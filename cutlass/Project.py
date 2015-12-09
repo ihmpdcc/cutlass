@@ -24,6 +24,7 @@ class Project(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+    osdf_node_type = "project"
 
     def __init__(self):
         """
@@ -384,7 +385,7 @@ class Project(Base):
             },
             'linkage': self._links,
             'ns': Project.namespace,
-            'node_type': 'project',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'name': self._name,
                 'mixs': self._mixs,

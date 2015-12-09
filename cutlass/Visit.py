@@ -23,6 +23,7 @@ class Visit(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+    osdf_node_type = "visit"
 
     date_format = '%Y-%m-%d'
 
@@ -230,7 +231,7 @@ class Visit(Base):
             },
             'linkage': self._links,
             'ns': Visit.namespace,
-            'node_type': 'visit',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'visit_number': self._visit_number,
                 'date': self._date,

@@ -24,6 +24,7 @@ class Sample(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+    osdf_node_type = "sample"
 
     def __init__(self):
         """
@@ -384,7 +385,7 @@ class Sample(Base):
             },
             'linkage': self._links,
             'ns': Sample.namespace,
-            'node_type': 'sample',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'fma_body_site': self._fma_body_site,
                 'mixs': self._mixs,

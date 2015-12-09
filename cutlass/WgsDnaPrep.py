@@ -24,6 +24,7 @@ class WgsDnaPrep(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+    osdf_node_type = "wgs_dna_prep"
 
     def __init__(self):
         """
@@ -437,7 +438,7 @@ class WgsDnaPrep(Base):
             },
             'linkage': self._links,
             'ns': WgsDnaPrep.namespace,
-            'node_type': 'wgs_dna_prep',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'comment': self._comment,
                 'lib_layout': self._lib_layout,

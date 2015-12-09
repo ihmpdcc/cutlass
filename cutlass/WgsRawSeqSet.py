@@ -24,6 +24,7 @@ class WgsRawSeqSet(Base):
         namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
+    osdf_node_type = "wgs_raw_seq_set"
 
     aspera_server = "aspera.ihmpdcc.org"
 
@@ -450,7 +451,7 @@ class WgsRawSeqSet(Base):
             },
             'linkage': self._links,
             'ns': WgsRawSeqSet.namespace,
-            'node_type': 'wgs_raw_seq_set',
+            'node_type': self.osdf_node_type,
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,

@@ -22,6 +22,7 @@ class Study(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+    osdf_node_type = "study"
 
     def __init__(self):
         """
@@ -268,7 +269,7 @@ class Study(Base):
             },
             'linkage': self._links,
             'ns': Study.namespace,
-            'node_type': 'study',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'name': self._name,
                 'description': self._description,

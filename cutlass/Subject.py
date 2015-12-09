@@ -22,6 +22,7 @@ class Subject(Base):
         namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
+    osdf_node_type = "subject"
 
     valid_races = ( "african_american", "american_indian_or_alaska_native",
                     "asian", "caucasian", "hispanic_or_latino", "native_hawaiian",
@@ -215,7 +216,7 @@ class Subject(Base):
             },
             'linkage': self._links,
             'ns': Subject.namespace,
-            'node_type': 'subject',
+            'node_type': self.osdf_node_type,
             'meta': {
                 'gender': self._gender,
                 'rand_subject_id': self._rand_subject_id,

@@ -23,6 +23,7 @@ class SixteenSTrimmedSeqSet(Base):
         namespace (str): The namespace this class will use in the OSDF instance
     """
     namespace = "ihmp"
+    osdf_node_type = "16s_trimmed_seq_set"
 
     def __init__(self):
         """
@@ -390,7 +391,7 @@ class SixteenSTrimmedSeqSet(Base):
             },
             'linkage': self._links,
             'ns': SixteenSTrimmedSeqSet.namespace,
-            'node_type': '16s_trimmed_seq_set',
+            'node_type': self.osdf_node_type,
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,
