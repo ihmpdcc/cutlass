@@ -364,6 +364,7 @@ class Study(Base):
         study._center = study_data['meta']['center']
         study._contact = study_data['meta']['contact']
         study._tags = study_data['meta']['tags']
+        study._subtype = study_data['meta']['subtype']
 
         if 'srp_id' in study_data['meta']:
             study._srp_id = study_data['meta']['srp_id']
