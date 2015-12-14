@@ -1,9 +1,9 @@
-#!/bin/tcsh
+#!/bin/bash
 
-setenv PYTHONPATH cutlass:osdf-python
+export PYTHONPATH=cutlass:osdf-python
 
 # iHMPDCC production server
-setenv SERVER osdf.ihmpdcc.org
+export SERVER=osdf.ihmpdcc.org
 
 # delete test nodes
-./list-test-nodes.py --username=$USER --password=$PASS --server=$SERVER --tag=jctest
+./list-test-nodes.py --username=$USER --password=$PASS --server=$SERVER --tag=${USER}test

@@ -12,4 +12,4 @@ export PYTHONPATH=cutlass:osdf-python
 export SERVER=osdf.ihmpdcc.org
 
 # upload new nodes
-./test-upload.py --username=$USER --password=$PASS --server=$SERVER --tag=jctest
+./test-upload.py --username=$USER --password=$PASS --server=$SERVER --tag=${USER}test
