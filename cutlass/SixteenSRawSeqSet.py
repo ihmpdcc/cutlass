@@ -796,7 +796,7 @@ class SixteenSRawSeqSet(Base):
     def trimmed_seq_sets(self):
         """Return iterator of all trimmed seq sets that were computed from
         this seq set
-        
+
         """
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
