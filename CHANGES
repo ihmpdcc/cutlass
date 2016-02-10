@@ -1,3 +1,10 @@
+cutlass 0.10
+
+ * Sample supports optional name property.
+ * Update to test for the Sample class.
+
+ - Victor <victor73@github.com>  Wed, 10 Feb 2016 12:00:00 -0400
+
 cutlass 0.9
 
  * Some documentation fixes.
