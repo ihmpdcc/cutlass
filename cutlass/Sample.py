@@ -43,9 +43,10 @@ class Sample(Base):
 
 	# Unique to sample
         self._body_site = None
-        self._supersite = None
-        self._mixs = None
         self._fma_body_site = None
+        self._mixs = None
+        self._name = None
+        self._supersite = None
 
     @property
     def body_site(self):
@@ -63,11 +64,56 @@ class Sample(Base):
         Returns:
             None
         """
-        body_sites = ["anterior_nares", "attached_keratinized_gingiva", "buccal_mucosa", "hard_palate", "left_antecubital_fossa", "left_retroauricular_crease", "mid_vagina", "palatine_tonsils", "posterior_fornix", "right_antecubital_fossa", "right_retroauricular_crease", "saliva", "stool", "subgingival_plaque", "supragingival_plaque", "throat", "tongue_dorsum", "vaginal_introitus", "ileal_pouch", "cervix", "perianal_region", "wall_of_vagina", "oral_cavity", "ileum", "blood", "bone", "cerebrospinal_fluid", "ear", "heart", "liver", "lymph_node", "spinal_cord", "elbow", "knee", "abdomen", "thigh", "leg", "forearm", "volar_forearm", "scalp", "shoulder", "nare", "shin", "back", "foot", "hand", "popliteal_fossa", "antecubital_fossa", "appendix", "ascending_colon", "colon", "conjunctiva", "dental_plaque", "descending_colon", "duodenum", "endometrium", "foregut", "gall_bladder", "gastric_antrum", "gingival_crevices", "gum_margin_of_molar_tooth_on_buccal_side", "gut", "ileal-anal_pouch", "intestinal_tract", "left_arm", "lung_aspirate", "lymph_nodes", "mouth", "nasal", "nasopharynx", "periodontal", "pharyngeal_mucosa", "rectal", "respiratory_tract", "right_arm", "sigmoid_colon", "stomach", "subgingival", "synovial_fluid", "teeth", "terminal_ileum", "transverse_colon", "unknown", "upper_respiratory_tract", "urethra", "urinary_tract", "vaginal", "wound" ]
+
+        body_sites = ["anterior_nares", "attached_keratinized_gingiva",
+            "buccal_mucosa", "hard_palate", "left_antecubital_fossa",
+            "left_retroauricular_crease", "mid_vagina", "palatine_tonsils",
+            "posterior_fornix", "right_antecubital_fossa",
+            "right_retroauricular_crease", "saliva", "stool",
+            "subgingival_plaque", "supragingival_plaque", "throat",
+            "tongue_dorsum", "vaginal_introitus", "ileal_pouch", "cervix",
+            "perianal_region", "wall_of_vagina", "oral_cavity", "ileum",
+            "blood", "bone", "cerebrospinal_fluid", "ear", "heart", "liver",
+            "lymph_node", "spinal_cord", "elbow", "knee", "abdomen", "thigh",
+            "leg", "forearm", "volar_forearm", "scalp", "shoulder", "nare",
+            "shin", "back", "foot", "hand", "popliteal_fossa",
+            "antecubital_fossa", "appendix", "ascending_colon", "colon",
+            "conjunctiva", "dental_plaque", "descending_colon", "duodenum",
+            "endometrium", "foregut", "gall_bladder", "gastric_antrum",
+            "gingival_crevices", "gum_margin_of_molar_tooth_on_buccal_side",
+            "gut", "ileal-anal_pouch", "intestinal_tract", "left_arm",
+            "lung_aspirate", "lymph_nodes", "mouth", "nasal", "nasopharynx",
+            "periodontal", "pharyngeal_mucosa", "rectal", "respiratory_tract",
+            "right_arm", "sigmoid_colon", "stomach", "subgingival",
+            "synovial_fluid", "teeth", "terminal_ileum", "transverse_colon",
+            "unknown", "upper_respiratory_tract", "urethra", "urinary_tract",
+            "vaginal", "wound" ]
+
         if body_site in body_sites:
             self._body_site= body_site
         else:
             raise Exception("Body Site provided is not a legal bodysite. Please check allowed bodysites.")
+
+    @property
+    def name(self):
+        """ An optional descriptive name for the sample. """
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        """
+        The setter for the optional sample name.
+
+        Args:
+            name (str): The name for the sample.
+
+        Returns:
+            None
+        """
+        if type(name) != str:
+            raise ValueError("'name' must be a string.")
+
+        self._name = name
 
     @property
     def supersite(self):
@@ -404,6 +450,10 @@ class Sample(Base):
         if self._body_site is not None:
             self.logger.debug("Sample object has the body site set.")
             sample_doc['meta']['body_site'] = self._body_site
+
+        if self._name is not None:
+            self.logger.debug("Sample object has the name set.")
+            sample_doc['meta']['name'] = self._name
 
         if self._supersite is not None:
             self.logger.debug("Sample object has the supersite set.")
