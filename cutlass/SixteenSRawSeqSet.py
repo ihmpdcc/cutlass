@@ -478,6 +478,7 @@ class SixteenSRawSeqSet(Base):
                 "seq_model": self.seq_model,
                 "size": self._size,
                 "study": self._study,
+                'subtype':'16s',
                 "urls": self._urls,
                 "subtype": "16s",
                 'tags': self._tags
@@ -639,6 +640,7 @@ class SixteenSRawSeqSet(Base):
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
 
         if 'sequence_type' in seq_set_data['meta']:
             module_logger.info(__name__ + " data has 'sequence_type' present.")
@@ -689,6 +691,7 @@ class SixteenSRawSeqSet(Base):
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
 
         if 'sequence_type' in seq_set_data['meta']:
             module_logger.info(__name__ + " data has 'sequence_type' present.")
@@ -758,6 +761,9 @@ class SixteenSRawSeqSet(Base):
         if not upload_result:
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return False
+        else:
+            self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
+
 
         if self.id is None:
             # The document has not yet been save
@@ -770,7 +776,6 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
-                self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
                 self._version = 1
                 success = True
             except Exception as e:
@@ -785,8 +790,9 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Update for " + __name__ + " %s successful." % self._id)
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+                self.logger.exception(e)
+                self.logger.error("An error occurred while updating %s %s.",
+                                    __name__, self._id)
 
         self.logger.debug("Returning " + str(success))
 

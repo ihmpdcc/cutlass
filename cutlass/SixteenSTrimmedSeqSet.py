@@ -398,6 +398,7 @@ class SixteenSTrimmedSeqSet(Base):
                 "format_doc": self._format_doc,
                 "size": self._size,
                 "study": self._study,
+                'subtype':'16s',
                 "urls": self._urls,
                 "subtype": "16s",
                 'tags': self._tags
