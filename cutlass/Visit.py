@@ -135,6 +135,10 @@ class Visit(Base):
         except ValueError:
             raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
 
+        now = datetime.now()
+        if parsed > now:
+            raise ValueError("Visit date must be in the past, not the future.")
+
         self.logger.debug("Date is in the correct format.")
         self._date = date
 
@@ -286,7 +290,7 @@ class Visit(Base):
 
         if 'by' not in self._links.keys():
             valid = False
-        
+
         self.logger.debug("Valid? %s" % str(valid))
 
         return valid

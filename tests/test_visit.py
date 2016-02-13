@@ -3,6 +3,7 @@
 import unittest
 import json
 import sys
+from datetime import date
 
 from cutlass import iHMPSession
 from cutlass import Visit
@@ -143,6 +144,20 @@ class VisitTest(unittest.TestCase):
 
         with self.assertRaises(Exception):
             visit.date = "random"
+
+    def testIllegalFutureDate(self):
+        visit = session.create_visit()
+        success = False
+        today = date.today()
+        next_year = str(date(today.year + 1, today.month, today.day))
+
+        try:
+            visit.date = next_year
+            success = True
+        except:
+            pass
+
+        self.assertFalse(success, "Visit class rejects future dates.")
 
     def testLegalDate(self):
         visit = session.create_visit()

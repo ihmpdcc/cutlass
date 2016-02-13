@@ -1,3 +1,10 @@
+cutlass 0.11
+
+ * Ensuring dates specified on the Visit class do not happen in the
+   future.
+
+ - Victor <victor73@github.com>  Sun, 14 Feb 2016 12:00:00 -0400
+
 cutlass 0.10
 
  * Sample supports optional name property.
