@@ -172,6 +172,22 @@ class iHMPSession(object):
         prep = MicrobiomeAssayPrep()
         return prep
 
+    def create_host_assay_prep(self):
+        """
+        Returns an empty host assay prep object.
+
+        Args:
+            None
+
+        Returns:
+            A HostAssayPrep object.
+        """
+        self.logger.debug("In create_host_assay_prep.")
+        from HostAssayPrep import HostAssayPrep
+        prep = HostAssayPrep()
+        return prep
+
+
     def create_16s_dna_prep(self):
         """
         Returns an empty 16S DNA Prep object.
@@ -305,6 +321,14 @@ class iHMPSession(object):
             from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
             self.logger.debug("Creating a SixteenSTrimmedSeqSet.")
             node = SixteenSTrimmedSeqSet()
+        elif node_type == "microb_assay_prep":
+            from MicrobiomeAssayPrep import MicrobiomeAssayPrep
+            self.logger.debug("Creating a MicrobiomeAssayPrep.")
+            node = MicrobiomeAssayPrep()
+        elif node_type == "host_assay_prep":
+            from HostAssayPrep import HostAssayPrep
+            self.logger.debug("Creating a HostAssayPrep.")
+            node = HostAssayPrep()
         else:
             raise ValueError("Invalid node type specified: %" % node_type)
 
