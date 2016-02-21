@@ -38,6 +38,9 @@ class ImportAllTest(unittest.TestCase):
     def testImport16STrimmedSeqSet(self):
         self.failIf(SixteenSTrimmedSeqSet is None)
 
+    def testImportHostAssayPrep(self):
+        self.failIf(HostAssayPrep is None)
+
     def testImportMicrobiomeAssayPrep(self):
         self.failIf(MicrobiomeAssayPrep is None)
 
@@ -52,7 +55,6 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportMIXS(self):
         self.failIf(MIXS is None)
-
 
 if __name__ == '__main__':
     unittest.main()

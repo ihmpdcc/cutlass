@@ -135,6 +135,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSTrimmedSeqSet is None)
 
+    def testImportHostAssayPrep(self):
+        success = False
+
+        try:
+            from cutlass import HostAssayPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostAssayPrep is None)
+
     def testImportMicrobiomeAssayPrep(self):
         success = False
 
