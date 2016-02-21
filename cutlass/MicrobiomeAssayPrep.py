@@ -22,8 +22,6 @@ class MicrobiomeAssayPrep(Base):
     """
     namespace = "ihmp"
 
-    date_format = '%Y-%m-%d'
-
     def __init__(self):
         """
         Constructor for the MicrobiomeAssayPrep class. This initializes the
@@ -67,7 +65,7 @@ class MicrobiomeAssayPrep(Base):
     @property
     def comment(self):
         """
-        str: A descriptive comment for the proteome.
+        str: A descriptive comment for the object.
         """
         self.logger.debug("In comment getter.")
         return self._comment
@@ -75,7 +73,7 @@ class MicrobiomeAssayPrep(Base):
     @comment.setter
     def comment(self, comment):
         """
-        The setter for a descriptive comment for the proteome object.
+        The setter for a descriptive comment for the object.
 
         Args:
             comment (str): The comment text.
@@ -742,10 +740,10 @@ class MicrobiomeAssayPrep(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Proteome with no ID.")
-            raise Exception("Proteome does not have an ID.")
+            self.logger.warn("Attempt to delete a MicrobiomeAssayPrep with no ID.")
+            raise Exception("MicrobiomeAssayPrep does not have an ID.")
 
-        proteome_id = self._id
+        prep_id = self._id
 
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
@@ -754,8 +752,8 @@ class MicrobiomeAssayPrep(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Proteome with ID %s." % proteome_id)
-            session.get_osdf().delete_node(proteome_id)
+            self.logger.info("Deleting MicrobiomeAssayPrep with ID %s." % prep_id)
+            session.get_osdf().delete_node(prep_id)
             success = True
         except Exception as e:
             self.logger.exception(e)
@@ -764,25 +762,25 @@ class MicrobiomeAssayPrep(Base):
         return success
 
     @staticmethod
-    def search(query = "\"proteome\"[node_type]"):
+    def search(query = "\"microb_assay_prep\"[node_type]"):
         """
-        Searches OSDF for Proteome nodes. Any criteria the user wishes to add
-        is provided by the user in the query language specifications provided
-        in the OSDF documentation. A general format is (including the quotes
-        and brackets):
+        Searches OSDF for MicrobiomeAssayPrep nodes. Any criteria the user
+        wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format is
+        (including the quotes and brackets):
 
         "search criteria"[field to search]
 
-        If there are any results, they are returned as Proteome instances,
+        If there are any results, they are returned as MicrobiomeAssayPrep instances,
         otherwise an empty list will be returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
-                         Proteome node type.
+                         MicrobiomeAssayPrep node type.
 
         Returns:
-            Returns an array of Proteome objects. It returns an empty list if
-            there are no results.
+            Returns an array of MicrobiomeAssayPrep objects. It returns an
+            empty list if there are no results.
         """
         module_logger.debug("In search.")
 
@@ -790,19 +788,21 @@ class MicrobiomeAssayPrep(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"proteome\"[node_type]":
-            query = query + " && \"proteome\"[node_type]"
+        if query != "\"microb_assay_prep\"[node_type]":
+            query = query + " && \"microb_assay_prep\"[node_type]"
 
-        proteome_data = session.get_osdf().oql_query(Proteome.namespace, query)
+        prep_data = session.get_osdf().oql_query(
+            MicrobiomeAssayPrep.namespace, query
+        )
 
-        all_results = proteome_data['results']
+        all_results = prep_data['results']
 
         result_list = list()
 
         if len(all_results) > 0:
             for result in all_results:
-                proteome_result = Proteome.load_microassayprep(result)
-                result_list.append(proteome_result)
+                prep_result = MicrobiomeAssayPrep.load_microassayprep(result)
+                result_list.append(prep_result)
 
         return result_list
 
