@@ -27,6 +27,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Project is None)
 
+    def testImportProteome(self):
+        success = False
+
+        try:
+            from cutlass import Proteome
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Proteome is None)
+
     def testImportStudy(self):
         success = False
 
@@ -122,6 +134,18 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(SixteenSTrimmedSeqSet is None)
+
+    def testImportMicrobiomeAssayPrep(self):
+        success = False
+
+        try:
+            from cutlass import MicrobiomeAssayPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(MicrobiomeAssayPrep is None)
 
     def testImportMIMS(self):
         success = False

@@ -11,6 +11,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportProject(self):
         self.failIf(Project is None)
 
+    def testImportProteome(self):
+        self.failIf(Proteome is None)
+
     def testImportStudy(self):
         self.failIf(Study is None)
 
@@ -34,6 +37,9 @@ class ImportAllTest(unittest.TestCase):
 
     def testImport16STrimmedSeqSet(self):
         self.failIf(SixteenSTrimmedSeqSet is None)
+
+    def testImportMicrobiomeAssayPrep(self):
+        self.failIf(MicrobiomeAssayPrep is None)
 
     def testImportAspera(self):
         self.failIf(aspera is None)
