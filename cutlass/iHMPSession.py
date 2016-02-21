@@ -82,6 +82,21 @@ class iHMPSession(object):
         project = Project()
         return project
 
+    def create_proteome(self):
+        """
+        Returns an empty Proteome object.
+
+        Args:
+            None
+
+        Returns:
+            A Proteome object.
+        """
+        self.logger.debug("In create_proteome.")
+        from Proteome import Proteome
+        proteome = Proteome()
+        return proteome
+
     def create_sample(self):
         """
         Returns an empty Sample object.
@@ -96,21 +111,6 @@ class iHMPSession(object):
         from Sample import Sample
         sample = Sample()
         return sample
-
-    def create_visit(self):
-        """
-        Returns an empty Visit object.
-
-        Args:
-            None
-
-        Returns:
-            A Visit object.
-        """
-        self.logger.debug("In create_visit.")
-        from Visit import Visit
-        visit = Visit()
-        return visit
 
     def create_subject(self):
         """
@@ -141,6 +141,36 @@ class iHMPSession(object):
         from Study import Study
         study = Study()
         return study
+
+    def create_visit(self):
+        """
+        Returns an empty Visit object.
+
+        Args:
+            None
+
+        Returns:
+            A Visit object.
+        """
+        self.logger.debug("In create_visit.")
+        from Visit import Visit
+        visit = Visit()
+        return visit
+
+    def create_microbiome_assay_prep(self):
+        """
+        Returns an empty microbiome assay prep object.
+
+        Args:
+            None
+
+        Returns:
+            A MicrobiomeAssayPrep object.
+        """
+        self.logger.debug("In create_microbiome_assay_prep.")
+        from MicrobiomeAssayPrep import MicrobiomeAssayPrep
+        prep = MicrobiomeAssayPrep()
+        return prep
 
     def create_16s_dna_prep(self):
         """
@@ -235,6 +265,10 @@ class iHMPSession(object):
             from Project import Project
             self.logger.debug("Creating a Project.")
             node = Project()
+        elif node_type == "proteome":
+            from Proteome import Proteome
+            self.logger.debug("Creating a Proteome.")
+            node = Proteome()
         elif node_type == "visit":
             from Visit import Visit
             self.logger.debug("Creating a Visit.")
