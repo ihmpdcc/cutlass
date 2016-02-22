@@ -1,3 +1,12 @@
+cutlass 0.12
+
+ * Added several new classes, including WgsAssembledSeqSet,
+   Proteome, HostAssayPrep, and MicrobiomeAssayPrep.
+ * Added several new example scripts for the new objects.
+ * Improved type checking of the linkages in the base class.
+
+ - Victor <victor73@github.com>  Mon, 22 Feb 2016 12:00:00 -0400
+
 cutlass 0.11
 
  * Ensuring dates specified on the Visit class do not happen in the
