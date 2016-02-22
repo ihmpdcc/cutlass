@@ -14,10 +14,12 @@ module_logger.addHandler(logging.NullHandler())
 
 class Annotation(Base):
     """
-    The class encapsulates iHMP host assay prep data.  It contains all
+    The class encapsulates iHMP annotation data. It contains all
     the fields required to save a such an object in OSDF.
 
     Attributes:
+        date_format (str): The format of the date the annotation was made.
+
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
@@ -41,36 +43,25 @@ class Annotation(Base):
         self._links = {}
         self._tags = []
 
+        # Required properties
+        self._annotation_pipeline = None
         self._checksums = {}
-        self._comment = None
-        self._date = None
-
-        self._pride_id = None
-        self._sample_name = None
-        self._title = None
-        self._center = None
-        self._contact = None
-        self._prep_id = None
-        self._storage_duration = None
-        self._experiment_type = None
+        self._format = None
+        self._format_doc = None
+        self._orf_process = None
         self._study = None
+        self._urls = ['']
 
         # Optional properties
-        self._short_label = None
-        self._url = None
-        self._species = None
-        self._cell_type = None
-        self._tissue = None
-        self._reference = None
-        self._protocol_name = None
-        self._protocol_steps = None
-        self._exp_description = None
-        self._sample_description = None
+        self._comment = None
+        self._date = None
+        self._sop = None
+        self._annotation_source = None
 
     @property
     def checksums(self):
         """
-        dict: The proteome's checksum data.
+        dict: The annotation's checksum data.
         """
         self.logger.debug("In checksums getter.")
         return self._checksums
@@ -141,7 +132,7 @@ class Annotation(Base):
             raise ValueError("Invalid type for date.")
 
         try:
-            parsed = datetime.strptime(date, Proteome.date_format)
+            parsed = datetime.strptime(date, Annotation.date_format)
         except ValueError:
             raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
 
@@ -599,83 +590,60 @@ class Annotation(Base):
         return annot
 
     @staticmethod
-    def load(prep_id):
+    def load(annot_id):
         """
         Loads the data for the specified input ID from the OSDF instance to
         this object.  If the provided ID does not exist, then an error message
         is provided stating the project does not exist.
 
         Args:
-            prep_id (str): The OSDF ID for the document to load.
+            annot_id (str): The OSDF ID for the document to load.
 
         Returns:
             A Annotation object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s" % annot_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        prep_data = session.get_osdf().get_node(prep_id)
+        annot_data = session.get_osdf().get_node(annot_id)
 
         module_logger.info("Creating a template Annotation.")
-        prep = Annotation()
+        annot = Annotation()
 
         module_logger.debug("Filling in Annotation details.")
 
         # Node required fields
-        prep._set_id(prep_data['id'])
-        prep._links = prep_data['linkage']
-        prep._version = prep_data['ver']
+        annot._set_id(annot_data['id'])
+        annot._links = annot_data['linkage']
+        annot._version = annot_data['ver']
 
         # Required fields
-        prep._comment = prep_data['meta']['comment']
-        prep._pride_id = prep_data['meta']['pride_id']
-        prep._sample_name = prep_data['meta']['sample_name']
-        prep._title = prep_data['meta']['title']
-        prep._center = prep_data['meta']['center']
-        prep._contact = prep_data['meta']['contact']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._experiment_type = prep_data['meta']['experiment_type']
-        prep._short_label = prep_data['meta']['short_label']
-        prep._protocol_name = prep_data['meta']['protocol_name']
-        prep._study = prep_data['meta']['study']
-        prep._tags = prep_data['meta']['tags']
+        annot._annotation_pipeline = annot_data['meta']['annotation_pipeline']
+        annot._checksums = annot_data['meta']['checksums']
+        annot._format = annot_data['meta']['format']
+        annot._format_doc = annot_data['meta']['format_doc']
+        annot._orf_process = annot_data['meta']['orf_process']
+        annot._study = annot_data['meta']['study']
+        annot._tags = annot_data['meta']['tags']
+        annot._urls = annot_data['meta']['urls']
 
         # Handle Annotation optional properties
-        if 'short_label' in prep_data['meta']:
-            prep._short_label = prep_data['meta']['short_label']
+        if 'comment' in annot_data['meta']:
+            annot._comment = annot_data['meta']['comment']
 
-        if 'url' in prep_data['meta']:
-            prep._url = prep_data['meta']['url']
+        if 'date' in annot_data['meta']:
+            annot._date = annot_data['meta']['date']
 
-        if 'species' in prep_data['meta']:
-            prep._species = prep_data['meta']['species']
+        if 'sop' in annot_data['meta']:
+            annot._sop = annot_data['meta']['sop']
 
-        if 'cell_type' in prep_data['meta']:
-            prep._cell_type = prep_data['meta']['cell_type']
-
-        if 'tissue' in prep_data['meta']:
-            prep._tissue = prep_data['meta']['tissue']
-
-        if 'reference' in prep_data['meta']:
-            prep._reference = prep_data['meta']['reference']
-
-        if 'protocol_name' in prep_data['meta']:
-            prep._protocol_name = prep_data['meta']['protocol_name']
-
-        if 'protocol_steps' in prep_data['meta']:
-            prep._protocol_steps = prep_data['meta']['protocol_steps']
-
-        if 'exp_description' in prep_data['meta']:
-            prep._exp_description = prep_data['meta']['exp_description']
-
-        if 'sample_description' in prep_data['meta']:
-            prep._sample_description = prep_data['meta']['sample_description']
+        if 'annotation_source' in annot_data['meta']:
+            annot._annotation_source = annot_data['meta']['annotation_source']
 
         module_logger.debug("Returning loaded Annotation.")
-        return prep
+        return annot
 
     def save(self):
         """

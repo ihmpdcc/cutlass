@@ -32,6 +32,9 @@ class ImportAllTest(unittest.TestCase):
     def testImport16SRawSeqSet(self):
         self.failIf(SixteenSRawSeqSet is None)
 
+    def testImportWgsAssembledSeqSet(self):
+        self.failIf(WgsRawSeqSet is None)
+
     def testImportWgsRawSeqSet(self):
         self.failIf(WgsRawSeqSet is None)
 
@@ -43,6 +46,9 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportMicrobiomeAssayPrep(self):
         self.failIf(MicrobiomeAssayPrep is None)
+
+    def testImportAnnotation(self):
+        self.failIf(Annotation is None)
 
     def testImportAspera(self):
         self.failIf(aspera is None)

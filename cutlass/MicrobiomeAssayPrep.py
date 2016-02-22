@@ -2,7 +2,6 @@
 
 import json
 import logging
-from datetime import datetime
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
@@ -716,12 +715,12 @@ class MicrobiomeAssayPrep(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
         return ("comment", "pride_id", "sample_name", "title",
                 "center", "contact", "prep_id", "storage_duration",
-                "experiment_type", "study")
+                "experiment_type", "study", "tags")
 
     def delete(self):
         """

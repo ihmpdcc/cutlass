@@ -250,7 +250,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def format_doc(self):
-        """ str: URL for documentation of file format. """
+        """
+        str: URL for documentation of file format.
+        """
         self.logger.debug("In format_doc getter.")
 
         return self._format_doc

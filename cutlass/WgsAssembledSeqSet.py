@@ -62,7 +62,7 @@ class WgsAssembledSeqSet(Base):
         self._size = None
         self._study = None
         self._local_file = None
-        self._urls = []
+        self._urls = ['']
 
         # Optional
         self._date = None
@@ -719,7 +719,7 @@ class WgsAssembledSeqSet(Base):
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
-                                "assembled", remote_base])
+                                "hmasm", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         # Upload the file to the iHMP aspera server
@@ -734,7 +734,6 @@ class WgsAssembledSeqSet(Base):
             return False
         else:
             self._urls = [ "fasp://" + WgsAssembledSeqSet.aspera_server + remote_path ]
-
 
         if self.id is None:
             # The document has not yet been save

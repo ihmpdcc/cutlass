@@ -11,7 +11,7 @@ import sys
 username = "test"
 password = "test"
 
-session = iHMPSession(username, password, server="osdf-devel.igs.umaryland.edu")
+session = iHMPSession(username, password)
 
 print("Required fields: ")
 print(Annotation.required_fields())

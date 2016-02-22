@@ -20,7 +20,9 @@ class Proteome(Base):
     OSDF.
 
     Attributes:
-        namespace (str): The namespace this class will use in OSDF.
+        namespace (str): The namespace this class will use in OSDF
+
+        date_format (str): The format of the date
     """
     namespace = "ihmp"
 

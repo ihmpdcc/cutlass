@@ -1,4 +1,5 @@
 from .iHMPSession import iHMPSession
+from .Annotation import Annotation
 from .Project import Project
 from .Proteome import Proteome
 from .Study import Study
@@ -11,6 +12,7 @@ from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from .HostAssayPrep import HostAssayPrep
 from .WgsRawSeqSet import WgsRawSeqSet
+from .WgsAssembledSeqSet import WgsAssembledSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from .aspera import aspera
 from .mixs import MIXS, MixsException

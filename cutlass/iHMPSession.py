@@ -67,6 +67,21 @@ class iHMPSession(object):
         self.logger.debug("In get_osdf.")
         return self._osdf
 
+    def create_annotation(self):
+        """
+        Returns an empty Annotation object.
+
+        Args:
+            None
+
+        Returns:
+            A Annotation object.
+        """
+        self.logger.debug("In create_annotation.")
+        from Annotation import Annotation
+        annotation = Annotation()
+        return annotation
+
     def create_project(self):
         """
         Returns an empty Project object.
@@ -233,6 +248,21 @@ class iHMPSession(object):
         seq_set = SixteenSTrimmedSeqSet()
         return seq_set
 
+    def create_wgs_assembled_seq_set(self):
+        """
+        Returns an empty WGS Assembled Seq Set object.
+
+        Args:
+            None
+
+        Returns:
+            A WGS Assembled Sequence Set object.
+        """
+        self.logger.debug("In create_wgs_assembled_seq_set.")
+        from WgsAssembledSeqSet import WgsAssembledSeqSet
+        wgs_assembled_seq_set = WgsAssembledSeqSet()
+        return wgs_assembled_seq_set
+
     def create_wgs_raw_seq_set(self):
         """
         Returns an empty WGS Raw Seq Set object.
@@ -265,8 +295,8 @@ class iHMPSession(object):
 
     def create_object(self, node_type):
         """
-        Returns an empty object of the node_type provided. It must be a valid object,
-        or else an exception is raised.
+        Returns an empty object of the node_type provided. It must be a
+        valid object, or else an exception is raised.
 
         Args:
             node_type (str): The type of object desired.
@@ -281,6 +311,10 @@ class iHMPSession(object):
             from Project import Project
             self.logger.debug("Creating a Project.")
             node = Project()
+        elif node_type == "annotation":
+            from Annotation import Annotation
+            self.logger.debug("Creating an Annotation.")
+            node = Annotation()
         elif node_type == "proteome":
             from Proteome import Proteome
             self.logger.debug("Creating a Proteome.")
@@ -301,10 +335,6 @@ class iHMPSession(object):
             from Study import Study
             self.logger.debug("Creating a Study.")
             node = Study()
-        elif node_type == "wgs_dna_prep":
-            from WgsDnaPrep import WgsDnaPrep
-            self.logger.debug("Creating a WgsDnaPrep.")
-            node = WgsDnaPrep()
         elif node_type == "16s_dna_prep":
             from SixteenSDnaPrep import SixteenSDnaPrep
             self.logger.debug("Creating a SixteenSDnaPrep.")
@@ -313,6 +343,14 @@ class iHMPSession(object):
             from SixteenSRawSeqSet import SixteenSRawSeqSet
             self.logger.debug("Creating a SixteenSRawSeqSet.")
             node = SixteenSRawSeqSet()
+        elif node_type == "wgs_assembled_seq_set":
+            from WgsAssembledSeqSet import WgsAssembledSeqSet
+            self.logger.debug("Creating a WgsAssembledSeqSet.")
+            node = WgsAssembledSeqSet()
+        elif node_type == "wgs_dna_prep":
+            from WgsDnaPrep import WgsDnaPrep
+            self.logger.debug("Creating a WgsDnaPrep.")
+            node = WgsDnaPrep()
         elif node_type == "wgs_raw_seq_set":
             from WgsRawSeqSet import WgsRawSeqSet
             self.logger.debug("Creating a WgsRawSeqSet.")
@@ -336,7 +374,9 @@ class iHMPSession(object):
 
     @property
     def password(self):
-        """ str: The password provided by the user for the OSDF instance. """
+        """
+        str: The password provided by the user for the OSDF instance.
+        """
         self.logger.debug("In password getter.")
         return self._password
 
@@ -382,7 +422,9 @@ class iHMPSession(object):
 
     @property
     def server(self):
-        """ str: The server domain name that contains the live OSDF instance. """
+        """
+        str: The server domain name that contains the live OSDF instance.
+        """
         self.logger.debug("In server getter.")
         return self._server
 

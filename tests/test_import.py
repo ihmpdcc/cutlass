@@ -4,7 +4,18 @@ import unittest
 import sys
 
 class ImportTest(unittest.TestCase):
-    def testImportSession(self):
+    def testImportAnnotation(self):
+        success = False
+        try:
+            from cutlass import Annotation
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Annotation is None)
+
+    def testImportIHMPSession(self):
         success = False
         try:
             from cutlass import iHMPSession
@@ -86,6 +97,18 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(SixteenSDnaPrep is None)
+
+    def testImportWgsAssembledSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import WgsAssembledSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(WgsAssembledSeqSet is None)
 
     def testImportWgsDnaPrep(self):
         success = False
