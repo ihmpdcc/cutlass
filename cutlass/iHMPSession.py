@@ -2,6 +2,7 @@
 
 from osdf import OSDF
 import logging
+import importlib
 
 class iHMPSession(object):
     """
@@ -38,6 +39,56 @@ class iHMPSession(object):
         if iHMPSession._single is None:
             iHMPSession._single = self
 
+    def _get_cutlass_instance(self, name):
+        self.logger.debug("In _get_cutlass_instance.")
+
+        classes = { "annotation": "Annotation",
+                    "project": "Project",
+                    "proteome": "Proteome",
+                    "sample": "Sample",
+                    "subject": "Subject",
+                    "study": "Study",
+                    "visit": "Visit",
+                    "microbiome_assay_prep": "MicrobiomeAssayPrep",
+                    "host_assay_prep": "HostAssayPrep",
+                    "16s_dna_prep": "SixteenSDnaPrep",
+                    "16s_raw_seq_set": "SixteenSRawSeqSet",
+                    "16s_trimmed_seq_set": "SixteenSTrimmedSeqSet",
+                    "wgs_assembled_seq_set": "WgsAssembledSeqSet",
+                    "wgs_raw_seq_set": "WgsRawSeqSet",
+                    "wgs_dna_prep": "WgsDnaPrep" }
+
+        className = None
+        valid = False
+
+        if name in classes:
+            valid = True
+            className = classes[name]
+
+        instance = None
+
+        if valid:
+
+            module = importlib.import_module("cutlass", package="cutlass")
+
+            classVar = getattr(module, className)
+            instance = classVar()
+        else:
+            raise TypeError("%s not defined in %s" % (name, self.__class__))
+
+        return instance
+
+    def __getattr__(self, name):
+        if name.startswith("create_"):
+            classLc = name[7:]
+
+        try:
+            instance = self._get_cutlass_instance(classLc)
+        except TypeError:
+            raise AttributeError("%s not defined in %s" % (name, self.__class__))
+
+        return instance
+
     @staticmethod
     def get_session():
         """
@@ -67,232 +118,6 @@ class iHMPSession(object):
         self.logger.debug("In get_osdf.")
         return self._osdf
 
-    def create_annotation(self):
-        """
-        Returns an empty Annotation object.
-
-        Args:
-            None
-
-        Returns:
-            A Annotation object.
-        """
-        self.logger.debug("In create_annotation.")
-        from Annotation import Annotation
-        annotation = Annotation()
-        return annotation
-
-    def create_project(self):
-        """
-        Returns an empty Project object.
-
-        Args:
-            None
-
-        Returns:
-            A Project object.
-        """
-        self.logger.debug("In create_project.")
-        from Project import Project
-        project = Project()
-        return project
-
-    def create_proteome(self):
-        """
-        Returns an empty Proteome object.
-
-        Args:
-            None
-
-        Returns:
-            A Proteome object.
-        """
-        self.logger.debug("In create_proteome.")
-        from Proteome import Proteome
-        proteome = Proteome()
-        return proteome
-
-    def create_sample(self):
-        """
-        Returns an empty Sample object.
-
-        Args:
-            None
-
-        Returns:
-            A Sample object.
-        """
-        self.logger.debug("In create_sample.")
-        from Sample import Sample
-        sample = Sample()
-        return sample
-
-    def create_subject(self):
-        """
-        Returns an empty Subject object.
-
-        Args:
-            None
-
-        Returns:
-            A Subject object.
-        """
-        self.logger.debug("In create_subject.")
-        from Subject import Subject
-        subject = Subject()
-        return subject
-
-    def create_study(self):
-        """
-        Returns an empty Study object.
-
-        Args:
-            None
-
-        Returns:
-            A Study object.
-        """
-        self.logger.debug("In create_study.")
-        from Study import Study
-        study = Study()
-        return study
-
-    def create_visit(self):
-        """
-        Returns an empty Visit object.
-
-        Args:
-            None
-
-        Returns:
-            A Visit object.
-        """
-        self.logger.debug("In create_visit.")
-        from Visit import Visit
-        visit = Visit()
-        return visit
-
-    def create_microbiome_assay_prep(self):
-        """
-        Returns an empty microbiome assay prep object.
-
-        Args:
-            None
-
-        Returns:
-            A MicrobiomeAssayPrep object.
-        """
-        self.logger.debug("In create_microbiome_assay_prep.")
-        from MicrobiomeAssayPrep import MicrobiomeAssayPrep
-        prep = MicrobiomeAssayPrep()
-        return prep
-
-    def create_host_assay_prep(self):
-        """
-        Returns an empty host assay prep object.
-
-        Args:
-            None
-
-        Returns:
-            A HostAssayPrep object.
-        """
-        self.logger.debug("In create_host_assay_prep.")
-        from HostAssayPrep import HostAssayPrep
-        prep = HostAssayPrep()
-        return prep
-
-
-    def create_16s_dna_prep(self):
-        """
-        Returns an empty 16S DNA Prep object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S DNA Prep object.
-        """
-        self.logger.debug("In create_16s_dna_prep.")
-        from SixteenSDnaPrep import SixteenSDnaPrep
-        prep = SixteenSDnaPrep()
-        return prep
-
-    def create_16s_raw_seq_set(self):
-        """
-        Returns an empty 16S Raw Sequence Set object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S Raw Sequence Set object.
-        """
-        self.logger.debug("In create_16s_raw_seq_set.")
-        from SixteenSRawSeqSet import SixteenSRawSeqSet
-        seq_set = SixteenSRawSeqSet()
-        return seq_set
-
-    def create_16s_trimmed_seq_set(self):
-        """
-        Returns an empty 16S Trimmed Sequence Set object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S Trimmed Sequence Set object.
-        """
-        self.logger.debug("In create_16s_trimmed_seq_set.")
-        from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
-        seq_set = SixteenSTrimmedSeqSet()
-        return seq_set
-
-    def create_wgs_assembled_seq_set(self):
-        """
-        Returns an empty WGS Assembled Seq Set object.
-
-        Args:
-            None
-
-        Returns:
-            A WGS Assembled Sequence Set object.
-        """
-        self.logger.debug("In create_wgs_assembled_seq_set.")
-        from WgsAssembledSeqSet import WgsAssembledSeqSet
-        wgs_assembled_seq_set = WgsAssembledSeqSet()
-        return wgs_assembled_seq_set
-
-    def create_wgs_raw_seq_set(self):
-        """
-        Returns an empty WGS Raw Seq Set object.
-
-        Args:
-            None
-
-        Returns:
-            A WGS Raw Sequence Set object.
-        """
-        self.logger.debug("In create_wgs_raw_seq_set.")
-        from WgsRawSeqSet import WgsRawSeqSet
-        wgs_raw_seq_set = WgsRawSeqSet()
-        return wgs_raw_seq_set
-
-    def create_wgs_dna_prep(self):
-        """
-        Returns an empty WGS DNA Prep object.
-
-        Args:
-            None
-
-        Returns:
-            A WGS Dna Prep object.
-        """
-        self.logger.debug("In create_16s_trimmed_seq_set.")
-        from WgsDnaPrep import WgsDnaPrep
-        wgs_dna_prep = WgsDnaPrep()
-        return wgs_dna_prep
-
     def create_object(self, node_type):
         """
         Returns an empty object of the node_type provided. It must be a
@@ -306,71 +131,14 @@ class iHMPSession(object):
         """
         self.logger.debug("In create_object. Type: %s" % node_type)
 
-        node = None
-        if node_type == "project":
-            from Project import Project
-            self.logger.debug("Creating a Project.")
-            node = Project()
-        elif node_type == "annotation":
-            from Annotation import Annotation
-            self.logger.debug("Creating an Annotation.")
-            node = Annotation()
-        elif node_type == "proteome":
-            from Proteome import Proteome
-            self.logger.debug("Creating a Proteome.")
-            node = Proteome()
-        elif node_type == "visit":
-            from Visit import Visit
-            self.logger.debug("Creating a Visit.")
-            node = Visit()
-        elif node_type == "subject":
-            from Subject import Subject
-            self.logger.debug("Creating a Subject.")
-            node = Subject()
-        elif node_type == "sample":
-            from Sample import Sample
-            self.logger.debug("Creating a Sample.")
-            node = Sample()
-        elif node_type == "study":
-            from Study import Study
-            self.logger.debug("Creating a Study.")
-            node = Study()
-        elif node_type == "16s_dna_prep":
-            from SixteenSDnaPrep import SixteenSDnaPrep
-            self.logger.debug("Creating a SixteenSDnaPrep.")
-            node = SixteenSDnaPrep()
-        elif node_type == "16s_raw_seq_set":
-            from SixteenSRawSeqSet import SixteenSRawSeqSet
-            self.logger.debug("Creating a SixteenSRawSeqSet.")
-            node = SixteenSRawSeqSet()
-        elif node_type == "wgs_assembled_seq_set":
-            from WgsAssembledSeqSet import WgsAssembledSeqSet
-            self.logger.debug("Creating a WgsAssembledSeqSet.")
-            node = WgsAssembledSeqSet()
-        elif node_type == "wgs_dna_prep":
-            from WgsDnaPrep import WgsDnaPrep
-            self.logger.debug("Creating a WgsDnaPrep.")
-            node = WgsDnaPrep()
-        elif node_type == "wgs_raw_seq_set":
-            from WgsRawSeqSet import WgsRawSeqSet
-            self.logger.debug("Creating a WgsRawSeqSet.")
-            node = WgsRawSeqSet()
-        elif node_type == "16s_trimmed_seq_set":
-            from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
-            self.logger.debug("Creating a SixteenSTrimmedSeqSet.")
-            node = SixteenSTrimmedSeqSet()
-        elif node_type == "microb_assay_prep":
-            from MicrobiomeAssayPrep import MicrobiomeAssayPrep
-            self.logger.debug("Creating a MicrobiomeAssayPrep.")
-            node = MicrobiomeAssayPrep()
-        elif node_type == "host_assay_prep":
-            from HostAssayPrep import HostAssayPrep
-            self.logger.debug("Creating a HostAssayPrep.")
-            node = HostAssayPrep()
-        else:
-            raise ValueError("Invalid node type specified: %" % node_type)
+        instance = None
 
-        return node
+        try:
+            instance = self._get_cutlass_instance(node_type)
+        except TypeError:
+            raise ValueError("Invalid node type specified: %s" % node_type)
+
+        return instance
 
     @property
     def password(self):
