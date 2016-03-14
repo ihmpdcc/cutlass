@@ -300,6 +300,8 @@ class Base(object):
         else:
             return cs
 
+    def __call__(self):
+        return self
 
     def __str__(self):
         _id = "no ID" if not self._id else self._id[-8:]
