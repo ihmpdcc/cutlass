@@ -395,7 +395,7 @@ class WgsRawSeqSet(Base):
         """
         self.logger.debug("In study setter.")
 
-        studies = ["preg_preterm","ibd","prediabetes"]
+        studies = ["preg_preterm", "ibd", "prediabetes"]
 
         if type(study) != str:
             raise ValueError("study must be a string.")
@@ -525,7 +525,7 @@ class WgsRawSeqSet(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
@@ -702,7 +702,7 @@ class WgsRawSeqSet(Base):
 
 
         if self.id is None:
-            # The document has not yet been save
+            # The document has not yet been saved
             seq_set_data = self._get_raw_doc()
             self.logger.info("Got the raw JSON document.")
 
