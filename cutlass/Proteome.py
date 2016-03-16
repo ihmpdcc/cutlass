@@ -2,11 +2,14 @@
 
 import json
 import logging
+import os
+import string
 from datetime import datetime
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from Visit import Visit
+from aspera import aspera
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -23,10 +26,14 @@ class Proteome(Base):
         namespace (str): The namespace this class will use in OSDF
 
         date_format (str): The format of the date
+
+        aspera_server (str): The hostname of the DCC Aspera server
     """
     namespace = "ihmp"
 
     date_format = '%Y-%m-%d'
+
+    aspera_server = "aspera.ihmpdcc.org"
 
     def __init__(self):
         """
@@ -51,21 +58,23 @@ class Proteome(Base):
         self._detector = None
         self._instrument_name = None
         self._pepid_format = None
-        self._pepid_url = []
+        self._pepid_url = ['']
         self._pride_id = None
         self._processing_method = None
         self._protid_format = None
         self._protocol_name = None
         self._protmod_format = None
-        self._protid_url = []
-        self._protmod_url = []
+        self._protid_url = ['']
+        self._protmod_url = ['']
+        self._local_protmod_file = None
         self._sample_name = None
         self._search_engine = None
         self._short_label = None
         self._software = None
         self._source = None
         self._spectra_format = None
-        self._spectra_url = []
+        self._spectra_url = ['']
+        self._local_spectra_file = None
         self._study = None
         self._title = None
 
@@ -713,60 +722,109 @@ class Proteome(Base):
         self._protmod_format = protmod_format
 
     @property
+    def protmod_url(self):
+        """
+        list: URLs for protein modifications files using the PSI-MOD ontology.
+        """
+        self.logger.debug("In protmod_url getter.")
+        return self._protmod_url
+
+    @property
+    def local_protmod_file(self):
+        """
+        str: Local path where the PSI-MOD data is located.
+        """
+        self.logger.debug("In local_protmod_file getter.")
+        return self._local_protmod_file
+
+    @local_protmod_file.setter
+    def local_protmod_file(self, local_protmod_file):
+        """
+        Local file where PSI-MOD data is located. This data will be
+        uploaded via Aspera when the node is saved.
+
+        Args:
+            local_protmod_file (str): Local file containing the PSI-MOD data
+
+        Returns:
+            None
+        """
+        self.logger.debug("In local_protmod_file setter.")
+        if type(local_protmod_file) is not str:
+            raise ValueError("Invalid type for local_protmod_file. Must be a string.")
+
+        self._local_protmod_file = local_protmod_file
+
+    @property
     def spectra_url(self):
         """
         list: URLs from where spectra files can be obtained.
         """
         self.logger.debug("In spectra_url getter.")
-        return self.spectra_url
+        return self._spectra_url
 
-    @spectra_url.setter
-    def spectra_url(self, spectra_url):
+    @property
+    def local_spectra_file(self):
         """
-        URLs from where spectra files can be obtained, see allowable
-        formats at
-        http://www.ebi.ac.uk/pride/help/archive/submission/pridexml#\
-        SubmissionForBiologistsSecondVersion-CreatingPRIDEXMLfiles
+        str: Local path where the spectra file is located.
+        """
+        self.logger.debug("In local_spectra_file getter.")
+        return self._local_spectra_file
+
+    @local_spectra_file.setter
+    def local_spectra_file(self, local_spectra_file):
+        """
+        Local file where spectra data is located. This data will be
+        uploaded via Aspera when the node is saved.
 
         Args:
-            spectra_url (list): URLs from where files can be obtained.
+            local_spectra_file (str):  Local file containing the spectra data.
 
         Returns:
             None
         """
-        self.logger.debug("In spectra_url setter.")
-        if type(spectra_url) is not list:
-            raise ValueError("Invalid type for spectra_url. Must be a list.")
+        self.logger.debug("In local_spectra_file setter.")
+        if type(local_spectra_file) is not str:
+            raise ValueError("Invalid type for local_spectra_file. " + \
+                             "Must be a string.")
 
-        self._spectra_url = spectra_url
+        self._local_spectra_file = local_spectra_file
 
     @property
     def protid_url(self):
         """
-        list: URLs from where protein identification files can be obtained.
+        list: URLs from where protein identification file can be obtained.
         """
         self.logger.debug("In protid_url getter.")
-        return self.protid_url
+        return self._protid_url
 
-    @protid_url.setter
-    def protid_url(self, protid_url):
+    @property
+    def local_protid_file(self):
         """
-        URLs from where protein identification files can be obtained, see allowable
-        formats at
-        http://www.ebi.ac.uk/pride/help/archive/submission/pridexml#\
-        SubmissionForBiologistsSecondVersion-CreatingPRIDEXMLfiles
+        str: Local path where the protein identification file is located.
+        """
+        self.logger.debug("In local_protid_file getter.")
+        return self._local_protid_file
+
+    @local_protid_file.setter
+    def local_protid_file(self, local_protid_file):
+        """
+        Local file where protein identification data is located. This data will
+        be uploaded via Aspera when the node is saved.
 
         Args:
-            protid_url (list): URLs from where files can be obtained.
+            local_protid_file (str):  Local file containing the protein
+            identification data.
 
         Returns:
             None
         """
-        self.logger.debug("In protid_url setter.")
-        if type(protid_url) is not list:
-            raise ValueError("Invalid type for protid_url. Must be a list.")
+        self.logger.debug("In local_protid_file setter.")
+        if type(local_protid_file) is not str:
+            raise ValueError("Invalid type for local_protid_file. " + \
+                             "Must be a string.")
 
-        self._protid_url = protid_url
+        self._local_protid_file = local_protid_file
 
     @property
     def pepid_url(self):
@@ -774,52 +832,35 @@ class Proteome(Base):
         list: URLs from where peptide identification file can be obtained.
         """
         self.logger.debug("In pepid_url getter.")
-        return self.pepid_url
-
-    @pepid_url.setter
-    def pepid_url(self, pepid_url):
-        """
-        URLs from where peptide identification files can be obtained, see allowable
-        formats at
-        http://www.ebi.ac.uk/pride/help/archive/submission/pridexml#\
-        SubmissionForBiologistsSecondVersion-CreatingPRIDEXMLfiles
-
-        Args:
-            pepid_url (list): URLs from where files can be obtained.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In pepid_url setter.")
-        if type(pepid_url) is not list:
-            raise ValueError("Invalid type for pepid_url. Must be a list.")
-
-        self._pepid_url = pepid_url
+        return self._pepid_url
 
     @property
-    def protmod_url(self):
+    def local_pepid_file(self):
         """
-        list: URLs for protein modifications files using the PSI-MOD ontology.
+        str: Local path where the peptide identification file is located.
         """
-        self.logger.debug("In protmod_url getter.")
-        return self.protmod_url
+        self.logger.debug("In local_pepid_file getter.")
+        return self._local_pepid_file
 
-    @protmod_url.setter
-    def protmod_url(self, protmod_url):
+    @local_pepid_file.setter
+    def local_pepid_file(self, local_pepid_file):
         """
-        URLs for protein modifications files using the PSI-MOD ontology.
+        Local file where peptide identification data is located. This data will
+        be uploaded via Aspera when the node is saved.
 
         Args:
-            protmod_url (list): URLs from where files can be obtained.
+            local_pepid_file (str):  Local file containing the peptide
+            identification data.
 
         Returns:
             None
         """
-        self.logger.debug("In protmod_url setter.")
-        if type(protmod_url) is not list:
-            raise ValueError("Invalid type for protmod_url. Must be a list.")
+        self.logger.debug("In local_pepid_file setter.")
+        if type(local_pepid_file) is not str:
+            raise ValueError("Invalid type for local_pepid_file. " + \
+                             "Must be a string.")
 
-        self._protmod_url = protmod_url
+        self._local_pepid_file = local_pepid_file
 
     @property
     def study(self):
@@ -841,10 +882,16 @@ class Proteome(Base):
             None
         """
         self.logger.debug("In study setter.")
-        if type(study) is not str:
-            raise ValueError("Invalid type for study.")
 
-        self._study = study
+        studies = ["preg_preterm", "ibd", "prediabetes"]
+
+        if type(study) != str:
+            raise ValueError("study must be a string.")
+
+        if study in studies:
+            self._study = study
+        else:
+            raise Exception("Not a valid study")
 
     def validate(self):
         """
@@ -1011,9 +1058,10 @@ class Proteome(Base):
         return ("checksums", "comment", "pride_id", "sample_name", "title",
                 "short_label", "protocol_name", "instrument_name", "source",
                 "analyzer", "detector", "software", "processing_method",
-                "search_engine", "protid_format", "protid_url", "pepid_format",
-                "pepid_url", "protmod_format", "protmod_url", "spectra_format",
-                "spectra_url", "study")
+                "search_engine", "protid_format", "pepid_format",
+                "protmod_format", "spectra_format",
+                "local_spectra_file", "local_protmod_file", "local_protid_file",
+                "local_pepid_file", "study")
 
     def delete(self):
         """
@@ -1202,6 +1250,55 @@ class Proteome(Base):
         module_logger.debug("Returning loaded Proteome.")
         return proteome
 
+    def _upload_files(self, study, file_map):
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
+
+        if study not in study2dir:
+            raise ValueError("Invalid study. No directory mapping for %s" % study)
+
+        study_dir = study2dir[study]
+        remote_paths = {}
+
+        # Get the session so we can get the username and password
+        session = iHMPSession.get_session()
+        username = session.username
+        password = session.password
+
+        # For each of the Proteome data files (there are 4), transmit them
+        # to the Aspera server and return a dictionary with the computed remote
+        # paths...
+        for file_type, local_file in file_map.iteritems():
+            self.logger.debug("Uploading %s of Proteome type %s" %
+                              (local_file, file_type))
+
+            remote_base = os.path.basename(local_file);
+
+            valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+            remote_base = ''.join(c for c in remote_base if c in valid_chars)
+            remote_base = remote_base.replace(' ', '_') # No spaces in filenames
+
+            remote_path = "/".join(["/" + study_dir, "proteome",
+                                    file_type, remote_base])
+            self.logger.debug("Remote path for this file will be %s." % remote_path)
+
+            # Upload the file to the iHMP aspera server
+            upload_success = aspera.upload_file(Proteome.aspera_server,
+                                                username,
+                                                password,
+                                                local_file,
+                                                remote_path)
+            if not upload_success:
+                self.logger.error(
+                    "Experienced an error uploading file %s. " % local_file)
+                raise Exception("Unable to upload " + local_file)
+            else:
+                remote_paths[file_type] = "fasp://" + Proteome.aspera_server + remote_path
+
+        return remote_paths
+
     def save(self):
         """
         Saves the data in OSDF. The JSON form of the current data for the
@@ -1234,6 +1331,28 @@ class Proteome(Base):
         osdf = session.get_osdf()
 
         success = False
+
+        study = self._study
+
+        files = { "spectra": self._local_spectra_file,
+                  "pepid": self._local_pepid_file,
+                  "protmod": self._local_protmod_file,
+                  "protid": self._local_protid_file }
+
+        remote_files = {}
+        try:
+            remote_files = self._upload_files(study, files)
+        except Exception as e:
+            self.logger.exception("Unable to transmit data via Aspera.")
+            return False
+
+        self.logger.info("Aspera transmission of Proteome files successful.");
+
+        self.logger.debug("Setting url properties with remote paths.")
+        self._protid_url = [ remote_files['protid'] ]
+        self._pepid_url = [ remote_files['pepid'] ]
+        self._protmod_url = [ remote_files['protmod'] ]
+        self._spectra_url = [ remote_files['spectra_url'] ]
 
         if self._id is None:
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
