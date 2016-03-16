@@ -21,12 +21,12 @@ def how_to():
     print(" -h, --help - usage")
 
 def main(argv):
-
     username = None
     password = None
 
     try:
-        opts, args = getopt.gnu_getopt(argv, "u:ph", ["username=", "password", "help"])
+        opts, args = getopt.gnu_getopt(argv, "u:ph",
+                                       ["username=", "password", "help"])
         if not opts:
             how_to()
             sys.exit(2)
@@ -45,8 +45,12 @@ def main(argv):
             sys.exit(2)
 
     if password is None:
-        password = getpass.getpass("Enter your password (Don't worry, it's not shown): ")
-        password_confirm = getpass.getpass("Enter your password AGAIN to confirm: ")
+        password = getpass.getpass(
+                       "Enter your password (Don't worry, it's not shown): "
+                   )
+        password_confirm = getpass.getpass(
+                               "Enter your password AGAIN to confirm: "
+                           )
 
     if (password != password_confirm):
         print("Passwords entered do not match.")
