@@ -83,7 +83,7 @@ def run_ascp(ascp_cmd, password, keyfile=None):
                 "Can't use private key. No such file or directory: "+keyfile)
         ascp_cmd = [ascp_cmd[0], "-i", keyfile] + ascp_cmd[1:]
 
-        
+
     try:
         logger.debug("Command: " + " ".join(ascp_cmd))
         process = subprocess.Popen(ascp_cmd, stdout=subprocess.PIPE,
@@ -132,7 +132,7 @@ def upload_file(server, username, password, local_file, remote_path,
         logger.warn("local file " + local_file + " does not exist")
         return False
 
-    ascp_cmd = [ ASCP_COMMAND, "-T", "-v", "-l", "300M", local_file,
-                 username + "@" + server + ":" + remote_path ]
+    remote_clause = username + "@" + server + ":" + remote_path
+    ascp_cmd = [ ASCP_COMMAND, "-T", "-v", "-l", "300M", local_file, remote_clause ]
 
     return run_ascp(ascp_cmd, password, keyfile)
