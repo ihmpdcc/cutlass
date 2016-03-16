@@ -32,7 +32,7 @@ prep.title = "the title"
 
 # Optional properties
 prep.short_label = "the short label"
-prep.url = [ "http://prep.url" ]
+prep.urls = [ "http://prep.url" ]
 prep.species = "the species"
 prep.cell_type = "the cell type"
 prep.tissue = "test tissue"

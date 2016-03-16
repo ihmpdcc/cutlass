@@ -51,7 +51,7 @@ class HostAssayPrep(Base):
 
         # Optional properties
         self._short_label = None
-        self._url = None
+        self._urls = None
         self._species = None
         self._cell_type = None
         self._tissue = None
@@ -395,6 +395,29 @@ class HostAssayPrep(Base):
         self._tissue = tissue
 
     @property
+    def urls(self):
+        """
+        list: List of URL strings to relevant electronic resources.
+        """
+        self.logger.debug("In urls getter.")
+        return self._urls
+
+    @urls.setter
+    def url(self, urls):
+        """
+        URLs of relevant electronic resources.
+
+        Args:
+            urls (list): List of URL strings
+
+        Returns:
+            None
+        """
+
+        self._urls = urls
+
+
+    @property
     def reference(self):
         """
         str: Link to literature citation for which this experiment provides
@@ -669,9 +692,9 @@ class HostAssayPrep(Base):
            self.logger.debug("HostAssayPrep object has the 'short_label' property set.")
            prep_doc['meta']['short_label'] = self._short_label
 
-        if self._url is not None:
+        if self._urls is not None:
            self.logger.debug("HostAssayPrep object has the 'url' property set.")
-           prep_doc['meta']['url'] = self._url
+           prep_doc['meta']['urls'] = self._urls
 
         if self._species is not None:
            self.logger.debug("HostAssayPrep object has the 'species' property set.")
@@ -840,8 +863,8 @@ class HostAssayPrep(Base):
         if 'short_label' in prep_data['meta']:
             prep._short_label = prep_data['meta']['short_label']
 
-        if 'url' in prep_data['meta']:
-            prep._url = prep_data['meta']['url']
+        if 'urls' in prep_data['meta']:
+            prep._urls = prep_data['meta']['urls']
 
         if 'species' in prep_data['meta']:
             prep._species = prep_data['meta']['species']
@@ -920,7 +943,7 @@ class HostAssayPrep(Base):
             prep._short_label = prep_data['meta']['short_label']
 
         if 'url' in prep_data['meta']:
-            prep._url = prep_data['meta']['url']
+            prep._urls = prep_data['meta']['urls']
 
         if 'species' in prep_data['meta']:
             prep._species = prep_data['meta']['species']
