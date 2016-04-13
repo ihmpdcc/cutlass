@@ -160,7 +160,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.assertTrue(success, "Able to use the checksums setter")
 
         self.assertEqual(wgsRawSeqSet.checksums['md5'], checksums['md5'],
-                         "Property getter for 'lib_layout' works.")
+                         "Property getter for 'checksums' works.")
 
     def testFormatLegal(self):
         wgsRawSeqSet = session.create_object("wgs_raw_seq_set")
@@ -173,7 +173,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         except:
             pass
 
-        self.assertTrue(success, "Able to use the format setter")
+        self.assertTrue(success, "Able to use the 'format' setter")
 
         self.assertEqual(wgsRawSeqSet.format, test_format,
                          "Property getter for 'format' works.")

@@ -158,11 +158,11 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         except:
             pass
 
-        self.assertTrue(success, "Able to use the checksums setter")
+        self.assertTrue(success, "Able to use the 'checksums' setter")
 
         self.assertEqual(sixteenSRawSeqSet.checksums['md5'],
                          checksums['md5'],
-                         "Property getter for 'lib_layout' works.")
+                         "Property getter for 'checksums' works.")
 
     def testFormatLegal(self):
         sixteenSRawSeqSet = session.create_16s_raw_seq_set()
