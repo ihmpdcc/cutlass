@@ -89,11 +89,8 @@ class ProteomeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             proteome.version = "test"
 
-    def testIllegalComment(self):
+    def testComment(self):
         self.stringTypeTest("comment")
-
-    def testLegalComment(self):
-        self.stringPropertyTest("comment")
 
     def testIllegalChecksums(self):
         proteome = session.create_proteome()
@@ -161,109 +158,72 @@ class ProteomeTest(unittest.TestCase):
         self.assertEqual(proteome.date, date,
                          "Property getter for 'date' works.")
 
-    def testIllegalPrideIdType(self):
+    def testPrideId(self):
         self.stringTypeTest("pride_id")
 
-    def testLegalPrideId(self):
-        self.stringPropertyTest("pride_id")
-
-    def testIllegalSampleNameType(self):
+    def testSampleName(self):
         self.stringTypeTest("sample_name")
 
-    def testLegalSampleName(self):
-        self.stringPropertyTest("sample_name")
-
-    def testIllegalTitleType(self):
+    def testTitle(self):
         self.stringTypeTest("title")
 
-    def testLegalTitle(self):
-        self.stringPropertyTest("title")
-
-    def testIllegalShortLabelType(self):
+    def testShortLabel(self):
         self.stringTypeTest("short_label")
 
-    def testLegalShortLabel(self):
-        self.stringPropertyTest("short_label")
-
-    def testIllegalReferenceType(self):
+    def testReference(self):
         self.stringTypeTest("reference")
 
-    def testLegalReference(self):
-        self.stringPropertyTest("reference")
-
-    def testIllegalProtocolNameType(self):
+    def testProtocolName(self):
         self.stringTypeTest("protocol_name")
 
-    def testLegalProtocolName(self):
-        self.stringPropertyTest("protocol_name")
-
-    def testIllegalProtocolStepsType(self):
+    def testProtocolSteps(self):
         self.stringTypeTest("protocol_steps")
 
-    def testLegalProtocolSteps(self):
-        self.stringPropertyTest("protocol_steps")
-
-    def testIllegalExpDescriptionType(self):
+    def testExpDescription(self):
         self.stringTypeTest("exp_description")
 
-    def testLegalExpDescription(self):
-        self.stringPropertyTest("exp_description")
-
-    def testIllegalSampleDescriptionType(self):
+    def testSampleDescription(self):
         self.stringTypeTest("sample_description")
 
-    def testLegalSampleDescription(self):
-        self.stringPropertyTest("sample_description")
-
-    def testIllegalInstrumentNameType(self):
+    def testInstrumentName(self):
         self.stringTypeTest("instrument_name")
 
-    def testLegalInstrumentName(self):
-        self.stringPropertyTest("instrument_name")
-
-    def testIllegalSourceType(self):
+    def testSource(self):
         self.stringTypeTest("source")
 
-    def testLegalSource(self):
-        self.stringPropertyTest("source")
-
-    def testIllegalAnalyzerType(self):
+    def testAnalyzer(self):
         self.stringTypeTest("analyzer")
 
-    def testLegalAnalyzer(self):
-        self.stringPropertyTest("analyzer")
-
-    def testIllegalDetectorType(self):
+    def testDetector(self):
         self.stringTypeTest("detector")
 
-    def testLegalDetector(self):
-        self.stringPropertyTest("detector")
-
-    def testIllegalSoftwareType(self):
+    def testSoftware(self):
         self.stringTypeTest("software")
 
-    def testLegalSoftware(self):
-        self.stringPropertyTest("software")
-
-    def testIllegalProcessingMethodType(self):
+    def testProcessingMethod(self):
         self.stringTypeTest("processing_method")
 
-    def testLegalProcessingMethod(self):
-        self.stringPropertyTest("processing_method")
-
-    def testIllegalSearchEngineType(self):
+    def testSearchEngine(self):
         self.stringTypeTest("search_engine")
 
-    def testLegalSearchEngine(self):
-        self.stringPropertyTest("search_engine")
-
-    def testIllegalXMLGenerationType(self):
+    def testXMLGeneration(self):
         self.stringTypeTest("xml_generation")
 
-    def testLegalXMLGeneration(self):
-        self.stringPropertyTest("xml_generation")
+    def stringTypeTest(self, prop):
+        proteome = session.create_proteome()
 
-    def stringPropertyTest(self, prop):
+        # test an int
+        with self.assertRaises(Exception):
+            setattr(proteome, prop, 1)
+
+        # test a list
+        with self.assertRaises(Exception):
+            setattr(proteome, prop, ["test"])
+
+        # test a dictionary
+        with self.assertRaises(Exception):
+            setattr(proteome, prop, {})
+
         proteome = session.create_proteome()
 
         value = "random"
@@ -282,56 +242,50 @@ class ProteomeTest(unittest.TestCase):
         self.assertEqual(retrieved, value,
                          "Property getter for '%s' works." % prop)
 
-    def stringTypeTest(self, prop):
-        proteome = session.create_proteome()
 
-        # test an int
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, 1)
-
-        # test a list
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, ["test"])
-
-        # test a dictionary
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, {})
-
-    def testIllegalSpectraFormatType(self):
+    def testSpectraFormat(self):
         self.stringTypeTest("spectra_format")
 
-    def testLegalSpectraFormat(self):
-        self.stringPropertyTest("spectra_format")
-
-    def testIllegalProtIDType(self):
+    def testProtIDFormat(self):
         self.stringTypeTest("protid_format")
 
-    def testLegalProtIDFormat(self):
-        self.stringPropertyTest("protid_format")
-
-    def testIllegalPepIDFormatType(self):
+    def testPepIDFormat(self):
         self.stringTypeTest("pepid_format")
 
-    def testLegalPepIDFormat(self):
-        self.stringPropertyTest("pepid_format")
-
-    def testIllegalProtModFormatType(self):
+    def testProtModFormat(self):
         self.stringTypeTest("protmod_format")
 
-    def testLegalProtModFormat(self):
-        self.stringPropertyTest("protmod_format")
+    def testStudy(self):
+        proteome = session.create_proteome()
 
-    def testIllegalStudyType(self):
-        self.stringTypeTest("study")
+        # Try an int
+        with self.assertRaises(ValueError):
+            proteome.study = 3
 
-    def testLegalStudy(self):
-        self.stringPropertyTest("study")
+        # Try an list
+        with self.assertRaises(ValueError):
+            proteome.study = [ 'a', 'b', 'c' ]
+
+        # Try a dict
+        with self.assertRaises(ValueError):
+            proteome.study = { 'a': 1, 'b': 2, 'c': 3 }
+
+        value = "random"
+        with self.assertRaises(Exception):
+            proteome.study = value
+
+        value = "prediabetes"
+        proteome.study = value
+
+        self.assertEqual(proteome.study, value,
+                         "No exception when a valid study provided.")
 
     def testTags(self):
         proteome = session.create_visit()
 
         tags = proteome.tags
-        self.assertTrue(type(tags) == list, "Proteome tags() method returns a list.")
+        self.assertTrue(type(tags) == list,
+                        "Proteome tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template proteome tags list is empty.")
 
         new_tags = [ "tagA", "tagB" ]
@@ -389,7 +343,8 @@ class ProteomeTest(unittest.TestCase):
         test_comment = "comment"
         test_checksums =  { "md5": "60b725f10c9c85c70d97880dfe8191b3" }
 
-        self.assertFalse(proteome.save(), "Proteome not saved successfully, no required fields")
+        self.assertFalse(proteome.save(),
+                         "Proteome not saved successfully, no required fields")
 
         proteome.date = test_date
 
@@ -408,7 +363,8 @@ class ProteomeTest(unittest.TestCase):
         with self.assertRaises(Exception):
             proteome.delete()
 
-        self.assertTrue(proteome.save() == True, "Proteome was not saved successfully")
+        self.assertTrue(proteome.save() == True,
+                        "Proteome was not saved successfully")
 
         # Load the proteome that was just saved from the OSDF instance
         proteome = session.create_proteome()
@@ -423,7 +379,8 @@ class ProteomeTest(unittest.TestCase):
                          "Proteome checksums not saved & loaded successfully")
 
         # Proteome is deleted successfully
-        self.assertTrue(proteome.delete(), "Proteome was not deleted successfully")
+        self.assertTrue(proteome.delete(),
+                        "Proteome was not deleted successfully")
 
         # The proteome of the initial ID should not load successfully
         load_test = session.create_proteome()
