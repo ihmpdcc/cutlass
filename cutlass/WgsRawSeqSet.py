@@ -7,6 +7,7 @@ import string
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
+from Util import *
 
 
 # Create a module logger named after the module
@@ -139,11 +140,12 @@ class WgsRawSeqSet(Base):
     @property
     def checksums(self):
         """ str: One or more checksums used to ensure file integrity. """
-        self.logger.debug("In checksums getter.")
+        self.logger.debug("In 'checksums' getter.")
 
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the WgsRawSeqSet checksums.
@@ -154,7 +156,7 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
+        self.logger.debug("In 'checksums' setter.")
 
         if 'md5' not in checksums:
             raise ValueError("Checksum data must contain at least the 'md5' value")
@@ -169,6 +171,7 @@ class WgsRawSeqSet(Base):
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the WgsRawSeqSet comment. The comment must be a string,
@@ -180,13 +183,10 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-
-        if type(comment) != str:
-            raise ValueError("comment must be a string.")
+        self.logger.debug("In 'comment' setter.")
 
         if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
+            raise Exception("Comment is too long. Max length is 512 characters.")
 
         self._comment = comment
 
@@ -194,11 +194,12 @@ class WgsRawSeqSet(Base):
     def exp_length(self):
         """ int: The number of raw bases or color space calls expected for the read,
                  includes both mate pairs and all technical portions. """
-        self.logger.debug("In exp_length getter.")
+        self.logger.debug("In 'exp_length' getter.")
 
         return self._exp_length
 
     @exp_length.setter
+    @enforce_int
     def exp_length(self, exp_length):
         """
         The setter for the WgsRawSeqSet exp length.
@@ -211,18 +212,19 @@ class WgsRawSeqSet(Base):
         """
         self.logger.debug("In exp_length setter.")
         if exp_length < 0:
-            raise ValueError("The exp_length must be non-negative.")
+            raise ValueError("The 'exp_length' must be non-negative.")
 
         self._exp_length = exp_length
 
     @property
     def format(self):
         """ str: The file format of the sequence file """
-        self.logger.debug("In format getter.")
+        self.logger.debug("In 'format' getter.")
 
         return self._format
 
     @format.setter
+    @enforce_string
     def format(self, format_str):
         """
         The setter for the WgsRawSeqSet format. This must be either fasta or fastq.
@@ -233,25 +235,23 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
-
-        if type(format_str) != str:
-            raise ValueError("format must be a string.")
+        self.logger.debug("In 'format' setter.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
             self._format = format_str
         else:
-            raise Exception("Format must be fasta or fastq only.")
+            raise Exception("Format must be either fasta or fastq.")
 
     @property
     def format_doc(self):
         """ str: URL for documentation of file format. """
-        self.logger.debug("In format_doc getter.")
+        self.logger.debug("In 'format_doc' getter.")
 
         return self._format_doc
 
     @format_doc.setter
+    @enforce_string
     def format_doc(self, format_doc):
         """
         The setter for the WgsRawSeqSet format doc.
@@ -262,10 +262,7 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format_doc setter.")
-
-        if type(format_doc) != str:
-            raise ValueError("format_doc must be a string.")
+        self.logger.debug("In 'format_doc' setter.")
 
         self._format_doc = format_doc
 
@@ -277,6 +274,7 @@ class WgsRawSeqSet(Base):
         return self._local_file
 
     @local_file.setter
+    @enforce_string
     def local_file(self, local_file):
         """
         The setter for the WgsRawSeqSet local file.
@@ -290,19 +288,17 @@ class WgsRawSeqSet(Base):
         """
         self.logger.debug("In local_file setter.")
 
-        if type(local_file) != str:
-            raise ValueError("local_file must be a string.")
-
         self._local_file = local_file
 
     @property
     def seq_model(self):
         """ str: Sequencing instrument model. """
-        self.logger.debug("In seq_model getter.")
+        self.logger.debug("In 'seq_model' getter.")
 
         return self._seq_model
 
     @seq_model.setter
+    @enforce_string
     def seq_model(self, seq_model):
         """
         The setter for the WgsRawSeqSet seq model.
@@ -313,21 +309,21 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In seq_model setter.")
-
-        if type(seq_model) != str:
-            raise ValueError("seq_model must be a string.")
+        self.logger.debug("In 'seq_model' setter.")
 
         self._seq_model = seq_model
 
     @property
     def sequence_type(self):
-        """ str: Specifies whether the file contains peptide or nucleotide data. """
-        self.logger.debug("In sequence_type getter.")
+        """
+        str: Specifies whether the file contains peptide or nucleotide data.
+        """
+        self.logger.debug("In 'sequence_type' getter.")
 
         return self._sequence_type
 
     @sequence_type.setter
+    @enforce_string
     def sequence_type(self, sequence_type):
         """
         The setter for the WgsRawSeqSet sequence type. This must be either
@@ -339,10 +335,7 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequence_type setter.")
-
-        if type(sequence_type) != str:
-            raise ValueError("sequence_type must be a string.")
+        self.logger.debug("In 'sequence_type' setter.")
 
         types = ["peptide", "nucleotide"]
         if sequence_type in types:
@@ -352,23 +345,27 @@ class WgsRawSeqSet(Base):
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """
-        self.logger.debug("In size getter.")
+        """
+        int: The size of the file in bytes.
+        """
+        self.logger.debug("In 'size' getter.")
 
         return self._size
 
     @size.setter
+    @enforce_int
     def size(self, size):
         """
         The setter for the WgsRawSeqSet size.
 
         Args:
-            size (int): The size of the seq set.
+            size (int): The size of the seq set in bytes.
 
         Returns:
             None
         """
-        self.logger.debug("In size setter.")
+        self.logger.debug("In 'size' setter.")
+
         if size < 0:
             raise ValueError("The size must be non-negative.")
 
@@ -377,11 +374,12 @@ class WgsRawSeqSet(Base):
     @property
     def study(self):
         """ str: One of the 3 studies that are part of the iHMP. """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
 
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
         The setter for the WgsRawSeqSet study. This is restricted to be either
@@ -393,12 +391,9 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         studies = ["preg_preterm", "ibd", "prediabetes"]
-
-        if type(study) != str:
-            raise ValueError("study must be a string.")
 
         if study in studies:
             self._study = study

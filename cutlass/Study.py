@@ -6,6 +6,7 @@ from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from Subject import Subject
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -52,10 +53,11 @@ class Study(Base):
         """
         The name of the study within which the sequencing was organized.
         """
-        self.logger.debug("In name getter.")
+        self.logger.debug("In 'name' getter.")
         return self._name
 
     @name.setter
+    @enforce_string
     def name(self, name):
         """
         The setter for the study name.
@@ -66,10 +68,7 @@ class Study(Base):
         Returns:
             None
         """
-        self.logger.debug("In name setter.")
-
-        if type(name) != str:
-            raise ValueError("'name' must be a string.")
+        self.logger.debug("In 'name' setter.")
 
         self._name = name
 
@@ -78,11 +77,12 @@ class Study(Base):
         """
         A longer description of the study.
         """
-        self.logger.debug("In description getter.")
+        self.logger.debug("In 'description' getter.")
 
         return self._description
 
     @description.setter
+    @enforce_string
     def description(self, description):
         """
         The setter for the study description.
@@ -93,10 +93,7 @@ class Study(Base):
         Returns:
             None
         """
-        self.logger.debug("In description setter.")
-
-        if type(description) != str:
-            raise ValueError("'description' must be a string.")
+        self.logger.debug("In 'description' setter.")
 
         self._description = description
 
@@ -110,6 +107,7 @@ class Study(Base):
         return self._center
 
     @center.setter
+    @enforce_string
     def center(self, center):
         """
         The setter for the Study center. The center must be one of the
@@ -144,11 +142,12 @@ class Study(Base):
         """
         The study's primary contact at the sequencing center.
         """
-        self.logger.debug("In contact getter.")
+        self.logger.debug("In 'contact' getter.")
 
         return self._contact
 
     @contact.setter
+    @enforce_string
     def contact(self, contact):
         """
         The setter for the Study contact. The contact information must
@@ -160,10 +159,7 @@ class Study(Base):
         Returns:
             None
         """
-        self.logger.debug("In contact setter.")
-
-        if type(contact) != str:
-            raise ValueError("'contact' must be a string.")
+        self.logger.debug("In 'contact' setter.")
 
         if len(contact) < 3:
             raise ValueError("'contact' must be more than 3 characters.")
@@ -175,11 +171,14 @@ class Study(Base):
 
     @property
     def srp_id(self):
-        """ str: NCBI Sequence Read Archive (SRA) project ID """
-        self.logger.debug("In srp_id getter.")
+        """
+        str: NCBI Sequence Read Archive (SRA) project ID
+        """
+        self.logger.debug("In 'srp_id' getter.")
         return self._srp_id
 
     @srp_id.setter
+    @enforce_string
     def srp_id(self, srp_id):
         """
         The setter for the Study srp_id.
@@ -190,10 +189,7 @@ class Study(Base):
         Returns:
             None
         """
-        self.logger.debug("In srp_id setter.")
-
-        if type(srp_id) != str:
-            raise ValueError("'description' must be a string.")
+        self.logger.debug("In 'srp_id' setter.")
 
         self._srp_id = srp_id
 
@@ -206,6 +202,7 @@ class Study(Base):
         return self._subtype
 
     @subtype.setter
+    @enforce_string
     def subtype(self, subtype):
         """
         The setter for the Study subtype.
@@ -216,15 +213,9 @@ class Study(Base):
         Returns:
             None
         """
-        self.logger.debug("In subtype setter.")
-
-        if type(subtype) != str:
-            raise ValueError("'subtype' must be a string.")
+        self.logger.debug("In 'subtype' setter.")
 
         subtypes = ["preg_preterm", "ibd", "prediabetes"]
-
-        if type(subtype) != str:
-            raise ValueError("subtype must be a string.")
 
         if subtype in subtypes:
             self._subtype = subtype

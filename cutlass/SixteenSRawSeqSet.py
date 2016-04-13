@@ -9,6 +9,7 @@ from iHMPSession import iHMPSession
 from Base import Base
 from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from aspera import aspera
+from Util import *
 
 
 # Create a module logger named after the module
@@ -146,6 +147,7 @@ class SixteenSRawSeqSet(Base):
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the SixteenSRawSeqSet checksums.
@@ -166,11 +168,12 @@ class SixteenSRawSeqSet(Base):
     @property
     def comment(self):
         """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the SixteenSRawSeqSet comment. The comment must be a string,
@@ -182,10 +185,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-
-        if type(comment) != str:
-            raise ValueError("comment must be a string.")
+        self.logger.debug("In 'comment' setter.")
 
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
@@ -221,12 +221,15 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """
-        self.logger.debug("In format getter.")
+        """
+        str: The file format of the sequence file.
+        """
+        self.logger.debug("In 'format' getter.")
 
         return self._format
 
     @format.setter
+    @enforce_string
     def format(self, format_str):
         """
         The setter for the SixteenSRawSeqSet format. This must be either fasta or fastq.
@@ -237,10 +240,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
-
-        if type(format_str) != str:
-            raise ValueError("format must be a string.")
+        self.logger.debug("In 'format' setter.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
@@ -258,6 +258,7 @@ class SixteenSRawSeqSet(Base):
         return self._format_doc
 
     @format_doc.setter
+    @enforce_string
     def format_doc(self, format_doc):
         """
         The setter for the SixteenSRawSeqSet format doc.
@@ -269,9 +270,6 @@ class SixteenSRawSeqSet(Base):
             None
         """
         self.logger.debug("In format_doc setter.")
-
-        if type(format_doc) != str:
-            raise ValueError("format_doc must be a string.")
 
         self._format_doc = format_doc
 
@@ -285,6 +283,7 @@ class SixteenSRawSeqSet(Base):
         return self._local_file
 
     @local_file.setter
+    @enforce_string
     def local_file(self, local_file):
         """
         The setter for the SixteenSRawSeqSet local file.
@@ -298,9 +297,6 @@ class SixteenSRawSeqSet(Base):
         """
         self.logger.debug("In local_file setter.")
 
-        if type(local_file) != str:
-            raise ValueError("local_file must be a string.")
-
         self._local_file = local_file
 
     @property
@@ -313,6 +309,7 @@ class SixteenSRawSeqSet(Base):
         return self._seq_model
 
     @seq_model.setter
+    @enforce_string
     def seq_model(self, seq_model):
         """
         The setter for the SixteenSRawSeqSet seq model.
@@ -325,9 +322,6 @@ class SixteenSRawSeqSet(Base):
         """
         self.logger.debug("In seq_model setter.")
 
-        if type(seq_model) != str:
-            raise ValueError("seq_model must be a string.")
-
         self._seq_model = seq_model
 
     @property
@@ -335,11 +329,12 @@ class SixteenSRawSeqSet(Base):
         """
         str: Specifies whether the file contains peptide or nucleotide data.
         """
-        self.logger.debug("In sequence_type getter.")
+        self.logger.debug("In 'sequence_type' getter.")
 
         return self._sequence_type
 
     @sequence_type.setter
+    @enforce_string
     def sequence_type(self, sequence_type):
         """
         The setter for the SixteenSRawSeqSet sequence type. This must be either
@@ -351,10 +346,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequence_type setter.")
-
-        if type(sequence_type) != str:
-            raise ValueError("sequence_type must be a string.")
+        self.logger.debug("In 'sequence_type' setter.")
 
         types = ["peptide", "nucleotide"]
         if sequence_type in types:
@@ -365,22 +357,23 @@ class SixteenSRawSeqSet(Base):
     @property
     def size(self):
         """ int: The size of the file in bytes. """
-        self.logger.debug("In size getter.")
+        self.logger.debug("In 'size' getter.")
 
         return self._size
 
     @size.setter
+    @enforce_int
     def size(self, size):
         """
-        The setter for the SixteenSRawSeqSet size.
+        The setter for the SixteenSRawSeqSet size in bytes.
 
         Args:
-            size (int): The size of the seq set.
+            size (int): The size of the sequence set in bytes.
 
         Returns:
             None
         """
-        self.logger.debug("In size setter.")
+        self.logger.debug("In 'size' setter.")
         if size < 0:
             raise ValueError("The size must be non-negative.")
 
@@ -388,12 +381,15 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
-        self.logger.debug("In study getter.")
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
+        self.logger.debug("In 'study' getter.")
 
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
         The setter for the SixteenSRawSeqSet study. This is restricted to one
@@ -405,12 +401,9 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
-        studies = ["preg_preterm","ibd","prediabetes"]
-
-        if type(study) != str:
-            raise ValueError("study must be a string.")
+        studies = ["preg_preterm", "ibd", "prediabetes"]
 
         if study in studies:
             self._study = study
@@ -761,7 +754,8 @@ class SixteenSRawSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
+            self.logger.error("Experienced an error uploading the " + \
+                              "sequence set. Aborting save.")
             return False
         else:
             self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
@@ -802,17 +796,21 @@ class SixteenSRawSeqSet(Base):
 
 
     def trimmed_seq_sets(self):
-        """Return iterator of all trimmed seq sets that were computed from
-        this seq set
-
+        """
+        Return iterator of all trimmed sequence sets that were computed from
+        this sequence set.
         """
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
             res = query("ihmp", linkage_query, page=page_no)
             res_count = res['result_count']
+
             for doc in res['results']:
                 yield SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(doc)
+
             res_count -= len(res['results'])
+
             if res_count < 1:
                 break

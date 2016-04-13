@@ -5,6 +5,7 @@ import logging
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -66,10 +67,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: A descriptive comment for the object.
         """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
+
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for a descriptive comment for the object.
@@ -80,9 +83,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-        if type(comment) is not str:
-            raise ValueError("Invalid type for comment.")
+        self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
 
@@ -91,23 +92,23 @@ class MicrobiomeAssayPrep(Base):
         """
         str: PRIDE identifier corresponding to study.
         """
-        self.logger.debug("In pride_id getter.")
+        self.logger.debug("In 'pride_id' getter.")
+
         return self._pride_id
 
     @pride_id.setter
+    @enforce_string
     def pride_id(self, pride_id):
         """
         The setter for the PRIDE identifier corresponding to study.
 
         Args:
-            prid_id (str): The PRIDE identifier
+            pride_id (str): The PRIDE identifier
 
         Returns:
             None
         """
-        self.logger.debug("In pride_id setter.")
-        if type(pride_id) is not str:
-            raise ValueError("Invalid type for pride_id.")
+        self.logger.debug("In 'pride_id' setter.")
 
         self._pride_id = pride_id
 
@@ -117,10 +118,12 @@ class MicrobiomeAssayPrep(Base):
         str: The short label that is referable to the sample used to
         generate the dataset.
         """
-        self.logger.debug("In sample_name getter.")
+        self.logger.debug("In 'sample_name' getter.")
+
         return self._sample_name
 
     @sample_name.setter
+    @enforce_string
     def sample_name(self, sample_name):
         """
         The setter for the short label that is referable to the sample
@@ -132,9 +135,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sample_name setter.")
-        if type(sample_name) is not str:
-            raise ValueError("Invalid type for sample_name.")
+        self.logger.debug("In 'sample_name' setter.")
 
         self._sample_name = sample_name
 
@@ -143,7 +144,8 @@ class MicrobiomeAssayPrep(Base):
         """
         str: The description of the particular experiment.
         """
-        self.logger.debug("In title getter.")
+        self.logger.debug("In 'title' getter.")
+
         return self._title
 
     @title.setter
@@ -168,10 +170,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: The short label/nomenclature used to group/organize experiments.
         """
-        self.logger.debug("In short_label getter.")
+        self.logger.debug("In 'short_label' getter.")
+
         return self._short_label
 
     @short_label.setter
+    @enforce_string
     def short_label(self, short_label):
         """
         Set the short label/nomenclature used to group/organize experiments.
@@ -182,9 +186,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In short_label setter.")
-        if type(short_label) is not str:
-            raise ValueError("Invalid type for short_label.")
+        self.logger.debug("In 'short_label' setter.")
 
         self._short_label = short_label
 
@@ -193,10 +195,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: The center responsible for generating the microbiome assay Prep.
         """
-        self.logger.debug("In center getter.")
+        self.logger.debug("In 'center' getter.")
+
         return self._center
 
     @center.setter
+    @enforce_string
     def center(self, center):
         """
         Set the center responsible for generating the microbiome assay prep.
@@ -207,9 +211,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In center setter.")
-        if type(center) is not str:
-            raise ValueError("Invalid type for center.")
+        self.logger.debug("In 'center' setter.")
 
         self._center = center
 
@@ -218,10 +220,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: Get the name and email of the primary contact at the center.
         """
-        self.logger.debug("In contact getter.")
+        self.logger.debug("In 'contact' getter.")
+
         return self._contact
 
     @contact.setter
+    @enforce_string
     def contact(self, contact):
         """
         Set the name and email of the primary contact at the center.
@@ -232,9 +236,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In contact setter.")
-        if type(contact) is not str:
-            raise ValueError("Invalid type for contact.")
+        self.logger.debug("In 'contact' setter.")
 
         self._contact = contact
 
@@ -243,10 +245,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: Get the internal assay prep ID.
         """
-        self.logger.debug("In prep_id getter.")
+        self.logger.debug("In 'prep_id' getter.")
+
         return self._prep_id
 
     @prep_id.setter
+    @enforce_string
     def prep_id(self, prep_id):
         """
         Set the internal assay prep ID.
@@ -257,21 +261,21 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In prep_id setter.")
-        if type(prep_id) is not str:
-            raise ValueError("Invalid type for prep_id.")
+        self.logger.debug("In 'prep_id' setter.")
 
         self._prep_id = prep_id
 
     @property
     def storage_duration(self):
         """
-        str: Get the MIGS/MIMS storage duratino in days.
+        int: Get the MIGS/MIMS storage duration in days.
         """
         self.logger.debug("In storage_duration getter.")
+
         return self._storage_duration
 
     @storage_duration.setter
+    @enforce_int
     def storage_duration(self, storage_duration):
         """
         Set the MIGS/MIMS storage duration in days.
@@ -282,9 +286,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In storage_duration setter.")
-        if type(storage_duration) is not int:
-            raise ValueError("Invalid type for storage_duration.")
+        self.logger.debug("In 'storage_duration' setter.")
 
         self._storage_duration = storage_duration
 
@@ -293,10 +295,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: Get the PRIDE experiment type.
         """
-        self.logger.debug("In experiment_type getter.")
+        self.logger.debug("In 'experiment_type' getter.")
+
         return self._experiment_type
 
     @experiment_type.setter
+    @enforce_string
     def experiment_type(self, experiment_type):
         """
         Set the PRIDE experiment type.
@@ -307,9 +311,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In experiment_type setter.")
-        if type(experiment_type) is not str:
-            raise ValueError("Invalid type for experiment_type.")
+        self.logger.debug("In 'experiment_type' setter.")
 
         self._experiment_type = experiment_type
 
@@ -319,10 +321,12 @@ class MicrobiomeAssayPrep(Base):
         str: Controlled vocabulary term to describe a single species. NEWT CV
         terms are allowed.
         """
-        self.logger.debug("In species getter.")
+        self.logger.debug("In 'species' getter.")
+
         return self._species
 
     @species.setter
+    @enforce_string
     def species(self, species):
         """
         Controlled vocabulary term to describe a single species. NEWT CV
@@ -334,9 +338,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In species setter.")
-        if type(species) is not str:
-            raise ValueError("Invalid type for species.")
+        self.logger.debug("In 'species' setter.")
 
         self._species = species
 
@@ -346,10 +348,12 @@ class MicrobiomeAssayPrep(Base):
         str: Controlled vocabulary term to describe a single cell type. Cell
         type ontology CV terms are allowed.
         """
-        self.logger.debug("In cell_type getter.")
+        self.logger.debug("In 'cell_type' getter.")
+
         return self._cell_type
 
     @cell_type.setter
+    @enforce_string
     def cell_type(self, cell_type):
         """
         Controlled vocabulary term to describe a single cell type. Cell
@@ -361,9 +365,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In cell_type setter.")
-        if type(cell_type) is not str:
-            raise ValueError("Invalid type for cell_type.")
+        self.logger.debug("In 'cell_type' setter.")
 
         self._cell_type = cell_type
 
@@ -373,10 +375,12 @@ class MicrobiomeAssayPrep(Base):
         str: Controlled vocabulary term to describe a single tissue. BRENDA
         Tissue CV terms are allowed.
         """
-        self.logger.debug("In tissue getter.")
+        self.logger.debug("In 'tissue' getter.")
+
         return self._tissue
 
     @tissue.setter
+    @enforce_string
     def tissue(self, tissue):
         """
         Controlled vocabulary term to describe a single tissue. BRENDA Tissue
@@ -388,9 +392,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In tissue setter.")
-        if type(tissue) is not str:
-            raise ValueError("Invalid type for tissue.")
+        self.logger.debug("In 'tissue' setter.")
 
         self._tissue = tissue
 
@@ -400,10 +402,12 @@ class MicrobiomeAssayPrep(Base):
         str: Link to literature citation for which this experiment provides
         supporting evidence.
         """
-        self.logger.debug("In reference getter.")
+        self.logger.debug("In 'reference' getter.")
+
         return self._reference
 
     @reference.setter
+    @enforce_string
     def reference(self, reference):
         """
         Set the literature citation for which this experiment provides
@@ -415,9 +419,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In reference setter.")
-        if type(reference) is not str:
-            raise ValueError("Invalid type for reference.")
+        self.logger.debug("In 'reference' setter.")
 
         self._reference = reference
 
@@ -426,10 +428,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: The protocol title with versioning.
         """
-        self.logger.debug("In protocol_name getter.")
+        self.logger.debug("In 'protocol_name' getter.")
+
         return self._protocol_name
 
     @protocol_name.setter
+    @enforce_string
     def protocol_name(self, protocol_name):
         """
         Set the protocol title with versioning.
@@ -441,9 +445,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In protocol_name setter.")
-        if type(protocol_name) is not str:
-            raise ValueError("Invalid type for protocol_name.")
+        self.logger.debug("In 'protocol_name' setter.")
 
         self._protocol_name = protocol_name
 
@@ -452,10 +454,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: Description of the sample processing steps.
         """
-        self.logger.debug("In protocol_steps getter.")
+        self.logger.debug("In 'protocol_steps' getter.")
+
         return self._protocol_steps
 
     @protocol_steps.setter
+    @enforce_string
     def protocol_steps(self, protocol_steps):
         """
         Set the description of the sample processing steps.
@@ -467,9 +471,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In protocol_name setter.")
-        if type(protocol_steps) is not str:
-            raise ValueError("Invalid type for protocol_name.")
+        self.logger.debug("In 'protocol_steps' setter.")
 
         self._protocol_steps = protocol_steps
 
@@ -478,10 +480,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: Description of the goals and objectives of this study.
         """
-        self.logger.debug("In exp_description getter.")
+        self.logger.debug("In 'exp_description' getter.")
+
         return self._exp_description
 
     @exp_description.setter
+    @enforce_string
     def exp_description(self, exp_description):
         """
         Set the description of the goals and objectives of this study,
@@ -494,9 +498,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In exp_description setter.")
-        if type(exp_description) is not str:
-            raise ValueError("Invalid type for exp_description.")
+        self.logger.debug("In 'exp_description' setter.")
 
         self._exp_description = exp_description
 
@@ -506,10 +508,12 @@ class MicrobiomeAssayPrep(Base):
         str: Expansible description of the sample used to generate the
         dataset.
         """
-        self.logger.debug("In sample_description getter.")
+        self.logger.debug("In 'sample_description' getter.")
+
         return self._sample_description
 
     @sample_description.setter
+    @enforce_string
     def sample_description(self, sample_description):
         """
         Set the expansible description of the sample used to generate the
@@ -522,9 +526,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sample_description setter.")
-        if type(sample_description) is not str:
-            raise ValueError("Invalid type for sample_description.")
+        self.logger.debug("In 'sample_description' setter.")
 
         self._sample_description = sample_description
 
@@ -533,10 +535,12 @@ class MicrobiomeAssayPrep(Base):
         """
         str: One of the 3 studies that are part of the iHMP.
         """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
+
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
         One of the 3 studies that are part of the iHMP.
@@ -547,9 +551,7 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
-        if type(study) is not str:
-            raise ValueError("Invalid type for study.")
+        self.logger.debug("In 'study' setter.")
 
         self._study = study
 

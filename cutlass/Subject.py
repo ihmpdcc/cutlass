@@ -6,6 +6,7 @@ from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from Visit import Visit
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -53,11 +54,14 @@ class Subject(Base):
 
     @property
     def gender(self):
-        """ str: The subject's sex. """
-        self.logger.debug("In gender getter.")
+        """
+        str: The subject's sex.
+        """
+        self.logger.debug("In 'gender' getter.")
         return self._gender
 
     @gender.setter
+    @enforce_string
     def gender(self, gender):
         """
         The setter for the Subject's gender.
@@ -69,7 +73,8 @@ class Subject(Base):
         Returns:
             None
         """
-        self.logger.debug("In gender setter.")
+        self.logger.debug("In 'gender' setter.")
+
         if gender not in Subject.valid_genders:
             raise ValueError("Invalid gender: %s" % gender)
 
@@ -77,11 +82,14 @@ class Subject(Base):
 
     @property
     def race(self):
-        """ str: The subbject's race/ethnicity. """
-        self.logger.debug("In race getter.")
+        """
+        str: The subject's race/ethnicity.
+        """
+        self.logger.debug("In 'race' getter.")
         return self._race
 
     @race.setter
+    @enforce_string
     def race(self, race):
         """
         The setter for the Subject's race. The race must be one of the following:
@@ -111,10 +119,11 @@ class Subject(Base):
         """
         Randomized subject id used to anonymize subject identity.
         """
-        self.logger.debug("In rand_subject_id getter.")
+        self.logger.debug("In 'rand_subject_id' getter.")
         return self._rand_subject_id
 
     @rand_subject_id.setter
+    @enforce_string
     def rand_subject_id(self, rand_subject_id):
         """
         The setter for the Subject's random ID.
@@ -126,7 +135,7 @@ class Subject(Base):
         Returns:
             None
         """
-        self.logger.debug("In rand_subject_id setter.")
+        self.logger.debug("In 'rand_subject_id' setter.")
         self._rand_subject_id = rand_subject_id
 
     def validate(self):
@@ -467,7 +476,6 @@ class Subject(Base):
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success
-
 
     def visits(self):
         """

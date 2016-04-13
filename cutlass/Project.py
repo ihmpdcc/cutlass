@@ -8,6 +8,7 @@ from iHMPSession import iHMPSession
 from mixs import MIXS, MixsException
 from Base import Base
 from Study import Study
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -47,11 +48,15 @@ class Project(Base):
 
     @property
     def name(self):
-        """ str: The name of the project within which the sequencing was organized. """
-        self.logger.debug("In name getter.")
+        """
+        str: The name of the project within which the sequencing was organized.
+        """
+        self.logger.debug("In 'name' getter.")
+
         return self._name
 
     @name.setter
+    @enforce_string
     def name(self, name):
         """
         The setter for the Project name.
@@ -62,21 +67,21 @@ class Project(Base):
         Returns:
             None
         """
-        self.logger.debug("In name setter.")
-
-        if type(name) != str:
-            raise ValueError("'name' must be a string.")
+        self.logger.debug("In 'name' setter.")
 
         self._name = name
 
     @property
     def description(self):
-        """ str: A longer description of the project """
-        self.logger.debug("In description getter.")
+        """
+        str: A longer description of the project
+        """
+        self.logger.debug("In 'description' getter.")
 
         return self._description
 
     @description.setter
+    @enforce_string
     def description(self, description):
         """
         The setter for the Project description.
@@ -87,25 +92,27 @@ class Project(Base):
         Returns:
             None
         """
-        self.logger.debug("In description setter.")
-
-        if type(description) != str:
-            raise ValueError("'description' must be a string.")
+        self.logger.debug("In 'description' setter.")
 
         self._description = description
 
     @property
     def mixs(self):
-        """ dict: Minimal information for any system. "project_name" is the minimal
-            required field for this dictionary. """
-        self.logger.debug("In mixs getter.")
+        """
+        dict: Minimal information for any system. "project_name" is the minimal
+              required field for this dictionary.
+        """
+        self.logger.debug("In 'mixs' getter.")
+
         return self._mixs
 
     @mixs.setter
+    @enforce_dict
     def mixs(self, mixs):
         """
-        The setter for the Project's MIXS. The MIXS dictionary input must validate
-        with the MIXS class, and all minimal/required fields must be included.
+        The setter for the Project's MIXS. The MIXS dictionary input must
+        validate with the MIXS class, and all minimal/required fields must be
+        included.
 
         Args:
             mixs (dict): The new MIXS dictionary to assign to this instance.
@@ -113,7 +120,7 @@ class Project(Base):
         Returns:
             None
         """
-        self.logger.debug("In mixs setter.")
+        self.logger.debug("In 'mixs' setter.")
         valid_dictionary = MIXS.check_dict(mixs)
 
         # Validate the incoming MIXS data
@@ -138,13 +145,13 @@ class Project(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in
+        OSDF. If not saved previously, then the node ID is 'None', and upon a
+        successful, will be assigned to the alpha numeric ID found in OSDF.
+        Also, the version is updated as the data is saved in OSDF.
 
         Args:
             None
@@ -213,9 +220,9 @@ class Project(Base):
     @staticmethod
     def load(project_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+        Loads the data for the specified input ID from the OSDF instance to
+        this object. If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             project_id (str): The OSDF ID for the document to load.
@@ -225,8 +232,7 @@ class Project(Base):
         """
         module_logger.debug("In load. Specified ID: %s" % project_id)
 
-        # use the OSDF get_node() to load the data
-
+        # use OSDF get_node() to load the data
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
@@ -254,10 +260,11 @@ class Project(Base):
     def delete(self):
         """
         Deletes the current object (self) from the OSDF instance. If the object
-        has not been saved previously (node ID is not set), then an error message
-        will be logged stating the object was not deleted. If the ID is set, and
-        exists in the OSDF instance, then the object will be deleted from the
-        OSDF instance, and this object must be re-saved in order to use it again.
+        has not been saved previously (node ID is not set), then an error
+        message will be logged stating the object was not deleted. If the ID is
+        set, and exists in the OSDF instance, then the object will be deleted
+        from the OSDF instance, and this object must be re-saved in order to
+        use it again.
 
         Args:
             None
@@ -291,10 +298,10 @@ class Project(Base):
     @staticmethod
     def search(query = "\"project\"[node_type]"):
         """
-        Searches the OSDF database through all Project node types. Any
-        criteria the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
+        Searches the OSDF database through all Project node types. Any criteria
+        the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format is
+        (including the quotes and brackets):
 
         "search criteria"[field to search]
 
@@ -363,11 +370,11 @@ class Project(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless if they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless if they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -406,7 +413,9 @@ class Project(Base):
 
 
     def studies(self):
-        """Return iterator of all studies part of this project """
+        """
+        Returns an iterator of all studies connected to this project.
+        """
         linkage_query = '"{}"[linkage.part_of]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
 

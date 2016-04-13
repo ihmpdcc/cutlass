@@ -42,7 +42,8 @@ class iHMPSession(object):
     def _get_cutlass_instance(self, name):
         self.logger.debug("In _get_cutlass_instance.")
 
-        classes = { "annotation": "Annotation",
+        classes = { "abundance_matrix": "AbundanceMatrix",
+                    "annotation": "Annotation",
                     "project": "Project",
                     "proteome": "Proteome",
                     "sample": "Sample",

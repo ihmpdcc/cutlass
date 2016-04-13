@@ -1,4 +1,5 @@
 from .iHMPSession import iHMPSession
+from .AbundanceMatrix import AbundanceMatrix
 from .Annotation import Annotation
 from .Project import Project
 from .Proteome import Proteome

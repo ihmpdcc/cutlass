@@ -7,6 +7,7 @@ from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from Sample import Sample
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -58,6 +59,7 @@ class Visit(Base):
         return self._visit_id
 
     @visit_id.setter
+    @enforce_string
     def visit_id(self, visit_id):
         """
         The setter for the Visit's ID
@@ -70,24 +72,26 @@ class Visit(Base):
         """
         self.logger.debug("In visit_id setter.")
 
-        if type(visit_id) != str:
-            raise ValueError("'visit_id' must be a string.")
-
         self._visit_id = visit_id
 
     @property
     def visit_number(self):
-        """ int: A sequential number that is assigned as visits occur for
-                 that subject. """
+        """
+        int: A sequential number that is assigned as visits occur for
+        that subject.
+        """
         self.logger.debug("In visit_number getter.")
 
         return self._visit_number
 
     def increment_visit_number(self):
-        """ Increments the visit number by 1. """
+        """
+        Increments the visit number by 1.
+        """
         self._visit_number = self._visit_number + 1
 
     @visit_number.setter
+    @enforce_int
     def visit_number(self, visit_number):
         """
         The setter for the Visit's visit number
@@ -100,9 +104,6 @@ class Visit(Base):
         """
         self.logger.debug("In visit_number setter.")
 
-        if type(visit_number) != int:
-            raise ValueError("'visit_number' must be an integer.")
-
         if visit_number < 1:
             raise ValueError("'visit_number' must be greater than or equal to 1.")
 
@@ -112,11 +113,12 @@ class Visit(Base):
     def date(self):
         """ str: Date when the visit occurred. Can be different from sample dates,
                  a visit may encompass a set of sampling points. """
-        self.logger.debug("In date getter.")
+        self.logger.debug("In 'date' getter.")
 
         return self._date
 
     @date.setter
+    @enforce_string
     def date(self, date):
         """
         The setter for the Visit's most recent visit date.
@@ -128,7 +130,7 @@ class Visit(Base):
         Returns:
             None
         """
-        self.logger.debug("In date setter.")
+        self.logger.debug("In 'date' setter.")
 
         try:
             parsed = datetime.strptime(date, Visit.date_format)
@@ -144,13 +146,16 @@ class Visit(Base):
 
     @property
     def interval(self):
-        """ int: The amount of time since the last visit (in days).
-                 Use 0 for the first visit. """
-        self.logger.debug("In interval getter.")
+        """
+        int: The amount of time since the last visit (in days).
+             Use 0 for the first visit.
+        """
+        self.logger.debug("In 'interval' getter.")
 
         return self._interval
 
     @interval.setter
+    @enforce_int
     def interval(self, interval):
         """
         The setter for the Visit's interval since the last visit for this subject.
@@ -162,10 +167,7 @@ class Visit(Base):
         Returns:
             None
         """
-        self.logger.debug("In interval setter.")
-
-        if type(interval) != int:
-            raise ValueError("'interval' must be a integer.")
+        self.logger.debug("In 'interval' setter.")
 
         if interval < 0:
             raise ValueError("Invalid interval. Must be positive.")
@@ -174,13 +176,16 @@ class Visit(Base):
 
     @property
     def clinic_id(self):
-        """ str: The identifier used by the sequence center to uniquely identify
-                 where the visit occurred. """
-        self.logger.debug("In clinic_id getter.")
+        """
+        str: The identifier used by the sequence center to uniquely identify
+                 where the visit occurred.
+        """
+        self.logger.debug("In 'clinic_id' getter.")
 
         return self._clinic_id
 
     @clinic_id.setter
+    @enforce_string
     def clinic_id(self, clinic_id):
         """
         The setter for the Visit's clinic ID.
@@ -191,10 +196,7 @@ class Visit(Base):
         Returns:
             None
         """
-        self.logger.debug("In clinic_id setter.")
-
-        if type(clinic_id) != str:
-            raise ValueError("'interval' must be a integer.")
+        self.logger.debug("In 'clinic_id' setter.")
 
         self._clinic_id = clinic_id
 
@@ -543,13 +545,14 @@ class Visit(Base):
 
         return success
 
-
     def samples(self):
         """
         Return iterator of all samples collected during this visit.
         """
         linkage_query = '"{}"[linkage.collected_during]'.format(self.id)
+
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
             res = query(Visit.namespace, linkage_query, page=page_no)
             res_count = res['result_count']

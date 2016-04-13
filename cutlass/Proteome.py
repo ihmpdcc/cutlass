@@ -10,6 +10,7 @@ from iHMPSession import iHMPSession
 from Base import Base
 from Visit import Visit
 from aspera import aspera
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -91,10 +92,11 @@ class Proteome(Base):
         """
         dict: The proteome's checksum data.
         """
-        self.logger.debug("In checksums getter.")
+        self.logger.debug("In 'checksums' getter.")
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the Proteome's checksums.
@@ -105,10 +107,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
-
-        if type(checksums) is not dict:
-            raise ValueError("Invalid type for checksums.")
+        self.logger.debug("In 'checksums' setter.")
 
         self._checksums = checksums
 
@@ -117,10 +116,11 @@ class Proteome(Base):
         """
         str: A descriptive comment for the proteome.
         """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for a descriptive comment for the proteome object.
@@ -131,9 +131,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-        if type(comment) is not str:
-            raise ValueError("Invalid type for comment.")
+        self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
 
@@ -142,10 +140,11 @@ class Proteome(Base):
         """
         str: The date on which the spectra were generated.
         """
-        self.logger.debug("In date getter.")
+        self.logger.debug("In 'date' getter.")
         return self._date
 
     @date.setter
+    @enforce_string
     def date(self, date):
         """
         The setter the date on which the spectra were generated.
@@ -156,9 +155,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In date setter.")
-        if type(date) is not str:
-            raise ValueError("Invalid type for date.")
+        self.logger.debug("In 'date' setter.")
 
         try:
             parsed = datetime.strptime(date, Proteome.date_format)
@@ -176,23 +173,22 @@ class Proteome(Base):
         """
         str: PRIDE identifier corresponding to study.
         """
-        self.logger.debug("In pride_id getter.")
+        self.logger.debug("In 'pride_id' getter.")
         return self._pride_id
 
     @pride_id.setter
+    @enforce_string
     def pride_id(self, pride_id):
         """
         The setter for the PRIDE identifier corresponding to study.
 
         Args:
-            prid_id (str): The PRIDE identifier
+            pride_id (str): The PRIDE identifier
 
         Returns:
             None
         """
-        self.logger.debug("In pride_id setter.")
-        if type(pride_id) is not str:
-            raise ValueError("Invalid type for pride_id.")
+        self.logger.debug("In 'pride_id' setter.")
 
         self._pride_id = pride_id
 
@@ -202,10 +198,11 @@ class Proteome(Base):
         str: The short label that is referable to the sample used to
         generate the dataset.
         """
-        self.logger.debug("In sample_name getter.")
+        self.logger.debug("In 'sample_name' getter.")
         return self._sample_name
 
     @sample_name.setter
+    @enforce_string
     def sample_name(self, sample_name):
         """
         The setter for the short label that is referable to the sample
@@ -217,9 +214,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In sample_name setter.")
-        if type(sample_name) is not str:
-            raise ValueError("Invalid type for sample_name.")
+        self.logger.debug("In 'sample_name' setter.")
 
         self._sample_name = sample_name
 
@@ -228,10 +223,11 @@ class Proteome(Base):
         """
         str: The description of the particular experiment.
         """
-        self.logger.debug("In title getter.")
+        self.logger.debug("In 'title' getter.")
         return self._title
 
     @title.setter
+    @enforce_string
     def title(self, title):
         """
         The setter for the description of the particular experiment.
@@ -242,9 +238,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In title setter.")
-        if type(title) is not str:
-            raise ValueError("Invalid type for title.")
+        self.logger.debug("In 'title' setter.")
 
         self._title = title
 
@@ -253,10 +247,11 @@ class Proteome(Base):
         """
         str: The short label/nomenclature used to group/organize experiments.
         """
-        self.logger.debug("In short_label getter.")
+        self.logger.debug("In 'short_label' getter.")
         return self._short_label
 
     @short_label.setter
+    @enforce_string
     def short_label(self, short_label):
         """
         Set the short label/nomenclature used to group/organize experiments.
@@ -267,9 +262,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In short_label setter.")
-        if type(short_label) is not str:
-            raise ValueError("Invalid type for short_label.")
+        self.logger.debug("In 'short_label' setter.")
 
         self._short_label = short_label
 
@@ -279,10 +272,12 @@ class Proteome(Base):
         str: Link to literature citation for which this experiment provides
         supporting evidence.
         """
-        self.logger.debug("In reference getter.")
+        self.logger.debug("In 'reference' getter.")
+
         return self._reference
 
     @reference.setter
+    @enforce_string
     def reference(self, reference):
         """
         Set the literature citation for which this experiment provides
@@ -294,9 +289,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In reference setter.")
-        if type(reference) is not str:
-            raise ValueError("Invalid type for reference.")
+        self.logger.debug("In 'reference' setter.")
 
         self._reference = reference
 
@@ -305,10 +298,12 @@ class Proteome(Base):
         """
         str: The protocol title with versioning.
         """
-        self.logger.debug("In protocol_name getter.")
+        self.logger.debug("In 'protocol_name' getter.")
+
         return self._protocol_name
 
     @protocol_name.setter
+    @enforce_string
     def protocol_name(self, protocol_name):
         """
         Set the protocol title with versioning.
@@ -320,9 +315,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In protocol_name setter.")
-        if type(protocol_name) is not str:
-            raise ValueError("Invalid type for protocol_name.")
+        self.logger.debug("In 'protocol_name' setter.")
 
         self._protocol_name = protocol_name
 
@@ -331,24 +324,23 @@ class Proteome(Base):
         """
         str: Description of the sample processing steps.
         """
-        self.logger.debug("In protocol_steps getter.")
+        self.logger.debug("In 'protocol_steps' getter.")
         return self._protocol_steps
 
     @protocol_steps.setter
+    @enforce_string
     def protocol_steps(self, protocol_steps):
         """
-        Set the description of the sample processing steps.
+        Set the description of the sample processing steps using PRIDE
+        controlled vocabulary terms.
 
         Args:
-            protocol_name (str): Protocol title with versioning, ideally,
-            pointing to a URL.
+            protocol_steps (str): 
 
         Returns:
             None
         """
-        self.logger.debug("In protocol_name setter.")
-        if type(protocol_steps) is not str:
-            raise ValueError("Invalid type for protocol_name.")
+        self.logger.debug("In 'protocol_steps' setter.")
 
         self._protocol_steps = protocol_steps
 
@@ -357,10 +349,11 @@ class Proteome(Base):
         """
         str: Description of the goals and objectives of this study.
         """
-        self.logger.debug("In exp_description getter.")
+        self.logger.debug("In 'exp_description' getter.")
         return self._exp_description
 
     @exp_description.setter
+    @enforce_string
     def exp_description(self, exp_description):
         """
         Set the description of the goals and objectives of this study,
@@ -373,9 +366,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In exp_description setter.")
-        if type(exp_description) is not str:
-            raise ValueError("Invalid type for exp_description.")
+        self.logger.debug("In 'exp_description' setter.")
 
         self._exp_description = exp_description
 
@@ -385,10 +376,12 @@ class Proteome(Base):
         str: Expansible description of the sample used to generate the
         dataset.
         """
-        self.logger.debug("In sample_description getter.")
+        self.logger.debug("In 'sample_description' getter.")
+
         return self._sample_description
 
     @sample_description.setter
+    @enforce_string
     def sample_description(self, sample_description):
         """
         Set the expansible description of the sample used to generate the
@@ -401,9 +394,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In sample_description setter.")
-        if type(sample_description) is not str:
-            raise ValueError("Invalid type for sample_description.")
+        self.logger.debug("In 'sample_description' setter.")
 
         self._sample_description = sample_description
 
@@ -413,10 +404,11 @@ class Proteome(Base):
         str: Descriptive name of the instrument make, model, significant
         customizations.
         """
-        self.logger.debug("In instrument_name getter.")
+        self.logger.debug("In 'instrument_name' getter.")
         return self._instrument_name
 
     @instrument_name.setter
+    @enforce_string
     def instrument_name(self, instrument_name):
         """
         Descriptive name of the instrument make, model, significant
@@ -429,9 +421,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In instrument_name setter.")
-        if type(instrument_name) is not str:
-            raise ValueError("Invalid type for instrument_name.")
+        self.logger.debug("In 'instrument_name' setter.")
 
         self._instrument_name = instrument_name
 
@@ -441,10 +431,11 @@ class Proteome(Base):
         str: Ion source information, child of term MS:1000008, e.g. MS:1000398
         nanoelectrospray.
         """
-        self.logger.debug("In source getter.")
+        self.logger.debug("In 'source' getter.")
         return self._source
 
     @source.setter
+    @enforce_string
     def source(self, source):
         """
         Ion source information, child of term MS:1000008, e.g. MS:1000398
@@ -456,22 +447,22 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In source setter.")
-        if type(source) is not str:
-            raise ValueError("Invalid type for source.")
+        self.logger.debug("In 'source' setter.")
 
         self._source = source
 
     @property
     def analyzer(self):
         """
-        str: Single or multiple components of the mass analyzer, children terms of
-        MS:1000443, e.g. MS:1000081 quadrupole.
+        str: Single or multiple components of the mass analyzer, children terms
+        of MS:1000443, e.g. MS:1000081 quadrupole.
         """
-        self.logger.debug("In analyzer getter.")
+        self.logger.debug("In 'analyzer' getter.")
+
         return self._analyzer
 
     @analyzer.setter
+    @enforce_string
     def analyzer(self, analyzer):
         """
         Single or multiple components of the mass analyzer, children terms of
@@ -483,9 +474,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In analyzer setter.")
-        if type(analyzer) is not str:
-            raise ValueError("Invalid type for analyzer.")
+        self.logger.debug("In 'analyzer' setter.")
 
         self._analyzer = analyzer
 
@@ -495,10 +484,12 @@ class Proteome(Base):
         str: Detector type used, children terms of MS:1000026 e.g. MS:1000114:
         microchannel plate detector.
         """
-        self.logger.debug("In detector getter.")
+        self.logger.debug("In 'detector' getter.")
+
         return self._detector
 
     @detector.setter
+    @enforce_string
     def detector(self, detector):
         """
         Detector type used, children terms of MS:1000026 e.g. MS:1000114:
@@ -510,9 +501,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In detector setter.")
-        if type(detector) is not str:
-            raise ValueError("Invalid type for detector.")
+        self.logger.debug("In 'detector' setter.")
 
         self._detector = detector
 
@@ -521,10 +510,12 @@ class Proteome(Base):
         """
         str: Software used during data acquisition and data processing.
         """
-        self.logger.debug("In software getter.")
+        self.logger.debug("In 'software' getter.")
+
         return self._software
 
     @software.setter
+    @enforce_string
     def software(self, software):
         """
         Software used during data acquisition and data processing, including
@@ -536,9 +527,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In software setter.")
-        if type(software) is not str:
-            raise ValueError("Invalid type for software.")
+        self.logger.debug("In 'software' setter.")
 
         self._software = software
 
@@ -547,25 +536,25 @@ class Proteome(Base):
         """
         str: Description of the default peak processing method.
         """
-        self.logger.debug("In processing_method getter.")
+        self.logger.debug("In 'processing_method' getter.")
+
         return self._processing_method
 
     @processing_method.setter
+    @enforce_string
     def processing_method(self, processing_method):
         """
         Description of the default peak processing method, children terms of
         MS:1000452, e.g. MS:1000033 deisotoping."
 
         Args:
-            processing_method (str): Description of the deafault
+            processing_method (str): Description of the default
             peak processing method.
 
         Returns:
             None
         """
-        self.logger.debug("In processing_method setter.")
-        if type(processing_method) is not str:
-            raise ValueError("Invalid type for processing_method.")
+        self.logger.debug("In 'processing_method' setter.")
 
         self._processing_method = processing_method
 
@@ -574,10 +563,11 @@ class Proteome(Base):
         """
         str: Name of the protein search engine used, e.g. Mascot 2.2.1.
         """
-        self.logger.debug("In search_engine getter.")
+        self.logger.debug("In 'search_engine' getter.")
         return self._search_engine
 
     @search_engine.setter
+    @enforce_string
     def search_engine(self, search_engine):
         """
         Name of the protein search engine used, e.g. Mascot 2.2.1.
@@ -588,9 +578,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In search_engine setter.")
-        if type(search_engine) is not str:
-            raise ValueError("Invalid type for search_engine.")
+        self.logger.debug("In 'search_engine' setter.")
 
         self._search_engine = search_engine
 
@@ -600,10 +588,12 @@ class Proteome(Base):
         str: Software used to generate the PRIDE xml file, e.g. PRIDE Converter
         Toolsuite 2.0.
         """
-        self.logger.debug("In xml_generation getter.")
+        self.logger.debug("In 'xml_generation' getter.")
+
         return self._xml_generation
 
     @xml_generation.setter
+    @enforce_string
     def xml_generation(self, xml_generation):
         """
         Software used to generate the PRIDE xml file, e.g. PRIDE Converter
@@ -615,9 +605,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In xml_generation setter.")
-        if type(xml_generation) is not str:
-            raise ValueError("Invalid type for xml_generation.")
+        self.logger.debug("In 'xml_generation' setter.")
 
         self._xml_generation = xml_generation
 
@@ -626,10 +614,11 @@ class Proteome(Base):
         """
         str: File format of the file(s) containing data.
         """
-        self.logger.debug("In spectra_format getter.")
+        self.logger.debug("In 'spectra_format' getter.")
         return self._spectra_format
 
     @spectra_format.setter
+    @enforce_string
     def spectra_format(self, spectra_format):
         """
         File format of the file(s) containing data.
@@ -640,9 +629,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In spectra_format setter.")
-        if type(spectra_format) is not str:
-            raise ValueError("Invalid type for spectra_format.")
+        self.logger.debug("In 'spectra_format' setter.")
 
         self._spectra_format = spectra_format
 
@@ -651,10 +638,12 @@ class Proteome(Base):
         """
         str: File format of the file(s) containing data.
         """
-        self.logger.debug("In protid_format getter.")
+        self.logger.debug("In 'protid_format' getter.")
+
         return self._protid_format
 
     @protid_format.setter
+    @enforce_string
     def protid_format(self, protid_format):
         """
         File format of the file(s) containing data.
@@ -665,9 +654,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In protid_format setter.")
-        if type(protid_format) is not str:
-            raise ValueError("Invalid type for protid_format.")
+        self.logger.debug("In 'protid_format' setter.")
 
         self._protid_format = protid_format
 
@@ -676,10 +663,12 @@ class Proteome(Base):
         """
         str: File format of the file(s) containing data.
         """
-        self.logger.debug("In pepid_format getter.")
+        self.logger.debug("In 'pepid_format' getter.")
+
         return self._pepid_format
 
     @pepid_format.setter
+    @enforce_string
     def pepid_format(self, pepid_format):
         """
         File format of the file(s) containing data.
@@ -690,9 +679,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In pepid_format setter.")
-        if type(pepid_format) is not str:
-            raise ValueError("Invalid type for pepid_format.")
+        self.logger.debug("In 'pepid_format' setter.")
 
         self._pepid_format = pepid_format
 
@@ -701,10 +688,12 @@ class Proteome(Base):
         """
         str: File format of the file(s) containing data.
         """
-        self.logger.debug("In protmod_format getter.")
+        self.logger.debug("In 'protmod_format' getter.")
+
         return self._protmod_format
 
     @protmod_format.setter
+    @enforce_string
     def protmod_format(self, protmod_format):
         """
         File format of the file(s) containing data.
@@ -715,9 +704,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In protmod_format setter.")
-        if type(protmod_format) is not str:
-            raise ValueError("Invalid type for protmod_format.")
+        self.logger.debug("In 'protmod_format' setter.")
 
         self._protmod_format = protmod_format
 
@@ -726,7 +713,8 @@ class Proteome(Base):
         """
         list: URLs for protein modifications files using the PSI-MOD ontology.
         """
-        self.logger.debug("In protmod_url getter.")
+        self.logger.debug("In 'protmod_url' getter.")
+
         return self._protmod_url
 
     @property
@@ -734,10 +722,12 @@ class Proteome(Base):
         """
         str: Local path where the PSI-MOD data is located.
         """
-        self.logger.debug("In local_protmod_file getter.")
+        self.logger.debug("In 'local_protmod_file' getter.")
+
         return self._local_protmod_file
 
     @local_protmod_file.setter
+    @enforce_string
     def local_protmod_file(self, local_protmod_file):
         """
         Local file where PSI-MOD data is located. This data will be
@@ -749,9 +739,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_protmod_file setter.")
-        if type(local_protmod_file) is not str:
-            raise ValueError("Invalid type for local_protmod_file. Must be a string.")
+        self.logger.debug("In 'local_protmod_file' setter.")
 
         self._local_protmod_file = local_protmod_file
 
@@ -761,6 +749,7 @@ class Proteome(Base):
         list: URLs from where spectra files can be obtained.
         """
         self.logger.debug("In spectra_url getter.")
+
         return self._spectra_url
 
     @property
@@ -768,10 +757,12 @@ class Proteome(Base):
         """
         str: Local path where the spectra file is located.
         """
-        self.logger.debug("In local_spectra_file getter.")
+        self.logger.debug("In 'local_spectra_file' getter.")
+
         return self._local_spectra_file
 
     @local_spectra_file.setter
+    @enforce_string
     def local_spectra_file(self, local_spectra_file):
         """
         Local file where spectra data is located. This data will be
@@ -783,10 +774,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_spectra_file setter.")
-        if type(local_spectra_file) is not str:
-            raise ValueError("Invalid type for local_spectra_file. " + \
-                             "Must be a string.")
+        self.logger.debug("In 'local_spectra_file' setter.")
 
         self._local_spectra_file = local_spectra_file
 
@@ -795,7 +783,8 @@ class Proteome(Base):
         """
         list: URLs from where protein identification file can be obtained.
         """
-        self.logger.debug("In protid_url getter.")
+        self.logger.debug("In 'protid_url' getter.")
+
         return self._protid_url
 
     @property
@@ -803,10 +792,12 @@ class Proteome(Base):
         """
         str: Local path where the protein identification file is located.
         """
-        self.logger.debug("In local_protid_file getter.")
+        self.logger.debug("In 'local_protid_file' getter.")
+
         return self._local_protid_file
 
     @local_protid_file.setter
+    @enforce_string
     def local_protid_file(self, local_protid_file):
         """
         Local file where protein identification data is located. This data will
@@ -819,10 +810,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_protid_file setter.")
-        if type(local_protid_file) is not str:
-            raise ValueError("Invalid type for local_protid_file. " + \
-                             "Must be a string.")
+        self.logger.debug("In 'local_protid_file' setter.")
 
         self._local_protid_file = local_protid_file
 
@@ -839,10 +827,12 @@ class Proteome(Base):
         """
         str: Local path where the peptide identification file is located.
         """
-        self.logger.debug("In local_pepid_file getter.")
+        self.logger.debug("In 'local_pepid_file' getter.")
+
         return self._local_pepid_file
 
     @local_pepid_file.setter
+    @enforce_string
     def local_pepid_file(self, local_pepid_file):
         """
         Local file where peptide identification data is located. This data will
@@ -855,10 +845,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_pepid_file setter.")
-        if type(local_pepid_file) is not str:
-            raise ValueError("Invalid type for local_pepid_file. " + \
-                             "Must be a string.")
+        self.logger.debug("In 'local_pepid_file' setter.")
 
         self._local_pepid_file = local_pepid_file
 
@@ -867,10 +854,12 @@ class Proteome(Base):
         """
         str: One of the 3 studies that are part of the iHMP.
         """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
+
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
         One of the 3 studies that are part of the iHMP.
@@ -885,13 +874,10 @@ class Proteome(Base):
 
         studies = ["preg_preterm", "ibd", "prediabetes"]
 
-        if type(study) != str:
-            raise ValueError("study must be a string.")
-
         if study in studies:
             self._study = study
         else:
-            raise Exception("Not a valid study")
+            raise Exception("Invalid study.")
 
     def validate(self):
         """
@@ -958,11 +944,11 @@ class Proteome(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None

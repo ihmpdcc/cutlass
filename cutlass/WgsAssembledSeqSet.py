@@ -7,7 +7,7 @@ import string
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
-
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -73,11 +73,12 @@ class WgsAssembledSeqSet(Base):
         """
         str: The software and version used to generate the assembly.
         """
-        self.logger.debug("In assembler getter.")
+        self.logger.debug("In 'assembler' getter.")
 
         return self._assembler
 
     @assembler.setter
+    @enforce_string
     def assembler(self, assembler):
         """
         The setter for the assembler.
@@ -89,10 +90,7 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In assembler setter.")
-
-        if type(assembler) != str:
-            raise ValueError("assembler must be a string.")
+        self.logger.debug("In 'assembler' setter.")
 
         self._assembler = assembler
 
@@ -101,11 +99,12 @@ class WgsAssembledSeqSet(Base):
         """
         str: Get the name of the assembly provided by the submitter.
         """
-        self.logger.debug("In assembly_name getter.")
+        self.logger.debug("In 'assembly_name' getter.")
 
         return self._assembly_name
 
     @assembly_name.setter
+    @enforce_string
     def assembly_name(self, assembly_name):
         """
         Name/version of the assembly provided by the submitter.
@@ -117,21 +116,19 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In assembly_name setter.")
-
-        if type(assembly_name) != str:
-            raise ValueError("assembly_name must be a string.")
+        self.logger.debug("In 'assembly_name' setter.")
 
         self._assembly_name = assembly_name
 
     @property
     def checksums(self):
         """ str: One or more checksums used to ensure file integrity. """
-        self.logger.debug("In checksums getter.")
+        self.logger.debug("In 'checksums' getter.")
 
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the WgsAssembledSeqSet checksums.
@@ -142,7 +139,7 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
+        self.logger.debug("In 'checksums' setter.")
 
         if 'md5' not in checksums:
             raise ValueError("Checksum data must contain at least the 'md5' value")
@@ -154,11 +151,12 @@ class WgsAssembledSeqSet(Base):
         """
         str: Free-text comment.
         """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the WgsAssembledSeqSet comment. The comment must be a string,
@@ -170,13 +168,10 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-
-        if type(comment) != str:
-            raise ValueError("comment must be a string.")
+        self.logger.debug("In 'comment' setter.")
 
         if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
+            raise Exception("Comment is too long. Max length is 512 characters.")
 
         self._comment = comment
 
@@ -188,6 +183,7 @@ class WgsAssembledSeqSet(Base):
         return self._format
 
     @format.setter
+    @enforce_string
     def format(self, format_str):
         """
         The setter for the WgsAssembledSeqSet format. This must be either fasta or fastq.
@@ -217,6 +213,7 @@ class WgsAssembledSeqSet(Base):
         return self._format_doc
 
     @format_doc.setter
+    @enforce_string
     def format_doc(self, format_doc):
         """
         The setter for the WgsAssembledSeqSet format doc.
@@ -229,19 +226,17 @@ class WgsAssembledSeqSet(Base):
         """
         self.logger.debug("In format_doc setter.")
 
-        if type(format_doc) != str:
-            raise ValueError("format_doc must be a string.")
-
         self._format_doc = format_doc
 
     @property
     def local_file(self):
         """ str: URL to the local file to upload to the server. """
-        self.logger.debug("In local_file getter.")
+        self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
 
     @local_file.setter
+    @enforce_string
     def local_file(self, local_file):
         """
         The setter for the WgsAssembledSeqSet local file.
@@ -253,21 +248,21 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_file setter.")
-
-        if type(local_file) != str:
-            raise ValueError("local_file must be a string.")
+        self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
 
     @property
     def sequence_type(self):
-        """ str: Specifies whether the file contains peptide or nucleotide data. """
-        self.logger.debug("In sequence_type getter.")
+        """
+        str: Specifies whether the file contains peptide or nucleotide data.
+        """
+        self.logger.debug("In 'sequence_type' getter.")
 
         return self._sequence_type
 
     @sequence_type.setter
+    @enforce_string
     def sequence_type(self, sequence_type):
         """
         The setter for the WgsAssembledSeqSet sequence type. This must be either
@@ -279,12 +274,10 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequence_type setter.")
-
-        if type(sequence_type) != str:
-            raise ValueError("sequence_type must be a string.")
+        self.logger.debug("In 'sequence_type' setter.")
 
         types = ["peptide", "nucleotide"]
+
         if sequence_type in types:
             self._sequence_type = sequence_type
         else:
@@ -292,26 +285,26 @@ class WgsAssembledSeqSet(Base):
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """
-        self.logger.debug("In size getter.")
+        """
+        int: The size of the file in bytes.
+        """
+        self.logger.debug("In 'size' getter.")
 
         return self._size
 
     @size.setter
+    @enforce_int
     def size(self, size):
         """
         The setter for the WgsAssembledSeqSet size.
 
         Args:
-            size (int): The size of the seq set.
+            size (int): The size of the sequence set in bytes.
 
         Returns:
             None
         """
-        self.logger.debug("In size setter.")
-
-        if type(size) != int:
-            raise ValueError("The size must be a string.")
+        self.logger.debug("In 'size' setter.")
 
         if size < 0:
             raise ValueError("The size must be non-negative.")
@@ -320,12 +313,15 @@ class WgsAssembledSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
-        self.logger.debug("In study getter.")
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
+        self.logger.debug("In 'study' getter.")
 
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
         The setter for the WgsAssembledSeqSet study. This is restricted to be either
@@ -337,12 +333,9 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         studies = ["preg_preterm", "ibd", "prediabetes"]
-
-        if type(study) != str:
-            raise ValueError("study must be a string.")
 
         if study in studies:
             self._study = study
@@ -477,7 +470,8 @@ class WgsAssembledSeqSet(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results
+
+        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 

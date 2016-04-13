@@ -2,7 +2,6 @@
 
 import json
 import logging
-from datetime import datetime
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
@@ -13,23 +12,20 @@ module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class Annotation(Base):
+class AbundanceMatrix(Base):
     """
-    The class encapsulates iHMP annotation data. It contains all
+    The class encapsulates iHMP abundance matrix data. It contains all
     the fields required to save a such an object in OSDF.
 
     Attributes:
-        date_format (str): The format of the date the annotation was made.
 
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
 
-    date_format = '%Y-%m-%d'
-
     def __init__(self):
         """
-        Constructor for the Annotation class. This initializes the
+        Constructor for the AbundanceMatrix class. This initializes the
         fields specific to the class, and inherits from the Base class.
 
         Args:
@@ -45,49 +41,70 @@ class Annotation(Base):
         self._tags = []
 
         # Required properties
-        self._annotation_pipeline = None
         self._checksums = {}
+        self._comment = None
         self._format = None
         self._format_doc = None
-        self._orf_process = None
+        self._matrix_type = None
+        self._size = None
         self._study = None
         self._urls = ['']
 
         # Optional properties
-        self._comment = None
-        self._date = None
         self._sop = None
-        self._annotation_source = None
 
     @property
     def checksums(self):
         """
-        dict: The annotation's checksum data.
+        dict: The checksum data.
         """
         self.logger.debug("In checksums getter.")
         return self._checksums
 
+    #def enforce_dict(func):
+    #    def wrapper(self, arg):
+    #        if type(arg) is not dict:
+    #            raise ValueError("Invalid type provided. Must be a dict.")
+    #        func(self, arg)
+#
+#        return wrapper
+#
+#    def enforce_int(func):
+#        def wrapper(self, arg):
+#            if type(arg) is not int:
+#                raise ValueError("Invalid type provided. Must be an int.")
+#            func(self, arg)
+#
+#        return wrapper
+#
+#    def enforce_string(func):
+#        def wrapper(self, arg):
+#            if type(arg) is not str:
+#                raise ValueError("Invalid type provided. Must be a string.")
+#            func(self, arg)
+#
+#        return wrapper
+
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
-        The setter for the Annotation's checksums.
+        The setter for the checksums.
 
         Args:
-            checksums (dict): The checksums.
+            checksums (dict): The checksums used for data integrity checking.
 
         Returns:
             None
         """
         self.logger.debug("In checksums setter.")
-        if type(checksums) is not dict:
-            raise ValueError("Invalid type for checksums.")
 
         self._checksums = checksums
 
     @property
     def comment(self):
         """
-        str: A descriptive comment for the annotation.
+        str: A descriptive comment for the abundance matrix.
         """
         self.logger.debug("In comment getter.")
         return self._comment
@@ -96,7 +113,7 @@ class Annotation(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for a descriptive comment for the annotation.
+        The setter for a descriptive comment for the abundance matrix.
 
         Args:
             comment (str): The comment text.
@@ -108,70 +125,36 @@ class Annotation(Base):
 
         self._comment = comment
 
-    @property
-    def date(self):
-        """
-        str: The date on which the annotations were generated.
-        """
-        self.logger.debug("In date getter.")
-        return self._date
-
-    @date.setter
-    def date(self, date):
-        """
-        The setter the date of the annotation.
-
-        Args:
-            date (str): The date in YYYY-MM-DD format.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In date setter.")
-        if type(date) is not str:
-            raise ValueError("Invalid type for date.")
-
-        try:
-            parsed = datetime.strptime(date, Annotation.date_format)
-        except ValueError:
-            raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
-
-        now = datetime.now()
-        if parsed > now:
-            raise ValueError("Date must be in the past, not the future.")
-
-        self._date = date
 
     @property
     def format(self):
         """
-        str: The file format of the annotation file.
+        str: The file format of the matrix file. eg.g. tbl, csv, biom.
         """
         self.logger.debug("In format getter.")
         return self._format
 
     @format.setter
     @enforce_string
-    def format(self, format):
+    def format(self, format_):
         """
-        The setter for the file format of the annotation file.
+        The setter for the file format of the matrix file. eg.g. tbl, csv, biom.
 
         Args:
-            format (str): The file format of the annotation file.
+            format (str): The file format of the matrix file.
 
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
-
-        self._format = format
+        self.logger.debug("In 'format' setter.")
+        self._format = format_
 
     @property
     def format_doc(self):
         """
         str: URL for documentation of file format.
         """
-        self.logger.debug("In format_doc getter.")
+        self.logger.debug("In 'format_doc' getter.")
         return self._format_doc
 
     @format_doc.setter
@@ -191,33 +174,59 @@ class Annotation(Base):
         self._format_doc = format_doc
 
     @property
-    def orf_process(self):
+    def matrix_type(self):
         """
-        str: The software and version used to generate gene predictions.
+        str: The type of matrix, e.g. community, functional, proteomic,
+        lipidomic, transcriptomic.
         """
-        self.logger.debug("In orf_process getter.")
-        return self._orf_process
+        self.logger.debug("In 'matrix_type' getter.")
+        return self._matrix_type
 
-    @orf_process.setter
+    @matrix_type.setter
     @enforce_string
-    def orf_process(self, orf_process):
+    def matrix_type(self, matrix_type):
         """
-        Set the software and version used to generate gene predictions.
-
+        The setter for the type of matrix, e.g. community, functional,
+        proteomic, lipidomic, transcriptomic.
         Args:
-            orf_process (str): The software and version used.
+            matrix_type (str): 
 
         Returns:
             None
         """
-        self.logger.debug("In orf_process setter.")
+        self.logger.debug("In 'matrix_type' setter.")
 
-        self._orf_process = orf_process
+        self._matrix_type = matrix_type
+
+    @property
+    def size(self):
+        """
+        int: The size of the file in bytes.
+        """
+        self.logger.debug("In 'size' getter.")
+        return self._size
+
+    @size.setter
+    @enforce_int
+    def size(self, size):
+        """
+        The setter for the size of the file in bytes.
+
+        Args:
+            size (int): 
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'size' setter.")
+
+        self._size = size
 
     @property
     def sop(self):
         """
-        str: The URL for documentation of procedures used in annotation.
+        str: URL pointing to a description of the process used to generate
+        the matrix.
         """
         self.logger.debug("In sop getter.")
         return self._sop
@@ -226,7 +235,8 @@ class Annotation(Base):
     @enforce_string
     def sop(self, sop):
         """
-        Set the URL for documentation of procedures used in annotation.
+        Set the URL pointing to a description of the process used to generate
+        the matrix.
 
         Args:
             sop (str): The documentation URL.
@@ -237,58 +247,6 @@ class Annotation(Base):
         self.logger.debug("In sop setter.")
 
         self._sop = sop
-
-    @property
-    def annotation_pipeline(self):
-        """
-        str: Get the software and version used to generate the annotation.
-        """
-        self.logger.debug("In annotation_pipeline getter.")
-        return self._annotation_pipeline
-
-    @annotation_pipeline.setter
-    @enforce_string
-    def annotation_pipeline(self, annotation_pipeline):
-        """
-        Set The software and version used to generate annotation.
-
-        Args:
-            annotation_pipeline (str): The software and version used to
-            generate annotation.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In annotation_pipeline setter.")
-
-        self._annotation_pipeline = annotation_pipeline
-
-    @property
-    def annotation_source(self):
-        """
-        str: Get the databases used for providing curation.
-        """
-        self.logger.debug("In annotation_source getter.")
-        return self._annotation_source
-
-    @annotation_source.setter
-    @enforce_string
-    def annotation_source(self, annotation_source):
-        """
-        Set the databases used for providing curation; or for cases where
-        annotation was provided by a community jamboree or model organism
-        database.
-
-        Args:
-            annotation_source (str): The databases used for providing
-            curation.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In annotation_source setter.")
-
-        self._annotation_source = annotation_source
 
     @property
     def study(self):
@@ -342,7 +300,7 @@ class Annotation(Base):
             problems.append(error_message)
 
         if 'computed_from' not in self._links.keys():
-            problems.append("Must have a 'computed_from' link to a sample.")
+            problems.append("Must have a 'computed_from' link.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
         return problems
@@ -393,20 +351,21 @@ class Annotation(Base):
         """
         self.logger.debug("In _get_raw_doc.")
 
-        annot_doc = {
+        doc = {
             'acl': {
                 'read': [ 'all' ],
-                'write': [ Annotation.namespace ]
+                'write': [ AbundanceMatrix.namespace ]
             },
             'linkage': self._links,
-            'ns': Annotation.namespace,
-            'node_type': 'annotation',
+            'ns': AbundanceMatrix.namespace,
+            'node_type': 'abundance_matrix',
             'meta': {
-                'annotation_pipeline': self._annotation_pipeline,
                 'checksums': self._checksums,
+                'comment': self._comment,
                 'format': self._format,
                 'format_doc': self._format_doc,
-                'orf_process': self._orf_process,
+                'matrix_type': self._matrix_type,
+                'size': self._size,
                 'study': self._study,
                 'subtype': self._study,
                 'tags': self._tags,
@@ -416,30 +375,18 @@ class Annotation(Base):
 
         if self._id is not None:
            self.logger.debug("Annotation object has the OSDF id set.")
-           annot_doc['id'] = self._id
+           doc['id'] = self._id
 
         if self._version is not None:
            self.logger.debug("Annotation object has the OSDF version set.")
-           annot_doc['ver'] = self._version
+           doc['ver'] = self._version
 
-        # Handle Annotation optional properties
-        if self._comment is not None:
-           self.logger.debug("Annotation object has the 'comment' property set.")
-           annot_doc['meta']['comment'] = self._comment
-
-        if self._date is not None:
-           self.logger.debug("Annotation object has the 'date' property set.")
-           annot_doc['meta']['date'] = self._date
-
+        # Handle optional properties
         if self._sop is not None:
-           self.logger.debug("Annotation object has the 'sop' property set.")
-           annot_doc['meta']['sop'] = self._sop
+           self.logger.debug("Object has the 'sop' property set.")
+           doc['meta']['sop'] = self._sop
 
-        if self._annotation_source is not None:
-           self.logger.debug("Annotation object has the 'annotation_source' property set.")
-           annot_doc['meta']['annotation_source'] = self._annotation_source
-
-        return annot_doc
+        return doc
 
     @staticmethod
     def required_fields():
@@ -452,8 +399,8 @@ class Annotation(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("annotation_pipeline", "checksums", "format", "format_doc",
-                "orf_process", "study", "tags", "urls")
+        return ("checksums", "comment", "format", "format_doc", "matrix_type",
+                "size", "study", "urls")
 
     def delete(self):
         """
@@ -472,10 +419,10 @@ class Annotation(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Annotation with no ID.")
-            raise Exception("Annotation does not have an ID.")
+            self.logger.warn("Attempt to delete a AbundanceMatrix with no ID.")
+            raise Exception("AbundanceMatrix does not have an ID.")
 
-        annotation_id = self._id
+        matrix_id = self._id
 
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
@@ -484,8 +431,8 @@ class Annotation(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Annotation with ID %s." % annotation_id)
-            session.get_osdf().delete_node(annotation_id)
+            self.logger.info("Deleting AbunanceMatrix with ID %s." % matrix_id)
+            session.get_osdf().delete_node(matrix_id)
             success = True
         except Exception as e:
             self.logger.exception(e)
@@ -494,9 +441,9 @@ class Annotation(Base):
         return success
 
     @staticmethod
-    def search(query = "\"annotation\"[node_type]"):
+    def search(query = "\"abundance_matrix\"[node_type]"):
         """
-        Searches OSDF for Annotation nodes. Any criteria the user wishes to
+        Searches OSDF for AbundanceMatrix nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
         provided in the OSDF documentation. A general format is (including the
         quotes and brackets):
@@ -511,131 +458,114 @@ class Annotation(Base):
                          Annotation node type.
 
         Returns:
-            Returns an array of Annotation objects. It returns an empty list
+            Returns an array of AbundanceMatrix objects. It returns an empty list
             if there are no results.
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
+        # Searching without any parameters will return different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"annotation\"[node_type]":
-            query = query + " && \"annotation\"[node_type]"
+        if query != "\"abundance_matrix\"[node_type]":
+            query = query + " && \"abundance_matrix\"[node_type]"
 
-        annot_data = session.get_osdf().oql_query(Annotation.namespace, query)
+        matrix_data = session.get_osdf().oql_query(AbundanceMatrix.namespace, query)
 
-        all_results = annot_data['results']
+        all_results = matrix_data['results']
 
         result_list = list()
 
         if len(all_results) > 0:
             for result in all_results:
-                annot_result = Annotation.load_annotation(result)
-                result_list.append(annot_result)
+                matrix_result = AbundanceMatrix.load_abundance_matrix(result)
+                result_list.append(matrix_result)
 
         return result_list
 
     @staticmethod
-    def load_annotation(annot_data):
+    def load_abundance_matrix(matrix_data):
         """
-        Takes the provided JSON string and converts it to a
-        Annotation object
+        Takes the provided JSON string and converts it to an
+        AbundanceMatrix object
 
         Args:
-            annot_data (str): The JSON string to convert
+            data (str): The JSON string to convert
 
         Returns:
-            Returns a Annotation instance.
+            Returns an AbundanceMatrix instance.
         """
-        module_logger.info("Creating a template Annotation.")
-        annot = Annotation()
+        module_logger.info("Creating a template %s." % __name__)
+        matrix = AbundanceMatrix()
 
-        module_logger.debug("Filling in Annotation details.")
-        annot._set_id(annot_data['id'])
-        annot._links = annot_data['linkage']
-        annot._version = annot_data['ver']
+        module_logger.debug("Filling in %s details." % __name__)
+        matrix._set_id(matrix_data['id'])
+        matrix._links = matrix_data['linkage']
+        matrix._version = matrix_data['ver']
 
         # Required fields
-        annot._annotation_pipeline = annot_data['meta']['annotation_pipeline']
-        annot._checksums = annot_data['meta']['checksums']
-        annot._format = annot_data['meta']['format']
-        annot._format_doc = annot_data['meta']['format_doc']
-        annot._study = annot_data['meta']['study']
-        annot._tags = annot_data['meta']['tags']
-        annot._urls = annot_data['meta']['urls']
+        matrix._checksums = matrix_data['meta']['checksums']
+        matrix._comment = matrix_data['meta']['comment']
+        matrix._format = matrix_data['meta']['format']
+        matrix._format_doc = matrix_data['meta']['format_doc']
+        matrix._matrix_type = matrix_data['meta']['matrix_type']
+        matrix._size = matrix_data['meta']['size']
+        matrix._study = matrix_data['meta']['study']
+        matrix._tags = matrix_data['meta']['tags']
+        matrix._urls = matrix_data['meta']['urls']
 
         # Optional fields
-        if 'comment' in annot_data['meta']:
-            annot._comment = annot_data['meta']['comment']
+        if 'sop' in matrix_data['meta']:
+            matrix._sop = annot_data['meta']['sop']
 
-        if 'date' in annot_data['meta']:
-            annot._date = annot_data['meta']['date']
-
-        if 'sop' in annot_data['meta']:
-            annot._sop = annot_data['meta']['sop']
-
-        if 'annotation_source' in annot_data['meta']:
-            annot._annotation_source = annot_data['meta']['annotation_source']
-
-        module_logger.debug("Returning loaded Annotation.")
-        return annot
+        module_logger.debug("Returning loaded %s." % __name__)
+        return matrix
 
     @staticmethod
-    def load(annot_id):
+    def load(matrix_id):
         """
         Loads the data for the specified input ID from the OSDF instance to
-        this object.  If the provided ID does not exist, then an error message
+        this object. If the provided ID does not exist, then an error message
         is provided stating the project does not exist.
 
         Args:
-            annot_id (str): The OSDF ID for the document to load.
+            matrix_id (str): The OSDF ID for the document to load.
 
         Returns:
-            A Annotation object with all the available OSDF data loaded
+            An AbundanceMatrix object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % annot_id)
+        module_logger.debug("In load. Specified ID: %s" % matrix_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        annot_data = session.get_osdf().get_node(annot_id)
+        matrix_data = session.get_osdf().get_node(matrix_id)
 
-        module_logger.info("Creating a template Annotation.")
-        annot = Annotation()
+        module_logger.info("Creating a template %s." % __name__)
+        matrix = AbundanceMatrix()
 
-        module_logger.debug("Filling in Annotation details.")
+        module_logger.debug("Filling in %s details." % __name__)
 
         # Node required fields
-        annot._set_id(annot_data['id'])
-        annot._links = annot_data['linkage']
-        annot._version = annot_data['ver']
+        matrix._set_id(matrix_data['id'])
+        matrix._links = matrix_data['linkage']
+        matrix._version = matrix_data['ver']
 
         # Required fields
-        annot._annotation_pipeline = annot_data['meta']['annotation_pipeline']
-        annot._checksums = annot_data['meta']['checksums']
-        annot._format = annot_data['meta']['format']
-        annot._format_doc = annot_data['meta']['format_doc']
-        annot._orf_process = annot_data['meta']['orf_process']
-        annot._study = annot_data['meta']['study']
-        annot._tags = annot_data['meta']['tags']
-        annot._urls = annot_data['meta']['urls']
+        matrix._checksums = matrix_data['meta']['checksums']
+        matrix._comment = matrix_data['meta']['comment']
+        matrix._format = matrix_data['meta']['format']
+        matrix._format_doc = matrix_data['meta']['format_doc']
+        matrix._study = matrix_data['meta']['study']
+        matrix._tags = matrix_data['meta']['tags']
+        matrix._urls = matrix_data['meta']['urls']
 
-        # Handle Annotation optional properties
-        if 'comment' in annot_data['meta']:
-            annot._comment = annot_data['meta']['comment']
+        # Handle AbundanceMatrix optional properties
+        if 'sop' in matrix_data['meta']:
+            matrix._sop = matrix_data['meta']['sop']
 
-        if 'date' in annot_data['meta']:
-            annot._date = annot_data['meta']['date']
-
-        if 'sop' in annot_data['meta']:
-            annot._sop = annot_data['meta']['sop']
-
-        if 'annotation_source' in annot_data['meta']:
-            annot._annotation_source = annot_data['meta']['annotation_source']
-
-        module_logger.debug("Returning loaded Annotation.")
-        return annot
+        module_logger.debug("Returning loaded " + __name__ )
+        return matrix
 
     def save(self):
         """
@@ -674,7 +604,7 @@ class Annotation(Base):
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting Annotation to parsed JSON form.")
+            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
             data = json.loads( self.to_json() )
 
             try:
@@ -687,20 +617,22 @@ class Annotation(Base):
                 self.logger.exception(e)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("Annotation already has an ID, so we do an update (not an insert).")
+            self.logger.info("AbundanceMatrix already has an ID, " + \
+                             "so we do an update (not an insert).")
 
             try:
-                prep_data = self._get_raw_doc()
-                self.logger.info("Annotation already has an ID, " + \
+                matrix_data = self._get_raw_doc()
+                self.logger.info("AbundanceMatrix already has an ID, " + \
                                  "so we do an update (not an insert).")
-                prep_id = self._id
-                self.logger.debug("Annotation OSDF ID to update: %s." % prep_id)
-                osdf.edit_node(prep_data)
+                matrix_id = self._id
+                self.logger.debug("AbundanceMatrix OSDF ID to update: %s." % matrix_id)
+                osdf.edit_node(matrix_data)
 
-                prep_data = osdf.get_node(prep_id)
-                latest_version = prep_data['ver']
+                matrix_data = osdf.get_node(matrix_id)
+                latest_version = matrix_data['ver']
 
-                self.logger.debug("The version of this Annotation is now: %s" % str(latest_version))
+                self.logger.debug("The version of this AbundanceMatrix " + \
+                                  "is now: %s" % str(latest_version))
                 self._version = latest_version
                 success = True
             except Exception as e:
