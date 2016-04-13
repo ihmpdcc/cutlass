@@ -4,6 +4,17 @@ import unittest
 import sys
 
 class ImportTest(unittest.TestCase):
+    def testImportAbundanceMatrix(self):
+        success = False
+        try:
+            from cutlass import AbundanceMatrix
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(AbundanceMatrix is None)
+
     def testImportAnnotation(self):
         success = False
         try:
