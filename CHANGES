@@ -1,3 +1,11 @@
+cutlass 0.13
+
+ * New class for AbundanceMatrix and new tests.
+ * Corrections to method documentation.
+ * Using decorators for type checking.
+
+ - Victor <victor73@github.com>  Tue, 12 Apr 2016 12:00:00 -0400
+
 cutlass 0.12
 
  * Added several new classes, including WgsAssembledSeqSet,
