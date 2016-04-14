@@ -6,6 +6,7 @@ from .Proteome import Proteome
 from .Study import Study
 from .Visit import Visit
 from .Sample import Sample
+from .SampleAttribute import SampleAttribute
 from .Subject import Subject
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .WgsDnaPrep import WgsDnaPrep
