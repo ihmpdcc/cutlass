@@ -6,6 +6,7 @@ import logging
 from iHMPSession import iHMPSession
 from osdf import OSDF
 from itertools import islice
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -72,11 +73,9 @@ class Base(object):
         return self._version
 
     @version.setter
+    @enforce_int
     def version(self, version):
         self.logger.debug("In version setter.")
-
-        if type(version) != int:
-            raise ValueError("Version must be an integer.")
 
         if version <= 0:
             raise ValueError("Invalid version. Must be a postive integer.")
@@ -91,19 +90,17 @@ class Base(object):
                          pair specified by the JSON schema indicating links in the
                          OSDF instance.
         """
-        self.logger.debug("In links getter.")
+        self.logger.debug("In 'links' getter.")
         return self._links
 
     @links.setter
+    @enforce_dict
     def links(self, links):
         self.logger.debug("In links setter.")
-        if type(links) != dict:
-            raise ValueError("Links must be a dict of strings to lists.")
 
         for (link, node_list) in links.items():
             if (type(link) != str) or (type(node_list) != list):
                 raise ValueError("Links must be a dict of strings to lists.")
-
 
         self._links = links
 
@@ -236,8 +233,6 @@ class Base(object):
 
         """
         self.logger.debug("In search.")
-
-        #searching without any parameters will return all different results
 
         session = iHMPSession.get_session()
 
