@@ -16,7 +16,7 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportAbundanceMatrix(self):
         self.failIf(AbundanceMatrix is None)
-    
+
     def testImportAnnotation(self):
         self.failIf(Annotation is None)
 
@@ -43,6 +43,12 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportProteome(self):
         self.failIf(Proteome is None)
+
+    def testImportSample(self):
+        self.failIf(Sample is None)
+
+    def testImportSampleAttribute(self):
+        self.failIf(SampleAttribute is None)
 
     def testImportSession(self):
         self.failIf(iHMPSession is None)

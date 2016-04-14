@@ -26,6 +26,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Annotation is None)
 
+    def testImportAspera(self):
+        success = False
+
+        try:
+            from cutlass import aspera
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(aspera is None)
+
     def testImportIHMPSession(self):
         success = False
         try:
@@ -229,17 +241,29 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(MIXS is None)
 
-    def testImportAspera(self):
+    def testImportSample(self):
         success = False
 
         try:
-            from cutlass import aspera
+            from cutlass import Sample
             success = True
         except:
             pass
 
         self.failUnless(success)
-        self.failIf(aspera is None)
+        self.failIf(Sample is None)
+
+    def testImportSampleAttribute(self):
+        success = False
+
+        try:
+            from cutlass import SampleAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(SampleAttribute is None)
 
 if __name__ == '__main__':
     unittest.main()
