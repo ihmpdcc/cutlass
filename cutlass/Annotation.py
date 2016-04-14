@@ -690,15 +690,15 @@ class Annotation(Base):
             self.logger.info("Annotation already has an ID, so we do an update (not an insert).")
 
             try:
-                prep_data = self._get_raw_doc()
+                annot_data = self._get_raw_doc()
                 self.logger.info("Annotation already has an ID, " + \
                                  "so we do an update (not an insert).")
-                prep_id = self._id
-                self.logger.debug("Annotation OSDF ID to update: %s." % prep_id)
-                osdf.edit_node(prep_data)
+                annot_id = self._id
+                self.logger.debug("Annotation OSDF ID to update: %s." % annot_id)
+                osdf.edit_node(annot_data)
 
-                prep_data = osdf.get_node(prep_id)
-                latest_version = prep_data['ver']
+                annot_data = osdf.get_node(annot_id)
+                latest_version = annot_data['ver']
 
                 self.logger.debug("The version of this Annotation is now: %s" % str(latest_version))
                 self._version = latest_version
