@@ -3,8 +3,11 @@
 from osdf import OSDF
 import logging
 import importlib
+from Util import *
 
 class iHMPSession(object):
+    check_python_version(name="Cutlass")
+
     """
     The iHMP Session class. This class allows you to connect with an OSDF instance and
     begin analysis of iHMP data. It produces skeletons of all objects in the iHMP OSDF
