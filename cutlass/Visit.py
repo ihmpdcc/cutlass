@@ -110,8 +110,10 @@ class Visit(Base):
 
     @property
     def date(self):
-        """ str: Date when the visit occurred. Can be different from sample dates,
-                 a visit may encompass a set of sampling points. """
+        """
+        str: Date when the visit occurred. Can be different from sample dates,
+             a visit may encompass a set of sampling points.
+        """
         self.logger.debug("In 'date' getter.")
 
         return self._date
@@ -201,7 +203,7 @@ class Visit(Base):
             None
         """
         module_logger.debug("In required fields.")
-        return ("visit_id", "visit_number", "date", "interval", "tags")
+        return ("visit_id", "visit_number", "interval", "tags")
 
     def _get_raw_doc(self):
         """
@@ -229,7 +231,6 @@ class Visit(Base):
             'node_type': 'visit',
             'meta': {
                 'visit_number': self._visit_number,
-                'date': self._date,
                 'subtype': "visit",
                 'interval': self._interval,
             }
@@ -239,15 +240,19 @@ class Visit(Base):
            self.logger.debug("Visit object has the OSDF id set.")
            visit_doc['id'] = self._id
 
-        if self._tags is not None:
-            self.logger.debug("Visit object has the OSDF tags set.")
-            visit_doc['meta']['tags'] = self._tags
-
         if self._version is not None:
            self.logger.debug("Visit object has the OSDF version set.")
            visit_doc['ver'] = self._version
 
-        if self._clinic_id is not None:
+        if self._tags is not None:
+            self.logger.debug("Visit object has the OSDF tags set.")
+            visit_doc['meta']['tags'] = self._tags
+
+        if self._date is not None:
+           self.logger.debug("Visit object has the date set.")
+           visit_doc['meta']['date'] = self._date
+
+       if self._clinic_id is not None:
            self.logger.debug("Visit object has the clinic_id set.")
            visit_doc['meta']['clinic_id'] = self._clinic_id
 
@@ -462,8 +467,11 @@ class Visit(Base):
         # The attributes that are particular to Visit objects
         visit._visit_id = visit_data['meta']['visit_id']
         visit._visit_number = visit_data['meta']['visit_number']
-        visit._date = visit_data['meta']['date']
         visit._interval = visit_data['meta']['interval']
+
+        if 'date' in visit_data['meta']:
+            module_logger.info("Visit data has 'date' present.")
+            visit._date = visit_data['meta']['date']
 
         if 'clinic_id' in visit_data['meta']:
             module_logger.info("Visit data has 'clinic_id' present.")
@@ -516,7 +524,7 @@ class Visit(Base):
                 self.logger.info("Save for visit %s successful." % node_id)
                 self.logger.debug("Setting ID for visit %s." % node_id)
                 self._set_id(node_id)
-                self.version = 1
+                self._version = 1
                 success = True
             except Exception as e:
                 self.logger.error("An error occurred while inserting visit %s." +
