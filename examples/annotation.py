@@ -11,6 +11,14 @@ import sys
 username = "test"
 password = "test"
 
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
+
 session = iHMPSession(username, password)
 
 print("Required fields: ")
@@ -24,7 +32,12 @@ annot.format = "gff3"
 annot.format_doc = "the format url"
 annot.orf_process = "the orf process"
 annot.study = "prediabetes"
-annot.urls = [ "a", "b", "c" ]
+
+print("Creating a temp file for example/testing purposes.")
+temp_file = tempfile.NamedTemporaryFile(delete=False).name
+print("Local file: %s" % temp_file)
+
+annot.local_file = temp_file
 
 # Optional properties
 annot.comment = "hello world"
@@ -54,7 +67,8 @@ if annot.is_valid():
 
         print(annot2.to_json(indent=2))
 
-        deletion_success = annot.delete()
+        #deletion_success = annot.delete()
+        deletion_success= True
 
         if deletion_success:
             print("Deleted annot with ID %s" % annot_id)

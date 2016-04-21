@@ -3,8 +3,11 @@
 from osdf import OSDF
 import logging
 import importlib
+from Util import *
 
 class iHMPSession(object):
+    check_python_version(name="Cutlass")
+
     """
     The iHMP Session class. This class allows you to connect with an OSDF instance and
     begin analysis of iHMP data. It produces skeletons of all objects in the iHMP OSDF
@@ -147,10 +150,11 @@ class iHMPSession(object):
         """
         str: The password provided by the user for the OSDF instance.
         """
-        self.logger.debug("In password getter.")
+        self.logger.debug("In 'password' getter.")
         return self._password
 
     @password.setter
+    @enforce_password
     def password(self, password):
         """
         The password setter
@@ -170,10 +174,11 @@ class iHMPSession(object):
     @property
     def port(self):
         """ int: The port for access to the OSDF instance on the server. """
-        self.logger.debug("In port getter.")
+        self.logger.debug("In 'port' getter.")
         return self._port
 
     @port.setter
+    @enforce_int
     def port(self, port):
         """
         The port setter
@@ -184,7 +189,7 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In port setter.")
+        self.logger.debug("In 'port' setter.")
         self._port = port
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the port in the OSDF client.")
@@ -195,10 +200,11 @@ class iHMPSession(object):
         """
         str: The server domain name that contains the live OSDF instance.
         """
-        self.logger.debug("In server getter.")
+        self.logger.debug("In 'server' getter.")
         return self._server
 
     @server.setter
+    @enforce_string
     def server(self, server):
         """
         The server setter
@@ -209,7 +215,7 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In server setter.")
+        self.logger.debug("In 'server' setter.")
         self._server = server
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the server in the OSDF client.")
@@ -217,11 +223,14 @@ class iHMPSession(object):
 
     @property
     def username(self):
-        """ str: The username for acces to the OSDF server. """
-        self.logger.debug("In username getter.")
+        """
+        str: The username for acces to the OSDF server.
+        """
+        self.logger.debug("In 'username' getter.")
         return self._username
 
     @username.setter
+    @enforce_string
     def username(self, username):
         """
         The username setter
@@ -232,8 +241,9 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In username setter.")
+        self.logger.debug("In 'username' setter.")
         self._username = username
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the username in the OSDF client.")
         self._osdf.username = username

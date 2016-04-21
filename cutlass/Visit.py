@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from datetime import datetime
 import json
 import logging
 from itertools import count
@@ -119,6 +118,7 @@ class Visit(Base):
 
     @date.setter
     @enforce_string
+    @enforce_past_date
     def date(self, date):
         """
         The setter for the Visit's most recent visit date.
@@ -132,16 +132,6 @@ class Visit(Base):
         """
         self.logger.debug("In 'date' setter.")
 
-        try:
-            parsed = datetime.strptime(date, Visit.date_format)
-        except ValueError:
-            raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
-
-        now = datetime.now()
-        if parsed > now:
-            raise ValueError("Visit date must be in the past, not the future.")
-
-        self.logger.debug("Date is in the correct format.")
         self._date = date
 
     @property

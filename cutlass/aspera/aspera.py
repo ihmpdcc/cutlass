@@ -94,9 +94,15 @@ def run_ascp(ascp_cmd, password, keyfile=None):
 
         logger.info("Beginning transfer.")
         (s_out, s_err) = process.communicate()
-        logger.info("Invocation of ascp complete.")
+        rc = process.returncode
+        logger.info("Invocation of ascp complete. Return code: %s." % str(rc))
 
-        if not re.match(r"Completed: \S+ bytes transferred in", s_out):
+        success = False
+
+        if rc == 0:
+            logger.info("Aspera ascp utility returned successful exit value.")
+            success = True
+        else:
             if re.match(r"^.*failed to authenticate", s_err):
                 logger.error("Aspera authentication failure.")
             else:
@@ -104,12 +110,10 @@ def run_ascp(ascp_cmd, password, keyfile=None):
                     logger.error("Unexpected STDERR from ascp: %s" % s_err)
                 if s_out != None:
                     logger.error("Unexpected STDOUT from ascp: %s" % s_out)
-            return False
     except subprocess.CalledProcessError as cpe:
         logger.error("Encountered an error when running ascp: ", cpe)
-        return False
 
-    return True
+    return success
 
 # download a single file via Aspera. return True if successful, False if not
 def download_file(server, username, password, remote_path, local_path,

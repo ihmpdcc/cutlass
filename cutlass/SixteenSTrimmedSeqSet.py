@@ -2,8 +2,8 @@
 
 import json
 import logging
-import string
 import os
+import string
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
@@ -236,7 +236,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """
+        """ str: Path to the local file to upload to the server. """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -248,7 +248,7 @@ class SixteenSTrimmedSeqSet(Base):
         The setter for the SixteenSTrimmedSeqSet local file.
 
         Args:
-            local_file (str): The URL to the local file that should be uploaded
+            local_file (str): The path to the local file that should be uploaded
             to the server.
 
         Returns:
@@ -364,7 +364,7 @@ class SixteenSTrimmedSeqSet(Base):
         """
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "format", "format_doc",
-                "local_file", "size", "study", "tags", "urls")
+                "local_file", "size", "study", "tags")
 
     def _get_raw_doc(self):
         """
@@ -464,7 +464,7 @@ class SixteenSTrimmedSeqSet(Base):
     @staticmethod
     def load_sixteenSTrimmedSeqSet(seq_set_data):
         """
-        Takes the provided JSON string and converts it to a 
+        Takes the provided JSON string and converts it to a
         SixteenSTrimmedSeqSet object
 
         Args:
@@ -591,7 +591,7 @@ class SixteenSTrimmedSeqSet(Base):
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
-        remote_base = remote_base.replace(' ','_') # No spaces in filenames
+        remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
                                 "hm16str", remote_base])
@@ -615,13 +615,17 @@ class SixteenSTrimmedSeqSet(Base):
                     (self._local_file, aspera_server))
 
         if self.id is None:
-            # The document has not yet been save
-            seq_set_data = self._get_raw_doc()
+            # The document has not yet been saved
+            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+
+            # Get the JSON form of the data and load it
+            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
+            data = json.loads( self.to_json() )
             self.logger.info("Got the raw JSON document.")
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(seq_set_data)
+                node_id = session.get_osdf().insert_node(data)
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
@@ -630,20 +634,30 @@ class SixteenSTrimmedSeqSet(Base):
 
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
+                self.logger.exception(e)
+                self.logger.error("An error occurred while saving " + __name__ + ". " + \
                                   "Reason: %s" % e)
         else:
-            seq_set_data = self._get_raw_doc()
+            self.logger.info("%s set already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
+                seq_set_data = self._get_raw_doc()
+                seq_set_id = self._id
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
                 session.get_osdf().edit_node(seq_set_data)
                 self.logger.info("Update for " + __name__ + " %s successful." % self._id)
 
+                seq_set_data = session.get_osdf().get_node(seq_set_id)
+                latest_version = annot_data['ver']
+
+                self._version = latest_version
+                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+                self.logger.exception(e)
+                self.logger.error("An error occurred while updating " + \
+                                  "%s  %s. Reason: %s" % (__name__, self._id, e))
 
         self.logger.debug("Returning " + str(success))
 

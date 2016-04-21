@@ -3,6 +3,7 @@
 import unittest
 import json
 import sys
+from datetime import date
 
 from cutlass import iHMPSession
 from cutlass import Annotation
@@ -82,6 +83,43 @@ class AnnotationTest(unittest.TestCase):
 
         self.assertEqual(annot.checksums['md5'], checksums['md5'],
                          "Property getter for 'checksums' works.")
+
+    def testIllegalDate(self):
+        annot = session.create_annotation()
+
+        with self.assertRaises(Exception):
+            annot.date = "random"
+
+    def testIllegalFutureDate(self):
+        annot = session.create_annotation()
+        success = False
+        today = date.today()
+        next_year = str(date(today.year + 1, today.month, today.day))
+
+        try:
+            annot.date = next_year
+            success = True
+        except:
+            pass
+
+        self.assertFalse(success, "Annotation class rejects future dates.")
+
+    def testLegalDate(self):
+        annot = session.create_annotation()
+        success = False
+        date = "2015-07-27"
+
+        try:
+            annot.date = date
+            success = True
+        except Exception as e:
+            print(e)
+        #except:
+        #    pass
+
+        self.assertTrue(success, "Able to use the date setter")
+
+        self.assertEqual(annot.date, date, "Property getter for 'date' works.")
 
     def testFormat(self):
         annot = session.create_annotation()

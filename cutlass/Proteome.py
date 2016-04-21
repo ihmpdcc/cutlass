@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import string
-from datetime import datetime
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
@@ -145,6 +144,7 @@ class Proteome(Base):
 
     @date.setter
     @enforce_string
+    @enforce_past_date
     def date(self, date):
         """
         The setter the date on which the spectra were generated.
@@ -156,15 +156,6 @@ class Proteome(Base):
             None
         """
         self.logger.debug("In 'date' setter.")
-
-        try:
-            parsed = datetime.strptime(date, Proteome.date_format)
-        except ValueError:
-            raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
-
-        now = datetime.now()
-        if parsed > now:
-            raise ValueError("Date must be in the past, not the future.")
 
         self._date = date
 
@@ -335,7 +326,7 @@ class Proteome(Base):
         controlled vocabulary terms.
 
         Args:
-            protocol_steps (str): 
+            protocol_steps (str):
 
         Returns:
             None

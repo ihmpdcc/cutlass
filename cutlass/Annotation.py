@@ -2,10 +2,13 @@
 
 import json
 import logging
+import os
+import string
 from datetime import datetime
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
+from aspera import aspera
 from Util import *
 
 # Create a module logger named after the module
@@ -113,10 +116,13 @@ class Annotation(Base):
         """
         str: The date on which the annotations were generated.
         """
-        self.logger.debug("In date getter.")
+        self.logger.debug("In 'date' getter.")
+
         return self._date
 
     @date.setter
+    @enforce_string
+    @enforce_past_date
     def date(self, date):
         """
         The setter the date of the annotation.
@@ -127,18 +133,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In date setter.")
-        if type(date) is not str:
-            raise ValueError("Invalid type for date.")
-
-        try:
-            parsed = datetime.strptime(date, Annotation.date_format)
-        except ValueError:
-            raise ValueError("Invalid date. Must be in YYYY-MM-DD format.")
-
-        now = datetime.now()
-        if parsed > now:
-            raise ValueError("Date must be in the past, not the future.")
+        self.logger.debug("In 'date' setter.")
 
         self._date = date
 
@@ -147,7 +142,8 @@ class Annotation(Base):
         """
         str: The file format of the annotation file.
         """
-        self.logger.debug("In format getter.")
+        self.logger.debug("In 'format' getter.")
+
         return self._format
 
     @format.setter
@@ -162,7 +158,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
+        self.logger.debug("In 'format' setter.")
 
         self._format = format
 
@@ -186,7 +182,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In format_doc setter.")
+        self.logger.debug("In 'format_doc' setter.")
 
         self._format_doc = format_doc
 
@@ -195,7 +191,8 @@ class Annotation(Base):
         """
         str: The software and version used to generate gene predictions.
         """
-        self.logger.debug("In orf_process getter.")
+        self.logger.debug("In 'orf_process' getter.")
+
         return self._orf_process
 
     @orf_process.setter
@@ -210,7 +207,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In orf_process setter.")
+        self.logger.debug("In 'orf_process' setter.")
 
         self._orf_process = orf_process
 
@@ -219,7 +216,8 @@ class Annotation(Base):
         """
         str: The URL for documentation of procedures used in annotation.
         """
-        self.logger.debug("In sop getter.")
+        self.logger.debug("In 'sop' getter.")
+
         return self._sop
 
     @sop.setter
@@ -234,7 +232,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In sop setter.")
+        self.logger.debug("In 'sop' setter.")
 
         self._sop = sop
 
@@ -243,7 +241,8 @@ class Annotation(Base):
         """
         str: Get the software and version used to generate the annotation.
         """
-        self.logger.debug("In annotation_pipeline getter.")
+        self.logger.debug("In 'annotation_pipeline' getter.")
+
         return self._annotation_pipeline
 
     @annotation_pipeline.setter
@@ -259,7 +258,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In annotation_pipeline setter.")
+        self.logger.debug("In 'annotation_pipeline' setter.")
 
         self._annotation_pipeline = annotation_pipeline
 
@@ -268,7 +267,8 @@ class Annotation(Base):
         """
         str: Get the databases used for providing curation.
         """
-        self.logger.debug("In annotation_source getter.")
+        self.logger.debug("In 'annotation_source' getter.")
+
         return self._annotation_source
 
     @annotation_source.setter
@@ -286,7 +286,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In annotation_source setter.")
+        self.logger.debug("In 'annotation_source' setter.")
 
         self._annotation_source = annotation_source
 
@@ -295,7 +295,8 @@ class Annotation(Base):
         """
         str: One of the 3 studies that are part of the iHMP.
         """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
+
         return self._study
 
     @study.setter
@@ -310,9 +311,43 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         self._study = study
+
+    @property
+    def local_file(self):
+        """ str: Path to the local file to upload to the server. """
+        self.logger.debug("In 'local_file' getter.")
+
+        return self._local_file
+
+    @local_file.setter
+    @enforce_string
+    def local_file(self, local_file):
+        """
+        The setter for the Annotation local file.
+
+        Args:
+            local_file (str): The path to the local file that should be uploaded
+            to the server.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'local_file' setter.")
+
+        self._local_file = local_file
+
+    @property
+    def urls(self):
+        """
+        array: An array of string URLs from where the file can be obtained,
+               http, ftp, fasp, etc...
+        """
+        self.logger.debug("In 'urls' getter.")
+
+        return self._urls
 
     def validate(self):
         """
@@ -453,7 +488,7 @@ class Annotation(Base):
         """
         module_logger.debug("In required fields.")
         return ("annotation_pipeline", "checksums", "format", "format_doc",
-                "orf_process", "study", "tags", "urls")
+                "local_file", "orf_process", "study", "tags")
 
     def delete(self):
         """
@@ -655,6 +690,7 @@ class Annotation(Base):
 
         """
         self.logger.debug("In save.")
+        aspera_server = "aspera.ihmpdcc.org"
 
         # If node previously saved, use edit_node instead since ID
         # is given (an update in a way)
@@ -666,45 +702,90 @@ class Annotation(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        osdf = session.get_osdf()
+        study = self._study
+
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
+
+        if study not in study2dir:
+            raise ValueError("Invalid study. No directory mapping for %s" % study)
+
+        study_dir = study2dir[study]
+
+        remote_base = os.path.basename(self._local_file);
+
+        valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+        remote_base = ''.join(c for c in remote_base if c in valid_chars)
+        remote_base = remote_base.replace(' ', '_') # No spaces in filenames
+
+        remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
+                                "analysis", "hmgi", remote_base])
+        self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         success = False
 
+        upload_result = aspera.upload_file(aspera_server,
+                                           session.username,
+                                           session.password,
+                                           self._local_file,
+                                           remote_path)
+
+        if not upload_result:
+            self.logger.error("Experienced an error uploading the sequence " + \
+                              "set. Aborting save.")
+            return success
+
+        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
+                         (self._local_file, aspera_server))
+
+        self._urls = [ "fasp://" + aspera_server + remote_path ]
+
         if self._id is None:
+            # The document has not yet been saved
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting Annotation to parsed JSON form.")
+            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
             data = json.loads( self.to_json() )
+            self.logger.info("Got the raw JSON document.")
 
             try:
-                node_id = osdf.insert_node(data)
-
+                self.logger.info("Attempting to save a new node.")
+                node_id = session.get_osdf().insert_node(data)
                 self._set_id(node_id)
                 self._version = 1
+
+                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
+                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+
                 success = True
             except Exception as e:
                 self.logger.exception(e)
-                self.logger.error("An error occurred when saving %s.", self)
+                self.logger.error("An error occurred while saving " + __name__ + ". " + \
+                                  "Reason: %s" % e)
         else:
-            self.logger.info("Annotation already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
                 annot_data = self._get_raw_doc()
-                self.logger.info("Annotation already has an ID, " + \
-                                 "so we do an update (not an insert).")
                 annot_id = self._id
-                self.logger.debug("Annotation OSDF ID to update: %s." % annot_id)
-                osdf.edit_node(annot_data)
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % annot_id)
+                session.get_osdf().edit_node(annot_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
 
-                annot_data = osdf.get_node(annot_id)
+                annot_data = session.get_osdf().get_node(annot_id)
                 latest_version = annot_data['ver']
 
-                self.logger.debug("The version of this Annotation is now: %s" % str(latest_version))
                 self._version = latest_version
+                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+
                 success = True
             except Exception as e:
                 self.logger.exception(e)
-                self.logger.error("An error occurred when updating %s.", self)
+                self.logger.error("An error occurred while updating " + \
+                                  "%s %s. Reason: %s.", (__name__, self._id, e))
 
+        self.logger.debug("Returning " + str(success))
         return success
