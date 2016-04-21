@@ -154,7 +154,7 @@ class iHMPSession(object):
         return self._password
 
     @password.setter
-    @enforce_password
+    @enforce_string
     def password(self, password):
         """
         The password setter
