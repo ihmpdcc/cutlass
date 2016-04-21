@@ -8,6 +8,7 @@ from mixs import MIXS, MixsException
 from Base import Base
 from WgsDnaPrep import WgsDnaPrep
 from SixteenSDnaPrep import SixteenSDnaPrep
+from SampleAttribute import SampleAttribute
 from Util import *
 
 # Create a module logger named after the module
@@ -503,9 +504,32 @@ class Sample(Base):
             if res_count < 1:
                 break
 
+    def _sample_attr_docs(self):
+        linkage_query = '"{}"[linkage.associated_with]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(Sample.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield doc
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def sampleAttributes(self):
+        """
+        Return an iterator of the sample attributes associated with this sample.
+        """
+        for doc in self._sample_attr_docs():
+            if doc['node_type'] == "sample_attr":
+                yield SampleAttribute.load_sample_attr(doc)
+
     def sixteenSDnaPreps(self):
         """
-        Return iterator of all 16S preps prepared from this sample.
+        Return an iterator of the 16S DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "16s_dna_prep":
@@ -513,7 +537,7 @@ class Sample(Base):
 
     def wgsDnaPreps(self):
         """
-        Return iterator of all WGS DNA preps prepared from this sample.
+        Return an iterator of the WGS DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "wgs_dna_prep":
@@ -521,7 +545,7 @@ class Sample(Base):
 
     def dnaPreps(self):
         """
-        Return iterator of all preps prepared from this sample.
+        Return an iterator of all the DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "16s_dna_prep":
