@@ -17,8 +17,12 @@ import logging
 #
 # upload example command(s):
 #   ascp -T -v -L . testuser@aspera.ihmpdcc.org:
-#
+
+# Create a module logger named after the module
 logger = logging.getLogger(__name__)
+
+# Add a NullHandler for the case if no logging is configured by the application
+logger.addHandler(logging.NullHandler())
 
 ASCP_COMMAND = "ascp"
 ASCP_MIN_VERSION = '3.5'
