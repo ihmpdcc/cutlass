@@ -9,29 +9,34 @@ from Base import Base
 from aspera import aspera
 from Util import *
 
-
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class WgsRawSeqSet(Base):
+class WgsAssembledSeqSet(Base):
     """
-    The class encapsulating the Wgs Raw Sequence Set data for an iHMP instance.
-    This class contains all the fields required to save a Wgs Raw Sequence Set
-    object in the OSDF instance.
+    The class encapsulating the Wgs Assembled Sequence Set data for the iHMP.
+    This class contains all the fields required to save a Wgs Assembled
+    Sequence Set object in the OSDF instance.
 
     Attributes:
         namespace (str): The namespace this class will use in the OSDF instance
+
+        aspera_server (str): The name of the aspera where files are transferred to
+
+        date_format (str): The format of the date
     """
     namespace = "ihmp"
 
     aspera_server = "aspera.ihmpdcc.org"
 
+    date_format = '%Y-%m-%d'
+
     def __init__(self):
         """
-        Constructor for the WgsRawSeqSet class. This initializes the fields specific
-        to the WgsRawSeqSet class, and inherits from the Base class.
+        Constructor for the WgsAssembledSeqSet class. This initializes the fields specific
+        to the WgsAssembledSeqSet class, and inherits from the Base class.
 
         Args:
             None
@@ -46,18 +51,542 @@ class WgsRawSeqSet(Base):
         self._links = {}
         self._tags = []
 
-        # These are particular to WgsRawSeqSet objects
+        # These are particular to WgsAssembledSeqSet objects
+        self._assembler = None
+        self._assembly_name = None
         self._checksums = None
         self._comment = None
-        self._exp_length = None
         self._format = None
         self._format_doc = None
-        self._local_file = None
-        self._seq_model = None
         self._sequence_type = None
         self._size = None
         self._study = None
+        self._local_file = None
         self._urls = ['']
+
+        # Optional
+        self._date = None
+        self._sop = None
+
+    @property
+    def assembler(self):
+        """
+        str: The software and version used to generate the assembly.
+        """
+        self.logger.debug("In 'assembler' getter.")
+
+        return self._assembler
+
+    @assembler.setter
+    @enforce_string
+    def assembler(self, assembler):
+        """
+        The setter for the assembler.
+
+        Args:
+            assembler (str): The software and version used to generate the
+            assembly.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'assembler' setter.")
+
+        self._assembler = assembler
+
+    @property
+    def assembly_name(self):
+        """
+        str: Get the name of the assembly provided by the submitter.
+        """
+        self.logger.debug("In 'assembly_name' getter.")
+
+        return self._assembly_name
+
+    @assembly_name.setter
+    @enforce_string
+    def assembly_name(self, assembly_name):
+        """
+        Name/version of the assembly provided by the submitter.
+
+        Args:
+            assembly_name (str): Name/version of the assembly provided by the
+            submitter.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'assembly_name' setter.")
+
+        self._assembly_name = assembly_name
+
+    @property
+    def checksums(self):
+        """ str: One or more checksums used to ensure file integrity. """
+        self.logger.debug("In 'checksums' getter.")
+
+        return self._checksums
+
+    @checksums.setter
+    @enforce_dict
+    def checksums(self, checksums):
+        """
+        The setter for the WgsAssembledSeqSet checksums.
+
+        Args:
+            checksums (dict): The checksums for the WgsAssembledSeqSet.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'checksums' setter.")
+
+        if 'md5' not in checksums:
+            raise ValueError("Checksum data must contain at least the 'md5' value")
+
+        self._checksums = checksums
+
+    @property
+    def comment(self):
+        """
+        str: Free-text comment.
+        """
+        self.logger.debug("In 'comment' getter.")
+
+        return self._comment
+
+    @comment.setter
+    @enforce_string
+    def comment(self, comment):
+        """
+        The setter for the WgsAssembledSeqSet comment. The comment must be a string,
+        and less than 512 characters.
+
+        Args:
+            comment (str): The new comment to add to the string.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'comment' setter.")
+
+        if len(comment) > 512:
+            raise Exception("Comment is too long. Max length is 512 characters.")
+
+        self._comment = comment
+
+    @property
+    def format(self):
+        """ str: The file format of the sequence file """
+        self.logger.debug("In format getter.")
+
+        return self._format
+
+    @format.setter
+    @enforce_string
+    def format(self, format_str):
+        """
+        The setter for the WgsAssembledSeqSet format. This must be either fasta or fastq.
+
+        Args:
+            format_str (str): The new format string for the current object.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In format setter.")
+
+        if type(format_str) != str:
+            raise ValueError("format must be a string.")
+
+        formats = ["fasta", "fastq"]
+        if format_str in formats:
+            self._format = format_str
+        else:
+            raise Exception("Format must be fasta or fastq only.")
+
+    @property
+    def format_doc(self):
+        """ str: URL for documentation of file format. """
+        self.logger.debug("In format_doc getter.")
+
+        return self._format_doc
+
+    @format_doc.setter
+    @enforce_string
+    def format_doc(self, format_doc):
+        """
+        The setter for the WgsAssembledSeqSet format doc.
+
+        Args:
+            format_doc (str): The new format_doc for the current object.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In format_doc setter.")
+
+        self._format_doc = format_doc
+
+    @property
+    def local_file(self):
+        """ str: URL to the local file to upload to the server. """
+        self.logger.debug("In 'local_file' getter.")
+
+        return self._local_file
+
+    @local_file.setter
+    @enforce_string
+    def local_file(self, local_file):
+        """
+        The setter for the WgsAssembledSeqSet local file.
+
+        Args:
+            local_file (str): The URL to the local file that should
+                              be uploaded to the server.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'local_file' setter.")
+
+        self._local_file = local_file
+
+    @property
+    def sequence_type(self):
+        """
+        str: Specifies whether the file contains peptide or nucleotide data.
+        """
+        self.logger.debug("In 'sequence_type' getter.")
+
+        return self._sequence_type
+
+    @sequence_type.setter
+    @enforce_string
+    def sequence_type(self, sequence_type):
+        """
+        The setter for the WgsAssembledSeqSet sequence type. This must be either
+        peptide or nucleotide.
+
+        Args:
+            sequence_type (str): The new sequence type.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'sequence_type' setter.")
+
+        types = ["peptide", "nucleotide"]
+
+        if sequence_type in types:
+            self._sequence_type = sequence_type
+        else:
+            raise Exception("Sequence type must be either peptide or nucleotide")
+
+    @property
+    def size(self):
+        """
+        int: The size of the file in bytes.
+        """
+        self.logger.debug("In 'size' getter.")
+
+        return self._size
+
+    @size.setter
+    @enforce_int
+    def size(self, size):
+        """
+        The setter for the WgsAssembledSeqSet size.
+
+        Args:
+            size (int): The size of the sequence set in bytes.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'size' setter.")
+
+        if size < 0:
+            raise ValueError("The size must be non-negative.")
+
+        self._size = size
+
+    @property
+    def study(self):
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
+        self.logger.debug("In 'study' getter.")
+
+        return self._study
+
+    @study.setter
+    @enforce_string
+    def study(self, study):
+        """
+        The setter for the WgsAssembledSeqSet study. This is restricted to be either
+        preg_preterm, ibd, or prediabetes.
+
+        Args:
+            study (str): The study of the seq set.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'study' setter.")
+
+        studies = ["preg_preterm", "ibd", "prediabetes"]
+
+        if study in studies:
+            self._study = study
+        else:
+            raise Exception("Not a valid study")
+
+    @property
+    def urls(self):
+        """
+        array: An array of URL from where the file can be obtained,
+               http, ftp, fasp, etc... """
+        self.logger.debug("In urls getter.")
+
+        return self._urls
+
+    @staticmethod
+    def required_fields():
+        """
+        A static method. The required fields for the class.
+
+        Args:
+            None
+        Returns:
+            Tuple of strings of the required properties.
+        """
+        module_logger.debug("In required fields.")
+        return ("assembler", "assembly_name", "checksums", "comment",
+                "format", "format_doc", "sequence_type", "size",
+                "study", "tags", "urls", "local_file")
+
+    def _get_raw_doc(self):
+        """
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
+
+        Args:
+            None
+
+        Returns:
+            An object representation of the JSON document.
+        """
+        self.logger.debug("In _get_raw_doc.")
+
+        assembled_doc = {
+            'acl': {
+                'read': [ 'all' ],
+                'write': [ WgsAssembledSeqSet.namespace ]
+            },
+            'linkage': self._links,
+            'ns': WgsAssembledSeqSet.namespace,
+            'node_type': 'wgs_assembled_seq_set',
+            'meta': {
+                "assembler": self._assembler,
+                "assembly_name": self._assembly_name,
+                "checksums": self._checksums,
+                "comment": self._comment,
+                "format": self._format,
+                "format_doc": self._format_doc,
+                "sequence_type": self.sequence_type,
+                "size": self._size,
+                "study": self._study,
+                "urls": self._urls,
+                "subtype": self._study,
+                'tags': self._tags
+            }
+        }
+
+        if self._id is not None:
+           self.logger.debug(__name__ + " object has the OSDF id set.")
+           assembled_doc['id'] = self._id
+
+        if self._version is not None:
+           self.logger.debug(__name__ + " object has the OSDF version set.")
+           assembled_doc['ver'] = self._version
+
+        # Handle optional properties
+        if self._date is not None:
+           self.logger.debug(__name__ + " object has the date set.")
+           assembled_doc['meta']['date'] = self._date
+
+        if self._sop is not None:
+           self.logger.debug(__name__ + " object has the sop set.")
+           assembled_doc['meta']['sop'] = self._sop
+
+        return assembled_doc
+
+    def to_json(self, indent=4):
+        """
+        Converts the raw JSON doc (the dictionary representation)
+        to a printable JSON string.
+
+        Args:
+            indent (int): The indent for each successive line of the JSON string output
+
+        Returns:
+            A printable JSON string
+        """
+        self.logger.debug("In to_json.")
+
+        visit_doc = self._get_raw_doc()
+
+        self.logger.debug("Encoding structure to JSON.")
+
+        json_str = json.dumps(visit_doc, indent=indent)
+
+        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
+
+        return json_str
+
+    @staticmethod
+    def search(query = "\"wgs_assembled_seq_set\"[node_type]"):
+        """
+        Searches the OSDF database through all WgsAssembledSeqSet node types. Any
+        criteria the user wishes to add is provided by the user in the query language
+        specifications provided in the OSDF documentation. A general format
+        is (including the quotes and brackets):
+
+        "search criteria"[field to search]
+
+        If there are any results, they are returned as a WgsAssembledSeqSet instance,
+        otherwise an empty list will be returned.
+
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         WgsAssembledSeqSet node type.
+
+        Returns:
+            Returns an array of WgsAssembledSeqSet objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
+
+        # Searching without any parameters will return all different results
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+
+        if query != "\"wgs_assembled_seq_set\"[node_type]":
+            query = query + " && \"wgs_assembled_seq_set\"[node_type]"
+
+        wgsAssembledSeqSet_data = session.get_osdf().oql_query(WgsAssembledSeqSet.namespace, query)
+
+        all_results = wgsAssembledSeqSet_data['results']
+
+        result_list = list()
+
+        if len(all_results) > 0:
+            for result in all_results:
+                wgs_result = WgsAssembledSeqSet.load_wgsAssembledSeqSet(result)
+                result_list.append(wgs_result)
+
+        return result_list
+
+    @staticmethod
+    def load_wgsAssembledSeqSet(seq_set_data):
+        """
+        Takes the provided JSON string and converts it to a WgsAssembledSeqSet
+        object
+
+        Args:
+            seq_set_data (str): The JSON string to convert
+
+        Returns:
+            Returns a WgsAssembledSeqSet instance.
+        """
+        module_logger.info("Creating a template " + __name__ + ".")
+        seq_set = WgsAssembledSeqSet()
+
+        module_logger.debug("Filling in " + __name__ + " details.")
+
+        # The attributes commmon to all iHMP nodes
+        seq_set._set_id(seq_set_data['id'])
+        seq_set._version = seq_set_data['ver']
+        seq_set._links = seq_set_data['linkage']
+
+        # The attributes that are particular to WgsAssembledSeqSet documents
+        seq_set._checksums = seq_set_data['meta']['checksums']
+        seq_set._comment = seq_set_data['meta']['comment']
+        seq_set._exp_length = seq_set_data['meta']['exp_length']
+        seq_set._format = seq_set_data['meta']['format']
+        seq_set._format_doc = seq_set_data['meta']['format_doc']
+        seq_set._seq_model = seq_set_data['meta']['seq_model']
+        seq_set._size = seq_set_data['meta']['size']
+        seq_set._urls = seq_set_data['meta']['urls']
+        seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
+
+        if 'sequence_type' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'sequence_type' present.")
+            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+
+        module_logger.debug("Returning loaded " + __name__)
+
+        return seq_set
+
+    @staticmethod
+    def load(seq_set_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+
+        Args:
+            seq_set_id (str): The OSDF ID for the document to load.
+
+        Returns:
+            A WgsAssembledSeqSet object with all the available OSDF data loaded into it.
+        """
+        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+
+        seq_set_data = session.get_osdf().get_node(seq_set_id)
+
+        module_logger.info("Creating a template " + __name__ + ".")
+        seq_set = WgsAssembledSeqSet()
+
+        module_logger.debug("Filling in " + __name__ + " details.")
+
+        # The attributes commmon to all iHMP nodes
+        seq_set._set_id(seq_set_data['id'])
+        seq_set._version = seq_set_data['ver']
+        seq_set._links = seq_set_data['linkage']
+
+        # The attributes that are particular to WgsAssembledSeqSet documents
+        seq_set._checksums = seq_set_data['meta']['checksums']
+        seq_set._comment = seq_set_data['meta']['comment']
+        seq_set._exp_length = seq_set_data['meta']['exp_length']
+        seq_set._format = seq_set_data['meta']['format']
+        seq_set._format_doc = seq_set_data['meta']['format_doc']
+        seq_set._seq_model = seq_set_data['meta']['seq_model']
+        seq_set._size = seq_set_data['meta']['size']
+        seq_set._urls = seq_set_data['meta']['urls']
+        seq_set._tags = seq_set_data['meta']['tags']
+        seq_set._study = seq_set_data['meta']['study']
+
+        # Optional properties
+        if 'date' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'date' present.")
+            seq_set._date = seq_set_data['meta']['date']
+
+        if 'sop' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'sop' present.")
+            seq_set._sop = seq_set_data['meta']['sop']
+
+        module_logger.debug("Returning loaded " + __name__)
+
+        return seq_set
 
     def validate(self):
         """
@@ -92,8 +621,8 @@ class WgsRawSeqSet(Base):
         elif not os.path.isfile(self._local_file):
             problems.append("Local file does not point to an actual file.")
 
-        if 'sequenced_from' not in self._links.keys():
-            problems.append("Must add a 'sequenced_from' link to a wgs_dna_prep.")
+        if 'computed_from' not in self._links.keys():
+            problems.append("Must add a 'computed_from' link to a wgs_dna_prep.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
 
@@ -129,508 +658,13 @@ class WgsRawSeqSet(Base):
             self.logger.error("Local file does not point to an actual file.")
             valid = False
 
-        if 'sequenced_from' not in self._links.keys():
-            self.logger.error("Must have of 'sequenced_from' linkage.")
+        if 'computed_from' not in self._links.keys():
+            self.logger.error("Must have of 'computed_from' linkage.")
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
 
         return valid
-
-    @property
-    def checksums(self):
-        """ str: One or more checksums used to ensure file integrity. """
-        self.logger.debug("In 'checksums' getter.")
-
-        return self._checksums
-
-    @checksums.setter
-    @enforce_dict
-    def checksums(self, checksums):
-        """
-        The setter for the WgsRawSeqSet checksums.
-
-        Args:
-            checksums (dict): The checksums for the WgsRawSeqSet.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'checksums' setter.")
-
-        if 'md5' not in checksums:
-            raise ValueError("Checksum data must contain at least the 'md5' value")
-
-        self._checksums = checksums
-
-    @property
-    def comment(self):
-        """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
-
-        return self._comment
-
-    @comment.setter
-    @enforce_string
-    def comment(self, comment):
-        """
-        The setter for the WgsRawSeqSet comment. The comment must be a string,
-        and less than 512 characters.
-
-        Args:
-            comment (str): The new comment to add to the string.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'comment' setter.")
-
-        if len(comment) > 512:
-            raise Exception("Comment is too long. Max length is 512 characters.")
-
-        self._comment = comment
-
-    @property
-    def exp_length(self):
-        """ int: The number of raw bases or color space calls expected for the read,
-                 includes both mate pairs and all technical portions. """
-        self.logger.debug("In 'exp_length' getter.")
-
-        return self._exp_length
-
-    @exp_length.setter
-    @enforce_int
-    def exp_length(self, exp_length):
-        """
-        The setter for the WgsRawSeqSet exp length.
-
-        Args:
-            exp_length (int): The new exp_length for the current instance.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In exp_length setter.")
-        if exp_length < 0:
-            raise ValueError("The 'exp_length' must be non-negative.")
-
-        self._exp_length = exp_length
-
-    @property
-    def format(self):
-        """ str: The file format of the sequence file """
-        self.logger.debug("In 'format' getter.")
-
-        return self._format
-
-    @format.setter
-    @enforce_string
-    def format(self, format_str):
-        """
-        The setter for the WgsRawSeqSet format. This must be either fasta or fastq.
-
-        Args:
-            format_str (str): The new format string for the current object.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'format' setter.")
-
-        formats = ["fasta", "fastq"]
-        if format_str in formats:
-            self._format = format_str
-        else:
-            raise Exception("Format must be either fasta or fastq.")
-
-    @property
-    def format_doc(self):
-        """ str: URL for documentation of file format. """
-        self.logger.debug("In 'format_doc' getter.")
-
-        return self._format_doc
-
-    @format_doc.setter
-    @enforce_string
-    def format_doc(self, format_doc):
-        """
-        The setter for the WgsRawSeqSet format doc.
-
-        Args:
-            format_doc (str): The new format_doc for the current object.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'format_doc' setter.")
-
-        self._format_doc = format_doc
-
-    @property
-    def local_file(self):
-        """ str: URL to the local file to upload to the server. """
-        self.logger.debug("In local_file getter.")
-
-        return self._local_file
-
-    @local_file.setter
-    @enforce_string
-    def local_file(self, local_file):
-        """
-        The setter for the WgsRawSeqSet local file.
-
-        Args:
-            local_file (str): The URL to the local file that should
-                              be uploaded to the server.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In local_file setter.")
-
-        self._local_file = local_file
-
-    @property
-    def seq_model(self):
-        """ str: Sequencing instrument model. """
-        self.logger.debug("In 'seq_model' getter.")
-
-        return self._seq_model
-
-    @seq_model.setter
-    @enforce_string
-    def seq_model(self, seq_model):
-        """
-        The setter for the WgsRawSeqSet seq model.
-
-        Args:
-            seq_model (str): The new seq model.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'seq_model' setter.")
-
-        self._seq_model = seq_model
-
-    @property
-    def sequence_type(self):
-        """
-        str: Specifies whether the file contains peptide or nucleotide data.
-        """
-        self.logger.debug("In 'sequence_type' getter.")
-
-        return self._sequence_type
-
-    @sequence_type.setter
-    @enforce_string
-    def sequence_type(self, sequence_type):
-        """
-        The setter for the WgsRawSeqSet sequence type. This must be either
-        peptide or nucleotide.
-
-        Args:
-            sequence_type (str): The new sequence type.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'sequence_type' setter.")
-
-        types = ["peptide", "nucleotide"]
-        if sequence_type in types:
-            self._sequence_type = sequence_type
-        else:
-            raise Exception("Sequence type must be either peptide or nucleotide")
-
-    @property
-    def size(self):
-        """
-        int: The size of the file in bytes.
-        """
-        self.logger.debug("In 'size' getter.")
-
-        return self._size
-
-    @size.setter
-    @enforce_int
-    def size(self, size):
-        """
-        The setter for the WgsRawSeqSet size.
-
-        Args:
-            size (int): The size of the seq set in bytes.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'size' setter.")
-
-        if size < 0:
-            raise ValueError("The size must be non-negative.")
-
-        self._size = size
-
-    @property
-    def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
-        self.logger.debug("In 'study' getter.")
-
-        return self._study
-
-    @study.setter
-    @enforce_string
-    def study(self, study):
-        """
-        The setter for the WgsRawSeqSet study. This is restricted to be either
-        preg_preterm, ibd, or prediabetes.
-
-        Args:
-            study (str): The study of the seq set.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'study' setter.")
-
-        studies = ["preg_preterm", "ibd", "prediabetes"]
-
-        if study in studies:
-            self._study = study
-        else:
-            raise Exception("Not a valid study")
-
-    @property
-    def urls(self):
-        """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """
-        self.logger.debug("In urls getter.")
-
-        return self._urls
-
-    @staticmethod
-    def required_fields():
-        """
-        A static method. The required fields for the class.
-
-        Args:
-            None
-        Returns:
-            None
-        """
-        module_logger.debug("In required fields.")
-        return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "local_file", "seq_model", "size", "study", "tags", "urls")
-
-    def _get_raw_doc(self):
-        """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
-
-        Args:
-            None
-
-        Returns:
-            A dictionary representation of the JSON document.
-        """
-        self.logger.debug("In _get_raw_doc.")
-
-        sixteen_s_doc = {
-            'acl': {
-                'read': [ 'all' ],
-                'write': [ WgsRawSeqSet.namespace ]
-            },
-            'linkage': self._links,
-            'ns': WgsRawSeqSet.namespace,
-            'node_type': 'wgs_raw_seq_set',
-            'meta': {
-                "checksums": self._checksums,
-                "comment": self._comment,
-                "exp_length": self._exp_length,
-                "format": self._format,
-                "format_doc": self._format_doc,
-                "seq_model": self.seq_model,
-                "size": self._size,
-                "study": self._study,
-                "urls": self._urls,
-                "subtype": "wgs",
-                'tags': self._tags
-            }
-        }
-
-        if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           sixteen_s_doc['id'] = self._id
-
-        if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           sixteen_s_doc['ver'] = self._version
-
-        if self._sequence_type is not None:
-           self.logger.debug(__name__ + " object has the sequence_type set.")
-           sixteen_s_doc['meta']['sequence_type'] = self._sequence_type
-
-        return sixteen_s_doc
-
-    def to_json(self, indent=4):
-        """
-        Converts the raw JSON doc (the dictionary representation)
-        to a printable JSON string.
-
-        Args:
-            indent (int): The indent for each successive line of the JSON string output
-
-        Returns:
-            A printable JSON string
-        """
-        self.logger.debug("In to_json.")
-
-        visit_doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(visit_doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str
-
-    @staticmethod
-    def search(query = "\"wgs_raw_seq_set\"[node_type]"):
-        """
-        Searches the OSDF database through all WgsRawSeqSet node types. Any
-        criteria the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
-
-        "search criteria"[field to search]
-
-        If there are any results, they are returned as a WgsRawSeqSet instance,
-        otherwise an empty list will be returned.
-
-        Args:
-            query (str): The query for the OSDF framework. Defaults to the
-                         WgsRawSeqSet node type.
-
-        Returns:
-            Returns an array of WgsRawSeqSet objects. It returns an empty list if
-            there are no results.
-        """
-        module_logger.debug("In search.")
-        # Searching without any parameters will return all different results
-        session = iHMPSession.get_session()
-        module_logger.info("Got iHMP session.")
-
-        if query != "\"wgs_raw_seq_set\"[node_type]":
-            query = query + " && \"wgs_raw_seq_set\"[node_type]"
-
-        wgsRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
-
-        all_results = wgsRawSeqSet_data['results']
-
-        result_list = list()
-
-        if len(all_results) > 0:
-            for i in all_results:
-                wgsRawSeqSet_result = WgsRawSeqSet.load_wgsRawSeqSet(i)
-                result_list.append(wgsRawSeqSet_result)
-
-        return result_list
-
-    @staticmethod
-    def load_wgsRawSeqSet(seq_set_data):
-        """
-        Takes the provided JSON string and converts it to a WgsRawSeqSet
-        object
-
-        Args:
-            seq_set_data (str): The JSON string to convert
-
-        Returns:
-            Returns a WgsRawSeqSet instance.
-        """
-        module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsRawSeqSet()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-
-        # The attributes commmon to all iHMP nodes
-        seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
-
-        # The attributes that are particular to WgsRawSeqSet documents
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
-
-        if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
-
-        module_logger.debug("Returning loaded " + __name__)
-
-        return seq_set
-
-    @staticmethod
-    def load(seq_set_id):
-        """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
-
-        Args:
-            seq_set_id (str): The OSDF ID for the document to load.
-
-        Returns:
-            A WgsRawSeqSet object with all the available OSDF data loaded into it.
-        """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
-
-        session = iHMPSession.get_session()
-        module_logger.info("Got iHMP session.")
-
-        seq_set_data = session.get_osdf().get_node(seq_set_id)
-
-        module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsRawSeqSet()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-
-        # The attributes commmon to all iHMP nodes
-        seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
-
-        # The attributes that are particular to WgsRawSeqSet documents
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
-
-        if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
-
-        module_logger.debug("Returning loaded " + __name__)
-
-        return seq_set
 
     def save(self):
         """
@@ -679,11 +713,11 @@ class WgsRawSeqSet(Base):
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
-                                "raw", remote_base])
+                                "hmasm", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         # Upload the file to the iHMP aspera server
-        upload_result = aspera.upload_file(WgsRawSeqSet.aspera_server,
+        upload_result = aspera.upload_file(WgsAssembledSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
@@ -693,11 +727,10 @@ class WgsRawSeqSet(Base):
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return False
         else:
-            self._urls = [ "fasp://" + WgsRawSeqSet.aspera_server + remote_path ]
-
+            self._urls = [ "fasp://" + WgsAssembledSeqSet.aspera_server + remote_path ]
 
         if self.id is None:
-            # The document has not yet been saved
+            # The document has not yet been save
             seq_set_data = self._get_raw_doc()
             self.logger.info("Got the raw JSON document.")
 

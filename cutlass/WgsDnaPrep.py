@@ -8,6 +8,7 @@ from iHMPSession import iHMPSession
 from mims import MIMS, MimsException
 from Base import Base
 from WgsRawSeqSet import WgsRawSeqSet
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -121,12 +122,15 @@ class WgsDnaPrep(Base):
 
     @property
     def comment(self):
-        """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
+        """
+        str: Free-text comment.
+        """
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the WgsRawSeqSet comment. The comment must be a string,
@@ -139,8 +143,6 @@ class WgsDnaPrep(Base):
             None
         """
         self.logger.debug("In comment setter.")
-        if type(comment) != str:
-            raise ValueError("Invalid comment, must be a string.")
 
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
@@ -155,6 +157,7 @@ class WgsDnaPrep(Base):
         return self._frag_size
 
     @frag_size.setter
+    @enforce_int
     def frag_size(self, frag_size):
         """
         The setter for the WgsDnaPrep fragment size. The size must be an
@@ -168,9 +171,6 @@ class WgsDnaPrep(Base):
         """
         self.logger.debug("In frag_size setter.")
 
-        if type(frag_size) != int:
-            raise ValueError("Invalid comment, must be a string.")
-
         if frag_size < 0:
             raise ValueError("Invalid frag_size. Must be non-negative.")
 
@@ -180,14 +180,15 @@ class WgsDnaPrep(Base):
     def lib_layout(self):
         """ str: Specification of the layout: fragment/paired, and if paired,
                  then nominal insert size and standard deviation. """
-        self.logger.debug("In lib_layout getter.")
+        self.logger.debug("In 'lib_layout' getter.")
 
         return self._lib_layout
 
     @lib_layout.setter
+    @enforce_string
     def lib_layout(self, lib_layout):
         """
-        The setter for the WgsDnaPrep lib layout.
+        The setter for the lib layout.
 
         Args:
             lib_layout (str): The new lib layout.
@@ -195,7 +196,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In lib_layout setter.")
+        self.logger.debug("In 'lib_layout' setter.")
 
         self._lib_layout = lib_layout
 
@@ -203,12 +204,14 @@ class WgsDnaPrep(Base):
     def lib_selection(self):
         """ str: A controlled vocabulary of terms describing selection or reduction
                  method used in library construction. Terms used by TCGA include
-                 (random, hybrid selection) """
-        self.logger.debug("In lib_selection getter.")
+                 (random, hybrid selection)
+        """
+        self.logger.debug("In 'lib_selection' getter.")
 
         return self._lib_selection
 
     @lib_selection.setter
+    @enforce_string
     def lib_selection(self, lib_selection):
         """
         The setter for the WgsDnaPrep lib selection.
@@ -219,7 +222,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In lib_selection setter.")
+        self.logger.debug("In 'lib_selection' setter.")
 
         self._lib_selection = lib_selection
 
@@ -231,13 +234,14 @@ class WgsDnaPrep(Base):
         return self._mims
 
     @mims.setter
+    @enforce_dict
     def mims(self, mims):
         """
-        The setter for the WgsDnaPrep MIMARKS. The provided dictionary
-        must validate based on the MIMARKS class.
+        The setter for the WgsDnaPrep MIMS. The provided dictionary
+        must validate based on the MIMS class.
 
         Args:
-            mimars (dict): The new MIMARKS dictionary.
+            mims (dict): A MIMS dictionary.
 
         Returns:
             None
@@ -255,12 +259,15 @@ class WgsDnaPrep(Base):
 
     @property
     def ncbi_taxon_id(self):
-        """ str: NCBI taxon id. """
-        self.logger.debug("In ncbi_taxon_id getter.")
+        """
+        str: NCBI taxon id.
+        """
+        self.logger.debug("In 'ncbi_taxon_id' getter.")
 
         return self._ncbi_taxon_id
 
     @ncbi_taxon_id.setter
+    @enforce_string
     def ncbi_taxon_id(self, ncbi_taxon_id):
         """
         The setter for the WgsDnaPrep NCBI Taxon ID.
@@ -271,18 +278,19 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In ncbi_taxon_id setter.")
+        self.logger.debug("In 'ncbi_taxon_id' setter.")
 
         self._ncbi_taxon_id = ncbi_taxon_id
 
     @property
     def prep_id(self):
         """ str: Nucleic Acid Prep ID. """
-        self.logger.debug("In prep_id getter.")
+        self.logger.debug("In 'prep_id' getter.")
 
         return self._prep_id
 
     @prep_id.setter
+    @enforce_string
     def prep_id(self, prep_id):
         """
         The setter for the WgsDnaPrep Prep ID.
@@ -293,18 +301,21 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In prep_id setter.")
+        self.logger.debug("In 'prep_id' setter.")
 
         self._prep_id = prep_id
 
     @property
     def sequencing_center(self):
-        """ str: The center responsible for generating the 16S DNA Prep. """
-        self.logger.debug("In sequencing_center getter.")
+        """
+        str: The center responsible for generating the 16S DNA Prep.
+        """
+        self.logger.debug("In 'sequencing_center' getter.")
 
         return self._sequencing_center
 
     @sequencing_center.setter
+    @enforce_string
     def sequencing_center(self, sequencing_center):
         """
         The setter for the WgsDnaPrep sequencing center.
@@ -315,18 +326,19 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequencing_center setter.")
+        self.logger.debug("In 'sequencing_center' setter.")
 
         self._sequencing_center = sequencing_center
 
     @property
     def sequencing_contact(self):
         """ str: Name and email of the primary contact at the sequencing center. """
-        self.logger.debug("In sequencing_contact getter.")
+        self.logger.debug("In 'sequencing_contact' getter.")
 
         return self._sequencing_contact
 
     @sequencing_contact.setter
+    @enforce_string
     def sequencing_contact(self, sequencing_contact):
         """
         The setter for the WgsDnaPrep sequencing_contact.
@@ -337,18 +349,19 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequencing_contact setter.")
+        self.logger.debug("In 'sequencing_contact' setter.")
 
         self._sequencing_contact = sequencing_contact
 
     @property
     def storage_duration(self):
         """ int: Duration for which sample was stored in days. """
-        self.logger.debug("In storage_duration getter.")
+        self.logger.debug("In 'storage_duration' getter.")
 
         return self._storage_duration
 
     @storage_duration.setter
+    @enforce_int
     def storage_duration(self, storage_duration):
         """
         The setter for the WgsDnaPrep storage duration. The duration must
@@ -360,10 +373,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In storage_duration setter.")
-
-        if type(storage_duration) != int:
-            raise ValueError("Invalid storage duration, must be a integer.")
+        self.logger.debug("In 'storage_duration' setter.")
 
         if storage_duration < 0:
             raise ValueError("Invalid storage_duration. Must be non-negative.")
@@ -373,11 +383,12 @@ class WgsDnaPrep(Base):
     @property
     def srs_id(self):
         """ str: NCBI Sequence Read Archive sample ID of the form SRS012345. """
-        self.logger.debug("In srs_id getter.")
+        self.logger.debug("In 'srs_id' getter.")
 
         return self._srs_id
 
     @srs_id.setter
+    @enforce_string
     def srs_id(self, srs_id):
         """
         The setter for the WgsDnaPrep SRS ID. The ID must be a string, and
@@ -389,10 +400,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In srs_id setter.")
-
-        if type(srs_id) != str:
-            raise ValueError("Invalid comment, must be a string.")
+        self.logger.debug("In 'srs_id' setter.")
 
         if len(srs_id) < 3:
             raise Exception("SRS ID is too short, must be more than 3 characters.")
@@ -677,7 +685,9 @@ class WgsDnaPrep(Base):
         Return iterator of all raw_seq_sets sequenced from this prep.
         """
         linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
+
         query = iHMPSession.get_session().get_osdf().oql_query
+
         for page_no in count(1):
             res = query(WgsDnaPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
@@ -689,5 +699,3 @@ class WgsDnaPrep(Base):
 
             if res_count < 1:
                 break
-
-

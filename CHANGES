@@ -1,3 +1,51 @@
+cutlass 0.15
+
+ * Made date optional in the Visit class.
+ * sampleAttributes() to return iterator in Sample.
+ * Fixed broken decorator in iHMPSession.
+
+ - Victor <victor73@github.com>  Thu, 21 Apr 2016 12:00:00 -0400
+
+cutlass 0.14
+
+ * Added python version check.
+ * Using ascp exit value to check for aspera transfer success.
+ * Fixed Annotation save() and local file upload.
+ * New decorator for date checking.
+
+ - Victor <victor73@github.com>  Thu, 21 Apr 2016 12:00:00 -0400
+
+cutlass 0.13
+
+ * New class for AbundanceMatrix and new tests.
+ * Corrections to method documentation.
+ * Using decorators for type checking.
+
+ - Victor <victor73@github.com>  Tue, 12 Apr 2016 12:00:00 -0400
+
+cutlass 0.12
+
+ * Added several new classes, including WgsAssembledSeqSet,
+   Proteome, HostAssayPrep, and MicrobiomeAssayPrep.
+ * Added several new example scripts for the new objects.
+ * Improved type checking of the linkages in the base class.
+
+ - Victor <victor73@github.com>  Mon, 22 Feb 2016 12:00:00 -0400
+
+cutlass 0.11
+
+ * Ensuring dates specified on the Visit class do not happen in the
+   future.
+
+ - Victor <victor73@github.com>  Sun, 14 Feb 2016 12:00:00 -0400
+
+cutlass 0.10
+
+ * Sample supports optional name property.
+ * Update to test for the Sample class.
+
+ - Victor <victor73@github.com>  Wed, 10 Feb 2016 12:00:00 -0400
+
 cutlass 0.9
 
  * Some documentation fixes.

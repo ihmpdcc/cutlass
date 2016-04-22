@@ -8,6 +8,7 @@ from iHMPSession import iHMPSession
 from mimarks import MIMARKS, MimarksException
 from Base import Base
 from SixteenSRawSeqSet import SixteenSRawSeqSet
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -124,11 +125,12 @@ class SixteenSDnaPrep(Base):
     @property
     def comment(self):
         """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the WgsRawSeqSet comment. The comment must be a string,
@@ -141,9 +143,6 @@ class SixteenSDnaPrep(Base):
             None
         """
         self.logger.debug("In comment setter.")
-
-        if type(comment) != str:
-            raise ValueError("Invalid comment, must be a string.")
 
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
@@ -158,6 +157,7 @@ class SixteenSDnaPrep(Base):
         return self._frag_size
 
     @frag_size.setter
+    @enforce_int
     def frag_size(self, frag_size):
         """
         The setter for the SixteenSDnaPrep fragment size. The size must be an
@@ -170,9 +170,6 @@ class SixteenSDnaPrep(Base):
             None
         """
         self.logger.debug("In frag_size setter.")
-
-        if type(frag_size) != int:
-            raise ValueError("Invalid comment, must be a string.")
 
         if frag_size < 0:
             raise ValueError("Invalid frag_size. Must be non-negative.")
@@ -188,6 +185,7 @@ class SixteenSDnaPrep(Base):
         return self._lib_layout
 
     @lib_layout.setter
+    @enforce_string
     def lib_layout(self, lib_layout):
         """
         The setter for the SixteenSDnaPrep lib layout.
@@ -212,6 +210,7 @@ class SixteenSDnaPrep(Base):
         return self._lib_selection
 
     @lib_selection.setter
+    @enforce_string
     def lib_selection(self, lib_selection):
         """
         The setter for the SixteenSDnaPrep lib selection.
@@ -234,6 +233,7 @@ class SixteenSDnaPrep(Base):
         return self._mimarks
 
     @mimarks.setter
+    @enforce_dict
     def mimarks(self, mimarks):
         """
         The setter for the SixteenSDnaPrep MIMARKS. The provided dictionary
@@ -264,6 +264,7 @@ class SixteenSDnaPrep(Base):
         return self._ncbi_taxon_id
 
     @ncbi_taxon_id.setter
+    @enforce_string
     def ncbi_taxon_id(self, ncbi_taxon_id):
         """
         The setter for the SixteenSDnaPrep NCBI Taxon ID.
@@ -286,6 +287,7 @@ class SixteenSDnaPrep(Base):
         return self._prep_id
 
     @prep_id.setter
+    @enforce_string
     def prep_id(self, prep_id):
         """
         The setter for the SixteenSDnaPrep Prep ID.
@@ -308,6 +310,7 @@ class SixteenSDnaPrep(Base):
         return self._srs_id
 
     @srs_id.setter
+    @enforce_string
     def srs_id(self, srs_id):
         """
         The setter for the SixteenSDnaPrep SRS ID. The ID must be a string, and
@@ -321,9 +324,6 @@ class SixteenSDnaPrep(Base):
         """
         self.logger.debug("In srs_id setter.")
 
-        if type(srs_id) != str:
-            raise ValueError("Invalid comment, must be a string.")
-
         if len(srs_id) < 3:
             raise Exception("SRS ID is too short, must be more than 3 characters.")
 
@@ -331,12 +331,15 @@ class SixteenSDnaPrep(Base):
 
     @property
     def sequencing_center(self):
-        """ str: The center responsible for generating the 16S DNA Prep. """
-        self.logger.debug("In sequencing_center getter.")
+        """
+        str: The center responsible for generating the 16S DNA Prep.
+        """
+        self.logger.debug("In 'sequencing_center' getter.")
 
         return self._sequencing_center
 
     @sequencing_center.setter
+    @enforce_string
     def sequencing_center(self, sequencing_center):
         """
         The setter for the SixteenSDnaPrep sequencing center.
@@ -347,7 +350,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequencing_center setter.")
+        self.logger.debug("In 'sequencing_center' setter.")
 
         self._sequencing_center = sequencing_center
 
@@ -359,6 +362,7 @@ class SixteenSDnaPrep(Base):
         return self._sequencing_contact
 
     @sequencing_contact.setter
+    @enforce_string
     def sequencing_contact(self, sequencing_contact):
         """
         The setter for the SixteenSDnaPrep sequencing_contact.
@@ -381,6 +385,7 @@ class SixteenSDnaPrep(Base):
         return self._storage_duration
 
     @storage_duration.setter
+    @enforce_int
     def storage_duration(self, storage_duration):
         """
         The setter for the SixteenSDnaPrep storage duration. The duration must
@@ -393,9 +398,6 @@ class SixteenSDnaPrep(Base):
             None
         """
         self.logger.debug("In storage_duration setter.")
-
-        if type(storage_duration) != int:
-            raise ValueError("Invalid storage duration, must be a integer.")
 
         if storage_duration < 0:
             raise ValueError("Invalid storage_duration. Must be non-negative.")

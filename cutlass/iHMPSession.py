@@ -2,8 +2,12 @@
 
 from osdf import OSDF
 import logging
+import importlib
+from Util import *
 
 class iHMPSession(object):
+    check_python_version(name="Cutlass")
+
     """
     The iHMP Session class. This class allows you to connect with an OSDF instance and
     begin analysis of iHMP data. It produces skeletons of all objects in the iHMP OSDF
@@ -38,6 +42,58 @@ class iHMPSession(object):
         if iHMPSession._single is None:
             iHMPSession._single = self
 
+    def _get_cutlass_instance(self, name):
+        self.logger.debug("In _get_cutlass_instance.")
+
+        classes = { "abundance_matrix"      : "AbundanceMatrix",
+                    "annotation"            : "Annotation",
+                    "project"               : "Project",
+                    "proteome"              : "Proteome",
+                    "sample"                : "Sample",
+                    "sample_attr"           : "SampleAttribute",
+                    "subject"               : "Subject",
+                    "study"                 : "Study",
+                    "visit"                 : "Visit",
+                    "microbiome_assay_prep" : "MicrobiomeAssayPrep",
+                    "host_assay_prep"       : "HostAssayPrep",
+                    "16s_dna_prep"          : "SixteenSDnaPrep",
+                    "16s_raw_seq_set"       : "SixteenSRawSeqSet",
+                    "16s_trimmed_seq_set"   : "SixteenSTrimmedSeqSet",
+                    "wgs_assembled_seq_set" : "WgsAssembledSeqSet",
+                    "wgs_raw_seq_set"       : "WgsRawSeqSet",
+                    "wgs_dna_prep"          : "WgsDnaPrep" }
+
+        className = None
+        valid = False
+
+        if name in classes:
+            valid = True
+            className = classes[name]
+
+        instance = None
+
+        if valid:
+
+            module = importlib.import_module("cutlass", package="cutlass")
+
+            classVar = getattr(module, className)
+            instance = classVar()
+        else:
+            raise TypeError("%s not defined in %s" % (name, self.__class__))
+
+        return instance
+
+    def __getattr__(self, name):
+        if name.startswith("create_"):
+            classLc = name[7:]
+
+        try:
+            instance = self._get_cutlass_instance(classLc)
+        except TypeError:
+            raise AttributeError("%s not defined in %s" % (name, self.__class__))
+
+        return instance
+
     @staticmethod
     def get_session():
         """
@@ -67,160 +123,10 @@ class iHMPSession(object):
         self.logger.debug("In get_osdf.")
         return self._osdf
 
-    def create_project(self):
-        """
-        Returns an empty Project object.
-
-        Args:
-            None
-
-        Returns:
-            A Project object.
-        """
-        self.logger.debug("In create_project.")
-        from Project import Project
-        project = Project()
-        return project
-
-    def create_sample(self):
-        """
-        Returns an empty Sample object.
-
-        Args:
-            None
-
-        Returns:
-            A Sample object.
-        """
-        self.logger.debug("In create_sample.")
-        from Sample import Sample
-        sample = Sample()
-        return sample
-
-    def create_visit(self):
-        """
-        Returns an empty Visit object.
-
-        Args:
-            None
-
-        Returns:
-            A Visit object.
-        """
-        self.logger.debug("In create_visit.")
-        from Visit import Visit
-        visit = Visit()
-        return visit
-
-    def create_subject(self):
-        """
-        Returns an empty Subject object.
-
-        Args:
-            None
-
-        Returns:
-            A Subject object.
-        """
-        self.logger.debug("In create_subject.")
-        from Subject import Subject
-        subject = Subject()
-        return subject
-
-    def create_study(self):
-        """
-        Returns an empty Study object.
-
-        Args:
-            None
-
-        Returns:
-            A Study object.
-        """
-        self.logger.debug("In create_study.")
-        from Study import Study
-        study = Study()
-        return study
-
-    def create_16s_dna_prep(self):
-        """
-        Returns an empty 16S DNA Prep object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S DNA Prep object.
-        """
-        self.logger.debug("In create_16s_dna_prep.")
-        from SixteenSDnaPrep import SixteenSDnaPrep
-        prep = SixteenSDnaPrep()
-        return prep
-
-    def create_16s_raw_seq_set(self):
-        """
-        Returns an empty 16S Raw Sequence Set object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S Raw Sequence Set object.
-        """
-        self.logger.debug("In create_16s_raw_seq_set.")
-        from SixteenSRawSeqSet import SixteenSRawSeqSet
-        seq_set = SixteenSRawSeqSet()
-        return seq_set
-
-    def create_16s_trimmed_seq_set(self):
-        """
-        Returns an empty 16S Trimmed Sequence Set object.
-
-        Args:
-            None
-
-        Returns:
-            A 16S Trimmed Sequence Set object.
-        """
-        self.logger.debug("In create_16s_trimmed_seq_set.")
-        from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
-        seq_set = SixteenSTrimmedSeqSet()
-        return seq_set
-
-    def create_wgs_raw_seq_set(self):
-        """
-        Returns an empty WGS Raw Seq Set object.
-
-        Args:
-            None
-
-        Returns:
-            A WGS Raw Sequence Set object.
-        """
-        self.logger.debug("In create_wgs_raw_seq_set.")
-        from WgsRawSeqSet import WgsRawSeqSet
-        wgs_raw_seq_set = WgsRawSeqSet()
-        return wgs_raw_seq_set
-
-    def create_wgs_dna_prep(self):
-        """
-        Returns an empty WGS DNA Prep object.
-
-        Args:
-            None
-
-        Returns:
-            A WGS Dna Prep object.
-        """
-        self.logger.debug("In create_16s_trimmed_seq_set.")
-        from WgsDnaPrep import WgsDnaPrep
-        wgs_dna_prep = WgsDnaPrep()
-        return wgs_dna_prep
-
     def create_object(self, node_type):
         """
-        Returns an empty object of the node_type provided. It must be a valid object,
-        or else an exception is raised.
+        Returns an empty object of the node_type provided. It must be a
+        valid object, or else an exception is raised.
 
         Args:
             node_type (str): The type of object desired.
@@ -230,59 +136,25 @@ class iHMPSession(object):
         """
         self.logger.debug("In create_object. Type: %s" % node_type)
 
-        node = None
-        if node_type == "project":
-            from Project import Project
-            self.logger.debug("Creating a Project.")
-            node = Project()
-        elif node_type == "visit":
-            from Visit import Visit
-            self.logger.debug("Creating a Visit.")
-            node = Visit()
-        elif node_type == "subject":
-            from Subject import Subject
-            self.logger.debug("Creating a Subject.")
-            node = Subject()
-        elif node_type == "sample":
-            from Sample import Sample
-            self.logger.debug("Creating a Sample.")
-            node = Sample()
-        elif node_type == "study":
-            from Study import Study
-            self.logger.debug("Creating a Study.")
-            node = Study()
-        elif node_type == "wgs_dna_prep":
-            from WgsDnaPrep import WgsDnaPrep
-            self.logger.debug("Creating a WgsDnaPrep.")
-            node = WgsDnaPrep()
-        elif node_type == "16s_dna_prep":
-            from SixteenSDnaPrep import SixteenSDnaPrep
-            self.logger.debug("Creating a SixteenSDnaPrep.")
-            node = SixteenSDnaPrep()
-        elif node_type == "16s_raw_seq_set":
-            from SixteenSRawSeqSet import SixteenSRawSeqSet
-            self.logger.debug("Creating a SixteenSRawSeqSet.")
-            node = SixteenSRawSeqSet()
-        elif node_type == "wgs_raw_seq_set":
-            from WgsRawSeqSet import WgsRawSeqSet
-            self.logger.debug("Creating a WgsRawSeqSet.")
-            node = WgsRawSeqSet()
-        elif node_type == "16s_trimmed_seq_set":
-            from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
-            self.logger.debug("Creating a SixteenSTrimmedSeqSet.")
-            node = SixteenSTrimmedSeqSet()
-        else:
-            raise ValueError("Invalid node type specified: %" % node_type)
+        instance = None
 
-        return node
+        try:
+            instance = self._get_cutlass_instance(node_type)
+        except TypeError:
+            raise ValueError("Invalid node type specified: %s" % node_type)
+
+        return instance
 
     @property
     def password(self):
-        """ str: The password provided by the user for the OSDF instance. """
-        self.logger.debug("In password getter.")
+        """
+        str: The password provided by the user for the OSDF instance.
+        """
+        self.logger.debug("In 'password' getter.")
         return self._password
 
     @password.setter
+    @enforce_string
     def password(self, password):
         """
         The password setter
@@ -302,10 +174,11 @@ class iHMPSession(object):
     @property
     def port(self):
         """ int: The port for access to the OSDF instance on the server. """
-        self.logger.debug("In port getter.")
+        self.logger.debug("In 'port' getter.")
         return self._port
 
     @port.setter
+    @enforce_int
     def port(self, port):
         """
         The port setter
@@ -316,7 +189,7 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In port setter.")
+        self.logger.debug("In 'port' setter.")
         self._port = port
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the port in the OSDF client.")
@@ -324,11 +197,14 @@ class iHMPSession(object):
 
     @property
     def server(self):
-        """ str: The server domain name that contains the live OSDF instance. """
-        self.logger.debug("In server getter.")
+        """
+        str: The server domain name that contains the live OSDF instance.
+        """
+        self.logger.debug("In 'server' getter.")
         return self._server
 
     @server.setter
+    @enforce_string
     def server(self, server):
         """
         The server setter
@@ -339,7 +215,7 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In server setter.")
+        self.logger.debug("In 'server' setter.")
         self._server = server
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the server in the OSDF client.")
@@ -347,11 +223,14 @@ class iHMPSession(object):
 
     @property
     def username(self):
-        """ str: The username for acces to the OSDF server. """
-        self.logger.debug("In username getter.")
+        """
+        str: The username for acces to the OSDF server.
+        """
+        self.logger.debug("In 'username' getter.")
         return self._username
 
     @username.setter
+    @enforce_string
     def username(self, username):
         """
         The username setter
@@ -362,8 +241,9 @@ class iHMPSession(object):
         Returns:
             None
         """
-        self.logger.debug("In username setter.")
+        self.logger.debug("In 'username' setter.")
         self._username = username
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the username in the OSDF client.")
         self._osdf.username = username

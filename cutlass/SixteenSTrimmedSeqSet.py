@@ -2,11 +2,12 @@
 
 import json
 import logging
-import string
 import os
+import string
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -133,6 +134,7 @@ class SixteenSTrimmedSeqSet(Base):
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the SixteenSTrimmedSeqSet checksums.
@@ -152,12 +154,15 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def comment(self):
-        """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
+        """
+        str: Free-text comment.
+        """
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
     @comment.setter
+    @enforce_string
     def comment(self, comment):
         """
         The setter for the SixteenSTrimmedSeqSet comment. The comment must be a string,
@@ -169,10 +174,7 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
-
-        if type(comment) != str:
-            raise ValueError("comment must be a string.")
+        self.logger.debug("In 'comment' setter.")
 
         if len(comment) > 512:
             raise Exception("Comment is too long, must be less than 512 characters.")
@@ -182,11 +184,12 @@ class SixteenSTrimmedSeqSet(Base):
     @property
     def format(self):
         """ str: The file format of the sequence file """
-        self.logger.debug("In format getter.")
+        self.logger.debug("In 'format' getter.")
 
         return self._format
 
     @format.setter
+    @enforce_string
     def format(self, format_str):
         """
         The setter for the SixteenSTrimmedSeqSet format. This must be either
@@ -198,10 +201,7 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
-
-        if type(format_str) != str:
-            raise ValueError("format must be a string.")
+        self.logger.debug("In 'format' setter.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
@@ -211,12 +211,15 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def format_doc(self):
-        """ str: URL for documentation of file format. """
-        self.logger.debug("In format_doc getter.")
+        """
+        str: URL for documentation of file format.
+        """
+        self.logger.debug("In 'format_doc' getter.")
 
         return self._format_doc
 
     @format_doc.setter
+    @enforce_string
     def format_doc(self, format_doc):
         """
         The setter for the SixteenSTrimmedSeqSet format doc.
@@ -227,51 +230,47 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format_doc setter.")
-
-        if type(format_doc) != str:
-            raise ValueError("format_doc must be a string.")
+        self.logger.debug("In 'format_doc' setter.")
 
         self._format_doc = format_doc
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """
-        self.logger.debug("In local_file getter.")
+        """ str: Path to the local file to upload to the server. """
+        self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
 
     @local_file.setter
+    @enforce_string
     def local_file(self, local_file):
         """
         The setter for the SixteenSTrimmedSeqSet local file.
 
         Args:
-            local_file (str): The URL to the local file that should be uploaded
+            local_file (str): The path to the local file that should be uploaded
             to the server.
 
         Returns:
             None
         """
-        self.logger.debug("In local_file setter.")
-
-        if type(local_file) != str:
-            raise ValueError("local_file must be a string.")
+        self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
 
     @property
     def sequence_type(self):
         """ str: Specifies whether the file contains peptide or nucleotide data. """
-        self.logger.debug("In sequence_type getter.")
+        self.logger.debug("In 'sequence_type' getter.")
 
         return self._sequence_type
 
     @sequence_type.setter
+    @enforce_string
     def sequence_type(self, sequence_type):
         """
-        The setter for the SixteenSTrimmedSeqSet sequence type. This must be either
-        peptide or nucleotide.
+        The setter for the SixteenSTrimmedSeqSet sequence type. This must be
+        either peptide or nucleotide.
 
         Args:
             sequence_type (str): The new sequence type.
@@ -279,10 +278,7 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequence_type setter.")
-
-        if type(sequence_type) != str:
-            raise ValueError("sequence_type must be a string.")
+        self.logger.debug("In 'sequence_type' setter.")
 
         types = ["peptide", "nucleotide"]
         if sequence_type in types:
@@ -298,9 +294,10 @@ class SixteenSTrimmedSeqSet(Base):
         return self._size
 
     @size.setter
+    @enforce_int
     def size(self, size):
         """
-        The setter for the SixteenSTrimmedSeqSet size.
+        The setter for the SixteenSTrimmedSeqSet size in bytes.
 
         Args:
             size (int): The size of the seq set.
@@ -308,24 +305,27 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In size setter.")
-        if not (type(size) == int and size >= 0):
+        self.logger.debug("In 'size' setter.")
+        if size <= 0:
             raise ValueError("The size must be a non-negative integer.")
 
         self._size = size
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
-        self.logger.debug("In study getter.")
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
+        self.logger.debug("In 'study' getter.")
 
         return self._study
 
     @study.setter
+    @enforce_string
     def study(self, study):
         """
-        The setter for the SixteenSTrimmedSeqSet study. This is restricted to be either
-        preg_preterm, ibd, or prediabetes.
+        The setter for the SixteenSTrimmedSeqSet study. This is restricted to
+        be either preg_preterm, ibd, or prediabetes.
 
         Args:
             study (str): The study of the seq set.
@@ -333,12 +333,9 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
-        studies = ["preg_preterm","ibd","prediabetes"]
-
-        if type(study) != str:
-            raise ValueError("study must be a string.")
+        studies = ["preg_preterm", "ibd", "prediabetes"]
 
         if study in studies:
             self._study = study
@@ -347,9 +344,11 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def urls(self):
-        """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """
-        self.logger.debug("In urls getter.")
+        """
+        array: An array of URL from where the file can be obtained,
+               http, ftp, fasp, etc...
+        """
+        self.logger.debug("In 'urls' getter.")
 
         return self._urls
 
@@ -365,15 +364,15 @@ class SixteenSTrimmedSeqSet(Base):
         """
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "format", "format_doc",
-                "local_file", "size", "study", "tags", "urls")
+                "local_file", "size", "study", "tags")
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -422,23 +421,24 @@ class SixteenSTrimmedSeqSet(Base):
     @staticmethod
     def search(query = "\"16s_trimmed_seq_set\"[node_type]"):
         """
-        Searches the OSDF database through all SixteenSTrimmedSeqSet node types. Any
-        criteria the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
+        Searches the OSDF database through all SixteenSTrimmedSeqSet node
+        types. Any criteria the user wishes to add is provided by the user in
+        the query language specifications provided in the OSDF documentation. A
+        general format is (including the quotes and brackets):
 
         "search criteria"[field to search]
 
-        If there are any results, they are returned as a SixteenSTrimmedSeqSet instance,
-        otherwise an empty list will be returned.
+        If there are any results, they are returned as a SixteenSTrimmedSeqSet
+        instance, otherwise an empty list will be returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          SixteenSTrimmedSeqSet node type.
 
         Returns:
-            Returns an array of SixteenSTrimmedSeqSet objects. It returns an empty list if
-            there are no results.
+            Returns an array of SixteenSTrimmedSeqSet objects. It returns an
+            empty list if there are no results.
+
         """
         module_logger.debug("In search.")
         #searching without any parameters will return all different results
@@ -455,8 +455,8 @@ class SixteenSTrimmedSeqSet(Base):
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                sixteenSTrimmedSeqSet_result = SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(i)
+            for result in all_results:
+                sixteenSTrimmedSeqSet_result = SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(result)
                 result_list.append(sixteenSTrimmedSeqSet_result)
 
         return result_list
@@ -464,7 +464,8 @@ class SixteenSTrimmedSeqSet(Base):
     @staticmethod
     def load_sixteenSTrimmedSeqSet(seq_set_data):
         """
-        Takes the provided JSON string and converts it to a SixteenSTrimmedSeqSet object
+        Takes the provided JSON string and converts it to a
+        SixteenSTrimmedSeqSet object
 
         Args:
             seq_set_data (str): The JSON string to convert
@@ -549,13 +550,13 @@ class SixteenSTrimmedSeqSet(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        OSDF. Also, the version is updated as the data is saved in OSDF.
 
         Args:
             None
@@ -590,7 +591,7 @@ class SixteenSTrimmedSeqSet(Base):
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
-        remote_base = remote_base.replace(' ','_') # No spaces in filenames
+        remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
                                 "hm16str", remote_base])
@@ -606,20 +607,25 @@ class SixteenSTrimmedSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
+            self.logger.error("Experienced an error uploading the sequence " + \
+                              "set. Aborting save.")
             return success
 
         self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
                     (self._local_file, aspera_server))
 
         if self.id is None:
-            # The document has not yet been save
-            seq_set_data = self._get_raw_doc()
+            # The document has not yet been saved
+            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+
+            # Get the JSON form of the data and load it
+            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
+            data = json.loads( self.to_json() )
             self.logger.info("Got the raw JSON document.")
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(seq_set_data)
+                node_id = session.get_osdf().insert_node(data)
                 self.logger.info("Save for " + __name__ + " %s successful." % node_id)
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
@@ -628,20 +634,30 @@ class SixteenSTrimmedSeqSet(Base):
 
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
+                self.logger.exception(e)
+                self.logger.error("An error occurred while saving " + __name__ + ". " + \
                                   "Reason: %s" % e)
         else:
-            seq_set_data = self._get_raw_doc()
+            self.logger.info("%s set already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
+                seq_set_data = self._get_raw_doc()
+                seq_set_id = self._id
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
                 session.get_osdf().edit_node(seq_set_data)
                 self.logger.info("Update for " + __name__ + " %s successful." % self._id)
 
+                seq_set_data = session.get_osdf().get_node(seq_set_id)
+                latest_version = annot_data['ver']
+
+                self._version = latest_version
+                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+                self.logger.exception(e)
+                self.logger.error("An error occurred while updating " + \
+                                  "%s  %s. Reason: %s" % (__name__, self._id, e))
 
         self.logger.debug("Returning " + str(success))
 

@@ -4,7 +4,41 @@ import unittest
 import sys
 
 class ImportTest(unittest.TestCase):
-    def testImportSession(self):
+    def testImportAbundanceMatrix(self):
+        success = False
+        try:
+            from cutlass import AbundanceMatrix
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(AbundanceMatrix is None)
+
+    def testImportAnnotation(self):
+        success = False
+        try:
+            from cutlass import Annotation
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Annotation is None)
+
+    def testImportAspera(self):
+        success = False
+
+        try:
+            from cutlass import aspera
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(aspera is None)
+
+    def testImportIHMPSession(self):
         success = False
         try:
             from cutlass import iHMPSession
@@ -26,6 +60,18 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(Project is None)
+
+    def testImportProteome(self):
+        success = False
+
+        try:
+            from cutlass import Proteome
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Proteome is None)
 
     def testImportStudy(self):
         success = False
@@ -75,6 +121,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSDnaPrep is None)
 
+    def testImportWgsAssembledSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import WgsAssembledSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(WgsAssembledSeqSet is None)
+
     def testImportWgsDnaPrep(self):
         success = False
 
@@ -123,6 +181,30 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSTrimmedSeqSet is None)
 
+    def testImportHostAssayPrep(self):
+        success = False
+
+        try:
+            from cutlass import HostAssayPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostAssayPrep is None)
+
+    def testImportMicrobiomeAssayPrep(self):
+        success = False
+
+        try:
+            from cutlass import MicrobiomeAssayPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(MicrobiomeAssayPrep is None)
+
     def testImportMIMS(self):
         success = False
 
@@ -159,17 +241,29 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(MIXS is None)
 
-    def testImportAspera(self):
+    def testImportSample(self):
         success = False
 
         try:
-            from cutlass import aspera
+            from cutlass import Sample
             success = True
         except:
             pass
 
         self.failUnless(success)
-        self.failIf(aspera is None)
+        self.failIf(Sample is None)
+
+    def testImportSampleAttribute(self):
+        success = False
+
+        try:
+            from cutlass import SampleAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(SampleAttribute is None)
 
 if __name__ == '__main__':
     unittest.main()

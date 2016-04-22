@@ -8,6 +8,8 @@ from mixs import MIXS, MixsException
 from Base import Base
 from WgsDnaPrep import WgsDnaPrep
 from SixteenSDnaPrep import SixteenSDnaPrep
+from SampleAttribute import SampleAttribute
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -43,16 +45,22 @@ class Sample(Base):
 
 	# Unique to sample
         self._body_site = None
-        self._supersite = None
-        self._mixs = None
         self._fma_body_site = None
+        self._mixs = None
+        self._name = None
+        self._supersite = None
 
     @property
     def body_site(self):
-        """ str: Body site from which the sample was obtained. """
+        """
+        str: Body site from which the sample was obtained.
+        """
+        self.logger.debug("In 'body_site' getter.")
+
         return self._body_site
 
     @body_site.setter
+    @enforce_string
     def body_site(self, body_site):
         """
         The setter for the Sample body site.
@@ -63,18 +71,74 @@ class Sample(Base):
         Returns:
             None
         """
-        body_sites = ["anterior_nares", "attached_keratinized_gingiva", "buccal_mucosa", "hard_palate", "left_antecubital_fossa", "left_retroauricular_crease", "mid_vagina", "palatine_tonsils", "posterior_fornix", "right_antecubital_fossa", "right_retroauricular_crease", "saliva", "stool", "subgingival_plaque", "supragingival_plaque", "throat", "tongue_dorsum", "vaginal_introitus", "ileal_pouch", "cervix", "perianal_region", "wall_of_vagina", "oral_cavity", "ileum", "blood", "bone", "cerebrospinal_fluid", "ear", "heart", "liver", "lymph_node", "spinal_cord", "elbow", "knee", "abdomen", "thigh", "leg", "forearm", "volar_forearm", "scalp", "shoulder", "nare", "shin", "back", "foot", "hand", "popliteal_fossa", "antecubital_fossa", "appendix", "ascending_colon", "colon", "conjunctiva", "dental_plaque", "descending_colon", "duodenum", "endometrium", "foregut", "gall_bladder", "gastric_antrum", "gingival_crevices", "gum_margin_of_molar_tooth_on_buccal_side", "gut", "ileal-anal_pouch", "intestinal_tract", "left_arm", "lung_aspirate", "lymph_nodes", "mouth", "nasal", "nasopharynx", "periodontal", "pharyngeal_mucosa", "rectal", "respiratory_tract", "right_arm", "sigmoid_colon", "stomach", "subgingival", "synovial_fluid", "teeth", "terminal_ileum", "transverse_colon", "unknown", "upper_respiratory_tract", "urethra", "urinary_tract", "vaginal", "wound" ]
+
+        self.logger.debug("In 'body_site' setter.")
+
+        body_sites = ["anterior_nares", "attached_keratinized_gingiva",
+            "buccal_mucosa", "hard_palate", "left_antecubital_fossa",
+            "left_retroauricular_crease", "mid_vagina", "palatine_tonsils",
+            "posterior_fornix", "right_antecubital_fossa",
+            "right_retroauricular_crease", "saliva", "stool",
+            "subgingival_plaque", "supragingival_plaque", "throat",
+            "tongue_dorsum", "vaginal_introitus", "ileal_pouch", "cervix",
+            "perianal_region", "wall_of_vagina", "oral_cavity", "ileum",
+            "blood", "bone", "cerebrospinal_fluid", "ear", "heart", "liver",
+            "lymph_node", "spinal_cord", "elbow", "knee", "abdomen", "thigh",
+            "leg", "forearm", "volar_forearm", "scalp", "shoulder", "nare",
+            "shin", "back", "foot", "hand", "popliteal_fossa",
+            "antecubital_fossa", "appendix", "ascending_colon", "colon",
+            "conjunctiva", "dental_plaque", "descending_colon", "duodenum",
+            "endometrium", "foregut", "gall_bladder", "gastric_antrum",
+            "gingival_crevices", "gum_margin_of_molar_tooth_on_buccal_side",
+            "gut", "ileal-anal_pouch", "intestinal_tract", "left_arm",
+            "lung_aspirate", "lymph_nodes", "mouth", "nasal", "nasopharynx",
+            "periodontal", "pharyngeal_mucosa", "rectal", "respiratory_tract",
+            "right_arm", "sigmoid_colon", "stomach", "subgingival",
+            "synovial_fluid", "teeth", "terminal_ileum", "transverse_colon",
+            "unknown", "upper_respiratory_tract", "urethra", "urinary_tract",
+            "vaginal", "wound" ]
+
         if body_site in body_sites:
-            self._body_site= body_site
+            self._body_site = body_site
         else:
-            raise Exception("Body Site provided is not a legal bodysite. Please check allowed bodysites.")
+            raise Exception("Body site provided is not a valid body site.")
+
+    @property
+    def name(self):
+        """
+        An optional descriptive name for the sample.
+        """
+        self.logger.debug("In 'name' getter.")
+
+        return self._name
+
+    @name.setter
+    @enforce_string
+    def name(self, name):
+        """
+        The setter for the optional sample name.
+
+        Args:
+            name (str): The name for the sample.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'name' setter.")
+
+        self._name = name
 
     @property
     def supersite(self):
-        """ Body supersite from which the sample was obtained. """
+        """
+        Body supersite from which the sample was obtained.
+        """
+        self.logger.debug("In 'supersite' getter.")
+
         return self._supersite
 
     @supersite.setter
+    @enforce_string
     def supersite(self, supersite):
         """
         The setter for the Sample super site.
@@ -85,6 +149,8 @@ class Sample(Base):
         Returns:
             None
         """
+        self.logger.debug("In 'supersite' setter.")
+
         supersites = ["airways", "blood", "bone", "brain", "ear", "eye",
                       "gastrointestinal_tract", "heart", "lymph_node",
                       "liver", "lymph_nodes", "oral", "other", "skin",
@@ -92,17 +158,23 @@ class Sample(Base):
         if supersite in supersites:
             self._supersite= supersite
         else:
-            raise Exception("Supersite provided is not a legal supersite. Please check for allowed supersites. ")
+            raise Exception("Supersite provided is not a valid supersite.")
 
     @property
     def fma_body_site(self):
-        """ str: Typically a term from the FMA ontology. """
+        """
+        str: Typically a term from the FMA ontology.
+        """
+        self.logger.debug("In 'fma_body_site' getter.")
+
         return self._fma_body_site
 
     @fma_body_site.setter
+    @enforce_string
     def fma_body_site(self, fma_body_site):
         """
-        The setter for the Sample FMA body site.
+        The setter for the Sample FMA body site, which is typcally a term from
+        the FMA ontology.
 
         Args:
             fma_body_site (str): The new fma body site .
@@ -110,34 +182,34 @@ class Sample(Base):
         Returns:
             None
         """
-        self.logger.debug("In fma_body_site setter.")
+        self.logger.debug("In 'fma_body_site' setter.")
 
-        if type(fma_body_site) != str:
-            raise ValueError("'fma_body_site' must be a string.")
-
-        self._fma_body_site= fma_body_site
+        self._fma_body_site = fma_body_site
 
     @property
     def mixs(self):
-        """ dict: Minimal information of any sequence. """
+        """
+        dict: Minimal information of any sequence.
+        """
         return self._mixs
 
     @mixs.setter
+    @enforce_dict
     def mixs(self, mixs):
         """
         The setter for the Sample MIXS.
 
         Args:
-            mixs (str): The new MIXS.
+            mixs (dict): The new MIXS.
 
         Returns:
             None
         """
         valid_dictionary = MIXS.check_dict(mixs)
 
-        # Validate the incoming MIMARKS data
+        # Validate the incoming MIXS data
         if valid_dictionary:
-            self.logger.debug("MIXS data seems correct.")
+            self.logger.debug("MIXS data seems to be valid.")
             self._mixs = mixs
         else:
             raise MixsException("Invalid MIXS data detected.")
@@ -220,13 +292,13 @@ class Sample(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        OSDF. Also, the version is updated as the data is saved in OSDF.
 
         Args:
             None
@@ -277,9 +349,9 @@ class Sample(Base):
     @staticmethod
     def load(sample_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+        Loads the data for the specified input ID from the OSDF instance to
+        this object. If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             sample_id (str): The OSDF ID for the document to load.
@@ -364,11 +436,11 @@ class Sample(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -406,13 +478,16 @@ class Sample(Base):
             self.logger.debug("Sample object has the body site set.")
             sample_doc['meta']['body_site'] = self._body_site
 
+        if self._name is not None:
+            self.logger.debug("Sample object has the name set.")
+            sample_doc['meta']['name'] = self._name
+
         if self._supersite is not None:
             self.logger.debug("Sample object has the supersite set.")
             sample_doc['meta']['supersite'] = self._supersite
             sample_doc['meta']['subtype'] = self._supersite
 
         return sample_doc
-
 
     def _prep_docs(self):
         linkage_query = '"{}"[linkage.prepared_from]'.format(self.id)
@@ -429,28 +504,48 @@ class Sample(Base):
             if res_count < 1:
                 break
 
+    def _sample_attr_docs(self):
+        linkage_query = '"{}"[linkage.associated_with]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(Sample.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield doc
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def sampleAttributes(self):
+        """
+        Return an iterator of the sample attributes associated with this sample.
+        """
+        for doc in self._sample_attr_docs():
+            if doc['node_type'] == "sample_attr":
+                yield SampleAttribute.load_sample_attr(doc)
 
     def sixteenSDnaPreps(self):
         """
-        Return iterator of all 16S preps prepared from this sample.
+        Return an iterator of the 16S DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "16s_dna_prep":
                 yield SixteenSDnaPrep.load_sixteenSDnaPrep(doc)
 
-
     def wgsDnaPreps(self):
         """
-        Return iterator of all WGS preps prepared from this sample.
+        Return an iterator of the WGS DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "wgs_dna_prep":
                 yield WgsDnaPrep.load_wgsDnaPrep(doc)
 
-
     def dnaPreps(self):
         """
-        Return iterator of all preps prepared from this sample.
+        Return an iterator of all the DNA preps prepared from this sample.
         """
         for doc in self._prep_docs():
             if doc['node_type'] == "16s_dna_prep":

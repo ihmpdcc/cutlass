@@ -91,6 +91,35 @@ class SampleTest(unittest.TestCase):
                 "Property getter for 'body_site' works."
                 )
 
+    def testNameInt(self):
+        sample = session.create_sample()
+        with self.assertRaises(Exception):
+            sample.name = 3
+
+    def testNameList(self):
+        sample = session.create_sample()
+        with self.assertRaises(Exception):
+            sample.name = [ "a", "b", "c" ]
+
+    def testLegalName(self):
+        sample = session.create_sample()
+        success = False
+        name = "test_name"
+
+        try:
+            sample.name = name
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use the body_site setter")
+
+        self.assertEqual(
+                sample.name,
+                name,
+                "Property getter for 'name' works."
+                )
+
     def testIllegalSupersite(self):
         sample = session.create_sample()
 
@@ -150,6 +179,46 @@ class SampleTest(unittest.TestCase):
         self.assertEqual(sample_data['meta']['fma_body_site'],
                          fma_body_site,
                          "'fma_body_site' in JSON had expected value."
+                         )
+
+    def testNameInJson(self):
+        sample = session.create_sample()
+        success = False
+        fma_body_site = "test_fma_body_site"
+        name = "test_name"
+
+        sample.fma_body_site = fma_body_site
+        sample.name = name
+
+        sample_json = None
+
+        try:
+            sample_json = sample.to_json()
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use 'to_json'.")
+        self.assertTrue(sample_json is not None, "to_json() returned data.")
+
+        parse_success = False
+
+        try:
+            sample_data = json.loads(sample_json)
+            parse_success = True
+        except:
+            pass
+
+        self.assertTrue(parse_success,
+                        "to_json() did not throw an exception.")
+        self.assertTrue(sample_data is not None,
+                        "to_json() returned parsable JSON.")
+
+        self.assertTrue('meta' in sample_data, "JSON has 'meta' key in it.")
+
+        self.assertEqual(sample_data['meta']['name'],
+                         name,
+                         "'name' in JSON had expected value."
                          )
 
     def testId(self):

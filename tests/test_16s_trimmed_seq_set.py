@@ -332,7 +332,8 @@ class SixteenSTrimmedSeqSetTest(unittest.TestCase):
         checksums = {"md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
         exp_length = 100
         test_format = "fasta"
-        format_doc = "C:\Jar\\test.fasta"
+        test_format_doc = "http://example.com"
+        local_fasta_file = "test.fasta"
         seq_model = "center for sequencing"
         size = 132
         study = "ibd"
@@ -361,10 +362,10 @@ class SixteenSTrimmedSeqSetTest(unittest.TestCase):
                          "SixteenSTrimmedSeqSet not saved successfully")
 
         sixteenSTrimmedSeqSet.exp_length = exp_length
-        sixteenSTrimmedSeqSet.format_doc = format_doc
+        sixteenSTrimmedSeqSet.format_doc = test_format_doc
         sixteenSTrimmedSeqSet.format = test_format
         sixteenSTrimmedSeqSet.seq_model = seq_model
-        sixteenSTrimmedSeqSet.local_file = format_doc
+        sixteenSTrimmedSeqSet.local_file = local_fasta_file
         sixteenSTrimmedSeqSet.size = size
         sixteenSTrimmedSeqSet.study = study
 
