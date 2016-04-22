@@ -237,28 +237,28 @@ class Visit(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Visit object has the OSDF id set.")
-           visit_doc['id'] = self._id
+            self.logger.debug("Visit object has the OSDF id set.")
+            visit_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Visit object has the OSDF version set.")
-           visit_doc['ver'] = self._version
+            self.logger.debug("Visit object has the OSDF version set.")
+            visit_doc['ver'] = self._version
 
         if self._tags is not None:
             self.logger.debug("Visit object has the OSDF tags set.")
             visit_doc['meta']['tags'] = self._tags
 
         if self._date is not None:
-           self.logger.debug("Visit object has the date set.")
-           visit_doc['meta']['date'] = self._date
+            self.logger.debug("Visit object has the date set.")
+            visit_doc['meta']['date'] = self._date
 
-       if self._clinic_id is not None:
-           self.logger.debug("Visit object has the clinic_id set.")
-           visit_doc['meta']['clinic_id'] = self._clinic_id
+        if self._clinic_id is not None:
+            self.logger.debug("Visit object has the clinic_id set.")
+            visit_doc['meta']['clinic_id'] = self._clinic_id
 
         if self._visit_id is not None:
-           self.logger.debug("Visit object has the visit_id set.")
-           visit_doc['meta']['visit_id'] = self._visit_id
+            self.logger.debug("Visit object has the visit_id set.")
+            visit_doc['meta']['visit_id'] = self._visit_id
 
         return visit_doc
 
