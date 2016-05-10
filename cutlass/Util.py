@@ -8,27 +8,57 @@ DATE_FORMAT = '%Y-%m-%d'
 PYTHON_MIN_VERSION = (2, 7, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)
 
+def enforce_bool(func):
+    def wrapper(self, *args):
+        if type(args[0]) is not bool:
+            raise ValueError("Invalid type provided. Must be a bool.")
+
+        func(self, *args)
+
+    return wrapper
+
 def enforce_dict(func):
-    def wrapper(self, arg):
-        if type(arg) is not dict:
+    def wrapper(self, *args):
+        if type(args[0]) is not dict:
             raise ValueError("Invalid type provided. Must be a dict.")
-        func(self, arg)
+
+        func(self, *args)
+
+    return wrapper
+
+def enforce_float(func):
+    def wrapper(self, *args):
+        if type(args[0]) is not float:
+            raise ValueError("Invalid type provided. Must be a float.")
+
+        func(self, *args)
 
     return wrapper
 
 def enforce_int(func):
-    def wrapper(self, arg):
-        if type(arg) is not int:
+    def wrapper(self, *args):
+        if type(args[0]) is not int:
             raise ValueError("Invalid type provided. Must be an int.")
-        func(self, arg)
+
+        func(self, *args)
+
+    return wrapper
+
+def enforce_list(func):
+    def wrapper(self, *args):
+        if type(args[0]) is not list:
+            raise ValueError("Invalid type provided. Must be a list.")
+
+        func(self, *args)
 
     return wrapper
 
 def enforce_string(func):
-    def wrapper(self, arg):
-        if type(arg) is not str:
+    def wrapper(self, *args):
+        if type(args[0]) is not str:
             raise ValueError("Invalid type provided. Must be a string.")
-        func(self, arg)
+
+        func(self, *args)
 
     return wrapper
 
