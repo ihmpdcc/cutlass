@@ -54,6 +54,7 @@ class iHMPSession(object):
                     "subject"               : "Subject",
                     "study"                 : "Study",
                     "visit"                 : "Visit",
+                    "visit_attr"            : "VisitAttribute",
                     "microbiome_assay_prep" : "MicrobiomeAssayPrep",
                     "host_assay_prep"       : "HostAssayPrep",
                     "16s_dna_prep"          : "SixteenSDnaPrep",
@@ -224,7 +225,7 @@ class iHMPSession(object):
     @property
     def username(self):
         """
-        str: The username for acces to the OSDF server.
+        str: The username for access to the OSDF server.
         """
         self.logger.debug("In 'username' getter.")
         return self._username
