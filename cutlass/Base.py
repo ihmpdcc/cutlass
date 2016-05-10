@@ -69,13 +69,13 @@ class Base(object):
              The version must be of type integer, and must be a number
              greater than 0
         """
-        self.logger.debug("In version getter.")
+        self.logger.debug("In 'version' getter.")
         return self._version
 
     @version.setter
     @enforce_int
     def version(self, version):
-        self.logger.debug("In version setter.")
+        self.logger.debug("In 'version' setter.")
 
         if version <= 0:
             raise ValueError("Invalid version. Must be a postive integer.")
@@ -96,7 +96,7 @@ class Base(object):
     @links.setter
     @enforce_dict
     def links(self, links):
-        self.logger.debug("In links setter.")
+        self.logger.debug("In 'links' setter.")
 
         for (link, node_list) in links.items():
             if (type(link) != str) or (type(node_list) != list):
@@ -111,16 +111,15 @@ class Base(object):
                    all OSDF objects. The tag provided must be of type list. If not,
                    a ValueError is raised indicating the tags must be of type list.
         """
-        self.logger.debug("In tags getter.")
+        self.logger.debug("In 'tags' getter.")
         return self._tags
 
     @tags.setter
+    @enforce_list
     def tags(self, tags):
-        self.logger.debug("In tags setter.")
-        if type(tags) is list:
-            self._tags = tags
-        else:
-           raise ValueError("Tags must be a list.")
+        self.logger.debug("In 'tags' setter.")
+
+        self._tags = tags
 
     def add_tag(self, tag):
         """
@@ -301,10 +300,12 @@ class Base(object):
     def __str__(self):
         _id = "no ID" if not self._id else self._id[-8:]
         name = None
+
         for attr in ("_name", "_rand_subject_id", "_date", "_local_file"):
             if hasattr(self, attr):
                 name = getattr(self, attr)
                 break
+
         if name:
             return "<{} `{}' ({})>".format(self.__class__.__name__, name, _id)
         else:
@@ -313,14 +314,14 @@ class Base(object):
 
     __repr__ = __str__
 
-
     def __hash__(self):
         if not self._id:
-            raise TypeError("unhashable; must have ID: '{}')".format(str(self)))
-        return hash(self._id)
+            raise TypeError("Unhashable; must have ID: '{}')".format(str(self)))
 
+        return hash(self._id)
 
     def __eq__(self, other):
         if self._id and other._id:
             return self._id == other._id
+
         return False
