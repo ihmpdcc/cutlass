@@ -5,6 +5,7 @@ from .Project import Project
 from .Proteome import Proteome
 from .Study import Study
 from .Visit import Visit
+from .VisitAttribute import VisitAttribute
 from .Sample import Sample
 from .SampleAttribute import SampleAttribute
 from .Subject import Subject
