@@ -109,6 +109,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Visit is None)
 
+    def testImportVisitAttribute(self):
+        success = False
+
+        try:
+            from cutlass import VisitAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(VisitAttribute is None)
+
     def testImport16SDnaPrep(self):
         success = False
 

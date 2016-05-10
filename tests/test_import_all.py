@@ -62,6 +62,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportVisit(self):
         self.failIf(Visit is None)
 
+    def testImportVisitAttribute(self):
+        self.failIf(VisitAttribute is None)
+
     def testImportWgsDnaPrep(self):
         self.failIf(WgsDnaPrep is None)
 
