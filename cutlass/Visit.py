@@ -6,6 +6,7 @@ from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from Sample import Sample
+from VisitAttribute import VisitAttribute
 from Util import *
 
 # Create a module logger named after the module
@@ -23,8 +24,6 @@ class Visit(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
-
-    date_format = '%Y-%m-%d'
 
     def __init__(self):
         """
