@@ -197,7 +197,7 @@ class AbundanceMatrix(Base):
         The setter for the type of matrix, e.g. community, functional,
         proteomic, lipidomic, transcriptomic.
         Args:
-            matrix_type (str): 
+            matrix_type (str):
 
         Returns:
             None
@@ -221,7 +221,7 @@ class AbundanceMatrix(Base):
         The setter for the size of the file in bytes.
 
         Args:
-            size (int): 
+            size (int):
 
         Returns:
             None
@@ -498,7 +498,8 @@ class AbundanceMatrix(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                matrix_result = AbundanceMatrix.load_abundance_matrix(result)
+                #matrix_result = AbundanceMatrix.load_abundance_matrix(result)
+                matrix_result = AbundanceMatrix.load(result['id'])
                 result_list.append(matrix_result)
 
         return result_list
@@ -536,7 +537,7 @@ class AbundanceMatrix(Base):
 
         # Optional fields
         if 'sop' in matrix_data['meta']:
-            matrix._sop = annot_data['meta']['sop']
+            matrix._sop = matrix_data['meta']['sop']
 
         module_logger.debug("Returning loaded %s." % __name__)
         return matrix
@@ -560,31 +561,8 @@ class AbundanceMatrix(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         matrix_data = session.get_osdf().get_node(matrix_id)
+        matrix = AbundanceMatrix.load_abundance_matrix(matrix_data)
 
-        module_logger.info("Creating a template %s." % __name__)
-        matrix = AbundanceMatrix()
-
-        module_logger.debug("Filling in %s details." % __name__)
-
-        # Node required fields
-        matrix._set_id(matrix_data['id'])
-        matrix._links = matrix_data['linkage']
-        matrix._version = matrix_data['ver']
-
-        # Required fields
-        matrix._checksums = matrix_data['meta']['checksums']
-        matrix._comment = matrix_data['meta']['comment']
-        matrix._format = matrix_data['meta']['format']
-        matrix._format_doc = matrix_data['meta']['format_doc']
-        matrix._study = matrix_data['meta']['study']
-        matrix._tags = matrix_data['meta']['tags']
-        matrix._urls = matrix_data['meta']['urls']
-
-        # Handle AbundanceMatrix optional properties
-        if 'sop' in matrix_data['meta']:
-            matrix._sop = matrix_data['meta']['sop']
-
-        module_logger.debug("Returning loaded " + __name__ )
         return matrix
 
     def save(self):
@@ -654,11 +632,11 @@ class AbundanceMatrix(Base):
         if matrix_type not in remote_map:
             raise ValueError("Invalid matrix type. No mapping for %s" % matrix_type)
 
-        remote_elements = ["/", study_dir]
-            
+        remote_elements = [study_dir]
+
         remote_elements.extend(remote_map[matrix_type])
         remote_elements.append(remote_base)
-        remote_path = "/".join(remote_elements)
+        remote_path = "/" + "/".join(remote_elements)
 
         self.logger.debug("Remote path for this abundance matrix will be %s." % remote_path)
 
@@ -671,7 +649,7 @@ class AbundanceMatrix(Base):
 
         if not upload_result:
             self.logger.error("Experienced an error uploading the " + \
-                              "sequence set. Aborting save.")
+                              "abundance matrix. Aborting save.")
             return False
         else:
             self._urls = [ "fasp://" + AbundanceMatrix.aspera_server + remote_path ]
