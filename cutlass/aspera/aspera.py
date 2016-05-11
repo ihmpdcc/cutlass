@@ -45,20 +45,23 @@ def get_ascp_version(ascp_command):
     cre = re.compile(r"^.*ascp version (\d[\d\.]+)", re.MULTILINE)
     for match in cre.finditer(retval):
         version = match.groups()[0]
+
     # raise an exception if the expected string couldn't be matched
-    if version == None:
-        raise Exception("Output from ascp command ('" + ascp_command +
-                        " --version') did not contain a recognizable version number.")
+    if version is None:
+        raise Exception("Output from ascp command ('" + ascp_command + \
+                        " --version') did not contain a recognizable " + \
+                        "version number.")
     return version
 
 def check_ascp_version(ascp_command):
     logger.debug("In check_ascp_version.")
 
     # check ascp version, raise error if too low
-    ascp_ver = get_ascp_version(ascp_command)
-
-    if ascp_ver == None:
-        raise Exception("Unable to determine ascp version")
+    try:
+        ascp_ver = get_ascp_version(ascp_command)
+    except:
+        raise Exception("Unable to determine ascp version. Is it installed?")
+        
     if version_cmp(ascp_ver, ASCP_MIN_VERSION) < 0:
         raise Exception("Found ascp version " + ascp_ver + " but " +
                         ASCP_MIN_VERSION + " required")
@@ -86,7 +89,6 @@ def run_ascp(ascp_cmd, password, keyfile=None):
             raise IOError(
                 "Can't use private key. No such file or directory: "+keyfile)
         ascp_cmd = [ascp_cmd[0], "-i", keyfile] + ascp_cmd[1:]
-
 
     try:
         logger.debug("Command: " + " ".join(ascp_cmd))
