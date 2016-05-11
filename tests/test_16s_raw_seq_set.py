@@ -4,6 +4,7 @@ import unittest
 import json
 import random
 import string
+import tempfile
 import sys
 
 from cutlass import iHMPSession
@@ -189,7 +190,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
     def testFormatDocLegal(self):
         sixteenSRawSeqSet = session.create_16s_raw_seq_set()
         success = False
-        format_doc = "http://www.google.com"
+        format_doc = "http://example.com"
 
         try:
             sixteenSRawSeqSet.format_doc = format_doc
@@ -347,16 +348,18 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSixteenSRawSeqSet(self):
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
         # Attempt to save the sixteenSRawSeqSet at all points before and
         # after adding the required fields
 
         sixteenSRawSeqSet = session.create_16s_raw_seq_set()
 
         test_comment = "Test comment"
-        checksums = {"md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
+        checksums = {"md5": "abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
         exp_length = 100
         test_format = "fasta"
-        format_doc = "C:\Jar\\test.fasta"
+        format_doc = "http://example.com"
         seq_model = "center for sequencing"
         size = 132
         study = "ibd"
@@ -387,7 +390,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         sixteenSRawSeqSet.format_doc = format_doc
         sixteenSRawSeqSet.format = test_format
         sixteenSRawSeqSet.seq_model = seq_model
-        sixteenSRawSeqSet.local_file = format_doc
+        sixteenSRawSeqSet.local_file = temp_file
         sixteenSRawSeqSet.size = size
         sixteenSRawSeqSet.study = study
         sixteenSRawSeqSet.add_tag(tag)

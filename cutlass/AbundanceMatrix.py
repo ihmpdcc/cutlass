@@ -2,8 +2,11 @@
 
 import json
 import logging
-from itertools import count
+import os
+import string
+from aspera import aspera
 from iHMPSession import iHMPSession
+from itertools import count
 from Base import Base
 from Util import *
 
@@ -22,6 +25,8 @@ class AbundanceMatrix(Base):
         namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
+
+    aspera_server = "aspera.ihmpdcc.org"
 
     def __init__(self):
         """
@@ -45,6 +50,7 @@ class AbundanceMatrix(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
+        self._local_file = None
         self._matrix_type = None
         self._size = None
         self._study = None
@@ -60,30 +66,6 @@ class AbundanceMatrix(Base):
         """
         self.logger.debug("In checksums getter.")
         return self._checksums
-
-    #def enforce_dict(func):
-    #    def wrapper(self, arg):
-    #        if type(arg) is not dict:
-    #            raise ValueError("Invalid type provided. Must be a dict.")
-    #        func(self, arg)
-#
-#        return wrapper
-#
-#    def enforce_int(func):
-#        def wrapper(self, arg):
-#            if type(arg) is not int:
-#                raise ValueError("Invalid type provided. Must be an int.")
-#            func(self, arg)
-#
-#        return wrapper
-#
-#    def enforce_string(func):
-#        def wrapper(self, arg):
-#            if type(arg) is not str:
-#                raise ValueError("Invalid type provided. Must be a string.")
-#            func(self, arg)
-#
-#        return wrapper
 
     @checksums.setter
     @enforce_dict
@@ -172,6 +154,32 @@ class AbundanceMatrix(Base):
         self.logger.debug("In format_doc setter.")
 
         self._format_doc = format_doc
+
+    @property
+    def local_file(self):
+        """
+        str: The path to the local file to upload to the iHMP DCC.
+        """
+        self.logger.debug("In local_file getter.")
+
+        return self._local_file
+
+    @local_file.setter
+    @enforce_string
+    def local_file(self, local_file):
+        """
+        The setter for the AbundanceMatrix local file.
+
+        Args:
+            local_file (str): The URL to the local file that should be uploaded
+                              to the DCC.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In local_file setter.")
+
+        self._local_file = local_file
 
     @property
     def matrix_type(self):
@@ -299,6 +307,11 @@ class AbundanceMatrix(Base):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._local_file is None:
+            problems.append("Local file is not yet set.")
+        elif not os.path.isfile(self._local_file):
+            problems.append("Local file does not point to an actual file.")
+
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link.")
 
@@ -327,6 +340,13 @@ class AbundanceMatrix(Base):
         self.logger.info("Got iHMP session.")
 
         (valid, error_message) = session.get_osdf().validate_node(document)
+
+        if self._local_file is None:
+            self.logger.error("Must set the local file of the abundance matrix.")
+            valid = False
+        elif not os.path.isfile(self._local_file):
+            self.logger.error("Local file does not point to an actual file.")
+            valid = False
 
         if 'computed_from' not in self._links.keys():
             valid = False
@@ -367,7 +387,7 @@ class AbundanceMatrix(Base):
                 'matrix_type': self._matrix_type,
                 'size': self._size,
                 'study': self._study,
-                'subtype': self._study,
+                'subtype': self._matrix_type,
                 'tags': self._tags,
                 'urls': self._urls
             }
@@ -399,8 +419,8 @@ class AbundanceMatrix(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "comment", "format", "format_doc", "matrix_type",
-                "size", "study", "urls")
+        return ("checksums", "comment", "format", "format_doc", "local_file",
+                "matrix_type", "size", "study")
 
     def delete(self):
         """
@@ -595,6 +615,66 @@ class AbundanceMatrix(Base):
 
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
+
+        study = self._study
+
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
+
+        if study not in study2dir:
+            raise ValueError("Invalid study. No directory mapping for %s" % study)
+
+        study_dir = study2dir[study]
+
+        remote_base = os.path.basename(self._local_file);
+
+        valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+        remote_base = ''.join(c for c in remote_base if c in valid_chars)
+        remote_base = remote_base.replace(' ', '_') # No spaces in filenames
+
+        remote_map = {
+            "16s_community": [ "genome", "microbiome", "16s", "analysis", "hmqcp" ],
+            "wgs_community": [ "genome", "microbiome", "wgs", "analysis", "hmscp" ],
+            "wgs_functional": [ "genome", "microbiome", "wgs", "analysis", "hmmrc" ],
+            "microb_proteomic": [ "proteome", "microbiome", "analysis" ],
+            "microb_lipidomic": [ "lipidome", "microbiome", "analysis" ],
+            "microb_cytokine": [ "cytokine", "microbiome", "analysis" ],
+            "microb_metabolome": [ "metabolome", "microbiome", "analysis" ],
+            "microb_metatranscriptome": [ "metatranscriptome", "microbiome", "analysis" ],
+            "host_proteomic": [ "proteome", "host", "analysis" ],
+            "host_lipidomic": [ "lipidome", "host", "analysis" ],
+            "host_cytokine": [ "cytokine", "host", "analysis" ],
+            "host_metabolome": [ "metabolome", "host", "analysis" ],
+            "host_transcriptome": [ "transcriptome", "host", "analysis" ] }
+
+        matrix_type = self._matrix_type
+
+        if matrix_type not in remote_map:
+            raise ValueError("Invalid matrix type. No mapping for %s" % matrix_type)
+
+        remote_elements = ["/", study_dir]
+            
+        remote_elements.extend(remote_map[matrix_type])
+        remote_elements.append(remote_base)
+        remote_path = "/".join(remote_elements)
+
+        self.logger.debug("Remote path for this abundance matrix will be %s." % remote_path)
+
+        # Upload the file to the iHMP aspera server
+        upload_result = aspera.upload_file(AbundanceMatrix.aspera_server,
+                                           session.username,
+                                           session.password,
+                                           self._local_file,
+                                           remote_path)
+
+        if not upload_result:
+            self.logger.error("Experienced an error uploading the " + \
+                              "sequence set. Aborting save.")
+            return False
+        else:
+            self._urls = [ "fasp://" + AbundanceMatrix.aspera_server + remote_path ]
 
         osdf = session.get_osdf()
 
