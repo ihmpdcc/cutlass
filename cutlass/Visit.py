@@ -380,8 +380,11 @@ class Visit(Base):
         # The attributes that are particular to Visit objects
         visit._visit_id = visit_data['meta']['visit_id']
         visit._visit_number = visit_data['meta']['visit_number']
-        visit._date = visit_data['meta']['date']
         visit._interval = visit_data['meta']['interval']
+
+        if 'date' in visit_data['meta']:
+            module_logger.info("Visit data has 'date' present.")
+            visit._date = visit_data['meta']['date']
 
         if 'clinic_id' in visit_data['meta']:
             module_logger.info("Visit data has 'clinic_id' present.")
