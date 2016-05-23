@@ -142,7 +142,7 @@ class SixteenSRawSeqSet(Base):
         """
         str: One or more checksums used to ensure file integrity.
         """
-        self.logger.debug("In checksums getter.")
+        self.logger.debug("In 'checksums' getter.")
 
         return self._checksums
 
@@ -158,7 +158,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
+        self.logger.debug("In 'checksums' setter.")
 
         if 'md5' not in checksums:
             raise ValueError("Checksum data must contain at least the 'md5' value")
@@ -198,7 +198,7 @@ class SixteenSRawSeqSet(Base):
         int: The number of raw bases or color space calls expected for the read,
         includes both mate pairs and all technical portions.
         """
-        self.logger.debug("In exp_length getter.")
+        self.logger.debug("In 'exp_length' getter.")
 
         return self._exp_length
 
@@ -213,7 +213,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In exp_length setter.")
+        self.logger.debug("In 'exp_length' setter.")
         if exp_length < 0:
             raise ValueError("The exp_length must be non-negative.")
 
@@ -253,7 +253,7 @@ class SixteenSRawSeqSet(Base):
         """
         str: URL for documentation of file format.
         """
-        self.logger.debug("In format_doc getter.")
+        self.logger.debug("In 'format_doc' getter.")
 
         return self._format_doc
 
@@ -269,7 +269,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format_doc setter.")
+        self.logger.debug("In 'format_doc' setter.")
 
         self._format_doc = format_doc
 
@@ -278,7 +278,7 @@ class SixteenSRawSeqSet(Base):
         """
         str: The path to the local file to upload to the iHMP DCC.
         """
-        self.logger.debug("In local_file getter.")
+        self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
 
@@ -295,7 +295,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_file setter.")
+        self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
 
@@ -304,7 +304,7 @@ class SixteenSRawSeqSet(Base):
         """
         str: Sequencing instrument model.
         """
-        self.logger.debug("In seq_model getter.")
+        self.logger.debug("In 'seq_model' getter.")
 
         return self._seq_model
 
@@ -320,7 +320,7 @@ class SixteenSRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In seq_model setter.")
+        self.logger.debug("In 'seq_model' setter.")
 
         self._seq_model = seq_model
 
@@ -414,7 +414,7 @@ class SixteenSRawSeqSet(Base):
     def urls(self):
         """ array: An array of URL from where the file can be obtained,
                    http, ftp, fasp, etc... """
-        self.logger.debug("In urls getter.")
+        self.logger.debug("In 'urls' getter.")
 
         return self._urls
 
