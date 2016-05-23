@@ -357,11 +357,9 @@ class AbundanceMatrix(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless of whether they
+        are set or not. Any remaining fields are included only if they are set.
 
         Args:
             None
