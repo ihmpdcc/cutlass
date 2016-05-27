@@ -292,13 +292,13 @@ class Sample(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current
-        data for the instance is validated in the save function. If the data is
-        not valid, then the data will not be saved. If the instance was saved
-        previously, then the node ID is assigned the alpha numeric found in the
-        OSDF instance. If not saved previously, then the node ID is 'None', and
-        upon a successful, will be assigned to the alpha numeric ID found in
-        OSDF. Also, the version is updated as the data is saved in OSDF.
+        Saves the data to OSDF. The JSON form of the object is not valid, then
+        the data is not saved. If the instance was saved previously, then the
+        node ID is assigned the alphanumeric assigned by the OSDF instance. If
+        not saved previously, then the node ID is 'None', and upon a successful
+        save, will be defined as the alphanumeric ID from OSDF.  In addition,
+        the document's version is updated when a successful save operation is
+        completed.
 
         Args:
             None
@@ -342,7 +342,9 @@ class Sample(Base):
                 self.logger.info("Update for Sample %s successful." % self.id)
                 success = True
             except Exception as e:
-                self.logger.error("An error occurred while updating Sample %s. Reason: %s" % (self.id, e))
+                msg = "An error occurred while updating " + \
+                      "Sample %s. Reason: %s" % (self.id, e)
+                self.logger.error(msg)
 
         return success
 
