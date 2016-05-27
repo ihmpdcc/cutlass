@@ -18,11 +18,11 @@ module_logger.addHandler(logging.NullHandler())
 class SixteenSDnaPrep(Base):
     """
     The class encapsulating the project data for an iHMP instance.
-    This class contains all the fields required to save a project object in
-    the OSDF instance.
+    This class contains all the fields required to save a SixteenSDnaPrep object
+    in OSDF.
 
     Attributes:
-        namespace (str): The namespace this class will use in the OSDF instance
+        namespace (str): The namespace this class will use in OSDF.
     """
     namespace = "ihmp"
 
@@ -59,16 +59,16 @@ class SixteenSDnaPrep(Base):
 
     def validate(self):
         """
-        Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required
-        fields for that specific object must be present.
+        Validates the current object's data/JSON against the current schema in
+        OSDF for that specific object. All required fields for the object must
+        be present.
 
         Args:
             None
 
         Returns:
             A list of strings, where each string is the error that the
-            validation raised during OSDF validation
+            validation raised during OSDF validation.
         """
         self.logger.debug("In validate.")
 
@@ -94,16 +94,16 @@ class SixteenSDnaPrep(Base):
     def is_valid(self):
         """
         Validates the current object's data/JSON against the current schema
-        in the OSDF instance for the specific object. However, unlike
-        validates(), this method does not provide exact error messages,
+        in OSDF for the specific object. However, unlike
+        validate(), this method does not provide exact error messages,
         it states if the validation was successful or not.
 
         Args:
             None
 
         Returns:
-            True if the data validates, False if the current state of
-            fields in the instance do not validate with the OSDF instance
+            True if the data validates, False if the current state of fields in
+            the instance do not validate with OSDF.
         """
         self.logger.debug("In is_valid.")
 
