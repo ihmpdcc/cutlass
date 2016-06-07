@@ -20,6 +20,14 @@ class IHMPSessionTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(session is None)
 
+    def testCreateAbundanceMatrix(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        matrix = session.create_abundance_matrix()
+        self.failIf(matrix is None)
+
+        from cutlass import AbundanceMatrix
+        self.failUnless(isinstance(matrix, AbundanceMatrix))
+
     def testCreateAnnotation(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         annot = session.create_annotation()
@@ -27,6 +35,14 @@ class IHMPSessionTest(unittest.TestCase):
 
         from cutlass import Annotation
         self.failUnless(isinstance(annot, Annotation))
+
+    def testCreateCytokine(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        cytokine = session.create_cytokine()
+        self.failIf(cytokine is None)
+
+        from cutlass import Cytokine
+        self.failUnless(isinstance(cytokine, Cytokine))
 
     def testCreateProject(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
@@ -75,6 +91,14 @@ class IHMPSessionTest(unittest.TestCase):
 
         from cutlass import Visit
         self.failUnless(isinstance(visit, Visit))
+
+    def testCreateVisitAttribute(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        visit_attr = session.create_visit_attr()
+        self.failIf(visit_attr is None)
+
+        from cutlass import VisitAttribute
+        self.failUnless(isinstance(visit_attr, VisitAttribute))
 
     def testCreateMicrobiomeAssayPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
@@ -143,11 +167,14 @@ class IHMPSessionTest(unittest.TestCase):
     def testCreateObjectMethods(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
 
-        node_types = [ "annotation", "project", "proteome", "sample",
-                      "subject", "study", "visit", "microbiome_assay_prep",
-                      "host_assay_prep", "16s_dna_prep", "16s_raw_seq_set",
-                      "16s_trimmed_seq_set", "wgs_assembled_seq_set",
-                      "wgs_raw_seq_set", "wgs_dna_prep" ]
+        node_types = [
+                      "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
+                      "annotation", "abundance_matrix", "cytokine",
+                      "host_assay_prep", "microbiome_assay_prep",
+                      "project", "proteome", "sample",
+                      "sample_attr", "study", "subject",
+                      "visit", "visit_attr",
+                      "wgs_assembled_seq_set", "wgs_raw_seq_set", "wgs_dna_prep" ]
 
         for node_type in node_types:
              instance = session.create_object(node_type)
