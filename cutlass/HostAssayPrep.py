@@ -1045,3 +1045,25 @@ class HostAssayPrep(Base):
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success
+
+    def cytokines(self):
+        """
+        Returns an iterator of all Cytokines connected to this HostAssayPrep.
+        """
+        linkage_query = '"{}"[linkage.derived_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Cytokine import Cytokine
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Cytokine.load_cytokine(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
