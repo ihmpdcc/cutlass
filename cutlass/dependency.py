@@ -8,6 +8,7 @@ from .Sample import Sample
 from .WgsDnaPrep import WgsDnaPrep
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
+from .HostAssayPrep import HostAssayPrep
 
 # currently used in Base.children()
 # __name__ attribute used to ensure that if the class or method name
@@ -21,6 +22,7 @@ dependency_methods = {
            WgsDnaPrep.__name__ : WgsDnaPrep.raw_seq_sets.__name__,
       SixteenSDnaPrep.__name__ : SixteenSDnaPrep.raw_seq_sets.__name__,
     SixteenSRawSeqSet.__name__ : SixteenSRawSeqSet.trimmed_seq_sets.__name__,
+        HostAssayPrep.__name__ : HostAssayPrep.cytokines.__name__
 }
 
 def generator_flatten(gen):
