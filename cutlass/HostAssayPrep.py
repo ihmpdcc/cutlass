@@ -1050,7 +1050,7 @@ class HostAssayPrep(Base):
         """
         Returns an iterator of all Cytokines connected to this HostAssayPrep.
         """
-        linkage_query = '"{}"[linkage.derived_from]'.format(self.id)
+        linkage_query = '"{}"[linkage.derived_from] and "cytokine"[node_type]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
