@@ -275,8 +275,9 @@ class Base(object):
 
         return success
 
-
     def children(self, flatten=False):
+        self.logger.debug("In children.")
+
         # local imports to avoid cyclic imports
         from .dependency import dependency_methods
         from .dependency import generator_flatten
