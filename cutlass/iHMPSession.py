@@ -45,21 +45,23 @@ class iHMPSession(object):
     def _get_cutlass_instance(self, name):
         self.logger.debug("In _get_cutlass_instance.")
 
-        classes = { "abundance_matrix"      : "AbundanceMatrix",
+        classes = {
+                    "16s_dna_prep"          : "SixteenSDnaPrep",
+                    "16s_raw_seq_set"       : "SixteenSRawSeqSet",
+                    "16s_trimmed_seq_set"   : "SixteenSTrimmedSeqSet",
+                    "abundance_matrix"      : "AbundanceMatrix",
                     "annotation"            : "Annotation",
+                    "cytokine"              : "Cytokine",
+                    "host_assay_prep"       : "HostAssayPrep",
+                    "microbiome_assay_prep" : "MicrobiomeAssayPrep",
                     "project"               : "Project",
                     "proteome"              : "Proteome",
                     "sample"                : "Sample",
                     "sample_attr"           : "SampleAttribute",
-                    "subject"               : "Subject",
                     "study"                 : "Study",
+                    "subject"               : "Subject",
                     "visit"                 : "Visit",
                     "visit_attr"            : "VisitAttribute",
-                    "microbiome_assay_prep" : "MicrobiomeAssayPrep",
-                    "host_assay_prep"       : "HostAssayPrep",
-                    "16s_dna_prep"          : "SixteenSDnaPrep",
-                    "16s_raw_seq_set"       : "SixteenSRawSeqSet",
-                    "16s_trimmed_seq_set"   : "SixteenSTrimmedSeqSet",
                     "wgs_assembled_seq_set" : "WgsAssembledSeqSet",
                     "wgs_raw_seq_set"       : "WgsRawSeqSet",
                     "wgs_dna_prep"          : "WgsDnaPrep" }
