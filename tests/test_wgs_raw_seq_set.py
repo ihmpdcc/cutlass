@@ -5,6 +5,7 @@ import json
 import random
 import string
 import sys
+import tempfile
 
 from cutlass import iHMPSession
 from cutlass import WgsRawSeqSet
@@ -341,6 +342,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
     def testLoadSaveDeleteWgsRawSeqSet(self):
         # Attempt to save the wgsRawSeqSet at all points before and after
         # adding the required fields
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
         wgsRawSeqSet = session.create_object("wgs_raw_seq_set")
 
@@ -348,7 +350,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         checksums = {"md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
         exp_length = 100
         test_format = "fasta"
-        format_doc = "C:\Jar\\test.fasta"
+        format_doc = "http://www.google.com"
         seq_model = "center for sequencing"
         size = 132
         study = "ibd"
@@ -378,7 +380,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         wgsRawSeqSet.format_doc = format_doc
         wgsRawSeqSet.format = test_format
         wgsRawSeqSet.seq_model = seq_model
-        wgsRawSeqSet.local_file = format_doc
+        wgsRawSeqSet.local_file = temp_file
         wgsRawSeqSet.size = size
         wgsRawSeqSet.study = study
         wgsRawSeqSet.add_tag(tag)
