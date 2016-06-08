@@ -392,15 +392,15 @@ class Cytokine(Base):
 
         "search criteria"[field to search]
 
-        If there are any results, they are returned as Annotation instances,
+        If there are any results, they are returned as Cytokine instances,
         otherwise an empty list will be returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
-                         Annotation node type.
+                         Cytokine node type.
 
         Returns:
-            Returns an array of Annotation objects. It returns an empty list
+            Returns an array of Cytokine objects. It returns an empty list
             if there are no results.
         """
         module_logger.debug("In search.")
@@ -412,9 +412,9 @@ class Cytokine(Base):
         if query != "\"cytokine\"[node_type]":
             query = query + " && \"cytokine\"[node_type]"
 
-        annot_data = session.get_osdf().oql_query(Cytokine.namespace, query)
+        cyto_data = session.get_osdf().oql_query(Cytokine.namespace, query)
 
-        all_results = annot_data['results']
+        all_results = cyto_data['results']
 
         result_list = list()
 
@@ -437,7 +437,7 @@ class Cytokine(Base):
         Returns:
             Returns a Cytokine instance.
         """
-        module_logger.info("Creating a template Annotation.")
+        module_logger.info("Creating a template Cytokine.")
         cyto = Cytokine()
 
         module_logger.debug("Filling in Cytokine details.")
