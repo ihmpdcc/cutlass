@@ -2,9 +2,9 @@ cutlass 0.18
 
  * Added support for Cytokine data with the Cytokine class
    and associated test and example scripts.
- * Added support for ClusteredSeqSet data with the
-   ClusteredSeqSet class and associated test and example scripts.
- * Added cytokines() and children() support for HostAssayPrep
+ * Added support for Lipidome and ClusteredSeqSet data with the
+   classes and associated tests and example scripts.
+ * Added lipidomes(), cytokines() and children() support for HostAssayPrep
    and MicrobiomeAssayPrep classes.
  * Some logging improvements.
 
