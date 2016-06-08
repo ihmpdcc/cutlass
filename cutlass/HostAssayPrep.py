@@ -1046,10 +1046,36 @@ class HostAssayPrep(Base):
 
         return success
 
+    def lipidomes(self):
+        """
+        Returns an iterator of all Lipidomes connected to this HostAssayPrep.
+        """
+        self.logger.debug("In lipidomes().")
+
+        linkage_query = '"{}"[linkage.derived_from] and "lipidome"[node_type]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Lipidome import Lipidome
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Lipidome.load_lipidome(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
     def cytokines(self):
         """
         Returns an iterator of all Cytokines connected to this HostAssayPrep.
         """
+        self.logger.debug("In cytokines().")
+
         linkage_query = '"{}"[linkage.derived_from] and "cytokine"[node_type]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
@@ -1067,3 +1093,36 @@ class HostAssayPrep(Base):
 
             if res_count < 1:
                 break
+
+    def _derived_docs(self):
+        self.logger.debug("In _derived_docs.")
+
+        linkage_query = '"{}"[linkage.derived_from]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield doc
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def derivations(self):
+        """
+        Return an iterator of all the derived nodes from this prep, including
+        lipdomes, cytokines, etc...
+        """
+        self.logger.debug("In _derived_docs.")
+
+        from Cytokine import Cytokine
+        from Lipidome import Lipidome
+
+        for doc in self._derived_docs():
+            if doc['node_type'] == "lipidome":
+                yield Lipidome.load_lipidome(doc)
+            elif doc['node_type'] == "cytokine":
+                yield Cytokine.load_cytokine(doc)

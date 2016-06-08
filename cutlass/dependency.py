@@ -25,8 +25,8 @@ dependency_methods = {
                WgsDnaPrep.__name__  : WgsDnaPrep.raw_seq_sets.__name__,
           SixteenSDnaPrep.__name__  : SixteenSDnaPrep.raw_seq_sets.__name__,
         SixteenSRawSeqSet.__name__  : SixteenSRawSeqSet.trimmed_seq_sets.__name__,
-            HostAssayPrep.__name__  : HostAssayPrep.cytokines.__name__,
-      MicrobiomeAssayPrep.__name__  : MicrobiomeAssayPrep.cytokines.__name__
+            HostAssayPrep.__name__  : HostAssayPrep.derivations.__name__,
+      MicrobiomeAssayPrep.__name__  : MicrobiomeAssayPrep.derivations.__name__
 }
 
 def generator_flatten(gen):
