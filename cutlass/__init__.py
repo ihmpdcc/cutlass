@@ -1,6 +1,7 @@
 from .iHMPSession import iHMPSession
 from .AbundanceMatrix import AbundanceMatrix
 from .Annotation import Annotation
+from .ClusteredSeqSet import ClusteredSeqSet
 from .Cytokine import Cytokine
 from .HostAssayPrep import HostAssayPrep
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
