@@ -1,0 +1,315 @@
+#!/usr/bin/env python
+
+import unittest
+import json
+import sys
+import tempfile
+
+from cutlass import iHMPSession
+from cutlass import Cytokine
+
+session = iHMPSession("foo", "bar")
+
+class CytokineTest(unittest.TestCase):
+
+    def testImport(self):
+        success = False
+        try:
+            from cutlass import Cytokine
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Cytokine is None)
+
+    def testSessionCreate(self):
+        success = False
+        cyto = None
+
+        try:
+            cyto = session.create_cytokine()
+
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(cyto is None)
+
+
+    def testComment(self):
+        cyto = session.create_cytokine()
+
+        # activity level changed over the last 30 days. Must be a string.
+        with self.assertRaises(ValueError):
+            cyto.comment = 3
+
+        with self.assertRaises(ValueError):
+            cyto.comment = {}
+
+        with self.assertRaises(ValueError):
+            cyto.comment = []
+
+        with self.assertRaises(ValueError):
+            cyto.comment = 3.5
+
+        comment = "test activity change 30d"
+        cyto.comment = comment
+
+        self.assertEquals(comment, cyto.comment,
+                          "comment property works.")
+
+    def testChecksumsLegal(self):
+        cyto = session.create_cytokine()
+        success = False
+        checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
+
+        try:
+            cyto.checksums= checksums
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use the checksums setter")
+
+        self.assertEqual(cyto.checksums['md5'], checksums['md5'],
+                         "Property getter for 'checksums' works.")
+
+    def testToJson(self):
+        cyto = session.create_cytokine()
+        success = False
+
+        comment = "test cytokine comment"
+        study = "prediabetes"
+        format_ = "gff3"
+        format_doc = "test_format_doc"
+
+        cyto.comment = comment
+        cyto.study = study
+        cyto.format = format_
+        cyto.format_doc = format_doc
+
+        cyto_json = None
+
+        try:
+            cyto_json = cyto.to_json()
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use 'to_json'.")
+        self.assertTrue(cyto_json is not None, "to_json() returned data.")
+
+        parse_success = False
+
+        try:
+            cyto_data = json.loads(cyto_json)
+            parse_success = True
+        except:
+            pass
+
+        self.assertTrue(parse_success,
+                        "to_json() did not throw an exception.")
+        self.assertTrue(cyto_data is not None,
+                        "to_json() returned parsable JSON.")
+
+        self.assertTrue('meta' in cyto_data, "JSON has 'meta' key in it.")
+
+        self.assertEqual(cyto_data['meta']['comment'],
+                         comment,
+                         "'comment' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['format'],
+                         format_,
+                         "'format' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['study'],
+                         study,
+                         "'study' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['format_doc'],
+                         format_doc,
+                         "'format_doc' in JSON had expected value."
+                         )
+
+    def testDataInJson(self):
+        cyto = session.create_cytokine()
+        success = False
+        comment = "test_comment"
+        format_ = "gff3"
+        format_doc = "test_format_doc"
+
+        cyto.comment = comment
+        cyto.format = format_
+        cyto.format_doc = format_doc
+
+        cyto_json = None
+
+        try:
+            cyto_json = cyto.to_json()
+            success = True
+        except:
+            pass
+
+        self.assertTrue(success, "Able to use 'to_json'.")
+        self.assertTrue(cyto_json is not None, "to_json() returned data.")
+
+        parse_success = False
+
+        try:
+            cyto_data = json.loads(cyto_json)
+            parse_success = True
+        except:
+            pass
+
+        self.assertTrue(parse_success,
+                        "to_json() did not throw an exception.")
+        self.assertTrue(cyto_data is not None,
+                        "to_json() returned parsable JSON.")
+
+        self.assertTrue('meta' in cyto_data, "JSON has 'meta' key in it.")
+
+        self.assertEqual(cyto_data['meta']['comment'],
+                         comment,
+                         "'comment' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['format'],
+                         format_,
+                         "'format' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['format_doc'],
+                         format_doc,
+                         "'format_doc' in JSON had expected value."
+                         )
+
+    def testId(self):
+        cyto = session.create_cytokine()
+
+        self.assertTrue(cyto.id is None,
+                        "New template cytokine has no ID.")
+
+        with self.assertRaises(AttributeError):
+            cyto.id = "test"
+
+    def testVersion(self):
+        cyto = session.create_cytokine()
+
+        self.assertTrue(cyto.version is None,
+                        "New template cytokine has no version.")
+
+        with self.assertRaises(ValueError):
+            cyto.version = "test"
+
+    def testTags(self):
+        cyto = session.create_cytokine()
+
+        tags = cyto.tags
+        self.assertTrue(type(tags) == list, "Cytokine tags() method returns a list.")
+        self.assertEqual(len(tags), 0, "Template cytokine tags list is empty.")
+
+        new_tags = [ "tagA", "tagB" ]
+
+        cyto.tags = new_tags
+        self.assertEqual(cyto.tags, new_tags, "Can set tags on a cytokine.")
+
+        json_str = cyto.to_json()
+        doc = json.loads(json_str)
+        self.assertTrue('tags' in doc['meta'],
+                        "JSON representation has 'tags' field in 'meta'.")
+
+        self.assertEqual(doc['meta']['tags'], new_tags,
+                         "JSON representation had correct tags after setter.")
+
+    def testAddTag(self):
+        cyto = session.create_cytokine()
+
+        cyto.add_tag("test")
+        self.assertEqual(cyto.tags, [ "test" ], "Can add a tag to a cytokine.")
+
+        json_str = cyto.to_json()
+        doc = json.loads(json_str)
+
+        self.assertEqual(doc['meta']['tags'], [ "test" ],
+                         "JSON representation had correct tags after add_tag().")
+
+        # Try adding the same tag yet again, shouldn't get a duplicate
+        with self.assertRaises(ValueError):
+            cyto.add_tag("test")
+
+        json_str = cyto.to_json()
+        doc2 = json.loads(json_str)
+
+        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+                         "JSON document did not end up with duplicate tags.")
+
+    def testRequiredFields(self):
+        required = Cytokine.required_fields()
+
+        self.assertEqual(type(required), tuple,
+                         "required_fields() returns a tuple.")
+
+        self.assertTrue(len(required) > 0,
+                        "required_field() did not return empty value.")
+
+    def testLoadSaveDeleteCytokine(self):
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
+        # Attempt to save the cytokine at all points before and after adding
+        # the required fields
+        cyto = session.create_cytokine()
+        self.assertFalse(
+                cyto.save(),
+                "Cytokine not saved successfully, no required fields"
+                )
+
+        cyto.comment = "Test cytokine comment"
+
+        self.assertFalse(
+            cyto.save(),
+            "Cytokine not saved successfully, missing some required fields."
+            )
+
+        # Cytokine nodes are "derived_from" HostAssayPrep and
+        # MicrobiomeAssayPrep nodes
+        cyto.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b93c50"]}
+
+        cyto.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
+        cyto.format = "gff3"
+        cyto.format_doc = "Test format_doc"
+        cyto.study = "prediabetes"
+        cyto.local_file = temp_file
+
+        cyto.add_tag("test")
+
+        # Make sure cytokine does not delete if it does not exist
+        with self.assertRaises(Exception):
+            cyto.delete()
+
+        self.assertTrue(cyto.save() == True, "Cytokine was saved successfully")
+
+        # Load the cytokine that was just saved from the OSDF instance
+        cyto_loaded = session.create_cytokine()
+        cyto_loaded = cyto.load(cyto.id)
+
+        # Check all fields were saved and loaded successfully
+        self.assertEqual(cyto.comment, cyto_loaded.comment,
+                         "Cytokine comment not saved & loaded successfully")
+        self.assertEqual(cyto.tags[0], cyto_loaded.tags[0],
+                         "Cytokine tags not saved & loaded successfully")
+
+        # Cytokine is deleted successfully
+        self.assertTrue(cyto.delete(), "Cytokine was deleted successfully")
+
+        # the sample of the initial ID should not load successfully
+        load_test = session.create_cytokine()
+        with self.assertRaises(Exception):
+            load_test = load_test.load(cyto.id)
+
+if __name__ == '__main__':
+    unittest.main()
