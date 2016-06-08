@@ -63,7 +63,6 @@ if cyto.is_valid():
         print(cyto2.to_json(indent=2))
 
         deletion_success = cyto.delete()
-        deletion_success= True
 
         if deletion_success:
             print("Deleted cytokine with ID %s" % cyto_id)
