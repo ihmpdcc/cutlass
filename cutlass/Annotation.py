@@ -789,3 +789,25 @@ class Annotation(Base):
 
         self.logger.debug("Returning " + str(success))
         return success
+
+    def clustered_seq_sets(self):
+        """
+        Returns an iterator of all ClusteredSeqSets connected to this Annotation.
+        """
+        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from ClusteredSeqSet import ClusteredSeqSet
+
+        for page_no in count(1):
+            res = query(Annotation.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield ClusteredSeqSet.load_clustered_seq_set(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
