@@ -38,6 +38,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(aspera is None)
 
+    def testImportCytokine(self):
+        success = False
+
+        try:
+            from cutlass import Cytokine
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Cytokine is None)
+
     def testImportIHMPSession(self):
         success = False
         try:

@@ -23,6 +23,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportAspera(self):
         self.failIf(aspera is None)
 
+    def testImportCytokine(self):
+        self.failIf(Cytokine is None)
+
     def testImportHostAssayPrep(self):
         self.failIf(HostAssayPrep is None)
 
