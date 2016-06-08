@@ -1,5 +1,6 @@
 import inspect
 
+from .Annotation import Annotation
 from .Project import Project
 from .Study import Study
 from .Subject import Subject
@@ -16,6 +17,7 @@ from .HostAssayPrep import HostAssayPrep
 # changes, the maintainer is forced to update it here, too.
 dependency_methods = {
                   Project.__name__  : Project.studies.__name__,
+               Annotation.__name__  : Annotation.clustered_seq_sets.__name__,
                     Study.__name__  : Study.subjects.__name__,
                   Subject.__name__  : Subject.visits.__name__,
                     Visit.__name__  : Visit.samples.__name__,
