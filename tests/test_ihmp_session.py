@@ -178,11 +178,11 @@ class IHMPSessionTest(unittest.TestCase):
         node_types = [
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
                       "annotation", "abundance_matrix", "clustered_seq_set",
-                      "cytokine",
-                      "host_assay_prep", "microbiome_assay_prep", "project",
+                      "cytokine", "host_assay_prep", "lipidome",
+                      "microbiome_assay_prep", "project",
                       "proteome", "sample", "sample_attr", "study", "subject",
-                      "visit", "visit_attr",
-                      "wgs_assembled_seq_set", "wgs_raw_seq_set", "wgs_dna_prep" ]
+                      "visit", "visit_attr", "wgs_assembled_seq_set",
+                      "wgs_raw_seq_set", "wgs_dna_prep" ]
 
         for node_type in node_types:
              instance = session.create_object(node_type)

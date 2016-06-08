@@ -4,6 +4,7 @@ from .Annotation import Annotation
 from .ClusteredSeqSet import ClusteredSeqSet
 from .Cytokine import Cytokine
 from .HostAssayPrep import HostAssayPrep
+from .Lipidome import Lipidome
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from .Project import Project
 from .Proteome import Proteome

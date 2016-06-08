@@ -54,6 +54,7 @@ class iHMPSession(object):
                     "clustered_seq_set"     : "ClusteredSeqSet",
                     "cytokine"              : "Cytokine",
                     "host_assay_prep"       : "HostAssayPrep",
+                    "lipidome"              : "Lipidome",
                     "microbiome_assay_prep" : "MicrobiomeAssayPrep",
                     "project"               : "Project",
                     "proteome"              : "Proteome",

@@ -229,6 +229,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(HostAssayPrep is None)
 
+    def testImportLipidome(self):
+        success = False
+
+        try:
+            from cutlass import Lipidome
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Lipidome is None)
+
     def testImportMicrobiomeAssayPrep(self):
         success = False
 
