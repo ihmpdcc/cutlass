@@ -67,8 +67,7 @@ if annot.is_valid():
 
         print(annot2.to_json(indent=2))
 
-        #deletion_success = annot.delete()
-        deletion_success= True
+        deletion_success = annot.delete()
 
         if deletion_success:
             print("Deleted annot with ID %s" % annot_id)
