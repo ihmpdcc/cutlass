@@ -23,6 +23,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportAspera(self):
         self.failIf(aspera is None)
 
+    def testImportClusteredSeqSet(self):
+        self.failIf(ClusteredSeqSet is None)
+
     def testImportCytokine(self):
         self.failIf(Cytokine is None)
 

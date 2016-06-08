@@ -1,3 +1,15 @@
+cutlass 0.18
+
+ * Added support for Cytokine data with the Cytokine class
+   and associated test and example scripts.
+ * Added support for ClusteredSeqSet data with the
+   ClusteredSeqSet class and associated test and example scripts.
+ * Added cytokines() and children() support for HostAssayPrep
+   and MicrobiomeAssayPrep classes.
+ * Some logging improvements.
+
+ - Victor <victor73@github.com>  Wed, 08 Jun 2016 12:00:00 -0400
+
 cutlass 0.17
 
  * Added additional classes, including VisitAttribute and helper

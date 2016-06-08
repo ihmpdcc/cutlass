@@ -36,6 +36,14 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import Annotation
         self.failUnless(isinstance(annot, Annotation))
 
+    def testCreateClusteredSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        css = session.create_clustered_seq_set()
+        self.failIf(css is None)
+
+        from cutlass import ClusteredSeqSet
+        self.failUnless(isinstance(css, ClusteredSeqSet))
+
     def testCreateCytokine(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         cytokine = session.create_cytokine()
@@ -169,10 +177,10 @@ class IHMPSessionTest(unittest.TestCase):
 
         node_types = [
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
-                      "annotation", "abundance_matrix", "cytokine",
-                      "host_assay_prep", "microbiome_assay_prep",
-                      "project", "proteome", "sample",
-                      "sample_attr", "study", "subject",
+                      "annotation", "abundance_matrix", "clustered_seq_set",
+                      "cytokine",
+                      "host_assay_prep", "microbiome_assay_prep", "project",
+                      "proteome", "sample", "sample_attr", "study", "subject",
                       "visit", "visit_attr",
                       "wgs_assembled_seq_set", "wgs_raw_seq_set", "wgs_dna_prep" ]
 

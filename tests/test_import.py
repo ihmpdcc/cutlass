@@ -38,6 +38,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(aspera is None)
 
+    def testImportClusteredSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import ClusteredSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(ClusteredSeqSet is None)
+
     def testImportCytokine(self):
         success = False
 

@@ -51,6 +51,7 @@ class iHMPSession(object):
                     "16s_trimmed_seq_set"   : "SixteenSTrimmedSeqSet",
                     "abundance_matrix"      : "AbundanceMatrix",
                     "annotation"            : "Annotation",
+                    "clustered_seq_set"     : "ClusteredSeqSet",
                     "cytokine"              : "Cytokine",
                     "host_assay_prep"       : "HostAssayPrep",
                     "microbiome_assay_prep" : "MicrobiomeAssayPrep",
