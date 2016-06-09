@@ -55,6 +55,7 @@ class iHMPSession(object):
                     "cytokine"              : "Cytokine",
                     "host_assay_prep"       : "HostAssayPrep",
                     "lipidome"              : "Lipidome",
+                    "metabolome"            : "Metabolome",
                     "microbiome_assay_prep" : "MicrobiomeAssayPrep",
                     "project"               : "Project",
                     "proteome"              : "Proteome",

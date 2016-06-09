@@ -241,6 +241,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Lipidome is None)
 
+    def testImportMetabolome(self):
+        success = False
+
+        try:
+            from cutlass import Metabolome
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Metabolome is None)
+
     def testImportMicrobiomeAssayPrep(self):
         success = False
 

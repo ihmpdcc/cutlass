@@ -35,6 +35,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportLipidome(self):
         self.failIf(Lipidome is None)
 
+    def testImportMetabolome(self):
+        self.failIf(Metabolome is None)
+
     def testImportMicrobiomeAssayPrep(self):
         self.failIf(MicrobiomeAssayPrep is None)
 

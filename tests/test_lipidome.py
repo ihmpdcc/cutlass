@@ -41,7 +41,6 @@ class LipidomeTest(unittest.TestCase):
     def testComment(self):
         lip = session.create_lipidome()
 
-        # activity level changed over the last 30 days. Must be a string.
         with self.assertRaises(ValueError):
             lip.comment = 3
 
@@ -54,7 +53,7 @@ class LipidomeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             lip.comment = 3.5
 
-        comment = "test activity change 30d"
+        comment = "test lipidome comment"
         lip.comment = comment
 
         self.assertEquals(comment, lip.comment,
@@ -321,7 +320,7 @@ class LipidomeTest(unittest.TestCase):
         # Lipidome is deleted successfully
         self.assertTrue(lip.delete(), "Lipidome was deleted successfully")
 
-        # the sample of the initial ID should not load successfully
+        # the lipidome of the initial ID should not load successfully
         load_test = session.create_lipidome()
         with self.assertRaises(Exception):
             load_test = load_test.load(lip.id)

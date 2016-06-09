@@ -5,6 +5,7 @@ from .ClusteredSeqSet import ClusteredSeqSet
 from .Cytokine import Cytokine
 from .HostAssayPrep import HostAssayPrep
 from .Lipidome import Lipidome
+from .Metabolome import Metabolome
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from .Project import Project
 from .Proteome import Proteome

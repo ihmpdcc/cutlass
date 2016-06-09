@@ -1046,6 +1046,30 @@ class HostAssayPrep(Base):
 
         return success
 
+    def cytokines(self):
+        """
+        Returns an iterator of all Cytokines connected to this HostAssayPrep.
+        """
+        self.logger.debug("In cytokines().")
+
+        linkage_query = '"{}"[linkage.derived_from] and "cytokine"[node_type]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Cytokine import Cytokine
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Cytokine.load_cytokine(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
     def lipidomes(self):
         """
         Returns an iterator of all Lipidomes connected to this HostAssayPrep.
@@ -1070,24 +1094,24 @@ class HostAssayPrep(Base):
             if res_count < 1:
                 break
 
-    def cytokines(self):
+    def metabolomes(self):
         """
-        Returns an iterator of all Cytokines connected to this HostAssayPrep.
+        Returns an iterator of all Metabolomes connected to this HostAssayPrep.
         """
-        self.logger.debug("In cytokines().")
+        self.logger.debug("In metabolomes().")
 
-        linkage_query = '"{}"[linkage.derived_from] and "cytokine"[node_type]'.format(self.id)
+        linkage_query = '"{}"[linkage.derived_from] and "metabolome"[node_type]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Cytokine import Cytokine
+        from Metabolome import Metabolome
 
         for page_no in count(1):
             res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield Cytokine.load_cytokine(doc)
+                yield Metabolome.load_metabolome(doc)
 
             res_count -= len(res['results'])
 
@@ -1114,15 +1138,18 @@ class HostAssayPrep(Base):
     def derivations(self):
         """
         Return an iterator of all the derived nodes from this prep, including
-        lipdomes, cytokines, etc...
+        lipidomes, metabolomes, cytokines, etc...
         """
         self.logger.debug("In _derived_docs.")
 
         from Cytokine import Cytokine
         from Lipidome import Lipidome
+        from Metabolome import Metabolome
 
         for doc in self._derived_docs():
             if doc['node_type'] == "lipidome":
                 yield Lipidome.load_lipidome(doc)
+            elif doc['node_type'] == "metabolome":
+                yield Metabolome.load_metabolome(doc)
             elif doc['node_type'] == "cytokine":
                 yield Cytokine.load_cytokine(doc)

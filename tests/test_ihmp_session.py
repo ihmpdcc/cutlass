@@ -108,6 +108,14 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import VisitAttribute
         self.failUnless(isinstance(visit_attr, VisitAttribute))
 
+    def testCreateMetabolome(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        metabolome = session.create_metabolome()
+        self.failIf(metabolome is None)
+
+        from cutlass import Metabolome
+        self.failUnless(isinstance(metabolome, Metabolome))
+
     def testCreateMicrobiomeAssayPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         microbiome_assay_prep = session.create_microbiome_assay_prep()
@@ -179,7 +187,7 @@ class IHMPSessionTest(unittest.TestCase):
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
                       "annotation", "abundance_matrix", "clustered_seq_set",
                       "cytokine", "host_assay_prep", "lipidome",
-                      "microbiome_assay_prep", "project",
+                      "metabolome", "microbiome_assay_prep", "project",
                       "proteome", "sample", "sample_attr", "study", "subject",
                       "visit", "visit_attr", "wgs_assembled_seq_set",
                       "wgs_raw_seq_set", "wgs_dna_prep" ]
