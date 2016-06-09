@@ -20,6 +20,98 @@ class IHMPSessionTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(session is None)
 
+    def testUsername(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+
+        # Test the username getter.
+        self.assertEquals(session.username, IHMPSessionTest.username)
+
+        with self.assertRaises(ValueError):
+            session.username = 13
+
+        with self.assertRaises(ValueError):
+            session.username = True
+
+        with self.assertRaises(ValueError):
+            session.username = {}
+
+        with self.assertRaises(ValueError):
+            session.username = []
+
+        # Test the username setter.
+        newUsername = "testuser"
+        session.username = newUsername
+        self.assertEquals(session.username, newUsername)
+
+    def testPassword(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+
+        # Test the default password getter
+        self.assertEquals(session.password, IHMPSessionTest.password)
+
+        with self.assertRaises(ValueError):
+            session.password = 13
+
+        with self.assertRaises(ValueError):
+            session.password = True
+
+        with self.assertRaises(ValueError):
+            session.password = {}
+
+        with self.assertRaises(ValueError):
+            session.password = []
+
+        # Test the password setter.
+        newPassword = "testpass"
+        session.password = newPassword
+        self.assertEquals(session.password, newPassword)
+
+    def testPort(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+
+        # Test the default port
+        self.assertEquals(session.port, 8123)
+
+        with self.assertRaises(ValueError):
+            session.port = "test"
+
+        with self.assertRaises(ValueError):
+            session.port = True
+
+        with self.assertRaises(ValueError):
+            session.port = {}
+
+        with self.assertRaises(ValueError):
+            session.port = []
+
+        # Test the port setter.
+        newPort = 8000
+        session.port = newPort
+        self.assertEquals(session.port, newPort)
+
+    def testSSL(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+
+        # Test the default SSL flag (should be true).
+        self.assertTrue(session.ssl)
+
+        with self.assertRaises(ValueError):
+            session.ssl = "test"
+
+        with self.assertRaises(ValueError):
+            session.ssl = 13
+
+        with self.assertRaises(ValueError):
+            session.ssl = {}
+
+        with self.assertRaises(ValueError):
+            session.ssl = []
+
+        # Test the SSL setter.
+        newSSL = False
+        session.ssl = newSSL
+        self.assertFalse(session.ssl, newSSL)
+
     def testCreateAbundanceMatrix(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         matrix = session.create_abundance_matrix()

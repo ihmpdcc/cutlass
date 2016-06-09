@@ -7,40 +7,48 @@ from Util import *
 
 class iHMPSession(object):
     check_python_version(name="Cutlass")
-
     """
-    The iHMP Session class. This class allows you to connect with an OSDF instance and
-    begin analysis of iHMP data. It produces skeletons of all objects in the iHMP OSDF
-    database. Each object contains its own save, load, delete feature
+    The iHMP Session class. This class allows you to connect with an OSDF
+    instance and begin analysis of iHMP data. It produces skeletons of all
+    objects in the iHMP OSDF database. Each object contains its own save, load,
+    delete feature
 
     Attributes:
-        _single (iHMPSession): The iHMP Session that is currently live. None otherwise.
+        _single (iHMPSession): The iHMP Session that is currently live. None
+        otherwise.
+
     """
 
     _single = None
 
-    def __init__(self, username, password, server="osdf.ihmpdcc.org", port=8123):
+    def __init__(self, username, password, server="osdf.ihmpdcc.org", port=8123,
+                 ssl=True):
         """
         The initialization of the iHMPSession for the user.
 
         Args:
             username (str): The username for OSDF access
             password (str): The password for OSDF access
-            server (str): The server domain name containing the OSDF instance. Defaults
-                to 'osdf.ihmpdcc.org'.
+            server (str): The server domain name containing the OSDF instance.
+                          Defaults to 'osdf.ihmpdcc.org'.
             port (int): The port allowing access to the OSDF instance.
+            ssl (bool): Whether the OSDF server is behind SSL/TLS or not.
+                        Defaults to true.
         """
         self._username = username
         self._password = password
         self._server = server
         self._port = port
-        self._osdf = OSDF(self._server, self._username,
-                          self._password, self._port)
+        self._ssl = ssl
+        self._osdf = OSDF(self._server, self._username, self._password,
+                          port=self._port, ssl=self._ssl)
 
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         if iHMPSession._single is None:
             iHMPSession._single = self
+
+        self.logger.info("Using SSL encryption? %s" % str(self._ssl))
 
     def _get_cutlass_instance(self, name):
         self.logger.debug("In _get_cutlass_instance.")
@@ -226,6 +234,32 @@ class iHMPSession(object):
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the server in the OSDF client.")
         self._osdf.server = server
+
+    @property
+    def ssl(self):
+        """
+        str: Retrieve whether the session is using SSL or not.
+        """
+        self.logger.debug("In 'ssl' getter.")
+        return self._ssl
+
+    @ssl.setter
+    @enforce_bool
+    def ssl(self, ssl):
+        """
+        The ssl setter
+
+        Args:
+            ssl (bool): Whether to use encryption (SSL) or not.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'ssl' setter.")
+        self._ssl = ssl
+        # Ensure the OSDF object gets the new connection parameter
+        self.logger.debug("Setting the SSL flag in the OSDF client.")
+        self._osdf.ssl = ssl
 
     @property
     def username(self):
