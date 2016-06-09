@@ -37,11 +37,9 @@ class CytokineTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(cyto is None)
 
-
     def testComment(self):
         cyto = session.create_cytokine()
 
-        # activity level changed over the last 30 days. Must be a string.
         with self.assertRaises(ValueError):
             cyto.comment = 3
 
@@ -54,7 +52,7 @@ class CytokineTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             cyto.comment = 3.5
 
-        comment = "test activity change 30d"
+        comment = "test cytokine comment"
         cyto.comment = comment
 
         self.assertEquals(comment, cyto.comment,
