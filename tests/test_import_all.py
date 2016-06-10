@@ -71,6 +71,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportSubject(self):
         self.failIf(Subject is None)
 
+    def testImportViralSeqSet(self):
+        self.failIf(ViralSeqSet is None)
+
     def testImportVisit(self):
         self.failIf(Visit is None)
 

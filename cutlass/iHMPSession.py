@@ -71,6 +71,7 @@ class iHMPSession(object):
                     "sample_attr"           : "SampleAttribute",
                     "study"                 : "Study",
                     "subject"               : "Subject",
+                    "viral_seq_set"         : "ViralSeqSet",
                     "visit"                 : "Visit",
                     "visit_attr"            : "VisitAttribute",
                     "wgs_assembled_seq_set" : "WgsAssembledSeqSet",

@@ -278,9 +278,9 @@ class IHMPSessionTest(unittest.TestCase):
         node_types = [
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
                       "annotation", "abundance_matrix", "clustered_seq_set",
-                      "cytokine", "host_assay_prep", "lipidome",
-                      "metabolome", "microbiome_assay_prep", "project",
-                      "proteome", "sample", "sample_attr", "study", "subject",
+                      "cytokine", "host_assay_prep", "lipidome", "metabolome",
+                      "microbiome_assay_prep", "project", "proteome", "sample",
+                      "sample_attr", "study", "subject", "viral_seq_set",
                       "visit", "visit_attr", "wgs_assembled_seq_set",
                       "wgs_raw_seq_set", "wgs_dna_prep" ]
 

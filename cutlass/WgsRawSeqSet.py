@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import string
+from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
@@ -727,3 +728,27 @@ class WgsRawSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
+
+    def viral_seq_sets(self):
+        """
+        Returns an iterator of all ViralSeqSet nodes connected to this object.
+        """
+        self.logger.debug("In viral_seq_sets().")
+
+        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from ViralSeqSet import ViralSeqSet
+
+        for page_no in count(1):
+            res = query(WgsRawSeqSet.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield ViralSeqSet.load_viral_seq_set(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break

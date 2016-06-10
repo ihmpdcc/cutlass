@@ -7,6 +7,7 @@ from .Subject import Subject
 from .Visit import Visit
 from .Sample import Sample
 from .WgsDnaPrep import WgsDnaPrep
+from .WgsRawSeqSet import WgsRawSeqSet
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
@@ -23,6 +24,7 @@ dependency_methods = {
                     Visit.__name__  : Visit.samples.__name__,
                    Sample.__name__  : Sample.dnaPreps.__name__,
                WgsDnaPrep.__name__  : WgsDnaPrep.raw_seq_sets.__name__,
+             WgsRawSeqSet.__name__  : WgsRawSeqSet.viral_seq_sets.__name__,
           SixteenSDnaPrep.__name__  : SixteenSDnaPrep.raw_seq_sets.__name__,
         SixteenSRawSeqSet.__name__  : SixteenSRawSeqSet.trimmed_seq_sets.__name__,
             HostAssayPrep.__name__  : HostAssayPrep.derivations.__name__,

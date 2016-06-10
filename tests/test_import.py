@@ -121,6 +121,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Subject is None)
 
+    def testImportViralSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import ViralSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(ViralSeqSet is None)
+
     def testImportVisit(self):
         success = False
 
