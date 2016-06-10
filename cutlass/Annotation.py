@@ -794,6 +794,8 @@ class Annotation(Base):
         """
         Returns an iterator of all ClusteredSeqSets connected to this Annotation.
         """
+        self.logger.debug("In clustered_seq_sets.")
+
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
