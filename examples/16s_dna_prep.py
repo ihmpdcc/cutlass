@@ -62,7 +62,7 @@ test_prep.sequencing_center = "test center"
 test_prep.sequencing_contact = "test contact"
 test_prep.prep_id = "test prep id"
 test_prep.ncbi_taxon_id = "NCBI123ABC"
-test_prep.links = { "prepared_from": "610a4911a5ca67de12cdc1e4b4011876" }
+test_prep.links = { "prepared_from": [ "610a4911a5ca67de12cdc1e4b4011876" ] }
 
 test_prep.tags = [ "test", "16s_dna_prep", "ihmp" ]
 test_prep.add_tag("another")
@@ -77,7 +77,7 @@ if test_prep.is_valid():
 
     if success:
         prep_id = test_prep.id
-        print("Succesfully saved prep. ID: %s" % prep_id)
+        print("Successfully saved prep. ID: %s" % prep_id)
 
         prep2 = SixteenSDnaPrep.load(prep_id)
 
