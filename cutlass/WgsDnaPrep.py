@@ -7,7 +7,6 @@ from itertools import count
 from iHMPSession import iHMPSession
 from mims import MIMS, MimsException
 from Base import Base
-from WgsRawSeqSet import WgsRawSeqSet
 from Util import *
 
 # Create a module logger named after the module
@@ -133,7 +132,7 @@ class WgsDnaPrep(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the WgsRawSeqSet comment. The comment must be a string,
+        The setter for the comment. The comment must be a string,
         and less than 512 characters.
 
         Args:
@@ -528,7 +527,7 @@ class WgsDnaPrep(Base):
         Takes the provided JSON string and converts it to a WgsDnaPrep object
 
         Args:
-            subject_data (str): The JSON string to convert
+            prep_data (str): The JSON string to convert
 
         Returns:
             Returns a WgsDnaPrep instance.
@@ -570,9 +569,10 @@ class WgsDnaPrep(Base):
     @staticmethod
     def load(prep_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+
+        Loads the data for the specified input ID from the OSDF instance to
+        this object.  If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             prep_id (str): The OSDF ID for the document to load.
@@ -623,13 +623,13 @@ class WgsDnaPrep(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        OSDF. Also, the version is updated as the data is saved in OSDF.
 
         Args:
             None
@@ -679,12 +679,15 @@ class WgsDnaPrep(Base):
 
         return success
 
-
     def raw_seq_sets(self):
         """
         Return iterator of all raw_seq_sets sequenced from this prep.
         """
+        self.logger.debug("In raw_seq_sets.")
+
         linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
+
+        from WgsRawSeqSet import WgsRawSeqSet
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
