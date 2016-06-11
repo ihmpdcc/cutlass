@@ -65,7 +65,7 @@ test_prep.sequencing_center = "test center"
 test_prep.sequencing_contact = "test contact"
 test_prep.prep_id = "test prep id"
 test_prep.ncbi_taxon_id = "NCBI123ABC"
-test_prep.links = { "prepared_from": "610a4911a5ca67de12cdc1e4b4011876" }
+test_prep.links = { "prepared_from": [ "610a4911a5ca67de12cdc1e4b4011876" ] }
 
 test_prep.tags = [ "test", "wgs_dna_prep", "ihmp" ]
 test_prep.add_tag("another")
