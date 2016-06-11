@@ -140,7 +140,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def checksums(self):
-        """ str: One or more checksums used to ensure file integrity. """
+        """
+        str: One or more checksums used to ensure file integrity.
+        """
         self.logger.debug("In 'checksums' getter.")
 
         return self._checksums
@@ -149,25 +151,24 @@ class WgsRawSeqSet(Base):
     @enforce_dict
     def checksums(self, checksums):
         """
-        The setter for the WgsRawSeqSet checksums.
+        The setter for the checksum data.
 
         Args:
-            checksums (dict): The checksums for the WgsRawSeqSet.
+            checksums (dict): The checksums for the data file.
 
         Returns:
             None
         """
         self.logger.debug("In 'checksums' setter.")
 
-        if 'md5' not in checksums:
-            raise ValueError("Checksum data must contain at least the 'md5' value")
-
         self._checksums = checksums
 
     @property
     def comment(self):
-        """ str: Free-text comment. """
-        self.logger.debug("In comment getter.")
+        """
+        str: Free-text comment.
+        """
+        self.logger.debug("In 'comment' getter.")
 
         return self._comment
 
@@ -175,7 +176,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the WgsRawSeqSet comment. The comment must be a string,
+        The setter for the comment field. The comment must be a string,
         and less than 512 characters.
 
         Args:
@@ -185,9 +186,6 @@ class WgsRawSeqSet(Base):
             None
         """
         self.logger.debug("In 'comment' setter.")
-
-        if len(comment) > 512:
-            raise Exception("Comment is too long. Max length is 512 characters.")
 
         self._comment = comment
 
@@ -439,7 +437,7 @@ class WgsRawSeqSet(Base):
         """
         self.logger.debug("In _get_raw_doc.")
 
-        sixteen_s_doc = {
+        doc = {
             'acl': {
                 'read': [ 'all' ],
                 'write': [ WgsRawSeqSet.namespace ]
@@ -464,40 +462,17 @@ class WgsRawSeqSet(Base):
 
         if self._id is not None:
            self.logger.debug(__name__ + " object has the OSDF id set.")
-           sixteen_s_doc['id'] = self._id
+           doc['id'] = self._id
 
         if self._version is not None:
            self.logger.debug(__name__ + " object has the OSDF version set.")
-           sixteen_s_doc['ver'] = self._version
+           doc['ver'] = self._version
 
         if self._sequence_type is not None:
            self.logger.debug(__name__ + " object has the sequence_type set.")
-           sixteen_s_doc['meta']['sequence_type'] = self._sequence_type
+           doc['meta']['sequence_type'] = self._sequence_type
 
-        return sixteen_s_doc
-
-    def to_json(self, indent=4):
-        """
-        Converts the raw JSON doc (the dictionary representation)
-        to a printable JSON string.
-
-        Args:
-            indent (int): The indent for each successive line of the JSON string output
-
-        Returns:
-            A printable JSON string
-        """
-        self.logger.debug("In to_json.")
-
-        visit_doc = self._get_raw_doc()
-
-        self.logger.debug("Encoding structure to JSON.")
-
-        json_str = json.dumps(visit_doc, indent=indent)
-
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
-
-        return json_str
+        return doc
 
     @staticmethod
     def search(query = "\"wgs_raw_seq_set\"[node_type]"):
@@ -521,6 +496,7 @@ class WgsRawSeqSet(Base):
             there are no results.
         """
         module_logger.debug("In search.")
+
         # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
