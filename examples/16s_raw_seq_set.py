@@ -49,7 +49,7 @@ if seq_set.is_valid():
 
     if success:
         seq_set_id = seq_set.id
-        print("Succesfully saved prep. ID: %s" % seq_set_id)
+        print("Successfully saved prep. ID: %s" % seq_set_id)
 
         seq_set2 = SixteenSRawSeqSet.load(seq_set_id)
 
