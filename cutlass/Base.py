@@ -212,11 +212,11 @@ class Base(object):
         """
         self.logger.debug("In to_json.")
 
-        visit_doc = self._get_raw_doc()
+        doc = self._get_raw_doc()
 
         self.logger.debug("Encoding structure to JSON.")
 
-        json_str = json.dumps(visit_doc, indent=indent)
+        json_str = json.dumps(doc, indent=indent)
 
         self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
 
