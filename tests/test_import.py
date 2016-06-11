@@ -229,6 +229,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(SixteenSTrimmedSeqSet is None)
 
+    def testImportHostSeqPrep(self):
+        success = False
+
+        try:
+            from cutlass import HostSeqPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostSeqPrep is None)
+
     def testImportHostAssayPrep(self):
         success = False
 
@@ -240,6 +252,18 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(HostAssayPrep is None)
+
+    def testImportHostTranscriptomicsRawSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import HostTranscriptomicsRawSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostTranscriptomicsRawSeqSet is None)
 
     def testImportLipidome(self):
         success = False

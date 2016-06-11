@@ -3,7 +3,9 @@ from .AbundanceMatrix import AbundanceMatrix
 from .Annotation import Annotation
 from .ClusteredSeqSet import ClusteredSeqSet
 from .Cytokine import Cytokine
+from .HostSeqPrep import HostSeqPrep
 from .HostAssayPrep import HostAssayPrep
+from .HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
 from .Lipidome import Lipidome
 from .Metabolome import Metabolome
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep

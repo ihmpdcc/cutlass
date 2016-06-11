@@ -112,6 +112,30 @@ class IHMPSessionTest(unittest.TestCase):
         session.ssl = newSSL
         self.assertFalse(session.ssl, newSSL)
 
+    def testCreate16SDnaPrep(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        prep = session.create_16s_dna_prep()
+        self.failIf(prep is None)
+
+        from cutlass import SixteenSDnaPrep
+        self.failUnless(isinstance(prep, SixteenSDnaPrep))
+
+    def testCreate16SRawSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        seq_set = session.create_16s_raw_seq_set()
+        self.failIf(seq_set is None)
+
+        from cutlass import SixteenSRawSeqSet
+        self.failUnless(isinstance(seq_set, SixteenSRawSeqSet))
+
+    def testCreate16STrimmedSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        seq_set = session.create_16s_trimmed_seq_set()
+        self.failIf(seq_set is None)
+
+        from cutlass import SixteenSTrimmedSeqSet
+        self.failUnless(isinstance(seq_set, SixteenSTrimmedSeqSet))
+
     def testCreateAbundanceMatrix(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         matrix = session.create_abundance_matrix()
@@ -143,6 +167,38 @@ class IHMPSessionTest(unittest.TestCase):
 
         from cutlass import Cytokine
         self.failUnless(isinstance(cytokine, Cytokine))
+
+    def testCreateHostSeqPrep(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        prep = session.create_host_seq_prep()
+        self.failIf(prep is None)
+
+        from cutlass import HostSeqPrep
+        self.failUnless(isinstance(prep, HostSeqPrep))
+
+    def testCreateHostTranscriptomicsRawSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        htrss = session.create_host_transcriptomics_raw_seq_set()
+        self.failIf(htrss is None)
+
+        from cutlass import HostTranscriptomicsRawSeqSet
+        self.failUnless(isinstance(htrss, HostTranscriptomicsRawSeqSet))
+
+    def testCreateMetabolome(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        metabolome = session.create_metabolome()
+        self.failIf(metabolome is None)
+
+        from cutlass import Metabolome
+        self.failUnless(isinstance(metabolome, Metabolome))
+
+    def testCreateMicrobiomeAssayPrep(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        microbiome_assay_prep = session.create_microbiome_assay_prep()
+        self.failIf(microbiome_assay_prep is None)
+
+        from cutlass import MicrobiomeAssayPrep
+        self.failUnless(isinstance(microbiome_assay_prep, MicrobiomeAssayPrep))
 
     def testCreateProject(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
@@ -200,22 +256,6 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import VisitAttribute
         self.failUnless(isinstance(visit_attr, VisitAttribute))
 
-    def testCreateMetabolome(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        metabolome = session.create_metabolome()
-        self.failIf(metabolome is None)
-
-        from cutlass import Metabolome
-        self.failUnless(isinstance(metabolome, Metabolome))
-
-    def testCreateMicrobiomeAssayPrep(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        microbiome_assay_prep = session.create_microbiome_assay_prep()
-        self.failIf(microbiome_assay_prep is None)
-
-        from cutlass import MicrobiomeAssayPrep
-        self.failUnless(isinstance(microbiome_assay_prep, MicrobiomeAssayPrep))
-
     def testCreateHostAssayPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         host_assay_prep = session.create_host_assay_prep()
@@ -223,30 +263,6 @@ class IHMPSessionTest(unittest.TestCase):
 
         from cutlass import HostAssayPrep
         self.failUnless(isinstance(host_assay_prep, HostAssayPrep))
-
-    def test16SDnaPrep(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        prep = session.create_16s_dna_prep()
-        self.failIf(prep is None)
-
-        from cutlass import SixteenSDnaPrep
-        self.failUnless(isinstance(prep, SixteenSDnaPrep))
-
-    def test16SRawSeqSet(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        seq_set = session.create_16s_raw_seq_set()
-        self.failIf(seq_set is None)
-
-        from cutlass import SixteenSRawSeqSet
-        self.failUnless(isinstance(seq_set, SixteenSRawSeqSet))
-
-    def test16STrimmedSeqSet(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        seq_set = session.create_16s_trimmed_seq_set()
-        self.failIf(seq_set is None)
-
-        from cutlass import SixteenSTrimmedSeqSet
-        self.failUnless(isinstance(seq_set, SixteenSTrimmedSeqSet))
 
     def testWgsAssembledSeqSet(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
@@ -256,14 +272,6 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import WgsAssembledSeqSet
         self.failUnless(isinstance(seq_set, WgsAssembledSeqSet))
 
-    def testWgsRawSeqSet(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        seq_set = session.create_wgs_raw_seq_set()
-        self.failIf(seq_set is None)
-
-        from cutlass import WgsRawSeqSet
-        self.failUnless(isinstance(seq_set, WgsRawSeqSet))
-
     def testWgsDnaPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         prep = session.create_wgs_dna_prep()
@@ -272,13 +280,23 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import WgsDnaPrep
         self.failUnless(isinstance(prep, WgsDnaPrep))
 
+    def testWgsRawSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        seq_set = session.create_wgs_raw_seq_set()
+        self.failIf(seq_set is None)
+
+        from cutlass import WgsRawSeqSet
+        self.failUnless(isinstance(seq_set, WgsRawSeqSet))
+
     def testCreateObjectMethods(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
 
         node_types = [
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
                       "annotation", "abundance_matrix", "clustered_seq_set",
-                      "cytokine", "host_assay_prep", "lipidome", "metabolome",
+                      "cytokine", "host_assay_prep", "host_seq_prep",
+                      "host_transcriptomics_raw_seq_set", "lipidome",
+                      "metabolome",
                       "microbiome_assay_prep", "project", "proteome", "sample",
                       "sample_attr", "study", "subject", "viral_seq_set",
                       "visit", "visit_attr", "wgs_assembled_seq_set",

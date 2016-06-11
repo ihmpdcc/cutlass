@@ -29,8 +29,14 @@ class ImportAllTest(unittest.TestCase):
     def testImportCytokine(self):
         self.failIf(Cytokine is None)
 
+    def testImportHostSeqPrep(self):
+        self.failIf(HostSeqPrep is None)
+
     def testImportHostAssayPrep(self):
         self.failIf(HostAssayPrep is None)
+
+    def testImportHostTranscriptomicsRawSeqSet(self):
+        self.failIf(HostTranscriptomicsRawSeqSet is None)
 
     def testImportLipidome(self):
         self.failIf(Lipidome is None)
