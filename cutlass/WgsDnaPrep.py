@@ -679,15 +679,17 @@ class WgsDnaPrep(Base):
 
         return success
 
-    def raw_seq_sets(self):
+    def child_seq_sets(self):
         """
-        Return iterator of all raw_seq_sets sequenced from this prep.
+        Return iterator of all sequence sets descended from this prep.
         """
-        self.logger.debug("In raw_seq_sets.")
+        self.logger.debug("In child_seq_sets.")
 
         linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
 
         from WgsRawSeqSet import WgsRawSeqSet
+        from MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet
+        from ViralSeqSet import ViralSeqSet
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
@@ -696,7 +698,12 @@ class WgsDnaPrep(Base):
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield WgsRawSeqSet.load_wgsRawSeqSet(doc)
+                if doc['node_type'] == "wgs_raw_seq_set":
+                    yield WgsRawSeqSet.load_wgsRawSeqSet(doc)
+                elif doc['node_type'] == "viral_seq_set":
+                    yield ViralSeqSet.load_viral_seq_set(doc)
+                elif doc['node_type'] == "microb_transcriptomics_raw_seq_set":
+                    yield MicrobTranscriptomicsRawSeqSet.load_microb_transcriptomics_raw_set_set(doc)
 
             res_count -= len(res['results'])
 
