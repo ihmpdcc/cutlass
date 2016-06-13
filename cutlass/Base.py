@@ -43,8 +43,10 @@ class Base(object):
 
     @property
     def id(self):
-        """ str: An alpha numeric indicating the specific ID assigned to the document
-            in the OSDF instance """
+        """
+        str: An alphanumeric indicating the specific ID assigned to the document
+             in OSDF.
+        """
         self.logger.debug("In id getter.")
         return self._id
 
