@@ -10,7 +10,7 @@ from cutlass import ViralSeqSet
 
 session = iHMPSession("foo", "bar")
 
-class ViralSeqSetest(unittest.TestCase):
+class ViralSeqSetTest(unittest.TestCase):
 
     def testImport(self):
         success = False
