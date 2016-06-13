@@ -6,6 +6,7 @@ include cutlass/HostSeqSet.py
 include cutlass/HostTranscriptomicsRawSeqSet.py
 include cutlass/Lipidome.py
 include cutlass/Metabolome.py
+include cutlass/MicrobTranscriptomicsRawSeqSet.py
 include cutlass/Project.py
 include cutlass/Study.py
 include cutlass/Subject.py

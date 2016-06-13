@@ -301,6 +301,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(MicrobiomeAssayPrep is None)
 
+    def testImportMicrobTranscriptomicsRawSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import MicrobTranscriptomicsRawSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(MicrobTranscriptomicsRawSeqSet is None)
+
     def testImportMIMS(self):
         success = False
 

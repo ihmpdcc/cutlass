@@ -10,17 +10,16 @@ from Base import Base
 from aspera import aspera
 from Util import *
 
-
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class HostTranscriptomicsRawSeqSet(Base):
+class MicrobTranscriptomicsRawSeqSet(Base):
     """
-    The class models host transcriptomics raw sequence set data for the
+    The class models microbe transcriptomics raw sequence set data for the
     iHMP project. This class contains all the fields required to save a
-    HostTranscriptomicsRawSeqSet object to OSDF.
+    MicrobTranscriptomicsRawSeqSet object to OSDF.
 
     Attributes:
         namespace (str): The namespace this class will use in the OSDF instance
@@ -31,7 +30,7 @@ class HostTranscriptomicsRawSeqSet(Base):
 
     def __init__(self):
         """
-        Constructor for the HostTranscriptomicsRawSeqSet class. This initializes
+        Constructor for the MicrobTranscriptomicsRawSeqSet class. This initializes
         the fields specific to the class, and inherits from the Base class.
 
         Args:
@@ -47,7 +46,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         self._links = {}
         self._tags = []
 
-        # These are particular to HostTranscriptomicsRawSeqSet objects
+        # These are particular to MicrobTranscriptomicsRawSeqSet objects
         self._checksums = None
         self._comment = None
         self._exp_length = None
@@ -446,11 +445,11 @@ class HostTranscriptomicsRawSeqSet(Base):
         doc = {
             'acl': {
                 'read': [ 'all' ],
-                'write': [ HostTranscriptomicsRawSeqSet.namespace ]
+                'write': [ MicrobTranscriptomicsRawSeqSet.namespace ]
             },
             'linkage': self._links,
-            'ns': HostTranscriptomicsRawSeqSet.namespace,
-            'node_type': 'host_transcriptomics_raw_seq_set',
+            'ns': MicrobTranscriptomicsRawSeqSet.namespace,
+            'node_type': 'microb_transcriptomics_raw_seq_set',
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,
@@ -460,9 +459,9 @@ class HostTranscriptomicsRawSeqSet(Base):
                 "seq_model": self.seq_model,
                 "size": self._size,
                 "study": self._study,
-                "urls": self._urls,
-                "subtype": "host",
-                'tags': self._tags
+                "subtype": "microb",
+                'tags': self._tags,
+                "urls": self._urls
             }
         }
 
@@ -481,9 +480,9 @@ class HostTranscriptomicsRawSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"host_transcriptomics_raw_seq_set\"[node_type]"):
+    def search(query = "\"microb_transcriptomics_raw_seq_set\"[node_type]"):
         """
-        Searches the OSDF database through all HostTranscriptomicsRawSeqSet
+        Searches the OSDF database through all MicrobTranscriptomicsRawSeqSet
         nodes. Any criteria the user wishes to add is provided by the user
         in the query language specifications provided in the OSDF
         documentation. A general format is (including the quotes and brackets):
@@ -491,15 +490,15 @@ class HostTranscriptomicsRawSeqSet(Base):
         "search criteria"[field to search]
 
         If there are any results, they are returned as a
-        HostTranscriptomicsRawSeqSet instance, otherwise an empty list will be
+        MicrobTranscriptomicsRawSeqSet instance, otherwise an empty list will be
         returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
-                         HostTranscriptomicsRawSeqSet node type.
+                         MicrobTranscriptomicsRawSeqSet node type.
 
         Returns:
-            Returns an array of HostTranscriptomicsRawSeqSet objects. It returns
+            Returns an array of MicrobTranscriptomicsRawSeqSet objects. It returns
             an empty list if there are no results.
         """
         module_logger.debug("In search.")
@@ -507,8 +506,8 @@ class HostTranscriptomicsRawSeqSet(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"host_transcriptomics_raw_seq_set\"[node_type]":
-            query = query + " && \"host_transcriptomics_raw_seq_set\"[node_type]"
+        if query != "\"microb_transcriptomics_raw_seq_set\"[node_type]":
+            query = query + " && \"microb_transcriptomics_raw_seq_set\"[node_type]"
 
         rawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
 
@@ -518,26 +517,26 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                rawSeqSet_result = HostTranscriptomicsRawSeqSet. \
-                                      load_host_transcriptomics_raw_seq_set(result)
+                rawSeqSet_result = MicrobTranscriptomicsRawSeqSet. \
+                                      load_microb_transcriptomics_raw_seq_set(result)
                 result_list.append(rawSeqSet_result)
 
         return result_list
 
     @staticmethod
-    def load_host_transcriptomics_raw_set_set(seq_set_data):
+    def load_microb_transcriptomics_raw_set_set(seq_set_data):
         """
         Takes the provided JSON string and converts it to a
-        HostTranscriptomicsRawSeqSet object.
+        MicrobTranscriptomicsRawSeqSet object.
 
         Args:
             seq_set_data (str): The JSON string to convert
 
         Returns:
-            Returns a HostTranscriptomicsRawSeqSet instance.
+            Returns a MicrobTranscriptomicsRawSeqSet instance.
         """
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = HostTranscriptomicsRawSeqSet()
+        seq_set = MicrobTranscriptomicsRawSeqSet()
 
         module_logger.debug("Filling in " + __name__ + " details.")
 
@@ -578,7 +577,7 @@ class HostTranscriptomicsRawSeqSet(Base):
             seq_set_id (str): The OSDF ID for the document to load.
 
         Returns:
-            A HostTranscriptomicsRawSeqSet object with all the available OSDF
+            A MicrobTranscriptomicsRawSeqSet object with all the available OSDF
             data loaded into it.
         """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
@@ -589,7 +588,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         seq_set_data = session.get_osdf().get_node(seq_set_id)
 
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = HostTranscriptomicsRawSeqSet()
+        seq_set = MicrobTranscriptomicsRawSeqSet()
 
         module_logger.debug("Filling in " + __name__ + " details.")
 
@@ -666,12 +665,12 @@ class HostTranscriptomicsRawSeqSet(Base):
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
-        remote_path = "/".join(["/" + study_dir, "transcriptome", "host",
+        remote_path = "/".join(["/" + study_dir, "transcriptome", "microbiome",
                                 "raw", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         # Upload the file to the iHMP aspera server
-        upload_result = aspera.upload_file(HostTranscriptomicsRawSeqSet.aspera_server,
+        upload_result = aspera.upload_file(MicrobTranscriptomicsRawSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
@@ -681,8 +680,7 @@ class HostTranscriptomicsRawSeqSet(Base):
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return False
         else:
-            self._urls = [ "fasp://" + HostTranscriptomicsRawSeqSet.aspera_server + remote_path ]
-
+            self._urls = [ "fasp://" + MicrobTranscriptomicsRawSeqSet.aspera_server + remote_path ]
 
         if self.id is None:
             # The document has not yet been saved

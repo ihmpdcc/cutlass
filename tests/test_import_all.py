@@ -47,6 +47,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportMicrobiomeAssayPrep(self):
         self.failIf(MicrobiomeAssayPrep is None)
 
+    def testImportMirobTranscriptomicsRawSeqSet(self):
+        self.failIf(MicrobTranscriptomicsRawSeqSet is None)
+
     def testImportMIMARKS(self):
         self.failIf(MIMARKS is None)
 

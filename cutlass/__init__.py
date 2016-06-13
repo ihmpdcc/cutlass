@@ -8,6 +8,7 @@ from .HostAssayPrep import HostAssayPrep
 from .HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
 from .Lipidome import Lipidome
 from .Metabolome import Metabolome
+from .MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from .Project import Project
 from .Proteome import Proteome

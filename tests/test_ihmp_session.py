@@ -192,6 +192,14 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import Metabolome
         self.failUnless(isinstance(metabolome, Metabolome))
 
+    def testCreateMicrobTranscriptomicsRawSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        raw_seq_set = session.create_microb_transcriptomics_raw_seq_set()
+        self.failIf(raw_seq_set is None)
+
+        from cutlass import MicrobTranscriptomicsRawSeqSet
+        self.failUnless(isinstance(raw_seq_set, MicrobTranscriptomicsRawSeqSet))
+
     def testCreateMicrobiomeAssayPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         microbiome_assay_prep = session.create_microbiome_assay_prep()
@@ -296,8 +304,9 @@ class IHMPSessionTest(unittest.TestCase):
                       "annotation", "abundance_matrix", "clustered_seq_set",
                       "cytokine", "host_assay_prep", "host_seq_prep",
                       "host_transcriptomics_raw_seq_set", "lipidome",
-                      "metabolome",
-                      "microbiome_assay_prep", "project", "proteome", "sample",
+                      "metabolome", "microbiome_assay_prep",
+                      "microb_transcriptomics_raw_seq_set",
+                      "project", "proteome", "sample",
                       "sample_attr", "study", "subject", "viral_seq_set",
                       "visit", "visit_attr", "wgs_assembled_seq_set",
                       "wgs_raw_seq_set", "wgs_dna_prep" ]
