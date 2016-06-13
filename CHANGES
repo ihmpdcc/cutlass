@@ -2,7 +2,8 @@ cutlass 0.18
 
  * Added support for Cytokine data with the Cytokine class and associated test
    and example scripts.
- * Added support for HostSeqSet, HostTranscriptomicsRawSeqSet, Lipidome,
+ * Added support for HostSeqSet, HostTranscriptomicsRawSeqSet,
+   MicrobTranscriptomicsSeqSet, Lipidome,
    Metabolome, ClusteredSeqSet, ViralSeqSet data with the classes and
    associated tests and example scripts.
  * Added metabolomes(), lipidomes(), cytokines() and children() support for
