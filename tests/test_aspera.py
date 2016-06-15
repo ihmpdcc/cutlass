@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
-# Unit tests (sort of - has some dependencies on the environment!)
+# Unit tests (has some dependencies on the environment!)
 import unittest
-import aspera
+from cutlass import aspera
 
-class AsperaTestCase(unittest.TestCase):
+class AsperaTest(unittest.TestCase):
 
     # ------------------------------------------------
     # version_cmp
     # ------------------------------------------------
 
-    def test_version_cmp_lt(self):
+    def testVersionCmpLt(self):
         self.assertTrue(aspera.version_cmp('3.0.1', '3.5') == -1)
         self.assertTrue(aspera.version_cmp('3.0.10', '3.5') == -1)
 
-    def test_version_cmp_gt(self):
+    def testVersion_cmp_gt(self):
         self.assertTrue(aspera.version_cmp('3.5', '3.0.1') == 1)
         self.assertTrue(aspera.version_cmp('3.5', '3.0.10') == 1)
 
-    def test_version_cmp_eq(self):
+    def testVersion_cmp_eq(self):
         self.assertTrue(aspera.version_cmp('3.5', '3.5.0') == 0)
         self.assertTrue(aspera.version_cmp('3.5.0', '3.5') == 0)
 
@@ -28,13 +28,16 @@ class AsperaTestCase(unittest.TestCase):
 
     # invalid path passed in - should raise an exception
     def test_get_ascp_version_path_is_invalid(self):
-        self.assertRaises(OSError, aspera.get_ascp_version, "not_the_ascp_command")
+        self.assertRaises(OSError, aspera.get_ascp_version,
+                         "not_the_ascp_command")
 
-    # valid path--to something other than ascp--is passed in - should raise an exception
+    # valid path--to something other than ascp--is passed in -
+    # should raise an exception
     def test_get_ascp_version_path_is_something_else(self):
         self.assertRaises(Exception, aspera.get_ascp_version, "ls")
 
-    # valid path - should return something, assuming ascp is installed and in the path
+    # valid path - should return something, assuming ascp is installed and in
+    # the path
     def test_get_ascp_version_path_is_valid(self):
         ver = aspera.get_ascp_version("ascp")
         self.assertIsNotNone(ver)
@@ -47,8 +50,11 @@ class AsperaTestCase(unittest.TestCase):
     def test_check_ascp_version(self):
         self.assertTrue(aspera.check_ascp_version("ascp"))
 
-    def test_check_ascp_version_path_is_invalid(self):
-        self.assertRaises(OSError, aspera.check_ascp_version, "not_the_ascp_command")
+    def test_check_ascp_version_default(self):
+        try:
+            aspera.check_ascp_version
+        except Exception:
+            self.fail("check_ascp_version raised Exception unexpectedly!")
 
     def test_check_ascp_version_path_is_something_else(self):
         self.assertRaises(Exception, aspera.check_ascp_version, "ls")
