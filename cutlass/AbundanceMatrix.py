@@ -481,12 +481,13 @@ class AbundanceMatrix(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"abundance_matrix\"[node_type]":
-            query = query + " && \"abundance_matrix\"[node_type]"
+        if query != '"abundance_matrix"[node_type]':
+            query = '({}) && "abundance_matrix"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         matrix_data = session.get_osdf().oql_query(AbundanceMatrix.namespace, query)
 
@@ -496,7 +497,6 @@ class AbundanceMatrix(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                #matrix_result = AbundanceMatrix.load_abundance_matrix(result)
                 matrix_result = AbundanceMatrix.load(result['id'])
                 result_list.append(matrix_result)
 

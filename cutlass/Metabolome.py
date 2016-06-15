@@ -431,12 +431,13 @@ class Metabolome(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"metabolome\"[node_type]":
-            query = query + " && \"metabolome\"[node_type]"
+        if query != '"metabolome"[node_type]':
+            query = '({}) && "metabolome"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         data = session.get_osdf().oql_query(Metabolome.namespace, query)
 

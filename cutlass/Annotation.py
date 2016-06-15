@@ -551,12 +551,13 @@ class Annotation(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"annotation\"[node_type]":
-            query = query + " && \"annotation\"[node_type]"
+        if query != '"annotation"[node_type]':
+            query = '({}) && "annotation"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         annot_data = session.get_osdf().oql_query(Annotation.namespace, query)
 

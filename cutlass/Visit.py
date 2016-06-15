@@ -336,12 +336,14 @@ class Visit(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        # Searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"visit\"[node_type]":
-            query = query + " && \"visit\"[node_type]"
+        if query != '"visit"[node_type]':
+            query = '({}) && "visit"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         visit_data = session.get_osdf().oql_query(Visit.namespace, query)
 

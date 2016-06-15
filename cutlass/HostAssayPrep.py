@@ -808,12 +808,13 @@ class HostAssayPrep(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"host_assay_prep\"[node_type]":
-            query = query + " && \"host_assay_prep\"[node_type]"
+        if query != '"host_assay_prep"[node_type]':
+            query = '({}) && "host_assay_prep"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         prep_data = session.get_osdf().oql_query(HostAssayPrep.namespace, query)
 
@@ -823,13 +824,13 @@ class HostAssayPrep(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                prep_result = HostAssayPrep.load_hostassayprep(result)
+                prep_result = HostAssayPrep.load_host_assay_prep(result)
                 result_list.append(prep_result)
 
         return result_list
 
     @staticmethod
-    def load_hostassayprep(prep_data):
+    def load_host_assay_prep(prep_data):
         """
         Takes the provided JSON string and converts it to a
         HostAssayPrep object

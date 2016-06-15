@@ -409,8 +409,10 @@ class Cytokine(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"cytokine\"[node_type]":
-            query = query + " && \"cytokine\"[node_type]"
+        if query != '"cytokine"[node_type]':
+            query = '({}) && "cytokine"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         cyto_data = session.get_osdf().oql_query(Cytokine.namespace, query)
 

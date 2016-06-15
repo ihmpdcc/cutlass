@@ -273,8 +273,10 @@ class SampleAttribute(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"sample_attr\"[node_type]":
-            query = query + " && \"sample_attr\"[node_type]"
+        if query != '"sample_attr"[node_type]':
+            query = '({}) && "sample_attr"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         attrib_data = session.get_osdf().oql_query(SampleAttribute.namespace, query)
 

@@ -937,12 +937,13 @@ class HostSeqPrep(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"host_seq_prep\"[node_type]":
-            query = query + " && \"host_seq_prep\"[node_type]"
+        if query != '"host_seq_prep"[node_type]':
+            query = '({}) && "host_seq_prep"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         prep_data = session.get_osdf().oql_query(HostSeqPrep.namespace, query)
 

@@ -1,3 +1,13 @@
+cutlass 0.19
+
+ * Closed CUTLASS-3 problem with searches reported by Benjamin Leopold.
+ * Also addressed search() method for the other classes.
+ * Fixed minor issue with test_aspera.py unit test and moved round-trip test
+   script to tests/bin subdirectory to avoid conflict with unittest module and
+   test discovery.
+ 
+ - Victor <victor73@github.com>  Tue, 14 Jun 2016 12:00:00 -0400
+
 cutlass 0.18
 
  * Added support for Cytokine data with the Cytokine class and associated test

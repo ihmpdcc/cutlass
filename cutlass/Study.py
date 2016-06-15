@@ -307,12 +307,14 @@ class Study(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"study\"[node_type]":
-            query = query + " && \"study\"[node_type]"
+        if query != '"study"[node_type]':
+            query = '({}) && "study"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         study_data = session.get_osdf().oql_query(Study.namespace, query)
 

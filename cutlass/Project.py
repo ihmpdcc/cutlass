@@ -318,12 +318,13 @@ class Project(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"project\"[node_type]":
-            query = query + " && \"project\"[node_type]"
+        if query != '"project"[node_type]':
+            query = '({}) && "project"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         project_data = session.get_osdf().oql_query(Project.namespace, query)
 

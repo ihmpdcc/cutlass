@@ -1101,12 +1101,13 @@ class Proteome(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"proteome\"[node_type]":
-            query = query + " && \"proteome\"[node_type]"
+        if query != '"proteome"[node_type]':
+            query = '({}) && "proteome"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         proteome_data = session.get_osdf().oql_query(Proteome.namespace, query)
 

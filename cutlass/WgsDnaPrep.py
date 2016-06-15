@@ -501,12 +501,13 @@ class WgsDnaPrep(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"wgs_dna_prep\"[node_type]":
-            query = query + " && \"wgs_dna_prep\"[node_type]"
+        if query != '"wgs_dna_prep"[node_type]':
+            query = '({}) && "wgs_dna_prep"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         wgsDnaPrep_data = session.get_osdf().oql_query(WgsDnaPrep.namespace, query)
 

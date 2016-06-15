@@ -440,12 +440,14 @@ class SixteenSTrimmedSeqSet(Base):
 
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"16s_trimmed_seq_set\"[node_type]":
-            query = query + " && \"16s_trimmed_seq_set\"[node_type]"
+        if query != '"16s_trimmed_seq_set"[node_type]':
+            query = '({}) && "16s_trimmed_seq_set"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         sixteenSTrimmedSeqSet_data = session.get_osdf().oql_query("ihmp", query)
 

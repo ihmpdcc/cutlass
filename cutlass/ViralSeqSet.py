@@ -406,12 +406,13 @@ class ViralSeqSet(Base):
         """
         module_logger.debug("In search.")
 
-        # Searching without any parameters will return all different results
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"viral_seq_set\"[node_type]":
-            query = query + " && \"viral_seq_set\"[node_type]"
+        if query != '"viral_seq_set"[node_type]':
+            query = '({}) && "viral_seq_set"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         data = session.get_osdf().oql_query(ViralSeqSet.namespace, query)
 

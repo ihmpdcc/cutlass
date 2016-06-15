@@ -7,7 +7,6 @@ import string
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
-from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from aspera import aspera
 from Util import *
 
@@ -515,11 +514,48 @@ class SixteenSRawSeqSet(Base):
 
         return json_str
 
-    def search(self, query):
-        self.logger.debug("In search.")
+    @staticmethod
+    def search(query = "\"16s_raw_seq_set\"[node_type]"):
+        """
+        Searches OSDF for 16s DNA prep nodes. Any criteria the user wishes to
+        add is provided by the user in the query language specifications
+        provided in the OSDF documentation. A general format is (including the
+        quotes and brackets):
+
+        "search criteria"[field to search]
+
+        If there are any results, they are returned as a instance,
+        otherwise an empty list will be returned.
+
+        Args:
+            query (str): The OQL query for OSDF.
+
+        Returns:
+            Returns an array of objects. It returns an empty list if
+            there are no results.
+        """
+        module_logger.debug("In search.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        module_logger.info("Got iHMP session.")
+
+        if query != '"16s_raw_seq_set"[node_type]':
+            query = '({}) && "16s_raw_seq_set"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
+
+        seq_set_data = session.get_osdf().oql_query(SixteenSRawSeqSet.namespace, query)
+
+        all_results = seq_set_data['results']
+
+        result_list = list()
+
+        if len(all_results) > 0:
+            for result in all_results:
+                prep = SixteenSRawSeqSet.load_16s_raw_seq_set(result)
+                result_list.append(prep)
+
+        return result_list
 
     def delete(self):
         """
@@ -582,28 +618,30 @@ class SixteenSRawSeqSet(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        #searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         if query != "\"16s_raw_seq_set\"[node_type]":
             query = query + " && \"16s_raw_seq_set\"[node_type]"
 
-        sixteenSRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
+        sixteenSRawSeqSet_data = session.get_osdf().oql_query(
+            SixteenSRawSeqSet.namespace, query
+        )
 
         all_results = sixteenSRawSeqSet_data['results']
 
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                sixteenSRawSeqSet_result = SixteenSRawSeqSet.load_sixteenSRawSeqSet(i)
-                result_list.append(sixteenSRawSeqSet_result)
+            for result in all_results:
+                seq_set_result = SixteenSRawSeqSet.load_sixteenSRawSeqSet(result)
+                result_list.append(seq_set_result)
 
         return result_list
 
     @staticmethod
-    def load_sixteenSRawSeqSet(seq_set_data):
+    def load_16s_raw_seq_set(seq_set_data):
         """
         Takes the provided JSON string and converts it to a SixteenSRawSeqSet
         object
@@ -801,6 +839,8 @@ class SixteenSRawSeqSet(Base):
         """
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
+
+        from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 
         for page_no in count(1):
             res = query("ihmp", linkage_query, page=page_no)

@@ -435,8 +435,10 @@ class Lipidome(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"lipidome\"[node_type]":
-            query = query + " && \"lipidome\"[node_type]"
+        if query != '"lipidome"[node_type]':
+            query = '({}) && "lipidome"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         lip_data = session.get_osdf().oql_query(Lipidome.namespace, query)
 

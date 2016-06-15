@@ -392,13 +392,34 @@ class Sample(Base):
 
     @staticmethod
     def search(query = "\"sample\"[node_type]"):
+        """
+        Searches OSDF for Sample nodes. Any criteria the user wishes to
+        add is provided by the user in the query language specifications
+        provided in the OSDF documentation. A general format is (including the
+        quotes and brackets):
+
+        "search criteria"[field to search]
+
+        If there are any results, they are returned as Sample instances,
+        otherwise an empty list will be returned.
+
+        Args:
+            query (str): The query for the OSDF framework. Defaults to the
+                         Sample node type.
+
+        Returns:
+            Returns an array of Sample objects. It returns an empty
+            list if there are no results.
+        """
         module_logger.debug("In search.")
-        # Searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"sample\"[node_type]":
-            query = query + " && \"sample\"[node_type]"
+        if query != '"sample"[node_type]':
+            query = '({}) && "sample"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         sample_data = session.get_osdf().oql_query(Sample.namespace, query)
 

@@ -498,12 +498,14 @@ class SixteenSDnaPrep(Base):
             there are no results.
         """
         module_logger.debug("In search.")
-        # Searching without any parameters will return all different results
+
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"16s_dna_prep\"[node_type]":
-            query = query + " && \"16s_dna_prep\"[node_type]"
+        if query != '"16s_dna_prep"[node_type]':
+            query = '({}) && "16s_dna_prep"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         sixteenSDnaPrep_data = session.get_osdf().oql_query(SixteenSDnaPrep.namespace, query)
 
@@ -727,7 +729,7 @@ class SixteenSDnaPrep(Base):
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield SixteenSRawSeqSet.load_sixteenSRawSeqSet(doc)
+                yield SixteenSRawSeqSet.load_16s_raw_seq_set(doc)
 
             res_count -= len(res['results'])
 

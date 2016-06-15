@@ -507,8 +507,10 @@ class HostTranscriptomicsRawSeqSet(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != "\"host_transcriptomics_raw_seq_set\"[node_type]":
-            query = query + " && \"host_transcriptomics_raw_seq_set\"[node_type]"
+        if query != '"host_transcriptomics_raw_seq_set"[node_type]':
+            query = '({}) && "host_transcriptomics_raw_seq_set"[node_type]'.format(query)
+
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         rawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
 
