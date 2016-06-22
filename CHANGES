@@ -1,3 +1,9 @@
+cutlass 0.19.1
+
+ * Fixed issued with the name of a load method.
+
+ - Victor <victor73@github.com>  Wed, 22 Jun 2016 12:00:00 -0400
+
 cutlass 0.19
 
  * Closed CUTLASS-3 problem with searches reported by Benjamin Leopold.

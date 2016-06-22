@@ -635,7 +635,7 @@ class SixteenSRawSeqSet(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                seq_set_result = SixteenSRawSeqSet.load_sixteenSRawSeqSet(result)
+                seq_set_result = SixteenSRawSeqSet.load_16s_raw_seq_set(result)
                 result_list.append(seq_set_result)
 
         return result_list
