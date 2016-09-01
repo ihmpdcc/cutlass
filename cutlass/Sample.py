@@ -444,6 +444,7 @@ class Sample(Base):
         sample._set_id(sample_data['id'])
         # ver, not version for the key
         sample._version = sample_data['ver']
+        sample._name = sample_data['meta']['name']
         sample._tags = sample_data['meta']['tags']
         sample._mixs = sample_data['meta']['mixs']
         sample._links = sample_data['linkage']
