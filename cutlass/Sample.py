@@ -447,6 +447,7 @@ class Sample(Base):
         sample._name = sample_data['meta']['name']
         sample._tags = sample_data['meta']['tags']
         sample._mixs = sample_data['meta']['mixs']
+        sample._links = sample_data['linkage']
         sample._fma_body_site = sample_data['meta']['fma_body_site']
 
         if 'body_site' in sample_data['meta']:
