@@ -40,13 +40,12 @@ def get_ascp_version(ascp_command):
     logger.debug("In get_ascp_version.")
 
     version = None
-    retval = subprocess.check_output([ascp_command, "--version"],
+    output = subprocess.check_output([ascp_command, "--version"],
                                      universal_newlines = True)
-    cre = re.compile(r"^.*ascp version (\d[\d\.]+)", re.MULTILINE)
-    for match in cre.finditer(retval):
+    cre = re.compile(r"^.+version (\d[\d\.]+)", re.MULTILINE)
+    for match in cre.finditer(output):
         version = match.groups()[0]
 
-    # raise an exception if the expected string couldn't be matched
     if version is None:
         raise Exception("Output from ascp command ('" + ascp_command + \
                         " --version') did not contain a recognizable " + \
