@@ -93,7 +93,7 @@ class MicrobTranscriptomicsRawSeqSet(Base):
             problems.append("Local file does not point to an actual file.")
 
         if 'sequenced_from' not in self._links.keys():
-            problems.append("Must add a 'sequenced_from' link to a host_seq_prep.")
+            problems.append("Must add a 'sequenced_from' link to a wgs_dna_prep.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
 

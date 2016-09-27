@@ -1,6 +1,15 @@
+cutlass 0.21
+
+ * Change to exception message related to linkages of
+   MicrobTranscriptomicsRawSeqSet nodes reported by @cometsong.
+ * Aspera version check fixed to cope with older version of ascp
+   reported by @parikhhi.
+
+ - Victor <victor73@github.com>  Mon, 19 Sep 2016 14:00:00 -0400
+
 cutlass 0.20
 
- * Changes to Sample by @cometson to fix name attribute.
+ * Changes to Sample by @cometsong to fix name attribute.
  * Fixed problem identified by @parikhhi with Sample links.
 
  - Victor <victor73@github.com>  Thu, 01 Sep 2016 17:00:00 -0400
@@ -13,7 +22,7 @@ cutlass 0.19.1
 
 cutlass 0.19
 
- * Closed CUTLASS-3 problem with searches reported by Benjamin Leopold.
+ * Closed CUTLASS-3 problem with searches reported by @comentsong.
  * Also addressed search() method for the other classes.
  * Fixed minor issue with test_aspera.py unit test and moved round-trip test
    script to tests/bin subdirectory to avoid conflict with unittest module and
