@@ -131,7 +131,7 @@ class WgsRawSeqSet(Base):
             valid = False
 
         if 'sequenced_from' not in self._links.keys():
-            self.logger.error("Must have of 'sequenced_from' linkage.")
+            self.logger.error("Must have a 'sequenced_from' linkage.")
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
