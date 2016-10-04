@@ -31,8 +31,8 @@ class WgsRawSeqSet(Base):
 
     def __init__(self):
         """
-        Constructor for the WgsRawSeqSet class. This initializes the fields specific
-        to the WgsRawSeqSet class, and inherits from the Base class.
+        Constructor for the WgsRawSeqSet class. This initializes the fields
+        specific to the WgsRawSeqSet class, and inherits from the Base class.
 
         Args:
             None
@@ -176,8 +176,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the comment field. The comment must be a string,
-        and less than 512 characters.
+        The setter for the comment field. The comment must be a string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -191,8 +190,10 @@ class WgsRawSeqSet(Base):
 
     @property
     def exp_length(self):
-        """ int: The number of raw bases or color space calls expected for the read,
-                 includes both mate pairs and all technical portions. """
+        """
+        int: The number of raw bases or color space calls expected for the read,
+             includes both mate pairs and all technical portions.
+        """
         self.logger.debug("In 'exp_length' getter.")
 
         return self._exp_length
@@ -217,7 +218,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """
+        """
+        str: The file format of the sequence file.
+        """
         self.logger.debug("In 'format' getter.")
 
         return self._format
@@ -244,7 +247,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def format_doc(self):
-        """ str: URL for documentation of file format. """
+        """
+        str: URL for documentation of file format.
+        """
         self.logger.debug("In 'format_doc' getter.")
 
         return self._format_doc
@@ -267,7 +272,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """
+        """
+        str: URL to the local file to upload to the server.
+        """
         self.logger.debug("In local_file getter.")
 
         return self._local_file
@@ -423,11 +430,11 @@ class WgsRawSeqSet(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -478,9 +485,9 @@ class WgsRawSeqSet(Base):
     def search(query = "\"wgs_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all WgsRawSeqSet node types. Any
-        criteria the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
+        criteria the user wishes to add is provided by the user in the query
+        language specifications provided in the OSDF documentation. A general
+        format is (including the quotes and brackets):
 
         "search criteria"[field to search]
 
@@ -492,8 +499,8 @@ class WgsRawSeqSet(Base):
                          WgsRawSeqSet node type.
 
         Returns:
-            Returns an array of WgsRawSeqSet objects. It returns an empty list if
-            there are no results.
+            Returns an array of WgsRawSeqSet objects. It returns an empty list
+            if there are no results.
         """
         module_logger.debug("In search.")
 
@@ -563,15 +570,16 @@ class WgsRawSeqSet(Base):
     @staticmethod
     def load(seq_set_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+        Loads the data for the specified input ID from the OSDF instance to
+        this object.  If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             seq_set_id (str): The OSDF ID for the document to load.
 
         Returns:
-            A WgsRawSeqSet object with all the available OSDF data loaded into it.
+            A WgsRawSeqSet object with all the available OSDF data loaded into
+            it.
         """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
 

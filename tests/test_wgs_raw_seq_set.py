@@ -103,12 +103,6 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.comment = 1
 
-    def testCommentTooLong(self):
-        wgsRawSeqSet = session.create_object("wgs_raw_seq_set")
-
-        with self.assertRaises(Exception):
-            wgsRawSeqSet.comment = rand_generator(750)
-
     def testCommentLegal(self):
         wgsRawSeqSet = session.create_object("wgs_raw_seq_set")
         success = False

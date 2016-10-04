@@ -35,8 +35,9 @@ class WgsAssembledSeqSet(Base):
 
     def __init__(self):
         """
-        Constructor for the WgsAssembledSeqSet class. This initializes the fields specific
-        to the WgsAssembledSeqSet class, and inherits from the Base class.
+        Constructor for the WgsAssembledSeqSet class. This initializes the
+        fields specific to the WgsAssembledSeqSet class, and inherits from the
+        Base class.
 
         Args:
             None
@@ -159,8 +160,8 @@ class WgsAssembledSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the WgsAssembledSeqSet comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the WgsAssembledSeqSet comment. The comment must be a
+        string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -170,15 +171,14 @@ class WgsAssembledSeqSet(Base):
         """
         self.logger.debug("In 'comment' setter.")
 
-        if len(comment) > 512:
-            raise Exception("Comment is too long. Max length is 512 characters.")
-
         self._comment = comment
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """
-        self.logger.debug("In format getter.")
+        """
+        str: The file format of the sequence file.
+        """
+        self.logger.debug("In 'format' getter.")
 
         return self._format
 
@@ -194,10 +194,10 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
+        self.logger.debug("In 'format' setter.")
 
         if type(format_str) != str:
-            raise ValueError("format must be a string.")
+            raise ValueError("Format must be a string.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
@@ -230,7 +230,9 @@ class WgsAssembledSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """
+        """
+        str: URL to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -671,13 +673,14 @@ class WgsAssembledSeqSet(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        the OSDF instance. Also, the version is updated as the data is saved in
+        the OSDF instance.
 
         Args:
             None
