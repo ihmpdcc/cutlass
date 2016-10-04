@@ -22,7 +22,7 @@ dependency_methods = {
                     Study.__name__  : Study.subjects.__name__,
                   Subject.__name__  : Subject.visits.__name__,
                     Visit.__name__  : Visit.samples.__name__,
-                   Sample.__name__  : Sample.dnaPreps.__name__,
+                   Sample.__name__  : Sample.allChildren.__name__,
                WgsDnaPrep.__name__  : WgsDnaPrep.child_seq_sets.__name__,
              WgsRawSeqSet.__name__  : WgsRawSeqSet.viral_seq_sets.__name__,
           SixteenSDnaPrep.__name__  : SixteenSDnaPrep.raw_seq_sets.__name__,
