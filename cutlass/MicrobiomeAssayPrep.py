@@ -1099,6 +1099,31 @@ class MicrobiomeAssayPrep(Base):
             if res_count < 1:
                 break
 
+    def proteomes(self):
+        """
+        Returns an iterator of all Proteomes connected to this
+        MicrobiomeAssayPrep.
+        """
+        self.logger.debug("In proteomes().")
+
+        linkage_query = '"{}"[linkage.derived_from] and "proteomes"[node_type]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Proteome import Proteome
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Proteome.load_proteome(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
     def _derived_docs(self):
         self.logger.debug("In _derived_docs.")
 
@@ -1119,13 +1144,14 @@ class MicrobiomeAssayPrep(Base):
     def derivations(self):
         """
         Return an iterator of all the derived nodes from this prep, including
-        lipdomes, metabolomes, cytokines, etc...
+        lipidomes, metabolomes, cytokines, proteomes, etc...
         """
         self.logger.debug("In _derived_docs.")
 
         from Cytokine import Cytokine
         from Lipidome import Lipidome
         from Metabolome import Metabolome
+        from Proteome import Proteome
 
         for doc in self._derived_docs():
             if doc['node_type'] == "cytokine":
@@ -1134,3 +1160,5 @@ class MicrobiomeAssayPrep(Base):
                 yield Lipidome.load_lipidome(doc)
             elif doc['node_type'] == "metabolome":
                 yield Metabolome.load_metabolome(doc)
+            elif doc['node_type'] == "proteome":
+                yield Proteome.load_proteome(doc)
