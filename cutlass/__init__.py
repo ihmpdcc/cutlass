@@ -6,6 +6,7 @@ from .Cytokine import Cytokine
 from .HostSeqPrep import HostSeqPrep
 from .HostAssayPrep import HostAssayPrep
 from .HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
+from .HostWgsRawSeqSet import HostWgsRawSeqSet
 from .Lipidome import Lipidome
 from .Metabolome import Metabolome
 from .MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet

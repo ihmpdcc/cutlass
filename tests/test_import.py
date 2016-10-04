@@ -62,6 +62,53 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Cytokine is None)
 
+    def testImportHostSeqPrep(self):
+        success = False
+
+        try:
+            from cutlass import HostSeqPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostSeqPrep is None)
+
+    def testImportHostAssayPrep(self):
+        success = False
+
+        try:
+            from cutlass import HostAssayPrep
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostAssayPrep is None)
+
+    def testImportHostTranscriptomicsRawSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import HostTranscriptomicsRawSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostTranscriptomicsRawSeqSet is None)
+
+    def testImportHostWgsRawSeqSet(self):
+        success = False
+        try:
+            from cutlass import HostWgsRawSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostWgsRawSeqSet is None)
+
     def testImportIHMPSession(self):
         success = False
         try:
@@ -121,41 +168,6 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Subject is None)
 
-    def testImportViralSeqSet(self):
-        success = False
-
-        try:
-            from cutlass import ViralSeqSet
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(ViralSeqSet is None)
-
-    def testImportVisit(self):
-        success = False
-
-        try:
-            from cutlass import Visit
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(Visit is None)
-
-    def testImportVisitAttribute(self):
-        success = False
-
-        try:
-            from cutlass import VisitAttribute
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(VisitAttribute is None)
 
     def testImport16SDnaPrep(self):
         success = False
@@ -228,42 +240,6 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(SixteenSTrimmedSeqSet is None)
-
-    def testImportHostSeqPrep(self):
-        success = False
-
-        try:
-            from cutlass import HostSeqPrep
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(HostSeqPrep is None)
-
-    def testImportHostAssayPrep(self):
-        success = False
-
-        try:
-            from cutlass import HostAssayPrep
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(HostAssayPrep is None)
-
-    def testImportHostTranscriptomicsRawSeqSet(self):
-        success = False
-
-        try:
-            from cutlass import HostTranscriptomicsRawSeqSet
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(HostTranscriptomicsRawSeqSet is None)
 
     def testImportLipidome(self):
         success = False
@@ -372,6 +348,42 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(SampleAttribute is None)
+
+    def testImportViralSeqSet(self):
+        success = False
+
+        try:
+            from cutlass import ViralSeqSet
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(ViralSeqSet is None)
+
+    def testImportVisit(self):
+        success = False
+
+        try:
+            from cutlass import Visit
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Visit is None)
+
+    def testImportVisitAttribute(self):
+        success = False
+
+        try:
+            from cutlass import VisitAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(VisitAttribute is None)
 
 if __name__ == '__main__':
     unittest.main()

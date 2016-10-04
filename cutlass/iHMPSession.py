@@ -64,6 +64,7 @@ class iHMPSession(object):
           "host_assay_prep"                    : "HostAssayPrep",
           "host_seq_prep"                      : "HostSeqPrep",
           "host_transcriptomics_raw_seq_set"   : "HostTranscriptomicsRawSeqSet",
+          "host_wgs_raw_seq_set"               : "HostWgsRawSeqSet",
           "lipidome"                           : "Lipidome",
           "metabolome"                         : "Metabolome",
           "microbiome_assay_prep"              : "MicrobiomeAssayPrep",
