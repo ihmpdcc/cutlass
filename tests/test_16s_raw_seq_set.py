@@ -102,12 +102,6 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.comment = 1
 
-    def testCommentTooLong(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
-
-        with self.assertRaises(Exception):
-            sixteenSRawSeqSet.comment = rand_generator(750)
-
     def testCommentLegal(self):
         sixteenSRawSeqSet = session.create_16s_raw_seq_set()
         success = False

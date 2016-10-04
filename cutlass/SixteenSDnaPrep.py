@@ -124,7 +124,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def comment(self):
-        """ str: Free-text comment. """
+        """
+        str: Free-text comment.
+        """
         self.logger.debug("In 'comment' getter.")
 
         return self._comment
@@ -133,8 +135,7 @@ class SixteenSDnaPrep(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the WgsRawSeqSet comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the comment. The comment must be a string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -144,14 +145,13 @@ class SixteenSDnaPrep(Base):
         """
         self.logger.debug("In comment setter.")
 
-        if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
-
         self._comment = comment
 
     @property
     def frag_size(self):
-        """ int: Target library fragment size after shearing. """
+        """
+        int: Target library fragment size after shearing.
+        """
         self.logger.debug("In frag_size getter.")
 
         return self._frag_size
@@ -178,8 +178,10 @@ class SixteenSDnaPrep(Base):
 
     @property
     def lib_layout(self):
-        """ str: Specification of the layout: fragment/paired, and if paired,
-            then nominal insert size and standard deviation. """
+        """
+        str: Specification of the layout: fragment/paired, and if paired,
+             then nominal insert size and standard deviation.
+        """
         self.logger.debug("In lib_layout getter.")
 
         return self._lib_layout
@@ -258,7 +260,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def ncbi_taxon_id(self):
-        """ str: NCBI taxon id. """
+        """
+        str: NCBI taxon id.
+        """
         self.logger.debug("In ncbi_taxon_id getter.")
 
         return self._ncbi_taxon_id
@@ -281,7 +285,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def prep_id(self):
-        """ str: Nucleic Acid Prep ID. """
+        """
+        str: Nucleic Acid Prep ID.
+        """
         self.logger.debug("In prep_id getter.")
 
         return self._prep_id
@@ -304,7 +310,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def srs_id(self):
-        """ str: NCBI Sequence Read Archive sample ID of the form SRS012345. """
+        """
+        str: NCBI Sequence Read Archive sample ID of the form SRS012345.
+        """
         self.logger.debug("In srs_id getter.")
 
         return self._srs_id
@@ -379,7 +387,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def storage_duration(self):
-        """ int: Duration for which sample was stored in days. """
+        """
+        int: Duration for which sample was stored in days.
+        """
         self.logger.debug("In storage_duration getter.")
 
         return self._storage_duration
