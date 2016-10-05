@@ -313,7 +313,9 @@ class ClusteredSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -679,7 +681,6 @@ class ClusteredSeqSet(Base):
 
         Returns;
             True if successful, False otherwise.
-
         """
         self.logger.debug("In save.")
         aspera_server = "aspera.ihmpdcc.org"
