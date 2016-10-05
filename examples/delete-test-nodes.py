@@ -10,7 +10,7 @@ NAMESPACE = 'ihmp'
 NODE_TYPE_ORDER = [
     'annotation', 'abundance_matrix',
     'wgs_assembled_seq_set', '16s_trimmed_seq_set',
-    'wgs_raw_seq_set', '16s_raw_seq_set', 'wgs_dna_prep', '16s_dna_prep', 
+    'wgs_raw_seq_set', '16s_raw_seq_set', 'wgs_dna_prep', '16s_dna_prep',
     'sample', 'visit', 'subject', 'study', 'project'
     ]
 
@@ -25,11 +25,11 @@ args = parser.parse_args()
 ## main program
 logging.basicConfig(level=logging.INFO)
 s = iHMPSession(args.username, args.password, args.server)
-o = s.get_osdf()
+osdf = s.get_osdf()
 
 # query for all nodes with tag args.tag
 qstring = "\"" + args.tag + "\"[tags]"
-res = o.oql_query_all_pages(NAMESPACE, qstring)
+res = osdf.oql_query_all_pages(NAMESPACE, qstring)
 print("OQL query=" + qstring + " result_count=" + str(res['result_count']))
 results = res['results']
 
@@ -51,7 +51,7 @@ for r in sorted_res:
         # double-check that args.tag is present - should be superfluous
         if (t == args.tag):
             print("deleting " + id)
-            o.delete_node(id)
+            osdf.delete_node(id)
             n_deleted = n_deleted + 1
 
-print("num_deleted= " + str(n_deleted))
+print("Deleted count: " + str(n_deleted))
