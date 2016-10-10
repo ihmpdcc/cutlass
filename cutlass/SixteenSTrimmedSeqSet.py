@@ -670,3 +670,29 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
+
+    def abundance_matrices(self):
+        """
+        Returns an iterator of all AbundanceMatrix nodes connected to this
+        object.
+        """
+        self.logger.debug("In abundance_matrices().")
+
+        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from AbundanceMatrix import AbundanceMatrix
+
+        for page_no in count(1):
+            res = query(SixteenSTrimmedSeqSet.namespace, linkage_query,
+                        page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield AbundanceMatrix.load_abundance_matrix(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break

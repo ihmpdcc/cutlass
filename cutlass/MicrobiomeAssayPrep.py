@@ -1081,7 +1081,7 @@ class MicrobiomeAssayPrep(Base):
         """
         self.logger.debug("In metabolomes().")
 
-        linkage_query = '"{}"[linkage.derived_from] and "metabolomes"[node_type]'.format(self.id)
+        linkage_query = '"{}"[linkage.derived_from] && "metabolome"[node_type]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
@@ -1106,7 +1106,7 @@ class MicrobiomeAssayPrep(Base):
         """
         self.logger.debug("In proteomes().")
 
-        linkage_query = '"{}"[linkage.derived_from] and "proteomes"[node_type]'.format(self.id)
+        linkage_query = '"{}"[linkage.derived_from] && "proteome"[node_type]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
 

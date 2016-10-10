@@ -529,7 +529,7 @@ class WgsRawSeqSetPrivate(Base):
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield AbunanceMatrix.load_abundance_matrix(doc)
+                yield AbundanceMatrix.load_abundance_matrix(doc)
 
             res_count -= len(res['results'])
 
