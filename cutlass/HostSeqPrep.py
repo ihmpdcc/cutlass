@@ -957,3 +957,35 @@ class HostSeqPrep(Base):
                 result_list.append(prep_result)
 
         return result_list
+
+    def _derived_docs(self):
+        self.logger.debug("In _derived_docs().")
+
+        linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(HostSeqPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield doc
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def derivations(self):
+        """
+        Return an iterator of all the derived nodes from this prep.
+        """
+        self.logger.debug("In derivations().")
+
+        from HostWgsRawSeqSet import HostWgsRawSeqSet
+        from HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
+
+        for doc in self._derived_docs():
+            if doc['node_type'] == "host_transcriptomics_raw_seq_set":
+                yield HostTranscriptomicsRawSeqSet.load_host_transcriptomics_raw_set_set(doc)
+            elif doc['node_type'] == "host_wgs_raw_seq_set":
+                yield HostWgsRawSeqSet.load_hostWgsRawSeqSet(doc)

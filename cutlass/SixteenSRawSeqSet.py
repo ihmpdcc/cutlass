@@ -166,7 +166,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def comment(self):
-        """ str: Free-text comment. """
+        """
+        str: Free-text comment.
+        """
         self.logger.debug("In 'comment' getter.")
 
         return self._comment
@@ -175,8 +177,7 @@ class SixteenSRawSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the SixteenSRawSeqSet comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the SixteenSRawSeqSet comment. The comment must be a string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -185,9 +186,6 @@ class SixteenSRawSeqSet(Base):
             None
         """
         self.logger.debug("In 'comment' setter.")
-
-        if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
 
         self._comment = comment
 
@@ -355,7 +353,9 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """
+        """
+        int: The size of the file in bytes.
+        """
         self.logger.debug("In 'size' getter.")
 
         return self._size
@@ -411,8 +411,10 @@ class SixteenSRawSeqSet(Base):
 
     @property
     def urls(self):
-        """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """
+        """
+        array: An array of URL from where the file can be obtained,
+               http, ftp, fasp, etc...
+        """
         self.logger.debug("In 'urls' getter.")
 
         return self._urls
@@ -441,11 +443,11 @@ class SixteenSRawSeqSet(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless they are set or
+        not. Any remaining fields are included only if they are set. This
+        allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -599,23 +601,23 @@ class SixteenSRawSeqSet(Base):
     @staticmethod
     def search(query = "\"16s_raw_seq_set\"[node_type]"):
         """
-        Searches the OSDF database through all SixteenSRawSeqSet node types. Any
-        criteria the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
+        Searches the OSDF database through all SixteenSRawSeqSet node types.
+        Any criteria the user wishes to add is provided by the user in the
+        query language specifications provided in the OSDF documentation. A
+        general format is (including the quotes and brackets):
 
         "search criteria"[field to search]
 
-        If there are any results, they are returned as a SixteenSRawSeqSet instance,
-        otherwise an empty list will be returned.
+        If there are any results, they are returned as a SixteenSRawSeqSet
+        instance, otherwise an empty list will be returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
                          SixteenSRawSeqSet node type.
 
         Returns:
-            Returns an array of SixteenSRawSeqSet objects. It returns an empty list if
-            there are no results.
+            Returns an array of SixteenSRawSeqSet objects. It returns an empty
+            list if there are no results.
         """
         module_logger.debug("In search.")
 

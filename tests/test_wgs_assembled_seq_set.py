@@ -160,12 +160,6 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             seq_set.comment = 1
 
-    def testCommentTooLong(self):
-        seq_set = session.create_object("wgs_assembled_seq_set")
-
-        with self.assertRaises(Exception):
-            seq_set.comment = rand_generator(750)
-
     def testLegalComment(self):
         seq_set = session.create_object("wgs_assembled_seq_set")
         success = False

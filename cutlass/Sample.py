@@ -8,6 +8,9 @@ from mixs import MIXS, MixsException
 from Base import Base
 from WgsDnaPrep import WgsDnaPrep
 from SixteenSDnaPrep import SixteenSDnaPrep
+from HostSeqPrep import HostSeqPrep
+from MicrobiomeAssayPrep import MicrobiomeAssayPrep
+from HostAssayPrep import HostAssayPrep
 from SampleAttribute import SampleAttribute
 from Util import *
 
@@ -473,7 +476,7 @@ class Sample(Base):
         Returns:
             A dictionary representation of the JSON document.
         """
-        self.logger.debug("In _get_raw_doc.")
+        self.logger.debug("In _get_raw_doc().")
 
         sample_doc = {
             'acl': {
@@ -514,7 +517,9 @@ class Sample(Base):
 
         return sample_doc
 
-    def _prep_docs(self):
+    def _dep_docs(self):
+        self.logger.debug("In _dep_docs().")
+
         linkage_query = '"{}"[linkage.prepared_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
 
@@ -548,6 +553,8 @@ class Sample(Base):
         """
         Return an iterator of the sample attributes associated with this sample.
         """
+        self.logger.debug("In sampleAttributes().")
+
         for doc in self._sample_attr_docs():
             if doc['node_type'] == "sample_attr":
                 yield SampleAttribute.load_sample_attr(doc)
@@ -556,15 +563,49 @@ class Sample(Base):
         """
         Return an iterator of the 16S DNA preps prepared from this sample.
         """
-        for doc in self._prep_docs():
+        self.logger.debug("In sixteenSDnaPreps().")
+
+        for doc in self._dep_docs():
             if doc['node_type'] == "16s_dna_prep":
                 yield SixteenSDnaPrep.load_sixteenSDnaPrep(doc)
+
+    def hostSeqPreps(self):
+        """
+        Return an iterator of the HostSeqPreps prepared from this sample.
+        """
+        self.logger.debug("In hostSeqPreps().")
+
+        for doc in self._dep_docs():
+            if doc['node_type'] == "host_seq_prep":
+                yield HostSeqPrep.load_host_seq_prep(doc)
+
+    def microbAssayPreps(self):
+        """
+        Return an iterator of the MicrobiomeAssayPreps prepared from this sample.
+        """
+        self.logger.debug("In microbAssayPreps().")
+
+        for doc in self._dep_docs():
+            if doc['node_type'] == "microb_assay_prep":
+                yield MicrobiomeAssayPrep.load_microassayprep(doc)
+
+    def hostAssayPreps(self):
+        """
+        Return an iterator of the HostAssayPreps prepared from this sample.
+        """
+        self.logger.debug("In hostAssayPreps().")
+
+        for doc in self._dep_docs():
+            if doc['node_type'] == "host_assay_prep":
+                yield HostAssayPrep.load_host_assay_prep(doc)
 
     def wgsDnaPreps(self):
         """
         Return an iterator of the WGS DNA preps prepared from this sample.
         """
-        for doc in self._prep_docs():
+        self.logger.debug("In wgsDnaPreps().")
+
+        for doc in self._dep_docs():
             if doc['node_type'] == "wgs_dna_prep":
                 yield WgsDnaPrep.load_wgsDnaPrep(doc)
 
@@ -572,9 +613,40 @@ class Sample(Base):
         """
         Return an iterator of all the DNA preps prepared from this sample.
         """
-        for doc in self._prep_docs():
+        self.logger.debug("In dnaPreps().")
+
+        for doc in self._dep_docs():
             if doc['node_type'] == "16s_dna_prep":
                 yield SixteenSDnaPrep.load_sixteenSDnaPrep(doc)
             elif doc['node_type'] == "wgs_dna_prep":
                 yield WgsDnaPrep.load_wgsDnaPrep(doc)
 
+    def preps(self):
+        """
+        Return an iterator of all the preps taken from this sample.
+        """
+        self.logger.debug("In preps().")
+
+        for doc in self._dep_docs():
+            if doc['node_type'] == "16s_dna_prep":
+                yield SixteenSDnaPrep.load_sixteenSDnaPrep(doc)
+            elif doc['node_type'] == "wgs_dna_prep":
+                yield WgsDnaPrep.load_wgsDnaPrep(doc)
+            elif doc['node_type'] == "host_seq_prep":
+                yield HostSeqPrep.load_host_seq_prep(doc)
+            elif doc['node_type'] == "microb_assay_prep":
+                yield MicrobiomeAssayPrep.load_microassayprep(doc)
+            elif doc['node_type'] == "host_assay_prep":
+                yield HostAssayPrep.load_host_assay_prep(doc)
+
+    def allChildren(self):
+        """
+        Return an iterator of all the child nodes derived from this sample.
+        """
+        self.logger.debug("In all_children().")
+
+        for doc in self.preps():
+            yield doc
+
+        for attrib in self.sampleAttributes():
+            yield attrib

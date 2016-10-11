@@ -667,13 +667,11 @@ class HostAssayPrep(Base):
             'node_type': 'host_assay_prep',
             'meta': {
                 'comment': self._comment,
-                'pride_id': self._pride_id,
                 'sample_name': self._sample_name,
                 'title': self._title,
                 'center': self._center,
                 'contact': self._contact,
                 'prep_id': self._prep_id,
-                'storage_duration': self._storage_duration,
                 'experiment_type': self._experiment_type,
                 'subtype': self._study,
                 'study': self._study,
@@ -698,6 +696,10 @@ class HostAssayPrep(Base):
            self.logger.debug("HostAssayPrep object has the 'url' property set.")
            prep_doc['meta']['urls'] = self._urls
 
+        if self._pride_id is not None:
+           self.logger.debug("HostAssayPrep object has the 'pride_id' property set.")
+           prep_doc['meta']['pride_id'] = self._pride_id
+
         if self._species is not None:
            self.logger.debug("HostAssayPrep object has the 'species' property set.")
            prep_doc['meta']['species'] = self._species
@@ -710,10 +712,6 @@ class HostAssayPrep(Base):
            self.logger.debug("HostAssayPrep object has the 'tissue' property set.")
            prep_doc['meta']['tissue'] = self._tissue
 
-        if self._reference is not None:
-           self.logger.debug("HostAssayPrep object has the 'reference' property set.")
-           prep_doc['meta']['reference'] = self._reference
-
         if self._protocol_name is not None:
            self.logger.debug("HostAssayPrep object has the 'protocol_name' property set.")
            prep_doc['meta']['protocol_name'] = self._protocol_name
@@ -722,6 +720,10 @@ class HostAssayPrep(Base):
            self.logger.debug("HostAssayPrep object has the 'protocol_steps' property set.")
            prep_doc['meta']['protocol_steps'] = self._protocol_steps
 
+        if self._reference is not None:
+           self.logger.debug("HostAssayPrep object has the 'reference' property set.")
+           prep_doc['meta']['reference'] = self._reference
+
         if self._exp_description is not None:
            self.logger.debug("HostAssayPrep object has the 'exp_description' property set.")
            prep_doc['meta']['exp_description'] = self._exp_description
@@ -729,6 +731,10 @@ class HostAssayPrep(Base):
         if self._sample_description is not None:
            self.logger.debug("HostAssayPrep object has the 'sample_description' property set.")
            prep_doc['meta']['sample_description'] = self._sample_description
+
+        if self._storage_duration is not None:
+           self.logger.debug("HostAssayPrep object has the 'storage_duration' property set.")
+           prep_doc['meta']['storage_duration'] = self._storage_duration
 
         return prep_doc
 
@@ -743,9 +749,8 @@ class HostAssayPrep(Base):
             Tuple of strings for required properties.
         """
         module_logger.debug("In required fields.")
-        return ("comment", "pride_id", "sample_name", "title",
-                "center", "contact", "prep_id", "storage_duration",
-                "experiment_type", "study", "tags")
+        return ("comment", "sample_name", "title", "center", "contact",
+                "prep_id", "experiment_type", "study", "tags")
 
     def delete(self):
         """
@@ -851,13 +856,11 @@ class HostAssayPrep(Base):
 
         # Required fields
         prep._gender = prep_data['meta']['comment']
-        prep._pride_id = prep_data['meta']['pride_id']
         prep._sample_name = prep_data['meta']['sample_name']
         prep._title = prep_data['meta']['title']
         prep._center = prep_data['meta']['center']
         prep._contact = prep_data['meta']['contact']
         prep._prep_id = prep_data['meta']['prep_id']
-        prep._storage_duration = prep_data['meta']['storage_duration']
         prep._experiment_type = prep_data['meta']['experiment_type']
         prep._study = prep_data['meta']['study']
         prep._tags = prep_data['meta']['tags']
@@ -868,6 +871,9 @@ class HostAssayPrep(Base):
 
         if 'urls' in prep_data['meta']:
             prep._urls = prep_data['meta']['urls']
+
+        if 'pride_id' in prep_data['meta']:
+            prep._pride_id = prep_data['meta']['pride_id']
 
         if 'species' in prep_data['meta']:
             prep._species = prep_data['meta']['species']
@@ -892,6 +898,9 @@ class HostAssayPrep(Base):
 
         if 'sample_description' in prep_data['meta']:
             prep._sample_description = prep_data['meta']['sample_description']
+
+        if 'storage_duration' in prep_data['meta']:
+            prep._storage_duration = prep_data['meta']['storage_duration']
 
         module_logger.debug("Returning loaded HostAssayPrep.")
         return prep
@@ -1119,8 +1128,32 @@ class HostAssayPrep(Base):
             if res_count < 1:
                 break
 
+    def proteomes(self):
+        """
+        Returns an iterator of all Proteomes connected to this HostAssayPrep.
+        """
+        self.logger.debug("In proteomes().")
+
+        linkage_query = '"{}"[linkage.derived_from] and "proteome"[node_type]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Proteome import Proteome
+
+        for page_no in count(1):
+            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Proteome.load_proteome(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
     def _derived_docs(self):
-        self.logger.debug("In _derived_docs.")
+        self.logger.debug("In _derived_docs().")
 
         linkage_query = '"{}"[linkage.derived_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
@@ -1141,11 +1174,12 @@ class HostAssayPrep(Base):
         Return an iterator of all the derived nodes from this prep, including
         lipidomes, metabolomes, cytokines, etc...
         """
-        self.logger.debug("In _derived_docs.")
+        self.logger.debug("In derivations().")
 
         from Cytokine import Cytokine
         from Lipidome import Lipidome
         from Metabolome import Metabolome
+        from Proteome import Proteome
 
         for doc in self._derived_docs():
             if doc['node_type'] == "lipidome":
@@ -1154,3 +1188,5 @@ class HostAssayPrep(Base):
                 yield Metabolome.load_metabolome(doc)
             elif doc['node_type'] == "cytokine":
                 yield Cytokine.load_cytokine(doc)
+            elif doc['node_type'] == "proteome":
+                yield Proteome.load_proteome(doc)

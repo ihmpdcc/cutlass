@@ -128,8 +128,10 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def checksums(self):
-        """ str: One or more checksums used to ensure file integrity. """
-        self.logger.debug("In checksums getter.")
+        """
+        str: One or more checksums used to ensure file integrity.
+        """
+        self.logger.debug("In 'checksums' getter.")
 
         return self._checksums
 
@@ -165,8 +167,8 @@ class SixteenSTrimmedSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the SixteenSTrimmedSeqSet comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the SixteenSTrimmedSeqSet comment. The comment must be a
+        string, and less than 512 characters.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -176,14 +178,13 @@ class SixteenSTrimmedSeqSet(Base):
         """
         self.logger.debug("In 'comment' setter.")
 
-        if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
-
         self._comment = comment
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """
+        """
+        str: The file format of the sequence file.
+        """
         self.logger.debug("In 'format' getter.")
 
         return self._format
@@ -236,7 +237,9 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -260,7 +263,9 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def sequence_type(self):
-        """ str: Specifies whether the file contains peptide or nucleotide data. """
+        """
+        str: Specifies whether the file contains peptide or nucleotide data.
+        """
         self.logger.debug("In 'sequence_type' getter.")
 
         return self._sequence_type
@@ -288,7 +293,9 @@ class SixteenSTrimmedSeqSet(Base):
 
     @property
     def size(self):
-        """ int: The size of the file in bytes. """
+        """
+        int: The size of the file in bytes.
+        """
         self.logger.debug("In size getter.")
 
         return self._size
@@ -663,3 +670,29 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
+
+    def abundance_matrices(self):
+        """
+        Returns an iterator of all AbundanceMatrix nodes connected to this
+        object.
+        """
+        self.logger.debug("In abundance_matrices().")
+
+        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from AbundanceMatrix import AbundanceMatrix
+
+        for page_no in count(1):
+            res = query(SixteenSTrimmedSeqSet.namespace, linkage_query,
+                        page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield AbundanceMatrix.load_abundance_matrix(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break

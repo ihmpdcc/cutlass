@@ -99,12 +99,6 @@ class WgsDnaPrepTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsDnaPrep.comment = 1
 
-    def testCommentTooLong(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
-
-        with self.assertRaises(Exception):
-            wgsDnaPrep.comment = rand_generator(750)
-
     def testLegalComment(self):
         wgsDnaPrep = session.create_object("wgs_dna_prep")
         success = False

@@ -1,3 +1,21 @@
+cutlass 0.23
+
+  * Added support for the new WgsRawSeqSetPrivate node.
+  * Fixed issue with child retrieval in MicrobiomeAssayPrep.
+  * Added child retrieval functionality to WgsAssembledSeqSet.
+
+ - Victor <victor73@github.com>  Mon, 10 Oct 2016 15:50:00 -0400
+
+cutlass 0.22
+
+  * Removed length check on comment properties in some classes as we're
+    deferring to OSDF for that.
+  * Added support for the HostWgsRawSeqSet node, which was previously missing.
+  * Added proteome retrieval support contributed by @akumar.
+  * Added better support for retrieving dependent nodes in the Sample class.
+
+ - Victor <victor73@github.com>  Tue, 04 Oct 2016 15:30:00 -0400
+
 cutlass 0.21
 
  * Change to exception message related to linkages of

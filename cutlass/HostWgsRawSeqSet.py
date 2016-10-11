@@ -16,10 +16,10 @@ module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
-class WgsRawSeqSet(Base):
+class HostWgsRawSeqSet(Base):
     """
-    The class encapsulating the Wgs Raw Sequence Set data for an iHMP instance.
-    This class contains all the fields required to save a Wgs Raw Sequence Set
+    The class encapsulating the HostWgsRawSeqSet data for an iHMP instance.
+    This class contains all the fields required to save a HostWgsRawSeqSet
     object in the OSDF instance.
 
     Attributes:
@@ -31,8 +31,9 @@ class WgsRawSeqSet(Base):
 
     def __init__(self):
         """
-        Constructor for the WgsRawSeqSet class. This initializes the fields
-        specific to the WgsRawSeqSet class, and inherits from the Base class.
+        Constructor for the HostWgsRawSeqSet class. This initializes the fields
+        specific to the HostWgsRawSeqSet class, and inherits from the Base
+        class.
 
         Args:
             None
@@ -47,7 +48,7 @@ class WgsRawSeqSet(Base):
         self._links = {}
         self._tags = []
 
-        # These are particular to WgsRawSeqSet objects
+        # These are particular to HostWgsRawSeqSet objects
         self._checksums = None
         self._comment = None
         self._exp_length = None
@@ -94,7 +95,7 @@ class WgsRawSeqSet(Base):
             problems.append("Local file does not point to an actual file.")
 
         if 'sequenced_from' not in self._links.keys():
-            problems.append("Must add a 'sequenced_from' link to a wgs_dna_prep.")
+            problems.append("Must add a 'sequenced_from' link to a host_seq_prep.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
 
@@ -176,7 +177,8 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the comment field. The comment must be a string.
+        The setter for the comment field. The comment must be a string,
+        and less than 512 characters.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -190,10 +192,8 @@ class WgsRawSeqSet(Base):
 
     @property
     def exp_length(self):
-        """
-        int: The number of raw bases or color space calls expected for the read,
-             includes both mate pairs and all technical portions.
-        """
+        """ int: The number of raw bases or color space calls expected for the read,
+                 includes both mate pairs and all technical portions. """
         self.logger.debug("In 'exp_length' getter.")
 
         return self._exp_length
@@ -202,7 +202,7 @@ class WgsRawSeqSet(Base):
     @enforce_int
     def exp_length(self, exp_length):
         """
-        The setter for the WgsRawSeqSet exp length.
+        The setter for the HostWgsRawSeqSet exp_length.
 
         Args:
             exp_length (int): The new exp_length for the current instance.
@@ -218,9 +218,7 @@ class WgsRawSeqSet(Base):
 
     @property
     def format(self):
-        """
-        str: The file format of the sequence file.
-        """
+        """ str: The file format of the sequence file """
         self.logger.debug("In 'format' getter.")
 
         return self._format
@@ -229,7 +227,8 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def format(self, format_str):
         """
-        The setter for the WgsRawSeqSet format. This must be either fasta or fastq.
+        The setter for the HostWgsRawSeqSet format. This must be either fasta
+        or fastq.
 
         Args:
             format_str (str): The new format string for the current object.
@@ -258,7 +257,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def format_doc(self, format_doc):
         """
-        The setter for the WgsRawSeqSet format doc.
+        The setter for the HostWgsRawSeqSet format doc.
 
         Args:
             format_doc (str): The new format_doc for the current object.
@@ -283,7 +282,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def local_file(self, local_file):
         """
-        The setter for the WgsRawSeqSet local file.
+        The setter for the HostWgsRawSeqSet local file.
 
         Args:
             local_file (str): The URL to the local file that should
@@ -298,7 +297,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def seq_model(self):
-        """ str: Sequencing instrument model. """
+        """
+        str: Sequencing instrument model.
+        """
         self.logger.debug("In 'seq_model' getter.")
 
         return self._seq_model
@@ -307,7 +308,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def seq_model(self, seq_model):
         """
-        The setter for the WgsRawSeqSet seq model.
+        The setter for the HostWgsRawSeqSet seq model.
 
         Args:
             seq_model (str): The new seq model.
@@ -322,7 +323,8 @@ class WgsRawSeqSet(Base):
     @property
     def sequence_type(self):
         """
-        str: Specifies whether the file contains peptide or nucleotide data.
+        str:
+        Specifies whether the file contains peptide or nucleotide data.
         """
         self.logger.debug("In 'sequence_type' getter.")
 
@@ -332,7 +334,7 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def sequence_type(self, sequence_type):
         """
-        The setter for the WgsRawSeqSet sequence type. This must be either
+        The setter for the HostWgsRawSeqSet sequence type. This must be either
         peptide or nucleotide.
 
         Args:
@@ -362,7 +364,7 @@ class WgsRawSeqSet(Base):
     @enforce_int
     def size(self, size):
         """
-        The setter for the WgsRawSeqSet size.
+        The setter for the HostWgsRawSeqSet size.
 
         Args:
             size (int): The size of the seq set in bytes.
@@ -379,7 +381,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
         self.logger.debug("In 'study' getter.")
 
         return self._study
@@ -388,8 +392,8 @@ class WgsRawSeqSet(Base):
     @enforce_string
     def study(self, study):
         """
-        The setter for the WgsRawSeqSet study. This is restricted to be either
-        preg_preterm, ibd, or prediabetes.
+        The setter for the HostWgsRawSeqSet study. This is restricted to be
+        either preg_preterm, ibd, or prediabetes.
 
         Args:
             study (str): The study of the seq set.
@@ -408,9 +412,11 @@ class WgsRawSeqSet(Base):
 
     @property
     def urls(self):
-        """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """
-        self.logger.debug("In urls getter.")
+        """
+        array: An array of URL from where the file can be obtained,
+               http, ftp, fasp, etc...
+        """
+        self.logger.debug("In 'urls' getter.")
 
         return self._urls
 
@@ -421,6 +427,7 @@ class WgsRawSeqSet(Base):
 
         Args:
             None
+
         Returns:
             None
         """
@@ -430,11 +437,11 @@ class WgsRawSeqSet(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required
-        fields are filled into the JSON document, regardless they are set or
-        not. Any remaining fields are included only if they are set. This
-        allows the user to visualize the JSON to ensure fields are set
-        appropriately before saving into the database.
+        Generates the raw JSON document for the current object. All required fields are
+        filled into the JSON document, regardless they are set or not. Any remaining
+        fields are included only if they are set. This allows the user to visualize
+        the JSON to ensure fields are set appropriately before saving into the
+        database.
 
         Args:
             None
@@ -447,11 +454,11 @@ class WgsRawSeqSet(Base):
         doc = {
             'acl': {
                 'read': [ 'all' ],
-                'write': [ WgsRawSeqSet.namespace ]
+                'write': [ HostWgsRawSeqSet.namespace ]
             },
             'linkage': self._links,
-            'ns': WgsRawSeqSet.namespace,
-            'node_type': 'wgs_raw_seq_set',
+            'ns': HostWgsRawSeqSet.namespace,
+            'node_type': 'host_wgs_raw_seq_set',
             'meta': {
                 "checksums": self._checksums,
                 "comment": self._comment,
@@ -482,63 +489,63 @@ class WgsRawSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"wgs_raw_seq_set\"[node_type]"):
+    def search(query = "\"host_wgs_raw_seq_set\"[node_type]"):
         """
-        Searches the OSDF database through all WgsRawSeqSet node types. Any
+        Searches the OSDF database through all HostWgsRawSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query
         language specifications provided in the OSDF documentation. A general
         format is (including the quotes and brackets):
 
         "search criteria"[field to search]
 
-        If there are any results, they are returned as a WgsRawSeqSet instance,
-        otherwise an empty list will be returned.
+        If there are any results, they are returned as a HostWgsRawSeqSet
+        instance, otherwise an empty list will be returned.
 
         Args:
             query (str): The query for the OSDF framework. Defaults to the
-                         WgsRawSeqSet node type.
+                         HostWgsRawSeqSet node type.
 
         Returns:
-            Returns an array of WgsRawSeqSet objects. It returns an empty list
-            if there are no results.
+            Returns an array of HostWgsRawSeqSet objects. It returns an empty
+            list if there are no results.
         """
         module_logger.debug("In search.")
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        if query != '"wgs_raw_seq_set"[node_type]':
-            query = '({}) && "wgs_raw_seq_set"[node_type]'.format(query)
+        if query != '"host_wgs_raw_seq_set"[node_type]':
+            query = '({}) && "host_wgs_raw_seq_set"[node_type]'.format(query)
 
         module_logger.debug("Submitting OQL query: {}".format(query))
 
-        wgsRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
+        seqSet_data = session.get_osdf().oql_query("ihmp", query)
 
-        all_results = wgsRawSeqSet_data['results']
+        all_results = seqSet_data['results']
 
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                wgsRawSeqSet_result = WgsRawSeqSet.load_wgsRawSeqSet(i)
-                result_list.append(wgsRawSeqSet_result)
+            for hit in all_results:
+                result = HostWgsRawSeqSet.load_hostWgsRawSeqSet(hit)
+                result_list.append(result)
 
         return result_list
 
     @staticmethod
-    def load_wgsRawSeqSet(seq_set_data):
+    def load_hostWgsRawSeqSet(seq_set_data):
         """
-        Takes the provided JSON string and converts it to a WgsRawSeqSet
-        object
+        Takes the provided JSON string and converts it to a HostWgsRawSeqSet
+        object.
 
         Args:
             seq_set_data (str): The JSON string to convert
 
         Returns:
-            Returns a WgsRawSeqSet instance.
+            Returns a HostWgsRawSeqSet instance.
         """
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsRawSeqSet()
+        seq_set = HostWgsRawSeqSet()
 
         module_logger.debug("Filling in " + __name__ + " details.")
 
@@ -547,7 +554,7 @@ class WgsRawSeqSet(Base):
         seq_set._version = seq_set_data['ver']
         seq_set._links = seq_set_data['linkage']
 
-        # The attributes that are particular to WgsRawSeqSet documents
+        # The attributes that are particular to HostWgsRawSeqSet documents
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
         seq_set._exp_length = seq_set_data['meta']['exp_length']
@@ -578,8 +585,8 @@ class WgsRawSeqSet(Base):
             seq_set_id (str): The OSDF ID for the document to load.
 
         Returns:
-            A WgsRawSeqSet object with all the available OSDF data loaded into
-            it.
+            A HostWgsRawSeqSet object with all the available OSDF data loaded
+            into it.
         """
         module_logger.debug("In load. Specified ID: %s" % seq_set_id)
 
@@ -589,7 +596,7 @@ class WgsRawSeqSet(Base):
         seq_set_data = session.get_osdf().get_node(seq_set_id)
 
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsRawSeqSet()
+        seq_set = HostWgsRawSeqSet()
 
         module_logger.debug("Filling in " + __name__ + " details.")
 
@@ -598,7 +605,7 @@ class WgsRawSeqSet(Base):
         seq_set._version = seq_set_data['ver']
         seq_set._links = seq_set_data['linkage']
 
-        # The attributes that are particular to WgsRawSeqSet documents
+        # The attributes that are particular to HostWgsRawSeqSet documents
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
         seq_set._exp_length = seq_set_data['meta']['exp_length']
@@ -664,12 +671,12 @@ class WgsRawSeqSet(Base):
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
-        remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
+        remote_path = "/".join(["/" + study_dir, "genome", "host", "wgs",
                                 "raw", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
         # Upload the file to the iHMP aspera server
-        upload_result = aspera.upload_file(WgsRawSeqSet.aspera_server,
+        upload_result = aspera.upload_file(HostWgsRawSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
@@ -679,7 +686,7 @@ class WgsRawSeqSet(Base):
             self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
             return False
         else:
-            self._urls = [ "fasp://" + WgsRawSeqSet.aspera_server + remote_path ]
+            self._urls = [ "fasp://" + HostWgsRawSeqSet.aspera_server + remote_path ]
 
 
         if self.id is None:
@@ -713,27 +720,3 @@ class WgsRawSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
-
-    def viral_seq_sets(self):
-        """
-        Returns an iterator of all ViralSeqSet nodes connected to this object.
-        """
-        self.logger.debug("In viral_seq_sets().")
-
-        linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
-
-        query = iHMPSession.get_session().get_osdf().oql_query
-
-        from ViralSeqSet import ViralSeqSet
-
-        for page_no in count(1):
-            res = query(WgsRawSeqSet.namespace, linkage_query, page=page_no)
-            res_count = res['result_count']
-
-            for doc in res['results']:
-                yield ViralSeqSet.load_viral_seq_set(doc)
-
-            res_count -= len(res['results'])
-
-            if res_count < 1:
-                break

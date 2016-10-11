@@ -104,12 +104,6 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         with self.assertRaises(Exception):
             sixteenSDnaPrep.comment = 1
 
-    def testCommentTooLong(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
-
-        with self.assertRaises(Exception):
-            sixteenSDnaPrep.comment = rand_generator(750)
-
     def testLegalComment(self):
         sixteenSDnaPrep = session.create_16s_dna_prep()
         success = False

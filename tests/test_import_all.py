@@ -38,6 +38,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportHostTranscriptomicsRawSeqSet(self):
         self.failIf(HostTranscriptomicsRawSeqSet is None)
 
+    def testImportHostWgsRawSeqSet(self):
+        self.failIf(HostWgsRawSeqSet is None)
+
     def testImportLipidome(self):
         self.failIf(Lipidome is None)
 
@@ -97,6 +100,9 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportWgsRawSeqSet(self):
         self.failIf(WgsRawSeqSet is None)
+
+    def testImportWgsRawSeqSetPrivate(self):
+        self.failIf(WgsRawSeqSetPrivate is None)
 
 if __name__ == '__main__':
     unittest.main()

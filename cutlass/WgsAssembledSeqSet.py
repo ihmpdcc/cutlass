@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import string
+from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
 from aspera import aspera
@@ -35,8 +36,9 @@ class WgsAssembledSeqSet(Base):
 
     def __init__(self):
         """
-        Constructor for the WgsAssembledSeqSet class. This initializes the fields specific
-        to the WgsAssembledSeqSet class, and inherits from the Base class.
+        Constructor for the WgsAssembledSeqSet class. This initializes the
+        fields specific to the WgsAssembledSeqSet class, and inherits from the
+        Base class.
 
         Args:
             None
@@ -159,8 +161,8 @@ class WgsAssembledSeqSet(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the WgsAssembledSeqSet comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the WgsAssembledSeqSet comment. The comment must be a
+        string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -170,15 +172,14 @@ class WgsAssembledSeqSet(Base):
         """
         self.logger.debug("In 'comment' setter.")
 
-        if len(comment) > 512:
-            raise Exception("Comment is too long. Max length is 512 characters.")
-
         self._comment = comment
 
     @property
     def format(self):
-        """ str: The file format of the sequence file """
-        self.logger.debug("In format getter.")
+        """
+        str: The file format of the sequence file.
+        """
+        self.logger.debug("In 'format' getter.")
 
         return self._format
 
@@ -194,10 +195,10 @@ class WgsAssembledSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In format setter.")
+        self.logger.debug("In 'format' setter.")
 
         if type(format_str) != str:
-            raise ValueError("format must be a string.")
+            raise ValueError("Format must be a string.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
@@ -230,7 +231,9 @@ class WgsAssembledSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: URL to the local file to upload to the server. """
+        """
+        str: URL to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -517,20 +520,30 @@ class WgsAssembledSeqSet(Base):
         seq_set._links = seq_set_data['linkage']
 
         # The attributes that are particular to WgsAssembledSeqSet documents
+        seq_set._assembler = seq_set_data['meta']['assembler']
+        seq_set._assembly_name = seq_set_data['meta']['assembly_name']
         seq_set._checksums = seq_set_data['meta']['checksums']
         seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
         seq_set._format = seq_set_data['meta']['format']
         seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
+        seq_set._sequence_type = seq_set_data['meta']['sequence_type']
         seq_set._size = seq_set_data['meta']['size']
         seq_set._urls = seq_set_data['meta']['urls']
         seq_set._tags = seq_set_data['meta']['tags']
         seq_set._study = seq_set_data['meta']['study']
 
-        if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+        # Optional properties
+        if 'contact' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'contact' present.")
+            seq_set._date = seq_set_data['meta']['contact']
+
+        if 'date' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'date' present.")
+            seq_set._date = seq_set_data['meta']['date']
+
+        if 'sop' in seq_set_data['meta']:
+            module_logger.info(__name__ + " data has 'sop' present.")
+            seq_set._sop = seq_set_data['meta']['sop']
 
         module_logger.debug("Returning loaded " + __name__)
 
@@ -539,9 +552,9 @@ class WgsAssembledSeqSet(Base):
     @staticmethod
     def load(seq_set_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
+        Loads the data for the specified input ID from the OSDF instance to
+        this object.  If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
 
         Args:
             seq_set_id (str): The OSDF ID for the document to load.
@@ -557,35 +570,7 @@ class WgsAssembledSeqSet(Base):
         seq_set_data = session.get_osdf().get_node(seq_set_id)
 
         module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsAssembledSeqSet()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-
-        # The attributes commmon to all iHMP nodes
-        seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
-
-        # The attributes that are particular to WgsAssembledSeqSet documents
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
-
-        # Optional properties
-        if 'date' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'date' present.")
-            seq_set._date = seq_set_data['meta']['date']
-
-        if 'sop' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sop' present.")
-            seq_set._sop = seq_set_data['meta']['sop']
+        seq_set = WgsAssembledSeqSet.load_wgsAssembledSeqSet(seq_set_data)
 
         module_logger.debug("Returning loaded " + __name__)
 
@@ -671,13 +656,14 @@ class WgsAssembledSeqSet(Base):
 
     def save(self):
         """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
+        Saves the data in the current instance. The JSON form of the current
+        data for the instance is validated in the save function. If the data is
+        not valid, then the data will not be saved. If the instance was saved
+        previously, then the node ID is assigned the alpha numeric found in the
+        OSDF instance. If not saved previously, then the node ID is 'None', and
+        upon a successful, will be assigned to the alpha numeric ID found in
+        the OSDF instance. Also, the version is updated as the data is saved in
+        the OSDF instance.
 
         Args:
             None
@@ -763,3 +749,70 @@ class WgsAssembledSeqSet(Base):
         self.logger.debug("Returning " + str(success))
 
         return success
+
+    def abundance_matrices(self):
+        """
+        Returns an iterator of all AbundanceMatrix nodes connected to this
+        object.
+        """
+        self.logger.debug("In abundance_matrices().")
+
+        linkage_query = '"abundance_matrix"[node_type] && "{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from AbundanceMatrix import AbundanceMatrix
+
+        for page_no in count(1):
+            res = query(WgsAssembledSeqSet.namespace, linkage_query,
+                        page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield AbundanceMatrix.load_abundance_matrix(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def annotations(self):
+        """
+        Returns an iterator of all Annotation nodes connected to this
+        object.
+        """
+        self.logger.debug("In annotations().")
+
+        linkage_query = '"annotation"[node_type] && "{}"[linkage.computed_from]'.format(self.id)
+
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        from Annotation import Annotation
+
+        for page_no in count(1):
+            res = query(WgsAssembledSeqSet.namespace, linkage_query,
+                        page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield Annotation.load_annotation(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def derivations(self):
+        """
+        Returns an iterator of all nodes connected to this
+        object.
+        """
+        self.logger.debug("In derivations().")
+
+        self.logger.debug("Fetching annotations.")
+        for annot in self.annotations():
+            yield annot
+
+        self.logger.debug("Fetching abundance matrices.")
+        for abundance_matrix in self.abundance_matrices():
+            yield abundance_matrix

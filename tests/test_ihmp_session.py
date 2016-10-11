@@ -168,6 +168,14 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import Cytokine
         self.failUnless(isinstance(cytokine, Cytokine))
 
+    def testCreateHostAssayPrep(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        host_assay_prep = session.create_host_assay_prep()
+        self.failIf(host_assay_prep is None)
+
+        from cutlass import HostAssayPrep
+        self.failUnless(isinstance(host_assay_prep, HostAssayPrep))
+
     def testCreateHostSeqPrep(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         prep = session.create_host_seq_prep()
@@ -183,6 +191,14 @@ class IHMPSessionTest(unittest.TestCase):
 
         from cutlass import HostTranscriptomicsRawSeqSet
         self.failUnless(isinstance(htrss, HostTranscriptomicsRawSeqSet))
+
+    def testCreateHostWgsRawSeqSet(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        ss = session.create_host_wgs_raw_seq_set()
+        self.failIf(ss is None)
+
+        from cutlass import HostWgsRawSeqSet
+        self.failUnless(isinstance(ss, HostWgsRawSeqSet))
 
     def testCreateMetabolome(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
@@ -264,14 +280,6 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import VisitAttribute
         self.failUnless(isinstance(visit_attr, VisitAttribute))
 
-    def testCreateHostAssayPrep(self):
-        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
-        host_assay_prep = session.create_host_assay_prep()
-        self.failIf(host_assay_prep is None)
-
-        from cutlass import HostAssayPrep
-        self.failUnless(isinstance(host_assay_prep, HostAssayPrep))
-
     def testWgsAssembledSeqSet(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         seq_set = session.create_wgs_assembled_seq_set()
@@ -303,8 +311,8 @@ class IHMPSessionTest(unittest.TestCase):
                       "16s_dna_prep", "16s_raw_seq_set", "16s_trimmed_seq_set",
                       "annotation", "abundance_matrix", "clustered_seq_set",
                       "cytokine", "host_assay_prep", "host_seq_prep",
-                      "host_transcriptomics_raw_seq_set", "lipidome",
-                      "metabolome", "microbiome_assay_prep",
+                      "host_transcriptomics_raw_seq_set", "host_wgs_raw_seq_set",
+                      "lipidome", "metabolome", "microbiome_assay_prep",
                       "microb_transcriptomics_raw_seq_set",
                       "project", "proteome", "sample",
                       "sample_attr", "study", "subject", "viral_seq_set",

@@ -11,12 +11,11 @@ class iHMPSession(object):
     The iHMP Session class. This class allows you to connect with an OSDF
     instance and begin analysis of iHMP data. It produces skeletons of all
     objects in the iHMP OSDF database. Each object contains its own save, load,
-    delete feature
+    delete feature.
 
     Attributes:
         _single (iHMPSession): The iHMP Session that is currently live. None
         otherwise.
-
     """
 
     _single = None
@@ -27,8 +26,8 @@ class iHMPSession(object):
         The initialization of the iHMPSession for the user.
 
         Args:
-            username (str): The username for OSDF access
-            password (str): The password for OSDF access
+            username (str): The username for OSDF access.
+            password (str): The password for OSDF access.
             server (str): The server domain name containing the OSDF instance.
                           Defaults to 'osdf.ihmpdcc.org'.
             port (int): The port allowing access to the OSDF instance.
@@ -43,7 +42,8 @@ class iHMPSession(object):
         self._osdf = OSDF(self._server, self._username, self._password,
                           port=self._port, ssl=self._ssl)
 
-        self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
+        self.logger = logging.getLogger(self.__module__ + '.' + \
+                                        self.__class__.__name__)
 
         if iHMPSession._single is None:
             iHMPSession._single = self
@@ -64,6 +64,7 @@ class iHMPSession(object):
           "host_assay_prep"                    : "HostAssayPrep",
           "host_seq_prep"                      : "HostSeqPrep",
           "host_transcriptomics_raw_seq_set"   : "HostTranscriptomicsRawSeqSet",
+          "host_wgs_raw_seq_set"               : "HostWgsRawSeqSet",
           "lipidome"                           : "Lipidome",
           "metabolome"                         : "Metabolome",
           "microbiome_assay_prep"              : "MicrobiomeAssayPrep",
@@ -79,6 +80,7 @@ class iHMPSession(object):
           "visit_attr"                         : "VisitAttribute",
           "wgs_assembled_seq_set"              : "WgsAssembledSeqSet",
           "wgs_raw_seq_set"                    : "WgsRawSeqSet",
+          "wgs_raw_seq_set_private"            : "WgsRawSeqSetPrivate",
           "wgs_dna_prep"                       : "WgsDnaPrep" }
 
         className = None
@@ -91,7 +93,6 @@ class iHMPSession(object):
         instance = None
 
         if valid:
-
             module = importlib.import_module("cutlass", package="cutlass")
 
             classVar = getattr(module, className)
@@ -185,13 +186,16 @@ class iHMPSession(object):
         """
         self.logger.debug("In password setter.")
         self._password = password
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the password in the OSDF client.")
         self._osdf.password = password
 
     @property
     def port(self):
-        """ int: The port for access to the OSDF instance on the server. """
+        """
+        int: The port for access to the OSDF instance on the server.
+        """
         self.logger.debug("In 'port' getter.")
         return self._port
 
@@ -209,6 +213,7 @@ class iHMPSession(object):
         """
         self.logger.debug("In 'port' setter.")
         self._port = port
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the port in the OSDF client.")
         self._osdf.port = port
@@ -235,6 +240,7 @@ class iHMPSession(object):
         """
         self.logger.debug("In 'server' setter.")
         self._server = server
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the server in the OSDF client.")
         self._osdf.server = server
@@ -261,6 +267,7 @@ class iHMPSession(object):
         """
         self.logger.debug("In 'ssl' setter.")
         self._ssl = ssl
+
         # Ensure the OSDF object gets the new connection parameter
         self.logger.debug("Setting the SSL flag in the OSDF client.")
         self._osdf.ssl = ssl

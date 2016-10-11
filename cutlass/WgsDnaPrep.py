@@ -132,8 +132,7 @@ class WgsDnaPrep(Base):
     @enforce_string
     def comment(self, comment):
         """
-        The setter for the comment. The comment must be a string,
-        and less than 512 characters.
+        The setter for the comment. The comment must be a string.
 
         Args:
             comment (str): The new comment to add to the string.
@@ -143,14 +142,13 @@ class WgsDnaPrep(Base):
         """
         self.logger.debug("In comment setter.")
 
-        if len(comment) > 512:
-            raise Exception("Comment is too long, must be less than 512 characters.")
-
         self._comment = comment
 
     @property
     def frag_size(self):
-        """ int: Target library fragment size after shearing. """
+        """
+        int: Target library fragment size after shearing.
+        """
         self.logger.debug("In frag_size getter.")
 
         return self._frag_size
@@ -177,8 +175,10 @@ class WgsDnaPrep(Base):
 
     @property
     def lib_layout(self):
-        """ str: Specification of the layout: fragment/paired, and if paired,
-                 then nominal insert size and standard deviation. """
+        """
+        str: Specification of the layout: fragment/paired, and if paired,
+             then nominal insert size and standard deviation.
+        """
         self.logger.debug("In 'lib_layout' getter.")
 
         return self._lib_layout
@@ -201,9 +201,10 @@ class WgsDnaPrep(Base):
 
     @property
     def lib_selection(self):
-        """ str: A controlled vocabulary of terms describing selection or reduction
-                 method used in library construction. Terms used by TCGA include
-                 (random, hybrid selection)
+        """
+        str: A controlled vocabulary of terms describing selection or reduction
+             method used in library construction. Terms used by TCGA include
+             (random, hybrid selection)
         """
         self.logger.debug("In 'lib_selection' getter.")
 
@@ -227,7 +228,9 @@ class WgsDnaPrep(Base):
 
     @property
     def mims(self):
-        """ mimarks: Genomic Standards Consortium MIMS fields. """
+        """
+        mimarks: Genomic Standards Consortium MIMS fields.
+        """
         self.logger.debug("In mims getter.")
 
         return self._mims
@@ -331,7 +334,9 @@ class WgsDnaPrep(Base):
 
     @property
     def sequencing_contact(self):
-        """ str: Name and email of the primary contact at the sequencing center. """
+        """
+        str: Name and email of the primary contact at the sequencing center.
+        """
         self.logger.debug("In 'sequencing_contact' getter.")
 
         return self._sequencing_contact
@@ -354,7 +359,9 @@ class WgsDnaPrep(Base):
 
     @property
     def storage_duration(self):
-        """ int: Duration for which sample was stored in days. """
+        """
+        int: Duration for which sample was stored in days.
+        """
         self.logger.debug("In 'storage_duration' getter.")
 
         return self._storage_duration
@@ -381,7 +388,9 @@ class WgsDnaPrep(Base):
 
     @property
     def srs_id(self):
-        """ str: NCBI Sequence Read Archive sample ID of the form SRS012345. """
+        """
+        str: NCBI Sequence Read Archive sample ID of the form SRS012345.
+        """
         self.logger.debug("In 'srs_id' getter.")
 
         return self._srs_id
@@ -481,10 +490,10 @@ class WgsDnaPrep(Base):
     @staticmethod
     def search(query = "\"wgs_dna_prep\"[node_type]"):
         """
-        Searches the OSDF database through all WgsDnaPrep node types. Any criteria
-        the user wishes to add is provided by the user in the query language
-        specifications provided in the OSDF documentation. A general format
-        is (including the quotes and brackets):
+        Searches the OSDF database through all WgsDnaPrep node types. Any
+        criteria the user wishes to add is provided by the user in the query
+        language specifications provided in the OSDF documentation. A general
+        format is (including the quotes and brackets):
 
         "search criteria"[field to search]
 
@@ -570,7 +579,6 @@ class WgsDnaPrep(Base):
     @staticmethod
     def load(prep_id):
         """
-
         Loads the data for the specified input ID from the OSDF instance to
         this object.  If the provided ID does not exist, then an error message
         is provided stating the project does not exist.
