@@ -1063,7 +1063,7 @@ class MicrobiomeAssayPrep(Base):
         from Lipidome import Lipidome
 
         for page_no in count(1):
-            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
 
             for doc in res['results']:
@@ -1088,7 +1088,7 @@ class MicrobiomeAssayPrep(Base):
         from Metabolome import Metabolome
 
         for page_no in count(1):
-            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
 
             for doc in res['results']:
@@ -1113,7 +1113,7 @@ class MicrobiomeAssayPrep(Base):
         from Proteome import Proteome
 
         for page_no in count(1):
-            res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
+            res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
 
             for doc in res['results']:
