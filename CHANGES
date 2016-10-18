@@ -1,3 +1,10 @@
+cutlass 0.24
+
+  * Fixed wrong class name.
+  * Fixed problems with node load identified by @arjun0127.
+
+ - Victor <victor73@github.com>  Tue, 18 Oct 2016 11:35:00 -0400
+
 cutlass 0.23
 
   * Added support for the new WgsRawSeqSetPrivate node.
