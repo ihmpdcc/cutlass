@@ -8,9 +8,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import Cytokine
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class CytokineTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class CytokineTest(unittest.TestCase):
         cyto = None
 
         try:
-            cyto = session.create_cytokine()
+            cyto = self.session.create_cytokine()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class CytokineTest(unittest.TestCase):
         self.failIf(cyto is None)
 
     def testComment(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
 
         with self.assertRaises(ValueError):
             cyto.comment = 3
@@ -59,7 +66,7 @@ class CytokineTest(unittest.TestCase):
                           "comment property works.")
 
     def testChecksumsLegal(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -75,7 +82,7 @@ class CytokineTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testToJson(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
         success = False
 
         comment = "test cytokine comment"
@@ -135,7 +142,7 @@ class CytokineTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
         success = False
         comment = "test_comment"
         format_ = "gff3"
@@ -187,7 +194,7 @@ class CytokineTest(unittest.TestCase):
                          )
 
     def testId(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
 
         self.assertTrue(cyto.id is None,
                         "New template cytokine has no ID.")
@@ -196,7 +203,7 @@ class CytokineTest(unittest.TestCase):
             cyto.id = "test"
 
     def testVersion(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
 
         self.assertTrue(cyto.version is None,
                         "New template cytokine has no version.")
@@ -205,7 +212,7 @@ class CytokineTest(unittest.TestCase):
             cyto.version = "test"
 
     def testTags(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
 
         tags = cyto.tags
         self.assertTrue(type(tags) == list, "Cytokine tags() method returns a list.")
@@ -225,7 +232,7 @@ class CytokineTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
 
         cyto.add_tag("test")
         self.assertEqual(cyto.tags, [ "test" ], "Can add a tag to a cytokine.")
@@ -260,7 +267,7 @@ class CytokineTest(unittest.TestCase):
 
         # Attempt to save the cytokine at all points before and after adding
         # the required fields
-        cyto = session.create_cytokine()
+        cyto = self.session.create_cytokine()
         self.assertFalse(
                 cyto.save(),
                 "Cytokine not saved successfully, no required fields"
@@ -292,7 +299,7 @@ class CytokineTest(unittest.TestCase):
         self.assertTrue(cyto.save() == True, "Cytokine was saved successfully")
 
         # Load the cytokine that was just saved from the OSDF instance
-        cyto_loaded = session.create_cytokine()
+        cyto_loaded = self.session.create_cytokine()
         cyto_loaded = cyto.load(cyto.id)
 
         # Check all fields were saved and loaded successfully
@@ -305,7 +312,7 @@ class CytokineTest(unittest.TestCase):
         self.assertTrue(cyto.delete(), "Cytokine was deleted successfully")
 
         # the sample of the initial ID should not load successfully
-        load_test = session.create_cytokine()
+        load_test = self.session.create_cytokine()
         with self.assertRaises(Exception):
             load_test = load_test.load(cyto.id)
 

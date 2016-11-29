@@ -8,9 +8,16 @@ from cutlass import iHMPSession
 from cutlass import Subject
 from cutlass import MIXS, MixsException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class SubjectTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class SubjectTest(unittest.TestCase):
         subject = None
 
         try:
-            subject = session.create_subject()
+            subject = self.session.create_subject()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class SubjectTest(unittest.TestCase):
         self.failIf(subject is None)
 
     def testToJson(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
         success = False
         rand_subject_id = "1hwuejd837"
 
@@ -73,7 +80,7 @@ class SubjectTest(unittest.TestCase):
                          "'rand_subject_id' in JSON had expected value.")
 
     def testId(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         self.assertTrue(subject.id is None,
                         "New template subject has no ID.")
@@ -82,7 +89,7 @@ class SubjectTest(unittest.TestCase):
             subject.id = "test"
 
     def testVersion(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         self.assertTrue(subject.version is None,
                         "New template subject has no version.")
@@ -91,13 +98,13 @@ class SubjectTest(unittest.TestCase):
             subject.version = "test"
 
     def testIllegalGender(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         with self.assertRaises(Exception):
             subject.gender = "random"
 
     def testLegalGender(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
         success = False
         gender = "male"
 
@@ -114,13 +121,13 @@ class SubjectTest(unittest.TestCase):
                          "Property getter for 'gender' works.")
 
     def testIllegalRace(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         with self.assertRaises(Exception):
             subject.race = "random"
 
     def testLegalRace(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
         success = False
         race = "asian"
 
@@ -135,7 +142,7 @@ class SubjectTest(unittest.TestCase):
         self.assertEqual(subject.race, race, "Property getter for 'race' works.")
 
     def testTags(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         tags = subject.tags
         self.assertTrue(type(tags) == list,
@@ -156,7 +163,7 @@ class SubjectTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         subject.add_tag("test")
         self.assertEqual(subject.tags, [ "test" ], "Can add a tag to a subject.")
@@ -190,7 +197,7 @@ class SubjectTest(unittest.TestCase):
         # Attempt to save the subject at all points before and after
         # adding the required fields
 
-        subject = session.create_subject()
+        subject = self.session.create_subject()
 
         test_rand_subject_id = "128ieurjnf"
         test_gender = "male"
@@ -219,7 +226,7 @@ class SubjectTest(unittest.TestCase):
                         "Subject was not saved successfully")
 
         # Load the subject that was just saved from the OSDF instance
-        subject_loaded = session.create_subject()
+        subject_loaded = self.session.create_subject()
         subject_loaded = subject_loaded.load(subject.id)
 
         # Check all fields were saved and loaded successfully
@@ -234,7 +241,7 @@ class SubjectTest(unittest.TestCase):
         self.assertTrue(subject.delete(), "Subject was not deleted successfully")
 
         # The subject of the initial ID should not load successfully
-        load_test = session.create_subject()
+        load_test = self.session.create_subject()
         with self.assertRaises(Exception):
             load_test = load_test.load(subject.id)
 

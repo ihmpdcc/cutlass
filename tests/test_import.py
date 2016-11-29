@@ -312,6 +312,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Subject is None)
 
+    def testImportSubjectAttribute(self):
+        success = False
+
+        try:
+            from cutlass import SubjectAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(SubjectAttribute is None)
+
     def testImportViralSeqSet(self):
         success = False
 

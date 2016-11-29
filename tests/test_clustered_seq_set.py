@@ -8,9 +8,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import ClusteredSeqSet
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class ClusteredSeqSetTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         css = None
 
         try:
-            css = session.create_clustered_seq_set()
+            css = self.session.create_clustered_seq_set()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.failIf(css is None)
 
     def testComment(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         with self.assertRaises(ValueError):
             css.comment = 3
@@ -59,7 +66,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                           "comment property works.")
 
     def testChecksums(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -75,7 +82,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testClusteringProcess(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         with self.assertRaises(ValueError):
             css.clustering_process = 3
@@ -96,7 +103,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                           "clustering_process property works.")
 
     def testSize(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         with self.assertRaises(ValueError):
             css.size = "size"
@@ -117,7 +124,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                           "size property works.")
 
     def testToJson(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
         success = False
 
         comment = "test clustered_seq_set comment"
@@ -191,7 +198,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
         success = False
         comment = "test_comment"
         format_ = "gff3"
@@ -243,7 +250,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          )
 
     def testId(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         self.assertTrue(css.id is None,
                         "New template clustered_seq_set has no ID.")
@@ -252,7 +259,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
             css.id = "test"
 
     def testVersion(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         self.assertTrue(css.version is None,
                         "New template clustered_seq_set has no version.")
@@ -261,7 +268,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
             css.version = "test"
 
     def testTags(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         tags = css.tags
         self.assertTrue(type(tags) == list,
@@ -284,7 +291,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
 
         css.add_tag("test")
         self.assertEqual(css.tags, [ "test" ],
@@ -320,7 +327,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
 
         # Attempt to save the clustered seq set at all points before and after
         # adding the required fields
-        css = session.create_clustered_seq_set()
+        css = self.session.create_clustered_seq_set()
         self.assertFalse(
                 css.save(),
                 "ClusteredSeqSet not saved successfully, no required fields"
@@ -353,7 +360,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.assertTrue(css.save() == True, "ClusteredSeqSet was saved successfully")
 
         # Load the clustered seq set that was just saved from the OSDF instance
-        css_loaded = session.create_clustered_seq_set()
+        css_loaded = self.session.create_clustered_seq_set()
         css_loaded = css.load(css.id)
 
         # Check all fields were saved and loaded successfully
@@ -366,7 +373,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.assertTrue(css.delete(), "ClusteredSeqSet was deleted successfully")
 
         # the clustered seq set of the initial ID should not load successfully
-        load_test = session.create_clustered_seq_set()
+        load_test = self.session.create_clustered_seq_set()
         with self.assertRaises(Exception):
             load_test = load_test.load(css.id)
 

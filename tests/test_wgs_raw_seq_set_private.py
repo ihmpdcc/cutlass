@@ -10,9 +10,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import WgsRawSeqSetPrivate
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class WgsRawSeqSetPrivateTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -30,7 +37,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
         seq_set = None
 
         try:
-            seq_set = session.create_object("wgs_raw_seq_set_private")
+            seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
             success = True
         except:
@@ -40,7 +47,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
         self.failIf(seq_set is None)
 
     def testToJson(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
         success = False
         comment = "Test comment"
 
@@ -77,7 +84,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         self.assertTrue(seq_set.id is None,
                         "New template object has no ID.")
@@ -86,7 +93,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
             seq_set.id = "test"
 
     def testVersion(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         self.assertTrue(seq_set.version is None,
                         "New template object has no version.")
@@ -95,13 +102,13 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
             seq_set.version = "test"
 
     def testCommentIllegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         with self.assertRaises(Exception):
             seq_set.comment = 1
 
     def testCommentLegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         success = False
         comment = "This is a test comment"
@@ -118,13 +125,13 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
                          "Property getter for 'comment' works.")
 
     def testExpLengthNegative(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         with self.assertRaises(Exception):
             seq_set.exp_length = -1
 
     def testExpLengthLegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
         success = False
         exp_length = 1020
 
@@ -140,7 +147,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
                          "Property getter for 'exp_length' works.")
 
     def testSequenceTypeLegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
         success = False
         sequence_type = "peptide"
 
@@ -156,13 +163,13 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
                          "Property getter for 'sequence_type' works.")
 
     def testSequenceTypeIllegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         with self.assertRaises(Exception):
             seq_set.sequence_type = "asbdasidsa"
 
     def testSeqModelLegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
         success = False
         seq_model = "Test seq model"
 
@@ -178,7 +185,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
                          "Property getter for 'seq_model' works.")
 
     def testStudyLegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
         success = False
         study = "ibd"
 
@@ -190,16 +197,17 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use the study setter")
 
-        self.assertEqual(seq_set.study, study, "Property getter for 'study' works.")
+        self.assertEqual(seq_set.study, study,
+                         "Property getter for 'study' works.")
 
     def testStudyIllegal(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.study = "adfadsf"
 
     def testTags(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         tags = seq_set.tags
         self.assertTrue(type(tags) == list, "tags() method returns a list.")
@@ -208,7 +216,8 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
         new_tags = [ "tagA", "tagB" ]
 
         seq_set.tags = new_tags
-        self.assertEqual(seq_set.tags, new_tags, "Can set tags on a WgsRawSeqSetPrivate.")
+        self.assertEqual(seq_set.tags, new_tags,
+                         "Can set tags on a WgsRawSeqSetPrivate.")
 
         json_str = seq_set.to_json()
         doc = json.loads(json_str)
@@ -220,7 +229,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         seq_set.add_tag("test")
         self.assertEqual(seq_set.tags, [ "test" ], "Can add a tag.")
@@ -253,7 +262,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
     def testLoadSaveDeleteWgsRawSeqSetPrivate(self):
         # Attempt to save the sequence set at all points before and after
         # adding the required fields
-        seq_set = session.create_object("wgs_raw_seq_set_private")
+        seq_set = self.session.create_object("wgs_raw_seq_set_private")
 
         test_comment = "Test comment"
         exp_length = 100
@@ -286,7 +295,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
         self.assertTrue(seq_set.save() == True, "Not saved successfully.")
 
         # load the object that was just saved from the OSDF instance
-        seq_set_loaded = session.create_object("wgs_raw_seq_set_private")
+        seq_set_loaded = self.session.create_object("wgs_raw_seq_set_private")
         seq_set_loaded = seq_set_loaded.load(seq_set.id)
 
         # Check all fields were saved and loaded successfully
@@ -297,7 +306,7 @@ class WgsRawSeqSetPrivateTest(unittest.TestCase):
         self.assertTrue(seq_set.delete(), "Not deleted successfully.")
 
         # The object identified by the initial ID should not load successfully
-        load_test = session.create_object("wgs_raw_seq_set_private")
+        load_test = self.session.create_object("wgs_raw_seq_set_private")
         with self.assertRaises(Exception):
             load_test = load_test.load(seq_set.id)
 

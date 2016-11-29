@@ -8,9 +8,16 @@ from cutlass import iHMPSession
 from cutlass import Sample
 from cutlass import MIXS, MixsException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class SampleTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class SampleTest(unittest.TestCase):
         sample = None
 
         try:
-            sample = session.create_sample()
+            sample = self.session.create_sample()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class SampleTest(unittest.TestCase):
         self.failIf(sample is None)
 
     def testFmaBodySite(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         fma_body_site = "test site"
 
@@ -57,24 +64,24 @@ class SampleTest(unittest.TestCase):
                 )
 
     def testFmaBodySiteInt(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         with self.assertRaises(ValueError):
             sample.fma_body_site = 3
 
     def testFmaBodySiteList(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         with self.assertRaises(ValueError):
             sample.fma_body_site = [ "a", "b", "c" ]
 
     def testIllegalBodySite(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         with self.assertRaises(Exception):
             sample.body_site = "random"
 
     def testLegalBodySite(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         body_site = "wound"
         try:
@@ -92,17 +99,17 @@ class SampleTest(unittest.TestCase):
                 )
 
     def testNameInt(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         with self.assertRaises(Exception):
             sample.name = 3
 
     def testNameList(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         with self.assertRaises(Exception):
             sample.name = [ "a", "b", "c" ]
 
     def testLegalName(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         name = "test_name"
 
@@ -121,13 +128,13 @@ class SampleTest(unittest.TestCase):
                 )
 
     def testIllegalSupersite(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         with self.assertRaises(Exception):
             sample.supersite = "hear"
 
     def testLegalSupersite(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         supersite = "heart"
         try:
@@ -145,7 +152,7 @@ class SampleTest(unittest.TestCase):
                 )
 
     def testToJson(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         fma_body_site = "test_fma_body_site"
 
@@ -182,7 +189,7 @@ class SampleTest(unittest.TestCase):
                          )
 
     def testNameInJson(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         success = False
         fma_body_site = "test_fma_body_site"
         name = "test_name"
@@ -222,7 +229,7 @@ class SampleTest(unittest.TestCase):
                          )
 
     def testId(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         self.assertTrue(sample.id is None,
                         "New template sample has no ID.")
@@ -231,7 +238,7 @@ class SampleTest(unittest.TestCase):
             sample.id = "test"
 
     def testVersion(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         self.assertTrue(sample.version is None,
                         "New template sample has no version.")
@@ -240,7 +247,7 @@ class SampleTest(unittest.TestCase):
             sample.version = "test"
 
     def testMixs(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         self.assertTrue(sample.mixs is None,
                         "New template sample has no MIXS data.")
@@ -289,7 +296,7 @@ class SampleTest(unittest.TestCase):
                          "Retrieved MIXS data appears to be okay.")
 
     def testTags(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         tags = sample.tags
         self.assertTrue(type(tags) == list, "Sample tags() method returns a list.")
@@ -310,7 +317,7 @@ class SampleTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        sample = session.create_sample()
+        sample = self.session.create_sample()
 
         sample.add_tag("test")
         self.assertEqual(sample.tags, [ "test" ], "Can add a tag to a sample.")
@@ -343,7 +350,7 @@ class SampleTest(unittest.TestCase):
     def testLoadSaveDeleteSample(self):
         # Attempt to save the sample at all points before and after adding
         # the required fields
-        sample = session.create_sample()
+        sample = self.session.create_sample()
         self.assertFalse(
                 sample.save(),
                 "Sample not saved successfully, no required fields"
@@ -386,7 +393,7 @@ class SampleTest(unittest.TestCase):
         self.assertTrue(sample.save() == True, "Sample was saved successfully")
 
         # Load the sample that was just saved from the OSDF instance
-        sample_loaded = session.create_sample()
+        sample_loaded = self.session.create_sample()
         sample_loaded = sample_loaded.load(sample.id)
 
         # Check all fields were saved and loaded successfully
@@ -400,8 +407,8 @@ class SampleTest(unittest.TestCase):
         # Sample is deleted successfully
         self.assertTrue(sample.delete(), "Sample was deleted successfully")
 
-        #the sample of the initial ID should not load successfully
-        load_test = session.create_sample()
+        # the sample of the initial ID should not load successfully
+        load_test = self.session.create_sample()
         with self.assertRaises(Exception):
             load_test = load_test.load(sample.id)
 

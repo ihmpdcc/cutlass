@@ -10,12 +10,19 @@ from cutlass import iHMPSession
 from cutlass import SixteenSDnaPrep
 from cutlass import MIMARKS, MimarksException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 class SixteenSDnaPrepTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -33,7 +40,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         sixteenSDnaPrep = None
 
         try:
-            sixteenSDnaPrep = session.create_16s_dna_prep()
+            sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
             success = True
         except:
@@ -43,7 +50,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.failIf(sixteenSDnaPrep is None)
 
     def testToJson(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         comment = "Test comment"
 
@@ -81,7 +88,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         self.assertTrue(sixteenSDnaPrep.id is None,
                         "New template sixteenSDnaPrep has no ID.")
@@ -90,7 +97,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
             sixteenSDnaPrep.id = "test"
 
     def testVersion(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         self.assertTrue(sixteenSDnaPrep.version is None,
                         "New template sixteenSDnaPrep has no version.")
@@ -99,13 +106,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
             sixteenSDnaPrep.version = "test"
 
     def testIllegalComment(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.comment = 1
 
     def testLegalComment(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         comment = "This is a test comment"
 
@@ -121,13 +128,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'comment' works.")
 
     def testIllegalFragSize(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.frag_size = "wrong frag size variable type"
 
     def testLegalFragSize(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         frag_size = 1020
 
@@ -143,7 +150,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'frag_size' works.")
 
     def testLegalLibLayout(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         lib_layout = "A test Lib Layout for the test class"
 
@@ -159,7 +166,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'lib_layout' works.")
 
     def testLegalLibSelection(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         lib_selection = "A test Lib selection for the test class"
 
@@ -175,7 +182,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'lib_selection' works.")
 
     def testLegalNCBITaxonID(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
 
@@ -191,7 +198,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'ncbi_taxon_id' works.")
 
     def testLegalPrepID(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         prep_id = "A test prep id for the test class"
 
@@ -207,7 +214,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'prep_id' works.")
 
     def testLegalSequencingCenter(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         sequencing_center = "A test seq center for the test class"
 
@@ -223,7 +230,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'sequencing_center' works.")
 
     def testLegalSequencingContact(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         sequencing_contact = "A test seq contact for the test class"
 
@@ -239,7 +246,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'sequencing_contact' works.")
 
     def testLegalSRSID(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         srs_id = "A test prep id for the test class"
 
@@ -254,13 +261,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         self.assertEqual(sixteenSDnaPrep.srs_id, srs_id, "Property getter for 'srs_id' works.")
 
     def testIllegalSRSID(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.srs_id = 1
 
     def testLegalStorageDuration(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         storage_duration = 12
 
@@ -276,13 +283,13 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "Property getter for 'storage_duration' works.")
 
     def testIllegalStorageDuration(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         with self.assertRaises(Exception):
             sixteenSDnaPrep.storage_duration = "ASDASDSAD"
 
     def testTags(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         tags = sixteenSDnaPrep.tags
         self.assertTrue(type(tags) == list,
@@ -305,7 +312,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         sixteenSDnaPrep.add_tag("test")
         self.assertEqual(sixteenSDnaPrep.tags, [ "test" ],
@@ -328,7 +335,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testMimarks(self):
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         self.assertTrue(sixteenSDnaPrep.mimarks is None,
                         "New template sixteenSDnaPrep has no MIMARKS data.")
@@ -408,7 +415,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         # Attempt to save the sixteenSDnaPrep at all points before and after
         # adding the required fields
 
-        sixteenSDnaPrep = session.create_16s_dna_prep()
+        sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
         test_comment = "Test comment"
         frag_size = 10
@@ -491,7 +498,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                         "SixteenSDnaPrep was not saved successfully")
 
         # Load the sixteenSDnaPrep that was just saved from the OSDF instance
-        sixteenSDnaPrep_loaded = session.create_16s_dna_prep()
+        sixteenSDnaPrep_loaded = self.session.create_16s_dna_prep()
         sixteenSDnaPrep_loaded = sixteenSDnaPrep_loaded.load(sixteenSDnaPrep.id)
 
         # Check all fields were saved and loaded successfully
@@ -507,7 +514,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                         "SixteenSDnaPrep was not deleted successfully")
 
         # The sixteenSDnaPrep of the initial ID should not load successfully
-        load_test = session.create_16s_dna_prep()
+        load_test = self.session.create_16s_dna_prep()
         with self.assertRaises(Exception):
             load_test = load_test.load(sixteenSDnaPrep.id)
 

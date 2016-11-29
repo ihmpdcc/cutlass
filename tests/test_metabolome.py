@@ -8,9 +8,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import Metabolome
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class MetabolomeTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class MetabolomeTest(unittest.TestCase):
         meta = None
 
         try:
-            meta = session.create_metabolome()
+            meta = self.session.create_metabolome()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class MetabolomeTest(unittest.TestCase):
         self.failIf(meta is None)
 
     def testComment(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         with self.assertRaises(ValueError):
             meta.comment = 3
@@ -59,7 +66,7 @@ class MetabolomeTest(unittest.TestCase):
                           "comment property works.")
 
     def testChecksums(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -75,7 +82,7 @@ class MetabolomeTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormat(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         with self.assertRaises(ValueError):
             meta.format = 30
@@ -99,7 +106,7 @@ class MetabolomeTest(unittest.TestCase):
                           "format property works.")
 
     def testFormatDoc(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         with self.assertRaises(ValueError):
             meta.format_doc = 30
@@ -123,7 +130,7 @@ class MetabolomeTest(unittest.TestCase):
                           "format_doc property works.")
 
     def testSubtype(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         with self.assertRaises(ValueError):
             meta.subtype = 30
@@ -147,7 +154,7 @@ class MetabolomeTest(unittest.TestCase):
                           "subtype property works.")
 
     def testToJson(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
         success = False
 
         comment = "test metabolome comment"
@@ -214,7 +221,7 @@ class MetabolomeTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
         success = False
         comment = "test_comment"
         format_ = "gff3"
@@ -273,7 +280,7 @@ class MetabolomeTest(unittest.TestCase):
                          )
 
     def testId(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         self.assertTrue(meta.id is None,
                         "New template metabolome has no ID.")
@@ -282,7 +289,7 @@ class MetabolomeTest(unittest.TestCase):
             meta.id = "test"
 
     def testVersion(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         self.assertTrue(meta.version is None,
                         "New template metabolome has no version.")
@@ -291,7 +298,7 @@ class MetabolomeTest(unittest.TestCase):
             meta.version = "test"
 
     def testTags(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         tags = meta.tags
         self.assertTrue(type(tags) == list, "Metabolome tags() method returns a list.")
@@ -311,7 +318,7 @@ class MetabolomeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
 
         meta.add_tag("test")
         self.assertEqual(meta.tags, [ "test" ], "Can add a tag to a metabolome.")
@@ -346,7 +353,7 @@ class MetabolomeTest(unittest.TestCase):
 
         # Attempt to save the metabolome at all points before and after adding
         # the required fields
-        meta = session.create_metabolome()
+        meta = self.session.create_metabolome()
         self.assertFalse(
                 meta.save(),
                 "Metabolome not saved successfully, no required fields"
@@ -378,7 +385,7 @@ class MetabolomeTest(unittest.TestCase):
         self.assertTrue(meta.save() == True, "Metabolome was saved successfully")
 
         # Load the metabolome that was just saved from the OSDF instance
-        meta_loaded = session.create_metabolome()
+        meta_loaded = self.session.create_metabolome()
         meta_loaded = meta.load(meta.id)
 
         # Check all fields were saved and loaded successfully
@@ -391,7 +398,7 @@ class MetabolomeTest(unittest.TestCase):
         self.assertTrue(meta.delete(), "Metabolome was deleted successfully")
 
         # the metabolome of the initial ID should not load successfully
-        load_test = session.create_metabolome()
+        load_test = self.session.create_metabolome()
         with self.assertRaises(Exception):
             load_test = load_test.load(meta.id)
 

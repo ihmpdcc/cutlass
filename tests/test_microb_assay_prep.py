@@ -8,9 +8,20 @@ from datetime import date
 from cutlass import iHMPSession
 from cutlass import MicrobiomeAssayPrep
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class MicrobiomeAssayPrepTest(unittest.TestCase):
+
+    session = None
+    util = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -28,7 +39,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
         prep = None
 
         try:
-            prep = session.create_microbiome_assay_prep()
+            prep = self.session.create_microbiome_assay_prep()
 
             success = True
         except:
@@ -38,7 +49,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
         self.failIf(prep is None)
 
     def testToJson(self):
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
         success = False
 
         comment = "test comment"
@@ -72,7 +83,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
 
         self.assertTrue(prep.id is None,
                         "New template prep has no ID.")
@@ -81,7 +92,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
             prep.id = "test"
 
     def testVersion(self):
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
 
         self.assertTrue(prep.version is None,
                         "New template prep has no version.")
@@ -90,121 +101,197 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
             prep.version = "test"
 
     def testIllegalComment(self):
-        self.stringTypeTest("comment")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "comment")
 
     def testLegalComment(self):
-        self.stringPropertyTest("comment")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "comment")
 
     def testIllegalPrideIdType(self):
-        self.stringTypeTest("pride_id")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "pride_id")
 
     def testLegalPrideId(self):
-        self.stringPropertyTest("pride_id")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "pride_id")
 
     def testIllegalSampleNameType(self):
-        self.stringTypeTest("sample_name")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "sample_name")
 
     def testLegalSampleName(self):
-        self.stringPropertyTest("sample_name")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "sample_name")
 
     def testIllegalTitleType(self):
-        self.stringTypeTest("title")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "title")
 
     def testLegalTitle(self):
-        self.stringPropertyTest("title")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "title")
 
     def testIllegalShortLabelType(self):
-        self.stringTypeTest("short_label")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "short_label")
 
     def testLegalShortLabel(self):
-        self.stringPropertyTest("short_label")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "short_label")
 
     def testIllegalCenterType(self):
-        self.stringTypeTest("center")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "center")
 
     def testLegalCenter(self):
-        self.stringPropertyTest("center")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "center")
 
     def testIllegalContactType(self):
-        self.stringTypeTest("contact")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "contact")
 
     def testLegalContact(self):
-        self.stringPropertyTest("contact")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "contact")
 
     def testIllegalPrepIDType(self):
-        self.stringTypeTest("prep_id")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "prep_id")
 
     def testLegalPrepID(self):
-        self.stringPropertyTest("prep_id")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "prep_id")
 
     def testIllegalStorageDurationType(self):
-        self.intTypeTest("storage_duration")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.intTypeTest(self, prep, "storage_duration")
 
     def testLegalStorageDuration(self):
-        self.intPropertyTest("storage_duration")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.intPropertyTest(self, prep, "storage_duration")
 
     def testIllegalExperimentTypeType(self):
-        self.stringTypeTest("experiment_type")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "experiment_type")
 
     def testLegalExperimentType(self):
-        self.stringPropertyTest("experiment_type")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "experiment_type")
 
     def testIllegalSpeciesType(self):
-        self.stringTypeTest("species")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "species")
 
     def testLegalSpecies(self):
-        self.stringPropertyTest("species")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "species")
 
     def testIllegalCellTypeType(self):
-        self.stringTypeTest("cell_type")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "cell_type")
 
     def testLegalCellType(self):
-        self.stringPropertyTest("cell_type")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "cell_type")
 
     def testIllegalTissueType(self):
-        self.stringTypeTest("tissue")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "tissue")
 
     def testLegalTissue(self):
-        self.stringPropertyTest("tissue")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "tissue")
 
     def testIllegalReferenceType(self):
-        self.stringTypeTest("reference")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "reference")
 
     def testLegalReference(self):
-        self.stringPropertyTest("reference")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "reference")
 
     def testIllegalProtocolNameType(self):
-        self.stringTypeTest("protocol_name")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "protocol_name")
 
     def testLegalProtocolName(self):
-        self.stringPropertyTest("protocol_name")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "protocol_name")
 
     def testIllegalProtocolStepsType(self):
-        self.stringTypeTest("protocol_steps")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "protocol_steps")
 
     def testLegalProtocolSteps(self):
-        self.stringPropertyTest("protocol_steps")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "protocol_steps")
 
     def testIllegalExpDescriptionType(self):
-        self.stringTypeTest("exp_description")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "exp_description")
 
     def testLegalExpDescription(self):
-        self.stringPropertyTest("exp_description")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "exp_description")
 
     def testIllegalSampleDescriptionType(self):
-        self.stringTypeTest("sample_description")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "sample_description")
 
     def testLegalSampleDescription(self):
-        self.stringPropertyTest("sample_description")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "sample_description")
 
     def testIllegalStudyType(self):
-        self.stringTypeTest("study")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringTypeTest(self, prep, "study")
 
     def testLegalStudy(self):
-        self.stringPropertyTest("study")
+        prep = self.session.create_microbiome_assay_prep()
+
+        self.util.stringPropertyTest(self, prep, "study")
 
     def testTags(self):
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
 
         tags = prep.tags
         self.assertTrue(type(tags) == list,
@@ -225,7 +312,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
 
         prep.add_tag("test")
         self.assertEqual(prep.tags, [ "test" ], "Can add a tag to a prep.")
@@ -253,12 +340,12 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
                          "required_fields() returns a tuple.")
 
         self.assertTrue(len(required) > 0,
-                        "required_field() did not return empty value.")
+                        "required_fields() did not return empty value.")
 
     def testLoadSaveDelete(self):
         # Attempt to save the object at all points before and after adding
         # the required fields
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
 
         test_links = {"prepared_from":[]}
         test_comment = "comment"
@@ -289,7 +376,7 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
         self.assertTrue(prep.save() == True, "Was not saved successfully")
 
         # Load the node that was just saved to OSDF
-        prep = session.create_microbiome_assay_prep()
+        prep = self.session.create_microbiome_assay_prep()
         prep = prep.load(prep.id)
 
         # Check all fields were saved and loaded successfully
@@ -304,78 +391,9 @@ class MicrobiomeAssayPrepTest(unittest.TestCase):
         self.assertTrue(prep.delete(), "Node was not deleted successfully")
 
         # The proteome of the initial ID should not load successfully
-        load_test = session.create_microbiome_assay_prep()
+        load_test = self.session.create_microbiome_assay_prep()
         with self.assertRaises(Exception):
             load_test = load_test.load(prep.id)
-
-    def intPropertyTest(self, prop):
-        prep = session.create_microbiome_assay_prep()
-
-        value = 1313
-        success = False
-
-        try:
-            setattr(prep, prop, value)
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the %s setter" % prop)
-
-        retrieved = getattr(prep, prop)
-
-        self.assertEqual(retrieved, value,
-                         "Property getter for '%s' works." % prop)
-
-    def stringPropertyTest(self, prop):
-        prep = session.create_microbiome_assay_prep()
-
-        value = "random"
-        success = False
-
-        try:
-            setattr(prep, prop, value)
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the %s setter" % prop)
-
-        retrieved = getattr(prep, prop)
-
-        self.assertEqual(retrieved, value,
-                         "Property getter for '%s' works." % prop)
-
-    def intTypeTest(self, prop):
-        prep = session.create_microbiome_assay_prep()
-
-        # test a string
-        with self.assertRaises(Exception):
-            setattr(prep, prop, "test")
-
-        # test a list
-        with self.assertRaises(Exception):
-            setattr(prep, prop, ["test"])
-
-        # test a dictionary
-        with self.assertRaises(Exception):
-            setattr(prep, prop, {})
-
-
-    def stringTypeTest(self, prop):
-        prep = session.create_microbiome_assay_prep()
-
-        # test an int
-        with self.assertRaises(Exception):
-            setattr(prep, prop, 1)
-
-        # test a list
-        with self.assertRaises(Exception):
-            setattr(prep, prop, ["test"])
-
-        # test a dictionary
-        with self.assertRaises(Exception):
-            setattr(prep, prop, {})
 
 if __name__ == '__main__':
     unittest.main()

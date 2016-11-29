@@ -8,9 +8,16 @@ from datetime import date
 from cutlass import iHMPSession
 from cutlass import Annotation
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class AnnotationTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class AnnotationTest(unittest.TestCase):
         annot = None
 
         try:
-            annot = session.create_annotation()
+            annot = self.session.create_annotation()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class AnnotationTest(unittest.TestCase):
         self.failIf(annot is None)
 
     def testAnnotationPipeline(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         pipeline = "test pipeline"
 
@@ -57,19 +64,19 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testAnnotationPipelinetInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.annotation_pipeline = 3
 
     def testAnnotationPipelineList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.annotation_pipeline = [ "a", "b", "c" ]
 
     def testChecksumsLegal(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -85,13 +92,13 @@ class AnnotationTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testIllegalDate(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(Exception):
             annot.date = "random"
 
     def testIllegalFutureDate(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         today = date.today()
         next_year = str(date(today.year + 1, today.month, today.day))
@@ -105,7 +112,7 @@ class AnnotationTest(unittest.TestCase):
         self.assertFalse(success, "Annotation class rejects future dates.")
 
     def testLegalDate(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         date = "2015-07-27"
 
@@ -122,7 +129,7 @@ class AnnotationTest(unittest.TestCase):
         self.assertEqual(annot.date, date, "Property getter for 'date' works.")
 
     def testFormat(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         format_ = "gff3"
 
@@ -141,19 +148,19 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testFormatInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.format = 3
 
     def testFormatList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.format = [ "a", "b", "c" ]
 
     def testFormatDoc(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         format_doc = "test format doc"
 
@@ -172,19 +179,19 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testFormatDocInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.format_doc = 3
 
     def testFormatDocList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.format_doc = [ "a", "b", "c" ]
 
     def testOrfProcess(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         orf_process = "test orf process"
 
@@ -203,19 +210,19 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testOrfProcessInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.orf_process = 3
 
     def testOrfProcesssList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.orf_process = [ "a", "b", "c" ]
 
     def testStudy(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         study = "test study"
 
@@ -234,19 +241,19 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testStudyInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.study = 3
 
     def testStudyList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.study = [ "a", "b", "c" ]
 
     def testComment(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         comment = "test comment"
 
@@ -265,20 +272,20 @@ class AnnotationTest(unittest.TestCase):
                 )
 
     def testCommentInt(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.comment = 3
 
     def testCommentList(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         with self.assertRaises(ValueError):
             annot.comment = [ "a", "b", "c" ]
 
 
     def testToJson(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
 
         annotation_pipeline = "test_annotation_pipeline"
@@ -344,7 +351,7 @@ class AnnotationTest(unittest.TestCase):
                          "'format_doc' in JSON had expected value."
                          )
     def testDataInJson(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         success = False
         comment = "test_comment"
         annotation_pipeline = "test_annotation_pipeline"
@@ -403,7 +410,7 @@ class AnnotationTest(unittest.TestCase):
                          )
 
     def testId(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         self.assertTrue(annot.id is None,
                         "New template annotation has no ID.")
@@ -412,7 +419,7 @@ class AnnotationTest(unittest.TestCase):
             annot.id = "test"
 
     def testVersion(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         self.assertTrue(annot.version is None,
                         "New template annotation has no version.")
@@ -421,7 +428,7 @@ class AnnotationTest(unittest.TestCase):
             annot.version = "test"
 
     def testTags(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         tags = annot.tags
         self.assertTrue(type(tags) == list, "Annotation tags() method returns a list.")
@@ -441,7 +448,7 @@ class AnnotationTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
 
         annot.add_tag("test")
         self.assertEqual(annot.tags, [ "test" ], "Can add a tag to an annotation.")
@@ -474,7 +481,7 @@ class AnnotationTest(unittest.TestCase):
     def testLoadSaveDeleteAnnotation(self):
         # Attempt to save the sample at all points before and after adding
         # the required fields
-        annot = session.create_annotation()
+        annot = self.session.create_annotation()
         self.assertFalse(
                 annot.save(),
                 "Annoatation not saved successfully, no required fields"
@@ -505,7 +512,7 @@ class AnnotationTest(unittest.TestCase):
         self.assertTrue(annot.save() == True, "Annotation was saved successfully")
 
         # Load the annotation that was just saved from the OSDF instance
-        annot_loaded = session.create_annotation()
+        annot_loaded = self.session.create_annotation()
         annot_loaded = annot_loaded.load(annot.id)
 
         # Check all fields were saved and loaded successfully
@@ -518,7 +525,7 @@ class AnnotationTest(unittest.TestCase):
         self.assertTrue(annot.delete(), "Annotation was deleted successfully")
 
         # the sample of the initial ID should not load successfully
-        load_test = session.create_annotation()
+        load_test = self.session.create_annotation()
         with self.assertRaises(Exception):
             load_test = load_test.load(annot.id)
 

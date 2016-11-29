@@ -10,12 +10,19 @@ from cutlass import iHMPSession
 from cutlass import WgsDnaPrep
 from cutlass import MIMS, MimsException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 class WgsDnaPrepTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -33,7 +40,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         wgsDnaPrep = None
 
         try:
-            wgsDnaPrep = session.create_object("wgs_dna_prep")
+            wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
             success = True
         except:
@@ -43,7 +50,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         self.failIf(wgsDnaPrep is None)
 
     def testToJson(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         comment = "Test comment"
 
@@ -76,7 +83,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         self.assertTrue(wgsDnaPrep.id is None,
                         "New template wgsDnaPrep has no ID.")
@@ -85,7 +92,7 @@ class WgsDnaPrepTest(unittest.TestCase):
             wgsDnaPrep.id = "test"
 
     def testVersion(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         self.assertTrue(wgsDnaPrep.version is None,
                         "New template wgsDnaPrep has no version.")
@@ -94,13 +101,13 @@ class WgsDnaPrepTest(unittest.TestCase):
             wgsDnaPrep.version = "test"
 
     def testIllegalComment(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
             wgsDnaPrep.comment = 1
 
     def testLegalComment(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         comment = "This is a test comment"
 
@@ -116,13 +123,13 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'comment' works.")
 
     def testIllegalFragSize(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
             wgsDnaPrep.frag_size = "wrong frag size variable type"
 
     def testLegalFragSize(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         frag_size = 1020
 
@@ -138,7 +145,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'frag_size' works.")
 
     def testLegalLibLayout(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         lib_layout = "A test Lib Layout for the test class"
 
@@ -154,7 +161,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'lib_layout' works.")
 
     def testLegalLibSelection(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         lib_selection = "A test Lib selection for the test class"
 
@@ -170,7 +177,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'lib_selection' works.")
 
     def testLegalNCBITaxonID(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
 
@@ -186,7 +193,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'ncbi_taxon_id' works.")
 
     def testLegalPrepID(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         prep_id = "A test prep id for the test class"
 
@@ -201,7 +208,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         self.assertEqual(wgsDnaPrep.prep_id, prep_id, "Property getter for 'prep_id' works.")
 
     def testLegalSequencingCenter(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         sequencing_center = "A test seq center for the test class"
 
@@ -217,7 +224,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'sequencing_center' works.")
 
     def testLegalSequencingContact(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         sequencing_contact = "A test seq contact for the test class"
 
@@ -233,7 +240,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'sequencing_contact' works.")
 
     def testLegalSRSID(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         srs_id = "A test prep id for the test class"
 
@@ -249,13 +256,13 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'srs_id' works.")
 
     def testIllegalSRSID(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
             wgsDnaPrep.srs_id = 1
 
     def testLegalStorageDuration(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         storage_duration = 12
 
@@ -271,13 +278,13 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Property getter for 'storage_duration' works.")
 
     def testIllegalStorageDuration(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
             wgsDnaPrep.storage_duration = "ASDASDSAD"
 
     def testTags(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         tags = wgsDnaPrep.tags
         self.assertTrue(type(tags) == list, "WgsDnaPrep tags() method returns a list.")
@@ -298,7 +305,7 @@ class WgsDnaPrepTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         wgsDnaPrep.add_tag("test")
         self.assertEqual(wgsDnaPrep.tags, [ "test" ], "Can add a tag to a wgsDnaPrep.")
@@ -320,7 +327,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testMims(self):
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         self.assertTrue(wgsDnaPrep.mims is None,
                         "New template wgsDnaPrep has no MIMS data.")
@@ -402,7 +409,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         # attempt to save the wgsDnaPrep at all points before and after adding the required fields
         # project_id = super(WgsDnaPrepTest, self).testSaveProject()
 
-        wgsDnaPrep = session.create_object("wgs_dna_prep")
+        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         test_comment = "Test comment"
         frag_size = 10
@@ -484,7 +491,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         self.assertTrue(wgsDnaPrep.save() == True, "WgsDnaPrep was not saved successfully")
 
         # load the wgsDnaPrep that was just saved from the OSDF instance
-        wgsDnaPrep_loaded = session.create_object("wgs_dna_prep")
+        wgsDnaPrep_loaded = self.session.create_object("wgs_dna_prep")
         wgsDnaPrep_loaded = wgsDnaPrep_loaded.load(wgsDnaPrep.id)
 
         # check all fields were saved and loaded successfully
@@ -499,7 +506,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         self.assertTrue(wgsDnaPrep.delete(), "WgsDnaPrep was not deleted successfully")
 
         # the wgsDnaPrep of the initial ID should not load successfully
-        load_test = session.create_object("wgs_dna_prep")
+        load_test = self.session.create_object("wgs_dna_prep")
         with self.assertRaises(Exception):
             load_test = load_test.load(wgsDnaPrep.id)
 

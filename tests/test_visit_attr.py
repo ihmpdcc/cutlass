@@ -3,9 +3,17 @@
 import unittest
 from cutlass import iHMPSession
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class VisitAttributeTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+
     def testImport(self):
         success = False
         try:
@@ -22,7 +30,7 @@ class VisitAttributeTest(unittest.TestCase):
         attr = None
 
         try:
-            visit = session.create_visit_attr()
+            visit = self.session.create_visit_attr()
 
             success = True
         except:
@@ -32,7 +40,7 @@ class VisitAttributeTest(unittest.TestCase):
         self.failIf(visit is None)
 
     def testToJson(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
         success = False
 
         attr.study = "prediabetes"
@@ -49,7 +57,7 @@ class VisitAttributeTest(unittest.TestCase):
         self.assertTrue(attr_json is not None, "to_json() returned data.")
 
     def testComment(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.comment = 1
@@ -69,7 +77,7 @@ class VisitAttributeTest(unittest.TestCase):
         self.assertEquals(comment, attr.comment, "comment property works.")
 
     def testClinicalPatientAge(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.age = "test age"
@@ -93,7 +101,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "age property works.")
 
     def testClinicalPatientHeight(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.height = "test height"
@@ -117,7 +125,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "height property works.")
 
     def testClinicalPatientWeight(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.weight = "test weight"
@@ -141,7 +149,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "weight property works.")
 
     def testClinicalPatientWeightDiff(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.weight_diff = 30.5
@@ -165,7 +173,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "weight_diff property works.")
 
     def testClinicalPatientBMI(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.bmi = "test bmi"
@@ -189,7 +197,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "bmi property works.")
 
     def testClinicalPatientHBI(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.hbi = "test hbi"
@@ -213,7 +221,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "hbi property works.")
 
     def testClinicalPatientHBITotal(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.hbi_total = "test hbi total"
@@ -237,7 +245,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "hbi_total property works.")
 
     def testClinicalPatientSCCAI(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.sccai = "test sccai"
@@ -261,7 +269,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "sccai property works.")
 
     def testClinicalPatientSCCAITotal(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.sccai_total = "test sccai total"
@@ -285,7 +293,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "sccai_total property works.")
 
     def testClinicalPatientFastGluc(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.fast_gluc = "test fast_gluc"
@@ -309,7 +317,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "fast_gluc property works.")
 
     def testClinicalPatient30mGluc(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.thirtym_gluc = "test thirtym_gluc"
@@ -333,7 +341,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "thirtym_gluc property works.")
 
     def testClinicalPatient60mGluc(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.sixtym_gluc = "test sixtym_gluc"
@@ -357,7 +365,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "sixtym_gluc property works.")
 
     def testHrtPrior(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.prior = "test prior"
@@ -381,7 +389,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "prior property works.")
 
     def testHrtCurrent(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.current = "test current"
@@ -405,7 +413,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "current property works.")
 
     def testHrtDuration(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.duration = True
@@ -430,7 +438,7 @@ class VisitAttributeTest(unittest.TestCase):
 
 
     def testHealthAssessSelfAssess(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.self_assess = "test new meds"
@@ -454,7 +462,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "self_assess property works.")
 
     def testHealthAssessSelfCondition(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.self_condition = True
@@ -478,7 +486,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "self_condition property works.")
 
     def testHealthAssessAbdominalPain(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.abdominal_pain = "test abdominal pain"
@@ -502,7 +510,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "abdominal_pain property works.")
 
     def testHealthAssessAcuteDis(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.acute_dis = True
@@ -526,7 +534,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "acute_dis property works.")
 
     def testHealthAssessArthralgia(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.arthralgia = "test arthralgia"
@@ -550,7 +558,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "arthralgia property works.")
 
     def testHealthAssessBowelDay(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.bowel_day = True
@@ -574,7 +582,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "bowel_day property works.")
 
     def testHealthAssessBowelNight(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.bowel_night = True
@@ -598,7 +606,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "bowel_night property works.")
 
     def testHealthAssessCancer(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.cancer = True
@@ -622,7 +630,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "cancer property works.")
 
     def testHealthAssessCancerMtc(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.cancer_mtc = "test cancer mtc"
@@ -646,7 +654,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "cancer_mtc property works.")
 
     def testHealthAssessChestPain(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.chest_pain = "test chest_pain"
@@ -670,7 +678,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "chest_pain property works.")
 
     def testHealthAssessClaudication(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.claudication = "test claudication"
@@ -694,7 +702,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "claudication property works.")
 
     def testHealthAssessChronicDis(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.chronic_dis = True
@@ -718,7 +726,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "chronic_dis property works.")
 
     def testHealthAssessDiarrhea(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.diarrhea = "test diarrhea"
@@ -742,7 +750,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "diarrhea property works.")
 
     def testHealthAssessDyspnea(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.dyspnea = "test dyspnea"
@@ -766,7 +774,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "dyspnea property works.")
 
     def testHealthAssessEryNodosum(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.ery_nodosum = "test ery nodosum"
@@ -790,7 +798,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "ery_nodosum property works.")
 
     def testHealthAssessFever(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.fever = True
@@ -814,7 +822,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "fever property works.")
 
     def testHealthAssessLegEdema(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.leg_edema = "test leg_edema"
@@ -838,7 +846,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "leg_edema property works.")
 
     def testHealthAssessNeurologic(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.neurologic = "test neurologic"
@@ -862,7 +870,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "neurologic property works.")
 
     def testHealthAssessPregnant(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.pregnant = "test pregnant"
@@ -886,7 +894,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "pregnant property works.")
 
     def testHealthAssessPregPlans(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.preg_plans = "test preg_plans"
@@ -910,7 +918,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "preg_plans property works.")
 
     def testHealthAssessPyoGangrenosum(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.pyo_gangrenosum = "test pyo_gangrenosum"
@@ -934,7 +942,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "pyo_gangrenosum property works.")
 
     def testHealthAssessRash(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.rash = "test rash"
@@ -958,7 +966,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "rash property works.")
 
     def testHealthAssessStoolBlood(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.stool_blood = "test stool blood"
@@ -982,7 +990,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "stool_blood property works.")
 
     def testHealthAssessStoolSoft(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.stool_soft = "test stool soft"
@@ -1006,7 +1014,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "stool_soft property works.")
 
     def testHealthAssessSurgery(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.surgery = 3
@@ -1030,7 +1038,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "surgery property works.")
 
     def testHealthAssessUrgencyDef(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.urgency_def = 3
@@ -1054,7 +1062,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "urgency_def property works.")
 
     def testHealthAssessUveitis(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.uveitis = 3
@@ -1078,7 +1086,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "uveitis property works.")
 
     def testHealthAssessWeightChange(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.weight_change = 3
@@ -1102,7 +1110,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "weight_change property works.")
 
     def testHealthAssessDiagOther(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.diag_other = 3
@@ -1126,7 +1134,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "diag_other property works.")
 
     def testHealthAssessHosp(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.hosp = 3
@@ -1150,7 +1158,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "hosp property works.")
 
     def testHealthAssessWorkMissed(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.work_missed = True
@@ -1174,7 +1182,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "work_missed property works.")
 
     def testMedicationsNewMeds(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.new_meds = "test new meds"
@@ -1198,7 +1206,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "new_meds property works.")
 
     def testMedicationsStoppedMeds(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.stopped_meds = "test stopped meds"
@@ -1222,7 +1230,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "stopped_meds property works.")
 
     def testMedicationsAbx(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.abx = "test abx"
@@ -1246,7 +1254,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "abx property works.")
 
     def testMedicationsChemo(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.chemo = "test chemo"
@@ -1270,7 +1278,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "chemo property works.")
 
     def testMedicationsImmunosupp(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.immunosupp = "test immunosupp"
@@ -1294,7 +1302,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "immunosupp property works.")
 
     def testTestsColonoscopy(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.colonoscopy = 1
@@ -1315,7 +1323,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "colonoscopy property works.")
 
     def testTestsOralContrast(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.oral_contrast = 1
@@ -1336,7 +1344,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "oral_contrast property works.")
 
     def testDiseaseComment(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_comment = True
@@ -1360,7 +1368,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_comment property works.")
 
     def testDiseaseName(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_name = True
@@ -1384,7 +1392,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_name property works.")
 
     def testDiseaseDescription(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_description = True
@@ -1408,7 +1416,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_description property works.")
 
     def testDiseaseOntologyID(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_ontology_id = True
@@ -1432,7 +1440,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_ontology_id property works.")
 
     def testDiseaseMeshID(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_mesh_id = True
@@ -1456,7 +1464,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_mesh_id property works.")
 
     def testDiseaseNciID(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_nci_id = True
@@ -1480,7 +1488,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_nci_id property works.")
 
     def testDiseaseUmlsConceptID(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_umls_concept_id = True
@@ -1504,7 +1512,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_umls_concept_id property works.")
 
     def testDiseaseStudyStatus(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.disease_study_status = True
@@ -1528,7 +1536,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "disease_study_status property works.")
 
     def testPsychPsychiatric(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.psychiatric = "test psychiatric"
@@ -1549,7 +1557,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "psychiatric property works.")
 
     def testPsychUpset(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.upset = "test upset"
@@ -1570,7 +1578,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "upset property works.")
 
     def testPsychControl(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.control = "test control"
@@ -1591,7 +1599,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "control property works.")
 
     def testPsychStress(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.stress = "test stress"
@@ -1612,7 +1620,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "stress property works.")
 
     def testPsychStressDef(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.stress_def = 3
@@ -1633,7 +1641,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "stress_def property works.")
 
     def testPsychConfident(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.confident = "test confident"
@@ -1654,7 +1662,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "confident property works.")
 
     def testPsychGoingYourWay(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.going_your_way = "test going_your_way"
@@ -1675,7 +1683,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "going_your_way property works.")
 
     def testPsychCoping(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.coping = "test coping"
@@ -1696,7 +1704,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "coping property works.")
 
     def testPsychIrritation(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.irritation = "test irritation"
@@ -1717,7 +1725,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "irritation property works.")
 
     def testPsychOnTop(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.on_top = "test on top"
@@ -1738,7 +1746,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "on_top property works.")
 
     def testPsychAnger(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.anger = "test anger"
@@ -1759,7 +1767,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "anger property works.")
 
     def testPsychDifficulties(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         with self.assertRaises(ValueError):
             attr.difficulties = "test difficulties"
@@ -1780,7 +1788,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "difficulties property works.")
 
     def testExerciseVigActivity(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # vig_activity_days
         with self.assertRaises(ValueError):
@@ -1840,7 +1848,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "vig_activity_minutes property works.")
 
     def testExerciseModActivity(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # mod_activity_days
         with self.assertRaises(ValueError):
@@ -1900,7 +1908,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "mod_activity_minutes property works.")
 
     def testExerciseWalking(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # walking_days
         with self.assertRaises(ValueError):
@@ -1960,7 +1968,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "walking_minutes property works.")
 
     def testExerciseActivity30d(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # activity level over the last 30 days. Must be a string.
         with self.assertRaises(ValueError):
@@ -1982,7 +1990,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "activity_30d property works.")
 
     def testExerciseActivity3m(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # activity level over the last 3 months. Must be a string.
         with self.assertRaises(ValueError):
@@ -2004,7 +2012,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "activity_3m property works.")
 
     def testExerciseActivityChange30d(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # activity level changed over the last 30 days. Must be a string.
         with self.assertRaises(ValueError):
@@ -2026,7 +2034,7 @@ class VisitAttributeTest(unittest.TestCase):
                           "activity_change_30d property works.")
 
     def testExerciseActivityChange3m(self):
-        attr = session.create_visit_attr()
+        attr = self.session.create_visit_attr()
 
         # activity level changed over the last 3 months. Must be a string.
         with self.assertRaises(ValueError):
