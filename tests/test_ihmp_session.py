@@ -256,6 +256,14 @@ class IHMPSessionTest(unittest.TestCase):
         from cutlass import Subject
         self.failUnless(isinstance(subject, Subject))
 
+    def testCreateSubjectAttribute(self):
+        session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
+        subject_attr = session.create_subject_attr()
+        self.failIf(subject_attr is None)
+
+        from cutlass import SubjectAttribute
+        self.failUnless(isinstance(subject_attr, SubjectAttribute))
+
     def testCreateStudy(self):
         session = iHMPSession(IHMPSessionTest.username, IHMPSessionTest.password)
         study = session.create_study()
@@ -314,8 +322,8 @@ class IHMPSessionTest(unittest.TestCase):
                       "host_transcriptomics_raw_seq_set", "host_wgs_raw_seq_set",
                       "lipidome", "metabolome", "microbiome_assay_prep",
                       "microb_transcriptomics_raw_seq_set",
-                      "project", "proteome", "sample",
-                      "sample_attr", "study", "subject", "viral_seq_set",
+                      "project", "proteome", "sample", "sample_attr", "study",
+                      "subject", "subject_attr", "viral_seq_set",
                       "visit", "visit_attr", "wgs_assembled_seq_set",
                       "wgs_raw_seq_set", "wgs_dna_prep" ]
 

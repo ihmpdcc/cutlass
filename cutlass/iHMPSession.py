@@ -81,7 +81,6 @@ class iHMPSession(object):
           "visit_attr"                         : "VisitAttribute",
           "wgs_assembled_seq_set"              : "WgsAssembledSeqSet",
           "wgs_raw_seq_set"                    : "WgsRawSeqSet",
-          "wgs_raw_seq_set_private"            : "WgsRawSeqSetPrivate",
           "wgs_dna_prep"                       : "WgsDnaPrep" }
 
         className = None
