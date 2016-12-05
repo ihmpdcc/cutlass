@@ -3,12 +3,14 @@
 import unittest
 import json
 import sys
+import tempfile
 from datetime import date
 
 from cutlass import iHMPSession
 from cutlass import Annotation
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class AnnotationTest(unittest.TestCase):
 
@@ -18,6 +20,8 @@ class AnnotationTest(unittest.TestCase):
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -221,36 +225,15 @@ class AnnotationTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             annot.orf_process = [ "a", "b", "c" ]
 
+    def testSize(self):
+        annot = self.session.create_annotation()
+
+        self.util.intTypeTest(self, annot, "size")
+
     def testStudy(self):
         annot = self.session.create_annotation()
-        success = False
-        study = "test study"
 
-        try:
-            annot.study = study
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'study' setter.")
-
-        self.assertEqual(
-                annot.study,
-                study,
-                "Property getter for 'study' works."
-                )
-
-    def testStudyInt(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.study = 3
-
-    def testStudyList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.study = [ "a", "b", "c" ]
+        self.util.stringTypeTest(self, annot, "study")
 
     def testComment(self):
         annot = self.session.create_annotation()
@@ -479,7 +462,9 @@ class AnnotationTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteAnnotation(self):
-        # Attempt to save the sample at all points before and after adding
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
+        # Attempt to save at all points before and after adding
         # the required fields
         annot = self.session.create_annotation()
         self.assertFalse(
@@ -502,6 +487,8 @@ class AnnotationTest(unittest.TestCase):
         annot.format_doc = "Test format_doc"
         annot.orf_process = "Test ORF process"
         annot.study = "prediabetes"
+        annot.local_file = temp_file
+        annot.size = 131313
 
         annot.add_tag("test")
 

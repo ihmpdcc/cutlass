@@ -52,7 +52,9 @@ class Annotation(Base):
         self._checksums = {}
         self._format = None
         self._format_doc = None
+        self._local_file = None
         self._orf_process = None
+        self._size = None
         self._study = None
         self._urls = ['']
 
@@ -291,6 +293,34 @@ class Annotation(Base):
         self._annotation_source = annotation_source
 
     @property
+    def size(self):
+        """
+        int: The size of the file in bytes.
+        """
+        self.logger.debug("In 'size' getter.")
+
+        return self._size
+
+    @size.setter
+    @enforce_int
+    def size(self, size):
+        """
+        The setter for the file size.
+
+        Args:
+            size (int): The size of the file in bytes.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'size' setter.")
+
+        if size < 0:
+            raise ValueError("The size must be non-negative.")
+
+        self._size = size
+
+    @property
     def study(self):
         """
         str: One of the 3 studies that are part of the iHMP.
@@ -442,6 +472,7 @@ class Annotation(Base):
                 'format': self._format,
                 'format_doc': self._format_doc,
                 'orf_process': self._orf_process,
+                'size': self._size,
                 'study': self._study,
                 'subtype': self._study,
                 'tags': self._tags,
@@ -488,7 +519,7 @@ class Annotation(Base):
         """
         module_logger.debug("In required fields.")
         return ("annotation_pipeline", "checksums", "format", "format_doc",
-                "local_file", "orf_process", "study", "tags")
+                "local_file", "orf_process", "size", "study", "tags")
 
     def delete(self):
         """
@@ -734,8 +765,8 @@ class Annotation(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence " + \
-                              "set. Aborting save.")
+            self.logger.error("Experienced an error uploading the annotation. " + \
+                              "Aborting save.")
             return success
 
         self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
