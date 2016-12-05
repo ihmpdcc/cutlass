@@ -20,6 +20,7 @@ from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from .Study import Study
 from .Subject import Subject
+from .SubjectAttribute import SubjectAttribute
 from .ViralSeqSet import ViralSeqSet
 from .Visit import Visit
 from .VisitAttribute import VisitAttribute
