@@ -5,3 +5,4 @@ MANIFEST
 *~
 cutlass.egg-info
 internal
+.cutlass_test.ini
