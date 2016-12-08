@@ -27,7 +27,6 @@ from .VisitAttribute import VisitAttribute
 from .WgsAssembledSeqSet import WgsAssembledSeqSet
 from .WgsDnaPrep import WgsDnaPrep
 from .WgsRawSeqSet import WgsRawSeqSet
-from .WgsRawSeqSetPrivate import WgsRawSeqSetPrivate
 from .aspera import aspera
 from .mixs import MIXS, MixsException
 from .mims import MIMS, MimsException
