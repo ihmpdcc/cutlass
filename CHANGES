@@ -1,3 +1,18 @@
+cutlass 0.26
+
+  * Added missing SubjectAttribute node, example and test.
+  * Modified Subject node to add attributes() method for retrieval
+    of SubjectAttribute information.
+  * Modified Annotation class to require file size.
+  * Bug fix to SixteenSTrimmedSeqSet save() functionality which
+    was losing the urls property.
+  * Removed WgsRawSeqSetPrivate class, test and example in favor
+    of more generic solution.
+  * Improved flexibility of test scripts by using a configuration
+    file for OSDF settings.
+
+ - Victor <victor73@github.com>  Fri, 29 Nov 2016 15:00:00 -0400
+
 cutlass 0.25
 
   * Removed some code duplication in Metabolome identified
