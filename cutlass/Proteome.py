@@ -76,6 +76,7 @@ class Proteome(Base):
         self._spectra_url = ['']
         self._local_spectra_file = None
         self._study = None
+        self._subtype = None
         self._title = None
 
         # Optional properties
@@ -870,6 +871,31 @@ class Proteome(Base):
         else:
             raise Exception("Invalid study.")
 
+    @property
+    def subtype(self):
+        """
+        str: Retrieves the subtype of the Proteome (host or microbiome).
+        """
+        self.logger.debug("In 'subtype' getter.")
+
+        return self._subtype
+
+    @subtype.setter
+    @enforce_string
+    def subtype(self, subtype):
+        """
+        Sets the subtype of the proteome. Must be either 'host' or 'microbiome'.
+
+        Args:
+            subtype (str): host or microbiome.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'subtype' setter.")
+
+        self._subtype = subtype
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -981,7 +1007,7 @@ class Proteome(Base):
                 'spectra_format': self._spectra_format,
                 'spectra_url': self._spectra_url,
                 'study': self._study,
-                'subtype': self._study,
+                'subtype': self._subtype,
                 'tags': self._tags
             }
         }
@@ -1038,7 +1064,7 @@ class Proteome(Base):
                 "search_engine", "protid_format", "pepid_format",
                 "protmod_format", "spectra_format",
                 "local_spectra_file", "local_protmod_file", "local_protid_file",
-                "local_pepid_file", "study")
+                "local_pepid_file", "study", "subtype")
 
     def delete(self):
         """
@@ -1137,43 +1163,6 @@ class Proteome(Base):
         proteome = Proteome()
 
         module_logger.debug("Filling in Proteome details.")
-        proteome._set_id(proteome_data['id'])
-        proteome._links = proteome_data['linkage']
-        proteome._version = proteome_data['ver']
-
-        proteome._gender = proteome_data['meta']['gender']
-        proteome._rand_proteome_id = proteome_data['meta']['rand_subject_id']
-        proteome._tags = proteome_data['meta']['tags']
-
-        if 'race' in proteome_data['meta']:
-            proteome._race = proteome_data['meta']['race']
-
-        module_logger.debug("Returning loaded Proteome.")
-        return proteome
-
-    @staticmethod
-    def load(proteome_id):
-        """
-        Loads the data for the specified input ID from the OSDF instance to this object.
-        If the provided ID does not exist, then an error message is provided stating the
-        project does not exist.
-
-        Args:
-            proteome_id (str): The OSDF ID for the document to load.
-
-        Returns:
-            A Proteome object with all the available OSDF data loaded into it.
-        """
-        module_logger.debug("In load. Specified ID: %s" % proteome_id)
-
-        session = iHMPSession.get_session()
-        module_logger.info("Got iHMP session.")
-        proteome_data = session.get_osdf().get_node(proteome_id)
-
-        module_logger.info("Creating a template Proteome.")
-        proteome = Proteome()
-
-        module_logger.debug("Filling in Proteome details.")
 
         # Node required fields
         proteome._set_id(proteome_data['id'])
@@ -1226,6 +1215,32 @@ class Proteome(Base):
             proteome._xml_generation = proteome_data['meta']['xml_generation']
 
         module_logger.debug("Returning loaded Proteome.")
+        return proteome
+
+    @staticmethod
+    def load(proteome_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to this object.
+        If the provided ID does not exist, then an error message is provided stating the
+        project does not exist.
+
+        Args:
+            proteome_id (str): The OSDF ID for the document to load.
+
+        Returns:
+            A Proteome object with all the available OSDF data loaded into it.
+        """
+        module_logger.debug("In load. Specified ID: %s" % proteome_id)
+
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+        proteome_data = session.get_osdf().get_node(proteome_id)
+
+        module_logger.info("Creating a template " + __name__ + ".")
+        proteome = Proteome.load_proteome(proteome_data)
+
+        module_logger.debug("Returning loaded " + __name__)
+
         return proteome
 
     def _upload_files(self, study, file_map):

@@ -8,9 +8,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import Lipidome
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class LipidomeTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class LipidomeTest(unittest.TestCase):
         lip = None
 
         try:
-            lip = session.create_lipidome()
+            lip = self.session.create_lipidome()
 
             success = True
         except:
@@ -39,7 +46,7 @@ class LipidomeTest(unittest.TestCase):
 
 
     def testComment(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
 
         with self.assertRaises(ValueError):
             lip.comment = 3
@@ -60,7 +67,7 @@ class LipidomeTest(unittest.TestCase):
                           "comment property works.")
 
     def testChecksumsLegal(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -76,7 +83,7 @@ class LipidomeTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testToJson(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
         success = False
 
         comment = "test lipidome comment"
@@ -143,7 +150,7 @@ class LipidomeTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
         success = False
         comment = "test_comment"
         subtype = "host"
@@ -202,7 +209,7 @@ class LipidomeTest(unittest.TestCase):
                          )
 
     def testId(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
 
         self.assertTrue(lip.id is None,
                         "New template lipidome has no ID.")
@@ -211,7 +218,7 @@ class LipidomeTest(unittest.TestCase):
             lip.id = "test"
 
     def testVersion(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
 
         self.assertTrue(lip.version is None,
                         "New template lipidome has no version.")
@@ -220,7 +227,7 @@ class LipidomeTest(unittest.TestCase):
             lip.version = "test"
 
     def testTags(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
 
         tags = lip.tags
         self.assertTrue(type(tags) == list, "Lipidome tags() method returns a list.")
@@ -240,7 +247,7 @@ class LipidomeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
 
         lip.add_tag("test")
         self.assertEqual(lip.tags, [ "test" ], "Can add a tag to a lipidome.")
@@ -275,7 +282,7 @@ class LipidomeTest(unittest.TestCase):
 
         # Attempt to save the lipidome at all points before and after adding
         # the required fields
-        lip = session.create_lipidome()
+        lip = self.session.create_lipidome()
         self.assertFalse(
                 lip.save(),
                 "Lipidome not saved successfully, no required fields"
@@ -308,7 +315,7 @@ class LipidomeTest(unittest.TestCase):
         self.assertTrue(lip.save() == True, "Lipidome was saved successfully")
 
         # Load the lipidome that was just saved from the OSDF instance
-        lip_loaded = session.create_lipidome()
+        lip_loaded = self.session.create_lipidome()
         lip_loaded = lip.load(lip.id)
 
         # Check all fields were saved and loaded successfully
@@ -321,7 +328,7 @@ class LipidomeTest(unittest.TestCase):
         self.assertTrue(lip.delete(), "Lipidome was deleted successfully")
 
         # the lipidome of the initial ID should not load successfully
-        load_test = session.create_lipidome()
+        load_test = self.session.create_lipidome()
         with self.assertRaises(Exception):
             load_test = load_test.load(lip.id)
 

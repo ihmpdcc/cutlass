@@ -312,6 +312,18 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Subject is None)
 
+    def testImportSubjectAttribute(self):
+        success = False
+
+        try:
+            from cutlass import SubjectAttribute
+            success = True
+        except:
+            pass
+
+        self.failUnless(success)
+        self.failIf(SubjectAttribute is None)
+
     def testImportViralSeqSet(self):
         success = False
 
@@ -383,18 +395,6 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(WgsRawSeqSet is None)
-
-    def testImportWgsRawSeqSetPrivate(self):
-        success = False
-
-        try:
-            from cutlass import WgsRawSeqSetPrivate
-            success = True
-        except:
-            pass
-
-        self.failUnless(success)
-        self.failIf(WgsRawSeqSetPrivate is None)
 
 if __name__ == '__main__':
     unittest.main()

@@ -512,35 +512,10 @@ class Metabolome(Base):
         module_logger.info("Got iHMP session.")
         node_data = session.get_osdf().get_node(node_id)
 
-        module_logger.info("Creating a template Metabolome.")
-        node = Metabolome()
+        node = Metabolome.load_metabolome(node_data);
 
-        module_logger.debug("Filling in Metabolome details.")
+        module_logger.debug("Returning loaded " + __name__)
 
-        # Node required fields
-        node._set_id(node_data['id'])
-        node._links = node_data['linkage']
-        node._version = node_data['ver']
-
-        # Required fields
-        node._checksums = node_data['meta']['checksums']
-        node._format = node_data['meta']['format']
-        node._format_doc = node_data['meta']['format_doc']
-        node._study = node_data['meta']['study']
-        node._tags = node_data['meta']['tags']
-        node._urls = node_data['meta']['urls']
-
-        # Handle Metabolome optional properties
-        if 'comment' in node_data['meta']:
-            node._comment = node_data['meta']['comment']
-
-        if 'format' in node_data['meta']:
-            node._format = node_data['meta']['format']
-
-        if 'format_doc' in node_data['meta']:
-            node._format_doc = node_data['meta']['format_doc']
-
-        module_logger.debug("Returning loaded Metabolome.")
         return node
 
     def save(self):

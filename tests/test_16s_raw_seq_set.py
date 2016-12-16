@@ -10,12 +10,19 @@ import sys
 from cutlass import iHMPSession
 from cutlass import SixteenSRawSeqSet
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 class SixteenSRawSeqSetTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -33,7 +40,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         sixteenSRawSeqSet = None
 
         try:
-            sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+            sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
             success = True
         except:
@@ -43,7 +50,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         self.failIf(sixteenSRawSeqSet is None)
 
     def testToJson(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         comment = "Test comment"
 
@@ -79,7 +86,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         self.assertTrue(sixteenSRawSeqSet.id is None,
                         "New template sixteenSRawSeqSet has no ID.")
@@ -88,7 +95,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
             sixteenSRawSeqSet.id = "test"
 
     def testVersion(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         self.assertTrue(sixteenSRawSeqSet.version is None,
                         "New template sixteenSRawSeqSet has no version.")
@@ -97,13 +104,13 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
             sixteenSRawSeqSet.version = "test"
 
     def testCommentIllegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.comment = 1
 
     def testCommentLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         comment = "This is a test comment"
 
@@ -119,13 +126,13 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'comment' works.")
 
     def testExpLengthNegative(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.exp_length = -1
 
     def testExpLengthLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         exp_length = 1020
 
@@ -143,7 +150,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          )
 
     def testChecksumsLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         checksums = {"md5":"asdf32qrfrae"}
 
@@ -160,7 +167,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormatLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         test_format = "fasta"
 
@@ -176,13 +183,13 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'format' works.")
 
     def testFormatIllegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.format = "asbdasidsa"
 
     def testFormatDocLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         format_doc = "http://example.com"
 
@@ -198,7 +205,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'format_doc' works.")
 
     def testSequenceTypeLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         sequence_type = "peptide"
 
@@ -214,13 +221,13 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'sequence_type' works.")
 
     def testSequenceTypeIllegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.sequence_type = "asbdasidsa"
 
     def testSeqModelLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         seq_model = "Test seq model"
 
@@ -236,7 +243,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'seq_model' works.")
 
     def testSizeLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         size = 10
 
@@ -252,13 +259,13 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'size' works.")
 
     def testSizeNegative(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.size = -1
 
     def testStudyLegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
         success = False
         study = "ibd"
 
@@ -274,19 +281,19 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'study' works.")
 
     def testStudyIllegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.study = "adfadsf"
 
     def testSRSIDIllegal(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             sixteenSRawSeqSet.study = 1
 
     def testTags(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         tags = sixteenSRawSeqSet.tags
         self.assertTrue(type(tags) == list,
@@ -310,7 +317,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         sixteenSRawSeqSet.add_tag("test")
         self.assertEqual(sixteenSRawSeqSet.tags, [ "test" ],
@@ -347,7 +354,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         # Attempt to save the sixteenSRawSeqSet at all points before and
         # after adding the required fields
 
-        sixteenSRawSeqSet = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         test_comment = "Test comment"
         checksums = {"md5": "abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
@@ -397,7 +404,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                         "SixteenSRawSeqSet was not saved successfully")
 
         # Load the sixteenSRawSeqSet that was just saved from the OSDF instance
-        sixteenSRawSeqSet_loaded = session.create_16s_raw_seq_set()
+        sixteenSRawSeqSet_loaded = self.session.create_16s_raw_seq_set()
         sixteenSRawSeqSet_loaded = sixteenSRawSeqSet_loaded.load(sixteenSRawSeqSet.id)
 
         # Check all fields were saved and loaded successfully
@@ -417,7 +424,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                         "SixteenSRawSeqSet was not deleted successfully")
 
         # The sixteenSRawSeqSet of the initial ID should not load successfully
-        load_test = session.create_16s_raw_seq_set()
+        load_test = self.session.create_16s_raw_seq_set()
         with self.assertRaises(Exception):
             load_test = load_test.load(sixteenSRawSeqSet.id)
 

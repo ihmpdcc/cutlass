@@ -83,6 +83,9 @@ class ImportAllTest(unittest.TestCase):
     def testImportSubject(self):
         self.failIf(Subject is None)
 
+    def testImportSubjectAttribute(self):
+        self.failIf(SubjectAttribute is None)
+
     def testImportViralSeqSet(self):
         self.failIf(ViralSeqSet is None)
 
@@ -100,9 +103,6 @@ class ImportAllTest(unittest.TestCase):
 
     def testImportWgsRawSeqSet(self):
         self.failIf(WgsRawSeqSet is None)
-
-    def testImportWgsRawSeqSetPrivate(self):
-        self.failIf(WgsRawSeqSetPrivate is None)
 
 if __name__ == '__main__':
     unittest.main()

@@ -8,9 +8,20 @@ from datetime import date
 from cutlass import iHMPSession
 from cutlass import Proteome
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class ProteomeTest(unittest.TestCase):
+
+    session = None
+    util = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -28,7 +39,7 @@ class ProteomeTest(unittest.TestCase):
         proteome = None
 
         try:
-            proteome = session.create_proteome()
+            proteome = self.session.create_proteome()
 
             success = True
         except:
@@ -38,7 +49,7 @@ class ProteomeTest(unittest.TestCase):
         self.failIf(proteome is None)
 
     def testToJson(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
         success = False
 
         comment = "test comment"
@@ -72,7 +83,7 @@ class ProteomeTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         self.assertTrue(proteome.id is None,
                         "New template proteome has no ID.")
@@ -81,7 +92,7 @@ class ProteomeTest(unittest.TestCase):
             proteome.id = "test"
 
     def testVersion(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         self.assertTrue(proteome.version is None,
                         "New template proteome has no version.")
@@ -90,10 +101,12 @@ class ProteomeTest(unittest.TestCase):
             proteome.version = "test"
 
     def testComment(self):
-        self.stringTypeTest("comment")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "comment")
 
     def testIllegalChecksums(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         with self.assertRaises(Exception):
             proteome.checksums = 1
@@ -105,7 +118,7 @@ class ProteomeTest(unittest.TestCase):
             proteome.checksums = [ "test" ]
 
     def testLegalChecksums(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         success = False
         try:
@@ -117,7 +130,7 @@ class ProteomeTest(unittest.TestCase):
         self.assertTrue(success, "Checksum setter accepts dictionary.")
 
     def testIllegalDateType(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         with self.assertRaises(Exception):
             proteome.date = 1
@@ -129,7 +142,7 @@ class ProteomeTest(unittest.TestCase):
             proteome.date = {}
 
     def testIllegalFutureDate(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
         success = False
         today = date.today()
         next_year = str(date(today.year + 1, today.month, today.day))
@@ -143,7 +156,7 @@ class ProteomeTest(unittest.TestCase):
         self.assertFalse(success, "Proteome class rejects future dates.")
 
     def testLegalDate(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
         success = False
         date = "2015-07-27"
 
@@ -159,104 +172,112 @@ class ProteomeTest(unittest.TestCase):
                          "Property getter for 'date' works.")
 
     def testPrideId(self):
-        self.stringTypeTest("pride_id")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "pride_id")
 
     def testSampleName(self):
-        self.stringTypeTest("sample_name")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "sample_name")
 
     def testTitle(self):
-        self.stringTypeTest("title")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "title")
 
     def testShortLabel(self):
-        self.stringTypeTest("short_label")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "short_label")
 
     def testReference(self):
-        self.stringTypeTest("reference")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "reference")
 
     def testProtocolName(self):
-        self.stringTypeTest("protocol_name")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "protocol_name")
 
     def testProtocolSteps(self):
-        self.stringTypeTest("protocol_steps")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "protocol_steps")
 
     def testExpDescription(self):
-        self.stringTypeTest("exp_description")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "exp_description")
 
     def testSampleDescription(self):
-        self.stringTypeTest("sample_description")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "sample_description")
 
     def testInstrumentName(self):
-        self.stringTypeTest("instrument_name")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "instrument_name")
 
     def testSource(self):
-        self.stringTypeTest("source")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "source")
 
     def testAnalyzer(self):
-        self.stringTypeTest("analyzer")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "analyzer")
 
     def testDetector(self):
-        self.stringTypeTest("detector")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "detector")
 
     def testSoftware(self):
-        self.stringTypeTest("software")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "software")
 
     def testProcessingMethod(self):
-        self.stringTypeTest("processing_method")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "processing_method")
 
     def testSearchEngine(self):
-        self.stringTypeTest("search_engine")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "search_engine")
 
     def testXMLGeneration(self):
-        self.stringTypeTest("xml_generation")
+        proteome = self.session.create_proteome()
 
-    def stringTypeTest(self, prop):
-        proteome = session.create_proteome()
-
-        # test an int
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, 1)
-
-        # test a list
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, ["test"])
-
-        # test a dictionary
-        with self.assertRaises(Exception):
-            setattr(proteome, prop, {})
-
-        proteome = session.create_proteome()
-
-        value = "random"
-        success = False
-
-        try:
-            setattr(proteome, prop, value)
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the %s setter" % prop)
-
-        retrieved = getattr(proteome, prop)
-
-        self.assertEqual(retrieved, value,
-                         "Property getter for '%s' works." % prop)
-
+        self.util.stringTypeTest(self, proteome, "xml_generation")
 
     def testSpectraFormat(self):
-        self.stringTypeTest("spectra_format")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "spectra_format")
 
     def testProtIDFormat(self):
-        self.stringTypeTest("protid_format")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "protid_format")
 
     def testPepIDFormat(self):
-        self.stringTypeTest("pepid_format")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "pepid_format")
 
     def testProtModFormat(self):
-        self.stringTypeTest("protmod_format")
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "protmod_format")
 
     def testStudy(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         # Try an int
         with self.assertRaises(ValueError):
@@ -281,7 +302,7 @@ class ProteomeTest(unittest.TestCase):
                          "No exception when a valid study provided.")
 
     def testTags(self):
-        proteome = session.create_visit()
+        proteome = self.session.create_visit()
 
         tags = proteome.tags
         self.assertTrue(type(tags) == list,
@@ -302,7 +323,7 @@ class ProteomeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         proteome.add_tag("test")
         self.assertEqual(proteome.tags, [ "test" ], "Can add a tag to a proteome.")
@@ -336,7 +357,7 @@ class ProteomeTest(unittest.TestCase):
         # Attempt to save the proteome at all points before and after adding
         # the required fields
 
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
 
         test_date = "2015-07-27"
         test_links = {"by":[]}
@@ -367,7 +388,7 @@ class ProteomeTest(unittest.TestCase):
                         "Proteome was not saved successfully")
 
         # Load the proteome that was just saved from the OSDF instance
-        proteome = session.create_proteome()
+        proteome = self.session.create_proteome()
         proteome = proteome.load(proteome.id)
 
         # Check all fields were saved and loaded successfully
@@ -383,7 +404,7 @@ class ProteomeTest(unittest.TestCase):
                         "Proteome was not deleted successfully")
 
         # The proteome of the initial ID should not load successfully
-        load_test = session.create_proteome()
+        load_test = self.session.create_proteome()
         with self.assertRaises(Exception):
             load_test = load_test.load(proteome.id)
 

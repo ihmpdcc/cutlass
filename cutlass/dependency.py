@@ -30,7 +30,7 @@ dependency_methods = {
         SixteenSRawSeqSet.__name__  : SixteenSRawSeqSet.trimmed_seq_sets.__name__,
     SixteenSTrimmedSeqSet.__name__  : SixteenSTrimmedSeqSet.abundance_matrices.__name__,
                     Study.__name__  : Study.subjects.__name__,
-                  Subject.__name__  : Subject.visits.__name__,
+                  Subject.__name__  : Subject.derivations.__name__,
                     Visit.__name__  : Visit.samples.__name__,
        WgsAssembledSeqSet.__name__  : WgsAssembledSeqSet.derivations.__name__,
                WgsDnaPrep.__name__  : WgsDnaPrep.child_seq_sets.__name__,

@@ -20,13 +20,13 @@ from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 from .Study import Study
 from .Subject import Subject
+from .SubjectAttribute import SubjectAttribute
 from .ViralSeqSet import ViralSeqSet
 from .Visit import Visit
 from .VisitAttribute import VisitAttribute
 from .WgsAssembledSeqSet import WgsAssembledSeqSet
 from .WgsDnaPrep import WgsDnaPrep
 from .WgsRawSeqSet import WgsRawSeqSet
-from .WgsRawSeqSetPrivate import WgsRawSeqSetPrivate
 from .aspera import aspera
 from .mixs import MIXS, MixsException
 from .mims import MIMS, MimsException

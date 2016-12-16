@@ -8,9 +8,17 @@ from cutlass import iHMPSession
 from cutlass import Project
 from cutlass import MIXS, MixsException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class ProjectTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+
     def testImport(self):
         success = False
         try:
@@ -27,7 +35,7 @@ class ProjectTest(unittest.TestCase):
         project = None
 
         try:
-            project = session.create_project()
+            project = self.session.create_project()
 
             success = True
         except:
@@ -37,7 +45,7 @@ class ProjectTest(unittest.TestCase):
         self.failIf(project is None)
 
     def testName(self):
-        project = session.create_project()
+        project = self.session.create_project()
         success = False
         test_name = "test name"
 
@@ -49,28 +57,29 @@ class ProjectTest(unittest.TestCase):
 
         self.assertTrue(success, "Able to use 'name' setter.")
 
-        self.assertEqual(project.name, test_name, "Property getter for 'name' works.")
+        self.assertEqual(project.name, test_name,
+                         "Property getter for 'name' works.")
 
     def testIntName(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         with self.assertRaises(ValueError):
             project.name = 3
 
     def testListName(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         with self.assertRaises(ValueError):
             project.name = [ "a", "b", "c" ]
 
     def testNoneName(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         with self.assertRaises(ValueError):
             project.name = None
 
     def testDescription(self):
-        project = session.create_project()
+        project = self.session.create_project()
         success = False
         test_description = "test description"
 
@@ -86,13 +95,13 @@ class ProjectTest(unittest.TestCase):
                          "Property getter for 'description' works.")
 
     def testIntDescription(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         with self.assertRaises(ValueError):
             project.description = 3
 
     def testToJson(self):
-        project = session.create_project()
+        project = self.session.create_project()
         success = False
         name = "test_name"
         description = "test description"
@@ -129,7 +138,7 @@ class ProjectTest(unittest.TestCase):
         self.assertEqual(project_data['meta']['description'],
                          description, "'description' in JSON had expected value.")
     def testId(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         self.assertTrue(project.id is None,
                         "New template project has no ID.")
@@ -138,7 +147,7 @@ class ProjectTest(unittest.TestCase):
             project.id = "test"
 
     def testVersion(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         self.assertTrue(project.version is None,
                         "New template project has no version.")
@@ -147,7 +156,7 @@ class ProjectTest(unittest.TestCase):
             project.version = "test"
 
     def testMixs(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         self.assertTrue(project.mixs is None,
                         "New template project has no MIXS data.")
@@ -196,7 +205,7 @@ class ProjectTest(unittest.TestCase):
                          "Retrieved MIXS data appears to be okay.")
 
     def testTags(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         tags = project.tags
         self.assertTrue(type(tags) == list, "Project tags() method returns a list.")
@@ -217,7 +226,7 @@ class ProjectTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        project = session.create_project()
+        project = self.session.create_project()
 
         project.add_tag("test")
         self.assertEqual(project.tags, [ "test" ], "Can add a tag to a project.")
@@ -250,7 +259,7 @@ class ProjectTest(unittest.TestCase):
     def testSaveProject(self):
         # Attempt to save the project at all points before and after adding
         # the required fields
-        project = session.create_project()
+        project = self.session.create_project()
 
         project.name = "Test Project"
 
@@ -287,7 +296,7 @@ class ProjectTest(unittest.TestCase):
 
     def testLoadSaveDeleteProject(self):
         # Attempt to save the project at all points before and after adding the required fields
-        project = session.create_project()
+        project = self.session.create_project()
         self.assertFalse(project.save(),
                          "Project not saved successfully, no required fields")
         project.name = "Test Project"
@@ -325,7 +334,7 @@ class ProjectTest(unittest.TestCase):
         self.assertTrue(project.save() == True, "project saved successfully")
 
         # Load the project that was just saved from the OSDF instance
-        project_loaded = session.create_project()
+        project_loaded = self.session.create_project()
         project_loaded = project_loaded.load(project.id)
 
         # Check all fields were saved and loaded successfully
@@ -339,10 +348,11 @@ class ProjectTest(unittest.TestCase):
                          "Project MIXS not saved & loaded successfully")
 
         # Project is deleted successfully
-        self.assertTrue(project.delete(), "Project was not deleted successfully")
+        self.assertTrue(project.delete(),
+                        "Project was not deleted successfully")
 
         # The project of the initial ID should not load successfully
-        load_test = session.create_project()
+        load_test = self.session.create_project()
         with self.assertRaises(Exception):
             load_test = load_test.load(project.id)
 

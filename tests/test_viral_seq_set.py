@@ -8,9 +8,16 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import ViralSeqSet
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class ViralSeqSetTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class ViralSeqSetTest(unittest.TestCase):
         vss = None
 
         try:
-            vss = session.create_viral_seq_set()
+            vss = self.session.create_viral_seq_set()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class ViralSeqSetTest(unittest.TestCase):
         self.failIf(vss is None)
 
     def testComment(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         with self.assertRaises(ValueError):
             vss.comment = 3
@@ -59,7 +66,7 @@ class ViralSeqSetTest(unittest.TestCase):
                           "comment property works.")
 
     def testChecksums(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -75,7 +82,7 @@ class ViralSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormat(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         with self.assertRaises(ValueError):
             vss.format = 30
@@ -99,7 +106,7 @@ class ViralSeqSetTest(unittest.TestCase):
                           "format property works.")
 
     def testFormatDoc(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         with self.assertRaises(ValueError):
             vss.format_doc = 30
@@ -123,7 +130,7 @@ class ViralSeqSetTest(unittest.TestCase):
                           "format_doc property works.")
 
     def testToJson(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
         success = False
 
         comment = "test viral_seq_set comment"
@@ -183,7 +190,7 @@ class ViralSeqSetTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
         success = False
         comment = "test_comment"
         format_ = "gff3"
@@ -235,7 +242,7 @@ class ViralSeqSetTest(unittest.TestCase):
                          )
 
     def testId(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         self.assertTrue(vss.id is None,
                         "New template viral_seq_set has no ID.")
@@ -244,7 +251,7 @@ class ViralSeqSetTest(unittest.TestCase):
             vss.id = "test"
 
     def testVersion(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         self.assertTrue(vss.version is None,
                         "New template viral_seq_set has no version.")
@@ -253,11 +260,14 @@ class ViralSeqSetTest(unittest.TestCase):
             vss.version = "test"
 
     def testTags(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         tags = vss.tags
-        self.assertTrue(type(tags) == list, "ViralSeqSet tags() method returns a list.")
-        self.assertEqual(len(tags), 0, "Template viral_seq_set tags list is empty.")
+        self.assertTrue(type(tags) == list,
+                        "ViralSeqSet tags() method returns a list.")
+
+        self.assertEqual(len(tags), 0,
+                         "Template viral_seq_set tags list is empty.")
 
         new_tags = [ "tagA", "tagB" ]
 
@@ -273,10 +283,11 @@ class ViralSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
 
         vss.add_tag("test")
-        self.assertEqual(vss.tags, [ "test" ], "Can add a tag to a viral_seq_set.")
+        self.assertEqual(vss.tags, [ "test" ],
+                         "Can add a tag to a viral_seq_set.")
 
         json_str = vss.to_json()
         doc = json.loads(json_str)
@@ -308,7 +319,7 @@ class ViralSeqSetTest(unittest.TestCase):
 
         # Attempt to save the viral_seq_set at all points before and after
         # adding the required fields
-        vss = session.create_viral_seq_set()
+        vss = self.session.create_viral_seq_set()
         self.assertFalse(
                 vss.save(),
                 "ViralSeqSet not saved successfully, no required fields"
@@ -339,7 +350,7 @@ class ViralSeqSetTest(unittest.TestCase):
         self.assertTrue(vss.save() == True, "ViralSeqSet was saved successfully")
 
         # Load the viral_seq_set that was just saved from the OSDF instance
-        vss_loaded = session.create_viral_seq_set()
+        vss_loaded = self.session.create_viral_seq_set()
         vss_loaded = vss.load(vss.id)
 
         # Check all fields were saved and loaded successfully
@@ -352,7 +363,7 @@ class ViralSeqSetTest(unittest.TestCase):
         self.assertTrue(vss.delete(), "ViralSeqSet was deleted successfully")
 
         # the viral_seq_set of the initial ID should not load successfully
-        load_test = session.create_viral_seq_set()
+        load_test = self.session.create_viral_seq_set()
         with self.assertRaises(Exception):
             load_test = load_test.load(vss.id)
 

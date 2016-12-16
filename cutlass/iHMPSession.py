@@ -75,12 +75,12 @@ class iHMPSession(object):
           "sample_attr"                        : "SampleAttribute",
           "study"                              : "Study",
           "subject"                            : "Subject",
+          "subject_attr"                       : "SubjectAttribute",
           "viral_seq_set"                      : "ViralSeqSet",
           "visit"                              : "Visit",
           "visit_attr"                         : "VisitAttribute",
           "wgs_assembled_seq_set"              : "WgsAssembledSeqSet",
           "wgs_raw_seq_set"                    : "WgsRawSeqSet",
-          "wgs_raw_seq_set_private"            : "WgsRawSeqSetPrivate",
           "wgs_dna_prep"                       : "WgsDnaPrep" }
 
         className = None

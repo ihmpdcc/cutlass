@@ -5,7 +5,6 @@ import logging
 from itertools import count
 from iHMPSession import iHMPSession
 from Base import Base
-from Visit import Visit
 from Util import *
 
 # Create a module logger named after the module
@@ -241,6 +240,7 @@ class Subject(Base):
            self.logger.debug("Subject object has the OSDF version set.")
            subject_doc['ver'] = self._version
 
+        # Handle optional properties
         if self._race is not None:
            self.logger.debug("Subject object has the race property set.")
            subject_doc['meta']['race'] = self._race
@@ -483,6 +483,8 @@ class Subject(Base):
         """
         Return iterator of all visits by this subject.
         """
+        from Visit import Visit
+
         linkage_query = '"{}"[linkage.by]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
 
@@ -497,3 +499,40 @@ class Subject(Base):
 
             if res_count < 1:
                 break
+
+    def attributes(self):
+        """
+        Return iterator of all subject attribute objects associoted with this
+        subject.
+        """
+        from SubjectAttribute import SubjectAttribute
+
+        linkage_query = '"{}"[linkage.associated_with]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(Subject.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield SubjectAttribute.load_subject_attribute(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
+
+    def derivations(self):
+        """
+        Returns an iterator of all nodes connected to this object.
+        """
+        self.logger.debug("In derivations().")
+
+        self.logger.debug("Fetching visits.")
+        for visit in self.visits():
+            yield visit
+
+        self.logger.debug("Fetching subject attributes.")
+        for subj_attrib in self.attributes():
+            yield subj_attrib
+

@@ -7,9 +7,16 @@ import sys
 from cutlass import iHMPSession
 from cutlass import SampleAttribute
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class SampleAttributeTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -27,7 +34,7 @@ class SampleAttributeTest(unittest.TestCase):
         attrib = None
 
         try:
-            attrib = session.create_sample_attr()
+            attrib = self.session.create_sample_attr()
 
             success = True
         except:
@@ -37,7 +44,7 @@ class SampleAttributeTest(unittest.TestCase):
         self.failIf(attrib is None)
 
     def testFecalCal(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
         success = False
         fecalcal = "test fecalcal"
 
@@ -56,19 +63,19 @@ class SampleAttributeTest(unittest.TestCase):
                 )
 
     def testFecalCalInt(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         with self.assertRaises(ValueError):
             attrib.fecalcal = 3
 
     def testFecalCalList(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         with self.assertRaises(ValueError):
             attrib.fecalcal = [ "a", "b", "c" ]
 
     def testToJson(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
         success = False
 
         fecalcal = "test fecalcal"
@@ -107,7 +114,7 @@ class SampleAttributeTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
         success = False
 
         fecalcal = "test fecalcal"
@@ -146,7 +153,7 @@ class SampleAttributeTest(unittest.TestCase):
                          )
 
     def testId(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         self.assertTrue(attrib.id is None,
                         "New template sample attribute has no ID.")
@@ -155,7 +162,7 @@ class SampleAttributeTest(unittest.TestCase):
             attrib.id = "test"
 
     def testVersion(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         self.assertTrue(attrib.version is None,
                         "New template sample attribute has no version.")
@@ -164,7 +171,7 @@ class SampleAttributeTest(unittest.TestCase):
             attrib.version = "test"
 
     def testTags(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         tags = attrib.tags
         self.assertTrue(type(tags) == list,
@@ -175,7 +182,8 @@ class SampleAttributeTest(unittest.TestCase):
         new_tags = [ "tagA", "tagB" ]
 
         attrib.tags = new_tags
-        self.assertEqual(attrib.tags, new_tags, "Can set tags on a sample attribute.")
+        self.assertEqual(attrib.tags, new_tags,
+                         "Can set tags on a sample attribute.")
 
         json_str = attrib.to_json()
         doc = json.loads(json_str)
@@ -186,10 +194,11 @@ class SampleAttributeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         attrib.add_tag("test")
-        self.assertEqual(attrib.tags, [ "test" ], "Can add a tag to a sample attribute.")
+        self.assertEqual(attrib.tags, [ "test" ],
+                         "Can add a tag to a sample attribute.")
 
         json_str = attrib.to_json()
         doc = json.loads(json_str)
@@ -219,7 +228,7 @@ class SampleAttributeTest(unittest.TestCase):
     def testLoadSaveDeleteAnnotation(self):
         # Attempt to save the sample at all points before and after adding
         # the required fields
-        attrib = session.create_sample_attr()
+        attrib = self.session.create_sample_attr()
 
         self.assertFalse(
                 attrib.save(),
@@ -244,10 +253,11 @@ class SampleAttributeTest(unittest.TestCase):
         with self.assertRaises(Exception):
             attrib.delete()
 
-        self.assertTrue(attrib.save() == True, "SampleAttribute was saved successfully.")
+        self.assertTrue(attrib.save() == True,
+                        "SampleAttribute was saved successfully.")
 
         # Load the annotation that was just saved from the OSDF instance
-        attrib_loaded = session.create_sample_attr()
+        attrib_loaded = self.session.create_sample_attr()
         attrib_loaded = attrib_loaded.load(attrib.id)
 
         # Check all fields were saved and loaded successfully
@@ -257,10 +267,11 @@ class SampleAttributeTest(unittest.TestCase):
                          "SampleAttribute tags not saved & loaded successfully")
 
         # SampleAttribute is deleted successfully
-        self.assertTrue(attrib.delete(), "SampleAttribute was deleted successfully.")
+        self.assertTrue(attrib.delete(),
+                        "SampleAttribute was deleted successfully.")
 
         # the node of the initial ID should not load successfully
-        load_test = session.create_sample_attr()
+        load_test = self.session.create_sample_attr()
 
         with self.assertRaises(Exception):
             load_test = load_test.load(attrib.id)

@@ -32,6 +32,7 @@ annot.format = "gff3"
 annot.format_doc = "the format url"
 annot.orf_process = "the orf process"
 annot.study = "prediabetes"
+annot.size = 131313
 
 print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name

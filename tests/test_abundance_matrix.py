@@ -7,9 +7,16 @@ import sys
 from cutlass import iHMPSession
 from cutlass import AbundanceMatrix
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class AbundanceMatrixTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -27,7 +34,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         matrix = None
 
         try:
-            matrix = session.create_abundance_matrix()
+            matrix = self.session.create_abundance_matrix()
 
             success = True
         except:
@@ -37,7 +44,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.failIf(matrix is None)
 
     def testChecksumsLegal(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         checksums = {"md5":"d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -53,7 +60,7 @@ class AbundanceMatrixTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testComment(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         comment = "test comment"
 
@@ -72,19 +79,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testCommentInt(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.comment = 3
 
     def testCommentList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.comment = [ "a", "b", "c" ]
 
     def testFormat(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         format_ = "fastq"
 
@@ -103,19 +110,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testFormatInt(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.format = 3
 
     def testFormatList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.format = [ "a", "b", "c" ]
 
     def testFormatDoc(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         format_doc = "test format doc"
 
@@ -134,19 +141,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testFormatDocInt(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.format_doc = 3
 
     def testFormatDocList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.format_doc = [ "a", "b", "c" ]
 
     def testMatrixType(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         matrix_type = "test matrix type"
 
@@ -165,19 +172,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testMatrixTypeInt(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.matrix_type = 3
 
     def testMatrixTypeList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.matrix_type = [ "a", "b", "c" ]
 
     def testSize(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         size = 1000
 
@@ -196,19 +203,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testSizeStr(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.size = "size"
 
     def testSizeList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.size = [ "a", "b", "c" ]
 
     def testStudy(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
         study = "test study"
 
@@ -227,19 +234,19 @@ class AbundanceMatrixTest(unittest.TestCase):
                 )
 
     def testStudyInt(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.study = 3
 
     def testStudyList(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.study = [ "a", "b", "c" ]
 
     def testToJson(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
 
         comment = "test_comment"
@@ -321,7 +328,7 @@ class AbundanceMatrixTest(unittest.TestCase):
                          )
 
     def testDataInJson(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         success = False
 
         comment = "test_comment"
@@ -395,7 +402,7 @@ class AbundanceMatrixTest(unittest.TestCase):
                          )
 
     def testId(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         self.assertTrue(matrix.id is None,
                         "New template abundance matrix has no ID.")
@@ -404,7 +411,7 @@ class AbundanceMatrixTest(unittest.TestCase):
             matrix.id = "test"
 
     def testVersion(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         self.assertTrue(matrix.version is None,
                         "New template abundance matrix has no version.")
@@ -413,7 +420,7 @@ class AbundanceMatrixTest(unittest.TestCase):
             matrix.version = "test"
 
     def testTags(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         tags = matrix.tags
         self.assertTrue(type(tags) == list, "AbundanceMatrix tags() method returns a list.")
@@ -433,7 +440,7 @@ class AbundanceMatrixTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
 
         matrix.add_tag("test")
         self.assertEqual(matrix.tags, [ "test" ], "Can add a tag to a matrix.")
@@ -466,7 +473,7 @@ class AbundanceMatrixTest(unittest.TestCase):
     def testLoadSaveDeleteAbundanceMatrix(self):
         # Attempt to save the sample at all points before and after adding
         # the required fields
-        matrix = session.create_abundance_matrix()
+        matrix = self.session.create_abundance_matrix()
         self.assertFalse(
                 matrix.save(),
                 "AbundanceMatrix not saved successfully, no required fields"
@@ -499,7 +506,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.assertTrue(matrix.save() == True, "AbundanceMatrix was saved successfully")
 
         # Load the matrix that was just saved from the OSDF instance
-        matrix_loaded = session.create_abundance_matrix()
+        matrix_loaded = self.session.create_abundance_matrix()
         matrix_loaded = matrix_loaded.load(matrix.id)
 
         # Check all fields were saved and loaded successfully
@@ -512,7 +519,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.assertTrue(matrix.delete(), "AbundanceMatrix was deleted successfully")
 
         # the matrix of the initial ID should no longer load successfully
-        load_test = session.create_abundance_matrix()
+        load_test = self.session.create_abundance_matrix()
         with self.assertRaises(Exception):
             load_test = load_test.load(matrix.id)
 

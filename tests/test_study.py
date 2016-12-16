@@ -8,9 +8,16 @@ from cutlass import iHMPSession
 from cutlass import Study
 from cutlass import MIXS, MixsException
 
-session = iHMPSession("foo", "bar")
+from CutlassTestConfig import CutlassTestConfig
 
 class StudyTest(unittest.TestCase):
+
+    session = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
 
     def testImport(self):
         success = False
@@ -28,7 +35,7 @@ class StudyTest(unittest.TestCase):
         study = None
 
         try:
-            study = session.create_study()
+            study = self.session.create_study()
 
             success = True
         except:
@@ -38,7 +45,7 @@ class StudyTest(unittest.TestCase):
         self.failIf(study is None)
 
     def testName(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         test_name = "test name"
 
@@ -54,25 +61,25 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'name' works.")
 
     def testIntName(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.name = 3
 
     def testListName(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.name = [ "a", "b", "c" ]
 
     def testNoneName(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.name = None
 
     def testDescription(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         test_description = "test description"
 
@@ -88,18 +95,18 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'description' works.")
 
     def testIntDescription(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.description = 3
 
     def testIllegalSubtype(self):
-        study = session.create_study()
+        study = self.session.create_study()
         with self.assertRaises(Exception):
             study.subtype = "random"
 
     def testLegalSubtype(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         subtype = "prediabetes"
         try:
@@ -114,12 +121,12 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'subtype' works.")
 
     def testIllegalCenter(self):
-        study = session.create_study()
+        study = self.session.create_study()
         with self.assertRaises(Exception):
             study.center = "random"
 
     def testLegalCenter(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         center = "Broad Institute"
         try:
@@ -134,7 +141,7 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'center' works.")
 
     def testSRPID(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         test_srp_id = "test srp_id"
 
@@ -150,25 +157,25 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'srp_id' works.")
 
     def testIntSRPID(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.srp_id = 3
 
     def testListSRPID(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.srp_id = [ "a", "b", "c" ]
 
     def testNoneSRPID(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.srp_id = None
 
     def testContact(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         test_contact = "test contact"
 
@@ -184,25 +191,25 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'contact' works.")
 
     def testIntContact(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.contact = 3
 
     def testListContact(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.contact = [ "a", "b", "c" ]
 
     def testNoneContact(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         with self.assertRaises(ValueError):
             study.contact = None
 
     def testToJson(self):
-        study = session.create_study()
+        study = self.session.create_study()
         success = False
         name = "Tested name"
 
@@ -227,7 +234,8 @@ class StudyTest(unittest.TestCase):
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
-        self.assertTrue(study_data is not None, "to_json() returned parsable JSON.")
+        self.assertTrue(study_data is not None,
+                        "to_json() returned parsable JSON.")
 
         self.assertTrue('meta' in study_data, "JSON has 'meta' key in it.")
 
@@ -235,7 +243,7 @@ class StudyTest(unittest.TestCase):
                          name, "'name' in JSON had expected value.")
 
     def testId(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         self.assertTrue(study.id is None,
                         "New template study has no ID.")
@@ -244,7 +252,7 @@ class StudyTest(unittest.TestCase):
             study.id = "test"
 
     def testVersion(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         self.assertTrue(study.version is None,
                         "New template study has no version.")
@@ -253,7 +261,7 @@ class StudyTest(unittest.TestCase):
             study.version = "test"
 
     def testTags(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         tags = study.tags
         self.assertTrue(type(tags) == list, "Study tags() method returns a list.")
@@ -274,7 +282,7 @@ class StudyTest(unittest.TestCase):
 
 
     def testAddTag(self):
-        study = session.create_study()
+        study = self.session.create_study()
 
         study.add_tag("test")
         self.assertEqual(study.tags, [ "test" ], "Can add a tag to a study.")
@@ -308,7 +316,7 @@ class StudyTest(unittest.TestCase):
         # Attempt to save the study at all points before and after
         # adding the required fields
 
-        study = session.create_study()
+        study = self.session.create_study()
 
         test_name = "Test name"
         test_description = "Test description"
@@ -339,10 +347,11 @@ class StudyTest(unittest.TestCase):
         with self.assertRaises(Exception):
             study.delete()
 
-        self.assertTrue(study.save() == True, "Study was not saved successfully")
+        self.assertTrue(study.save() == True,
+                        "Study was not saved successfully")
 
         # Load the study that was just saved from the OSDF instance
-        study_loaded = session.create_study()
+        study_loaded = self.session.create_study()
         study_loaded = study_loaded.load(study.id)
 
         # Check all fields were saved and loaded successfully
@@ -357,7 +366,7 @@ class StudyTest(unittest.TestCase):
         self.assertTrue(study.delete(), "Study was not deleted successfully")
 
         # The study of the initial ID should not load successfully
-        load_test = session.create_study()
+        load_test = self.session.create_study()
         with self.assertRaises(Exception):
             load_test = load_test.load(study.id)
 
