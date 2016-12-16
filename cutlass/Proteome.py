@@ -76,6 +76,7 @@ class Proteome(Base):
         self._spectra_url = ['']
         self._local_spectra_file = None
         self._study = None
+        self._subtype = None
         self._title = None
 
         # Optional properties
@@ -870,6 +871,31 @@ class Proteome(Base):
         else:
             raise Exception("Invalid study.")
 
+    @property
+    def subtype(self):
+        """
+        str: Retrieves the subtype of the Proteome (host or microbiome).
+        """
+        self.logger.debug("In 'subtype' getter.")
+
+        return self._subtype
+
+    @subtype.setter
+    @enforce_string
+    def subtype(self, subtype):
+        """
+        Sets the subtype of the proteome. Must be either 'host' or 'microbiome'.
+
+        Args:
+            subtype (str): host or microbiome.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'subtype' setter.")
+
+        self._subtype = subtype
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -981,7 +1007,7 @@ class Proteome(Base):
                 'spectra_format': self._spectra_format,
                 'spectra_url': self._spectra_url,
                 'study': self._study,
-                'subtype': self._study,
+                'subtype': self._subtype,
                 'tags': self._tags
             }
         }
@@ -1038,7 +1064,7 @@ class Proteome(Base):
                 "search_engine", "protid_format", "pepid_format",
                 "protmod_format", "spectra_format",
                 "local_spectra_file", "local_protmod_file", "local_protid_file",
-                "local_pepid_file", "study")
+                "local_pepid_file", "study", "subtype")
 
     def delete(self):
         """
