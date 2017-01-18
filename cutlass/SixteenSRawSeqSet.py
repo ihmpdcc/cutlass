@@ -801,7 +801,7 @@ class SixteenSRawSeqSet(Base):
 
 
         if self.id is None:
-            # The document has not yet been save
+            # The document has not yet been saved
             seq_set_data = self._get_raw_doc()
             self.logger.info("Got the raw JSON document.")
 
