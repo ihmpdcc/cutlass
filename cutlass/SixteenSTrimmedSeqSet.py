@@ -618,6 +618,8 @@ class SixteenSTrimmedSeqSet(Base):
             self.logger.error("Experienced an error uploading the sequence " + \
                               "set. Aborting save.")
             return success
+        else:
+            self._urls = [ "fasp://" + aspera_server + remote_path ]
 
         self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
                     (self._local_file, aspera_server))
@@ -638,11 +640,9 @@ class SixteenSTrimmedSeqSet(Base):
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
                 self._set_id(node_id)
                 self._version = 1
-                self._urls = [ "fasp://" + aspera_server + remote_path ]
 
                 success = True
             except Exception as e:
-                self.logger.exception(e)
                 self.logger.error("An error occurred while saving " + __name__ + ". " + \
                                   "Reason: %s" % e)
         else:
