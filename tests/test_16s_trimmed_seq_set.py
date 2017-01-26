@@ -5,6 +5,7 @@ import json
 import random
 import string
 import sys
+import tempfile
 
 from cutlass import iHMPSession
 from cutlass import SixteenSTrimmedSeqSet
@@ -324,6 +325,8 @@ class SixteenSTrimmedSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSixteenSTrimmedSeqSet(self):
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
         # Attempt to save the sixteenSTrimmedSeqSet at all points before and
         # after adding the required fields
 
@@ -334,7 +337,6 @@ class SixteenSTrimmedSeqSetTest(unittest.TestCase):
         exp_length = 100
         test_format = "fasta"
         test_format_doc = "http://example.com"
-        local_fasta_file = "test.fasta"
         seq_model = "center for sequencing"
         size = 132
         study = "ibd"
@@ -366,7 +368,7 @@ class SixteenSTrimmedSeqSetTest(unittest.TestCase):
         sixteenSTrimmedSeqSet.format_doc = test_format_doc
         sixteenSTrimmedSeqSet.format = test_format
         sixteenSTrimmedSeqSet.seq_model = seq_model
-        sixteenSTrimmedSeqSet.local_file = local_fasta_file
+        sixteenSTrimmedSeqSet.local_file = temp_file
         sixteenSTrimmedSeqSet.size = size
         sixteenSTrimmedSeqSet.study = study
 

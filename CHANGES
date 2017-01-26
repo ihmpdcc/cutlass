@@ -1,4 +1,4 @@
-cutlass 0.27
+cutlass 0.28
 
   * Added support for private data in nodes associated with files and file
     transfer, such as WgsRawSeqSet.
@@ -8,14 +8,21 @@ cutlass 0.27
 
  - Victor <victor73@github.com>  Thu, 26 Jan 2016 15:30:00 -0400
 
+cutlass 0.27
+
+  * Bug fix to SixteenSTrimmedSeqSet save() functionality which
+    was losing the urls property.
+  * Improved test for SixteenSTrimmedSeqSet class.
+  * Added missing example script for SixteenSTrimmedSeqSet data.
+
+ - Victor <victor73@github.com>  Tue, 17 Jan 2017 15:00:00 -0400
+
 cutlass 0.26
 
   * Added missing SubjectAttribute node, example and test.
   * Modified Subject node to add attributes() method for retrieval
     of SubjectAttribute information.
   * Modified Annotation class to require file size.
-  * Bug fix to SixteenSTrimmedSeqSet save() functionality which
-    was losing the urls property.
   * Removed WgsRawSeqSetPrivate class, test and example in favor
     of more generic solution.
   * Improved flexibility of test scripts by using a configuration
