@@ -11,6 +11,7 @@ from cutlass import WgsAssembledSeqSet
 from cutlass import MIMS, MimsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -18,11 +19,13 @@ def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
 class WgsAssembledSeqSetTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -49,12 +52,23 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(seq_set is None)
 
+    def testPrivateFiles(self):
+        seq_set = self.session.create_object("wgs_assembled_seq_set")
+
+        self.util.boolTypeTest(self, seq_set, "private_files")
+
+        self.util.boolPropertyTest(self, seq_set, "private_files")
+
     def testToJson(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
         success = False
+
         comment = "Test comment"
+        private_files = False
 
         seq_set.comment = comment
+        seq_set.private_files = private_files
+
         seqset_json = None
 
         try:
@@ -82,6 +96,11 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.assertEqual(seqset_data['meta']['comment'],
                          comment, "'comment' in JSON had expected value.")
 
+        self.assertEqual(seqset_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
+                         )
+
     def testId(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
@@ -100,49 +119,19 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             seq_set.version = "test"
 
-    def testIllegalAssembler(self):
+    def testAssembler(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
-        with self.assertRaises(Exception):
-            seq_set.assembler = 1
+        self.util.stringTypeTest(self, seq_set, "assembler")
 
-    def testLegalAssembler(self):
-        seq_set = self.session.create_object("wgs_assembled_seq_set")
-        success = False
-        assembler = "test assembler"
+        self.util.stringPropertyTest(self, seq_set, "assembler")
 
-        try:
-            seq_set.assembler = assembler
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the 'assembler' setter")
-
-        self.assertEqual(seq_set.assembler, assembler,
-                         "Property getter for 'assembler' works.")
-
-    def testIllegalAssemblyName(self):
+    def testAssemblyName(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
-        with self.assertRaises(Exception):
-            seq_set.assembly_name = 1
+        self.util.stringTypeTest(self, seq_set, "assembly_name")
 
-    def testLegalAssemblyName(self):
-        seq_set = self.session.create_object("wgs_assembled_seq_set")
-        success = False
-        assembly_name = "test assembly name"
-
-        try:
-            seq_set.assembly_name = assembly_name
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the 'assembly_name' setter")
-
-        self.assertEqual(seq_set.assembly_name, assembly_name,
-                         "Property getter for 'assembly_name' works.")
+        self.util.stringPropertyTest(self, seq_set, "assembly_name")
 
     def testChecksumsLegal(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -161,27 +150,12 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          checksums['md5'],
                          "Property getter for 'checksums' works.")
 
-    def testIllegalComment(self):
+    def testComment(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
-        with self.assertRaises(Exception):
-            seq_set.comment = 1
+        self.util.stringTypeTest(self, seq_set, "comment")
 
-    def testLegalComment(self):
-        seq_set = self.session.create_object("wgs_assembled_seq_set")
-        success = False
-        comment = "test comment"
-
-        try:
-            seq_set.comment = comment
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the 'comment' setter")
-
-        self.assertEqual(seq_set.comment, comment,
-                         "Property getter for 'comment' works.")
+        self.util.stringPropertyTest(self, seq_set, "comment")
 
     def testIllegalFormat(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -205,27 +179,12 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.assertEqual(seq_set.format, format_,
                          "Property getter for 'format' works.")
 
-    def testIllegalFormatDoc(self):
+    def testFormatDoc(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
-        with self.assertRaises(Exception):
-            seq_set.format_doc = 1
+        self.util.stringTypeTest(self, seq_set, "format_doc")
 
-    def testLegalFormatDoc(self):
-        seq_set = self.session.create_object("wgs_assembled_seq_set")
-        success = False
-        format_doc = "http://example.com"
-
-        try:
-            seq_set.format_doc = format_doc
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the 'format_doc' setter")
-
-        self.assertEqual(seq_set.format_doc, format_doc,
-                         "Property getter for 'format_doc' works.")
+        self.util.stringPropertyTest(self, seq_set, "format_doc")
 
     def testIllegalSequenceType(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -258,36 +217,12 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.assertEqual(seq_set.sequence_type, sequence_type,
                          "Property getter for 'sequence_type' works.")
 
-    def testLegalSize(self):
-        seq_set = self.session.create_object("wgs_assembled_seq_set")
-        success = False
-        size = 10000
-
-        try:
-            seq_set.size = size
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the 'size' setter.")
-
-        self.assertEqual(seq_set.size, size,
-                         "Property getter for 'size' works.")
-
-    def testIllegalSize(self):
+    def testSize(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
-        # Test string argument
-        with self.assertRaises(Exception):
-            seq_size.size = "ASDASDSAD"
+        self.util.intTypeTest(self, seq_set, "size")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            seq_size.size =  [ 'a', 'b', 'c' ]
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            seq_set.size = { 'a': 1, 'b': 2 }
+        self.util.intPropertyTest(self, seq_set, "size")
 
     def testTags(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -349,6 +284,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
 
         assembler = "Test assembler"
         assembly_name = "Test assembly name"
+        checksums = {"md5": "68b329da9893e34099c7d8ad5cb9c940"}
         comment = "Test comment"
         format_ = "fasta"
         format_doc = "http://example.com"
@@ -374,6 +310,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
 
         seq_set.assembler = assembler
         seq_set.assembly_name = assembly_name
+        seq_set.checksums = checksums
         seq_set.format = format_
         seq_set.format_doc = format_doc
         seq_set.sequence_type = sequence_type

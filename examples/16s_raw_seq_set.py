@@ -11,6 +11,17 @@ import sys
 username = "test"
 password = "test"
 
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
+
 session = iHMPSession(username, password)
 
 print("Required fields: ")
@@ -28,12 +39,17 @@ seq_set.sequence_type = "nucleotide"
 seq_set.size = 3000
 seq_set.study = "prediabetes"
 
+
 print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
 seq_set.local_file = temp_file
 
+# Optional properties
+seq_set.private_files = True
+
+# SixteenSRawSeqSets are 'sequenced_from' other nodes
 seq_set.links = { "sequenced_from": [ "610a4911a5ca67de12cdc1e4b4014133" ] }
 
 seq_set.tags = [ "16s_raw_seq_set", "ihmp" ]
@@ -55,7 +71,8 @@ if seq_set.is_valid():
 
         print(seq_set.to_json(indent=4))
 
-        deletion_success = seq_set.delete()
+        #deletion_success = seq_set.delete()
+        deletion_success = True
 
         if deletion_success:
             print("Deleted 16s_set_set with ID %s" % seq_set_id)

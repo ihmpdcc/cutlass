@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -45,6 +48,7 @@ annot.comment = "hello world"
 annot.date = "2011-11-11"
 annot.sop = "the SOP"
 annot.annotation_source = "the annotation source"
+annot.private_files = False
 
 # Annotations are 'computed_from' a WgsAssembledSeqSet
 annot.links = { "computed_from": [ "419d64483ec86c1fb9a94025f3b94551" ] }

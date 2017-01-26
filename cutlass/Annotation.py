@@ -28,6 +28,8 @@ class Annotation(Base):
     """
     namespace = "ihmp"
 
+    aspera_server = "aspera.ihmpdcc.org"
+
     date_format = '%Y-%m-%d'
 
     def __init__(self):
@@ -63,6 +65,61 @@ class Annotation(Base):
         self._date = None
         self._sop = None
         self._annotation_source = None
+        self._private_files = None
+
+    @property
+    def annotation_pipeline(self):
+        """
+        str: Get the software and version used to generate the annotation.
+        """
+        self.logger.debug("In 'annotation_pipeline' getter.")
+
+        return self._annotation_pipeline
+
+    @annotation_pipeline.setter
+    @enforce_string
+    def annotation_pipeline(self, annotation_pipeline):
+        """
+        Set The software and version used to generate annotation.
+
+        Args:
+            annotation_pipeline (str): The software and version used to
+            generate annotation.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'annotation_pipeline' setter.")
+
+        self._annotation_pipeline = annotation_pipeline
+
+    @property
+    def annotation_source(self):
+        """
+        str: Get the databases used for providing curation.
+        """
+        self.logger.debug("In 'annotation_source' getter.")
+
+        return self._annotation_source
+
+    @annotation_source.setter
+    @enforce_string
+    def annotation_source(self, annotation_source):
+        """
+        Set the databases used for providing curation; or for cases where
+        annotation was provided by a community jamboree or model organism
+        database.
+
+        Args:
+            annotation_source (str): The databases used for providing
+            curation.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'annotation_source' setter.")
+
+        self._annotation_source = annotation_source
 
     @property
     def checksums(self):
@@ -214,6 +271,32 @@ class Annotation(Base):
         self._orf_process = orf_process
 
     @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
+
+    @property
     def sop(self):
         """
         str: The URL for documentation of procedures used in annotation.
@@ -237,60 +320,6 @@ class Annotation(Base):
         self.logger.debug("In 'sop' setter.")
 
         self._sop = sop
-
-    @property
-    def annotation_pipeline(self):
-        """
-        str: Get the software and version used to generate the annotation.
-        """
-        self.logger.debug("In 'annotation_pipeline' getter.")
-
-        return self._annotation_pipeline
-
-    @annotation_pipeline.setter
-    @enforce_string
-    def annotation_pipeline(self, annotation_pipeline):
-        """
-        Set The software and version used to generate annotation.
-
-        Args:
-            annotation_pipeline (str): The software and version used to
-            generate annotation.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'annotation_pipeline' setter.")
-
-        self._annotation_pipeline = annotation_pipeline
-
-    @property
-    def annotation_source(self):
-        """
-        str: Get the databases used for providing curation.
-        """
-        self.logger.debug("In 'annotation_source' getter.")
-
-        return self._annotation_source
-
-    @annotation_source.setter
-    @enforce_string
-    def annotation_source(self, annotation_source):
-        """
-        Set the databases used for providing curation; or for cases where
-        annotation was provided by a community jamboree or model organism
-        database.
-
-        Args:
-            annotation_source (str): The databases used for providing
-            curation.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'annotation_source' setter.")
-
-        self._annotation_source = annotation_source
 
     @property
     def size(self):
@@ -406,10 +435,20 @@ class Annotation(Base):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
         if 'computed_from' not in self._links.keys():
-            problems.append("Must have a 'computed_from' link to a sample.")
+            problems.append("Must have a 'computed_from' link.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
+
         return problems
 
     def is_valid(self):
@@ -444,11 +483,9 @@ class Annotation(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled in, regardless of whether they are set or not. Any
+        remaining fields are included only if they are set.
 
         Args:
             None
@@ -458,7 +495,7 @@ class Annotation(Base):
         """
         self.logger.debug("In _get_raw_doc.")
 
-        annot_doc = {
+        doc = {
             'acl': {
                 'read': [ 'all' ],
                 'write': [ Annotation.namespace ]
@@ -481,31 +518,35 @@ class Annotation(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Annotation object has the OSDF id set.")
-           annot_doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Annotation object has the OSDF version set.")
-           annot_doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
-        # Handle Annotation optional properties
+        # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("Annotation object has the 'comment' property set.")
-           annot_doc['meta']['comment'] = self._comment
+            self.logger.debug("Object has the 'comment' property set.")
+            doc['meta']['comment'] = self._comment
 
         if self._date is not None:
-           self.logger.debug("Annotation object has the 'date' property set.")
-           annot_doc['meta']['date'] = self._date
+            self.logger.debug("Object has the 'date' property set.")
+            doc['meta']['date'] = self._date
 
         if self._sop is not None:
-           self.logger.debug("Annotation object has the 'sop' property set.")
-           annot_doc['meta']['sop'] = self._sop
+            self.logger.debug("Object has the 'sop' property set.")
+            doc['meta']['sop'] = self._sop
 
         if self._annotation_source is not None:
-           self.logger.debug("Annotation object has the 'annotation_source' property set.")
-           annot_doc['meta']['annotation_source'] = self._annotation_source
+            self.logger.debug("Object has the 'annotation_source' property set.")
+            doc['meta']['annotation_source'] = self._annotation_source
 
-        return annot_doc
+        if self._private_files is not None:
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
+
+        return doc
 
     @staticmethod
     def required_fields():
@@ -519,7 +560,7 @@ class Annotation(Base):
         """
         module_logger.debug("In required fields.")
         return ("annotation_pipeline", "checksums", "format", "format_doc",
-                "local_file", "orf_process", "size", "study", "tags")
+                "orf_process", "size", "study", "tags")
 
     def delete(self):
         """
@@ -619,6 +660,8 @@ class Annotation(Base):
         annot = Annotation()
 
         module_logger.debug("Filling in Annotation details.")
+
+        # The attributes commmon to all iHMP nodes
         annot._set_id(annot_data['id'])
         annot._links = annot_data['linkage']
         annot._version = annot_data['ver']
@@ -645,7 +688,10 @@ class Annotation(Base):
         if 'annotation_source' in annot_data['meta']:
             annot._annotation_source = annot_data['meta']['annotation_source']
 
-        module_logger.debug("Returning loaded Annotation.")
+        if 'private_files' in annot_data['meta']:
+            annot._private_file = annot_data['meta']['private_files']
+
+        module_logger.debug("Returning loaded %s." % __name__)
         return annot
 
     @staticmethod
@@ -667,73 +713,16 @@ class Annotation(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         annot_data = session.get_osdf().get_node(annot_id)
-
-        module_logger.info("Creating a template Annotation.")
-        annot = Annotation()
-
-        module_logger.debug("Filling in Annotation details.")
-
-        # Node required fields
-        annot._set_id(annot_data['id'])
-        annot._links = annot_data['linkage']
-        annot._version = annot_data['ver']
-
-        # Required fields
-        annot._annotation_pipeline = annot_data['meta']['annotation_pipeline']
-        annot._checksums = annot_data['meta']['checksums']
-        annot._format = annot_data['meta']['format']
-        annot._format_doc = annot_data['meta']['format_doc']
-        annot._orf_process = annot_data['meta']['orf_process']
-        annot._study = annot_data['meta']['study']
-        annot._tags = annot_data['meta']['tags']
-        annot._urls = annot_data['meta']['urls']
-
-        # Handle Annotation optional properties
-        if 'comment' in annot_data['meta']:
-            annot._comment = annot_data['meta']['comment']
-
-        if 'date' in annot_data['meta']:
-            annot._date = annot_data['meta']['date']
-
-        if 'sop' in annot_data['meta']:
-            annot._sop = annot_data['meta']['sop']
-
-        if 'annotation_source' in annot_data['meta']:
-            annot._annotation_source = annot_data['meta']['annotation_source']
+        annot = Annotation.load_annotation(annot_data)
 
         module_logger.debug("Returning loaded Annotation.")
+
         return annot
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
-
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-        aspera_server = "aspera.ihmpdcc.org"
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
         study = self._study
 
         study2dir = { "ibd": "ibd",
@@ -756,9 +745,8 @@ class Annotation(Base):
                                 "analysis", "hmgi", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
-        success = False
-
-        upload_result = aspera.upload_file(aspera_server,
+        # Upload the file to the iHMP aspera server
+        upload_result = aspera.upload_file(Annotation.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
@@ -767,12 +755,52 @@ class Annotation(Base):
         if not upload_result:
             self.logger.error("Experienced an error uploading the annotation. " + \
                               "Aborting save.")
-            return success
+            raise Exception("Unable to upload annotation.")
+        else:
+            self._urls = [ "fasp://" + Annotation.aspera_server + remote_path ]
 
-        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, aspera_server))
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously,
+        then the node ID is assigned the alpha numeric found in the OSDF
+        instance. If not saved previously, then the node ID is 'None', and upon
+        a successful save, will be assigned the ID found in OSDF.
+        Also, the version is updated as the data is saved in OSDF.
 
-        self._urls = [ "fasp://" + aspera_server + remote_path ]
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        success = False
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logger.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
 
         if self._id is None:
             # The document has not yet been saved
@@ -785,7 +813,7 @@ class Annotation(Base):
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(data)
+                node_id = osdf.insert_node(data)
                 self._set_id(node_id)
                 self._version = 1
 
@@ -804,15 +832,14 @@ class Annotation(Base):
                 annot_data = self._get_raw_doc()
                 annot_id = self._id
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % annot_id)
-                session.get_osdf().edit_node(annot_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                osdf.edit_node(annot_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % annot_id)
 
-                annot_data = session.get_osdf().get_node(annot_id)
+                annot_data = osdf.get_node(annot_id)
                 latest_version = annot_data['ver']
 
-                self._version = latest_version
                 self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
-
+                self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)

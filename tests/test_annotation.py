@@ -15,6 +15,7 @@ from CutlassTestUtil import CutlassTestUtil
 class AnnotationTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
@@ -50,34 +51,10 @@ class AnnotationTest(unittest.TestCase):
 
     def testAnnotationPipeline(self):
         annot = self.session.create_annotation()
-        success = False
-        pipeline = "test pipeline"
 
-        try:
-            annot.annotation_pipeline = pipeline
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, annot, "annotation_pipeline")
 
-        self.assertTrue(success, "Able to use 'annotation_pipeline' setter.")
-
-        self.assertEqual(
-                annot.annotation_pipeline,
-                pipeline,
-                "Property getter for 'annotation_pipeline' works."
-                )
-
-    def testAnnotationPipelinetInt(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.annotation_pipeline = 3
-
-    def testAnnotationPipelineList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.annotation_pipeline = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, annot, "annotation_pipeline")
 
     def testChecksumsLegal(self):
         annot = self.session.create_annotation()
@@ -124,9 +101,7 @@ class AnnotationTest(unittest.TestCase):
             annot.date = date
             success = True
         except Exception as e:
-            print(e)
-        #except:
-        #    pass
+            pass
 
         self.assertTrue(success, "Able to use the date setter")
 
@@ -134,138 +109,52 @@ class AnnotationTest(unittest.TestCase):
 
     def testFormat(self):
         annot = self.session.create_annotation()
-        success = False
-        format_ = "gff3"
 
-        try:
-            annot.format = format_
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, annot, "format")
 
-        self.assertTrue(success, "Able to use 'format' setter.")
-
-        self.assertEqual(
-                annot.format,
-                format_,
-                "Property getter for 'format' works."
-                )
-
-    def testFormatInt(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.format = 3
-
-    def testFormatList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.format = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, annot, "format")
 
     def testFormatDoc(self):
         annot = self.session.create_annotation()
-        success = False
-        format_doc = "test format doc"
 
-        try:
-            annot.format_doc = format_doc
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, annot, "format_doc")
 
-        self.assertTrue(success, "Able to use 'format_doc' setter.")
-
-        self.assertEqual(
-                annot.format_doc,
-                format_doc,
-                "Property getter for 'format_doc' works."
-                )
-
-    def testFormatDocInt(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.format_doc = 3
-
-    def testFormatDocList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.format_doc = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, annot, "format_doc")
 
     def testOrfProcess(self):
         annot = self.session.create_annotation()
-        success = False
-        orf_process = "test orf process"
 
-        try:
-            annot.orf_process = orf_process
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, annot, "orf_process")
 
-        self.assertTrue(success, "Able to use 'orf_process' setter.")
+        self.util.stringPropertyTest(self, annot, "orf_process")
 
-        self.assertEqual(
-                annot.orf_process,
-                orf_process,
-                "Property getter for 'orf_process' works."
-                )
-
-    def testOrfProcessInt(self):
+    def testPrivateFiles(self):
         annot = self.session.create_annotation()
 
-        with self.assertRaises(ValueError):
-            annot.orf_process = 3
+        self.util.boolTypeTest(self, annot, "private_files")
 
-    def testOrfProcesssList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.orf_process = [ "a", "b", "c" ]
+        self.util.boolPropertyTest(self, annot, "private_files")
 
     def testSize(self):
         annot = self.session.create_annotation()
 
         self.util.intTypeTest(self, annot, "size")
 
+        self.util.intPropertyTest(self, annot, "size")
+
     def testStudy(self):
         annot = self.session.create_annotation()
 
         self.util.stringTypeTest(self, annot, "study")
 
+        self.util.stringPropertyTest(self, annot, "study")
+
     def testComment(self):
         annot = self.session.create_annotation()
-        success = False
-        comment = "test comment"
 
-        try:
-            annot.comment = comment
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, annot, "comment")
 
-        self.assertTrue(success, "Able to use 'comment' setter.")
-
-        self.assertEqual(
-                annot.comment,
-                comment,
-                "Property getter for 'comment' works."
-                )
-
-    def testCommentInt(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.comment = 3
-
-    def testCommentList(self):
-        annot = self.session.create_annotation()
-
-        with self.assertRaises(ValueError):
-            annot.comment = [ "a", "b", "c" ]
-
+        self.util.stringPropertyTest(self, annot, "comment")
 
     def testToJson(self):
         annot = self.session.create_annotation()
@@ -276,12 +165,14 @@ class AnnotationTest(unittest.TestCase):
         study = "prediabetes"
         format_ = "gff3"
         format_doc = "test_format_doc"
+        private_files = False
 
         annot.annotation_pipeline = annotation_pipeline
         annot.orf_process = orf_process
         annot.study = study
         annot.format = format_
         annot.format_doc = format_doc
+        annot.private_files = private_files
 
         annot_json = None
 
@@ -333,6 +224,12 @@ class AnnotationTest(unittest.TestCase):
                          format_doc,
                          "'format_doc' in JSON had expected value."
                          )
+
+        self.assertEqual(annot_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
+                         )
+
     def testDataInJson(self):
         annot = self.session.create_annotation()
         success = False
@@ -508,10 +405,10 @@ class AnnotationTest(unittest.TestCase):
         self.assertEqual(annot.tags[0], annot_loaded.tags[0],
                          "Annotation tags not saved & loaded successfully")
 
-        # Annotation is deleted successfully
+        # Deleted successfully
         self.assertTrue(annot.delete(), "Annotation was deleted successfully")
 
-        # the sample of the initial ID should not load successfully
+        # the object of the initial ID should not load successfully
         load_test = self.session.create_annotation()
         with self.assertRaises(Exception):
             load_test = load_test.load(annot.id)

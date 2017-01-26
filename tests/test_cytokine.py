@@ -9,15 +9,18 @@ from cutlass import iHMPSession
 from cutlass import Cytokine
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class CytokineTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -47,23 +50,9 @@ class CytokineTest(unittest.TestCase):
     def testComment(self):
         cyto = self.session.create_cytokine()
 
-        with self.assertRaises(ValueError):
-            cyto.comment = 3
+        self.util.stringTypeTest(self, cyto, "comment")
 
-        with self.assertRaises(ValueError):
-            cyto.comment = {}
-
-        with self.assertRaises(ValueError):
-            cyto.comment = []
-
-        with self.assertRaises(ValueError):
-            cyto.comment = 3.5
-
-        comment = "test cytokine comment"
-        cyto.comment = comment
-
-        self.assertEquals(comment, cyto.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, cyto, "comment")
 
     def testChecksumsLegal(self):
         cyto = self.session.create_cytokine()
@@ -81,6 +70,13 @@ class CytokineTest(unittest.TestCase):
         self.assertEqual(cyto.checksums['md5'], checksums['md5'],
                          "Property getter for 'checksums' works.")
 
+    def testPrivateFiles(self):
+        cyto = self.session.create_cytokine()
+
+        self.util.boolTypeTest(self, cyto, "private_files")
+
+        self.util.boolPropertyTest(self, cyto, "private_files")
+
     def testToJson(self):
         cyto = self.session.create_cytokine()
         success = False
@@ -89,11 +85,13 @@ class CytokineTest(unittest.TestCase):
         study = "prediabetes"
         format_ = "gff3"
         format_doc = "test_format_doc"
+        private_files = False
 
         cyto.comment = comment
         cyto.study = study
         cyto.format = format_
         cyto.format_doc = format_doc
+        cyto.private_files = private_files
 
         cyto_json = None
 
@@ -116,6 +114,7 @@ class CytokineTest(unittest.TestCase):
 
         self.assertTrue(parse_success,
                         "to_json() did not throw an exception.")
+
         self.assertTrue(cyto_data is not None,
                         "to_json() returned parsable JSON.")
 
@@ -139,6 +138,11 @@ class CytokineTest(unittest.TestCase):
         self.assertEqual(cyto_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
+                         )
+
+        self.assertEqual(cyto_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
                          )
 
     def testDataInJson(self):
@@ -308,10 +312,10 @@ class CytokineTest(unittest.TestCase):
         self.assertEqual(cyto.tags[0], cyto_loaded.tags[0],
                          "Cytokine tags not saved & loaded successfully")
 
-        # Cytokine is deleted successfully
+        # Deleted successfully
         self.assertTrue(cyto.delete(), "Cytokine was deleted successfully")
 
-        # the sample of the initial ID should not load successfully
+        # the object of the initial ID should not load successfully
         load_test = self.session.create_cytokine()
         with self.assertRaises(Exception):
             load_test = load_test.load(cyto.id)

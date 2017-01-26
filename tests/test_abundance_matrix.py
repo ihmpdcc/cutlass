@@ -8,10 +8,12 @@ from cutlass import iHMPSession
 from cutlass import AbundanceMatrix
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class AbundanceMatrixTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
@@ -61,65 +63,17 @@ class AbundanceMatrixTest(unittest.TestCase):
 
     def testComment(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        comment = "test comment"
 
-        try:
-            matrix.comment = comment
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, matrix, "comment")
 
-        self.assertTrue(success, "Able to use 'comment' setter.")
-
-        self.assertEqual(
-                matrix.comment,
-                comment,
-                "Property getter for 'comment' works."
-                )
-
-    def testCommentInt(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.comment = 3
-
-    def testCommentList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.comment = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, matrix, "comment")
 
     def testFormat(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        format_ = "fastq"
 
-        try:
-            matrix.format = format_
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, matrix, "format")
 
-        self.assertTrue(success, "Able to use 'format' setter.")
-
-        self.assertEqual(
-                matrix.format,
-                format_,
-                "Property getter for 'format' works."
-                )
-
-    def testFormatInt(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.format = 3
-
-    def testFormatList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.format = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, matrix, "format")
 
     def testFormatDoc(self):
         matrix = self.session.create_abundance_matrix()
@@ -182,6 +136,13 @@ class AbundanceMatrixTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             matrix.matrix_type = [ "a", "b", "c" ]
+
+    def testPrivateFiles(self):
+        matrix = self.session.create_abundance_matrix()
+
+        self.util.boolTypeTest(self, matrix, "private_files")
+
+        self.util.boolPropertyTest(self, matrix, "private_files")
 
     def testSize(self):
         matrix = self.session.create_abundance_matrix()
@@ -256,6 +217,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         size = 1000
         study = "prediabetes"
         sop = "test SOP"
+        private_files = False
 
         matrix.comment = comment
         matrix.format = format_
@@ -264,6 +226,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         matrix.size = size
         matrix.study = study
         matrix.sop = sop
+        matrix.private_files = private_files
 
         matrix_json = None
 
@@ -325,6 +288,11 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.assertEqual(matrix_data['meta']['sop'],
                          sop,
                          "'sop' in JSON had expected value."
+                         )
+
+        self.assertEqual(matrix_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
                          )
 
     def testDataInJson(self):
@@ -474,6 +442,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         # Attempt to save the sample at all points before and after adding
         # the required fields
         matrix = self.session.create_abundance_matrix()
+
         self.assertFalse(
                 matrix.save(),
                 "AbundanceMatrix not saved successfully, no required fields"
@@ -520,6 +489,7 @@ class AbundanceMatrixTest(unittest.TestCase):
 
         # the matrix of the initial ID should no longer load successfully
         load_test = self.session.create_abundance_matrix()
+
         with self.assertRaises(Exception):
             load_test = load_test.load(matrix.id)
 

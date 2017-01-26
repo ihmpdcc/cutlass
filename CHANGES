@@ -1,3 +1,13 @@
+cutlass 0.27
+
+  * Added support for private data in nodes associated with files and file
+    transfer, such as WgsRawSeqSet.
+  * Missing example script for WgsRawSeqSet added.
+  * Missing test script for HostTranscriptomicsRawSeqSet added.
+  * New method for testing boolean properties in CutlassTestUtil class.
+
+ - Victor <victor73@github.com>  Thu, 26 Jan 2016 15:30:00 -0400
+
 cutlass 0.26
 
   * Added missing SubjectAttribute node, example and test.

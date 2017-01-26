@@ -10,7 +10,6 @@ from Base import Base
 from aspera import aspera
 from Util import *
 
-
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
@@ -60,45 +59,8 @@ class WgsRawSeqSet(Base):
         self._study = None
         self._urls = ['']
 
-    def validate(self):
-        """
-        Validates the current object's data/JSON against the current
-        schema in the OSDF instance for that specific object. All required
-        fields for that specific object must be present.
-
-        Args:
-            None
-
-        Returns:
-            A list of strings, where each string is the error that the
-            validation raised during OSDF validation
-        """
-        self.logger.debug("In validate.")
-
-        document = self._get_raw_doc()
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        problems = []
-
-        if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
-            problems.append(error_message)
-
-        if self._local_file is None:
-            problems.append("Local file is not yet set.")
-        elif not os.path.isfile(self._local_file):
-            problems.append("Local file does not point to an actual file.")
-
-        if 'sequenced_from' not in self._links.keys():
-            problems.append("Must add a 'sequenced_from' link to a wgs_dna_prep.")
-
-        self.logger.debug("Number of validation problems: %s." % len(problems))
-
-        return problems
+        # Optional properties
+        self._private_files = None
 
     def is_valid(self):
         """
@@ -112,26 +74,16 @@ class WgsRawSeqSet(Base):
 
         Returns:
             True if the data validates, False if the current state of
-            fields in the instance do not validate with the OSDF instance
+            fields in the instance do not validate with OSDF or
+            other node requirements.
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if self._local_file is None:
-            self.logger.error("Must set the local file of the sequence set.")
-            valid = False
-        elif not os.path.isfile(self._local_file):
-            self.logger.error("Local file does not point to an actual file.")
-            valid = False
-
-        if 'sequenced_from' not in self._links.keys():
-            self.logger.error("Must have a 'sequenced_from' linkage.")
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -292,13 +244,41 @@ class WgsRawSeqSet(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_file setter.")
+        self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
 
     @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
+
+    @property
     def seq_model(self):
-        """ str: Sequencing instrument model. """
+        """
+        str: Sequencing instrument model.
+        """
         self.logger.debug("In 'seq_model' getter.")
 
         return self._seq_model
@@ -379,7 +359,9 @@ class WgsRawSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
         self.logger.debug("In 'study' getter.")
 
         return self._study
@@ -408,11 +390,57 @@ class WgsRawSeqSet(Base):
 
     @property
     def urls(self):
-        """ array: An array of URL from where the file can be obtained,
-                   http, ftp, fasp, etc... """
-        self.logger.debug("In urls getter.")
+        """
+        array: An array of URL from where the file can be obtained,
+                   http, ftp, fasp, etc...
+        """
+        self.logger.debug("In 'urls' getter.")
 
         return self._urls
+
+    def validate(self):
+        """
+        Validates the current object's data/JSON against the current
+        schema in the OSDF instance for that specific object. All required
+        fields for that specific object must be present.
+
+        Args:
+            None
+
+        Returns:
+            A list of strings, where each string is the error that the
+            validation raised during OSDF validation
+        """
+        self.logger.debug("In validate.")
+
+        document = self._get_raw_doc()
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        (valid, error_message) = session.get_osdf().validate_node(document)
+
+        problems = []
+
+        if not valid:
+            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            problems.append(error_message)
+
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
+        if 'sequenced_from' not in self._links.keys():
+            problems.append("Must add a 'sequenced_from' link.")
+
+        self.logger.debug("Number of validation problems: %s." % len(problems))
+
+        return problems
 
     @staticmethod
     def required_fields():
@@ -426,7 +454,7 @@ class WgsRawSeqSet(Base):
         """
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "local_file", "seq_model", "size", "study", "tags", "urls")
+                "seq_model", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
         """
@@ -468,16 +496,21 @@ class WgsRawSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
+        # Handle optional properties
         if self._sequence_type is not None:
-           self.logger.debug(__name__ + " object has the sequence_type set.")
-           doc['meta']['sequence_type'] = self._sequence_type
+            self.logger.debug("Object has the 'sequence_type' set.")
+            doc['meta']['sequence_type'] = self._sequence_type
+
+        if self._private_files is not None:
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -559,12 +592,14 @@ class WgsRawSeqSet(Base):
         seq_set._tags = seq_set_data['meta']['tags']
         seq_set._study = seq_set_data['meta']['study']
 
+        # Optional fields
         if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
             seq_set._sequence_type = seq_set_data['meta']['sequence_type']
 
-        module_logger.debug("Returning loaded " + __name__)
+        if 'private_files' in seq_set_data['meta']:
+            seq_set._private_files = seq_set_data['meta']['private_files']
 
+        module_logger.debug("Returning loaded %s." % __name__)
         return seq_set
 
     @staticmethod
@@ -585,66 +620,17 @@ class WgsRawSeqSet(Base):
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-
         seq_set_data = session.get_osdf().get_node(seq_set_id)
+        seq_set = WgsRawSeqSet.load_wgsRawSeqSet(seq_set_data)
 
-        module_logger.info("Creating a template " + __name__ + ".")
-        seq_set = WgsRawSeqSet()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-
-        # The attributes commmon to all iHMP nodes
-        seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
-
-        # The attributes that are particular to WgsRawSeqSet documents
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
-
-        if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
-
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s." % __name__)
 
         return seq_set
 
-    def save(self):
-        """
-        Saves the data in the current instance. The JSON form of the current data
-        for the instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously, then
-        the node ID is assigned the alpha numeric found in the OSDF instance. If not
-        saved previously, then the node ID is 'None', and upon a successful, will be
-        assigned to the alpha numeric ID found in the OSDF instance. Also, the
-        version is updated as the data is saved in the OSDF instance.
-
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid")
-            return False
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        success = False
 
         study = self._study
 
@@ -676,42 +662,97 @@ class WgsRawSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence set. Aborting save.")
-            return False
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to upload WGS raw sequence set")
         else:
             self._urls = [ "fasp://" + WgsRawSeqSet.aspera_server + remote_path ]
 
 
-        if self.id is None:
-            # The document has not yet been saved
-            seq_set_data = self._get_raw_doc()
-            self.logger.info("Got the raw JSON document.")
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously,
+        then the node ID is assigned the alpha numeric found in the OSDF
+        instance. If not saved previously, then the node ID is 'None', and upon
+        a successful save, will be assigned to thealpha numeric ID found in
+        OSDF.
+
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        success = False
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logger.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
+
+        if self._id is None:
+            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+
+            # Get the JSON form of the data and load it
+            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
+            data = json.loads( self.to_json() )
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(seq_set_data)
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                node_id = osdf.insert_node(data)
+
                 self._set_id(node_id)
                 self._version = 1
+
+                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
+                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+
                 success = True
             except Exception as e:
+                self.logger.exception(e)
                 self.logger.error("An error occurred while saving " + __name__ + ". " +
                                   "Reason: %s" % e)
         else:
-            seq_set_data = self._get_raw_doc()
+            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
-                session.get_osdf().edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                seq_set_data = self._get_raw_doc()
+                seq_set_id = self._id
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                osdf.edit_node(seq_set_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+
+                seq_set_data = osdf.get_node(seq_set_id)
+                latest_version = seq_set_data['ver']
+
+                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
+                self._version = latest_version
                 success = True
             except Exception as e:
+                self.logger.exception(e)
                 self.logger.error("An error occurred while updating " +
                                   __name__ + " %s. Reason: %s" % self._id, e)
 
         self.logger.debug("Returning " + str(success))
-
         return success
 
     def viral_seq_sets(self):
