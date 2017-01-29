@@ -9,15 +9,18 @@ from cutlass import iHMPSession
 from cutlass import Metabolome
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class MetabolomeTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -47,23 +50,9 @@ class MetabolomeTest(unittest.TestCase):
     def testComment(self):
         meta = self.session.create_metabolome()
 
-        with self.assertRaises(ValueError):
-            meta.comment = 3
+        self.util.stringTypeTest(self, meta, "comment")
 
-        with self.assertRaises(ValueError):
-            meta.comment = {}
-
-        with self.assertRaises(ValueError):
-            meta.comment = []
-
-        with self.assertRaises(ValueError):
-            meta.comment = 3.5
-
-        comment = "test metabolome comment"
-        meta.comment = comment
-
-        self.assertEquals(comment, meta.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, meta, "comment")
 
     def testChecksums(self):
         meta = self.session.create_metabolome()
@@ -84,50 +73,23 @@ class MetabolomeTest(unittest.TestCase):
     def testFormat(self):
         meta = self.session.create_metabolome()
 
-        with self.assertRaises(ValueError):
-            meta.format = 30
+        self.util.stringTypeTest(self, meta, "format")
 
-        with self.assertRaises(ValueError):
-            meta.format = True
-
-        with self.assertRaises(ValueError):
-            meta.format = {}
-
-        with self.assertRaises(ValueError):
-            meta.format = []
-
-        with self.assertRaises(ValueError):
-            meta.format = 3.5
-
-        format = "test format"
-        meta.format = format
-
-        self.assertEquals(format, meta.format,
-                          "format property works.")
+        self.util.stringPropertyTest(self, meta, "format")
 
     def testFormatDoc(self):
         meta = self.session.create_metabolome()
 
-        with self.assertRaises(ValueError):
-            meta.format_doc = 30
+        self.util.stringTypeTest(self, meta, "format_doc")
 
-        with self.assertRaises(ValueError):
-            meta.format_doc = True
+        self.util.stringPropertyTest(self, meta, "format_doc")
 
-        with self.assertRaises(ValueError):
-            meta.format_doc = {}
+    def testPrivateFiles(self):
+        meta = self.session.create_metabolome()
 
-        with self.assertRaises(ValueError):
-            meta.format_doc = []
+        self.util.boolTypeTest(self, meta, "private_files")
 
-        with self.assertRaises(ValueError):
-            meta.format_doc = 3.5
-
-        format_doc = "test format_doc"
-        meta.format_doc = format_doc
-
-        self.assertEquals(format_doc, meta.format_doc,
-                          "format_doc property works.")
+        self.util.boolPropertyTest(self, meta, "private_files")
 
     def testSubtype(self):
         meta = self.session.create_metabolome()
@@ -162,12 +124,14 @@ class MetabolomeTest(unittest.TestCase):
         format_ = "gff3"
         format_doc = "test_format_doc"
         subtype = "host"
+        private_files = False
 
         meta.comment = comment
         meta.study = study
         meta.format = format_
         meta.format_doc = format_doc
         meta.subtype = subtype
+        meta.private_files = private_files
 
         meta_json = None
 
@@ -218,6 +182,11 @@ class MetabolomeTest(unittest.TestCase):
         self.assertEqual(meta_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
+                         )
+
+        self.assertEqual(meta_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
                          )
 
     def testDataInJson(self):
@@ -373,6 +342,7 @@ class MetabolomeTest(unittest.TestCase):
         meta.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
         meta.format = "gff3"
         meta.format_doc = "Test format_doc"
+        meta.subtype = "host"
         meta.study = "prediabetes"
         meta.local_file = temp_file
 

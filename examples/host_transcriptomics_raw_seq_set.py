@@ -36,7 +36,6 @@ print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
-htrss.local_file = temp_file
 htrss.size = 13131
 htrss.seq_model = "test sequencer model"
 htrss.exp_length = 2000
@@ -45,7 +44,8 @@ htrss.exp_length = 2000
 htrss.comment = "test host transcriptomics_raw_seq_set comment"
 htrss.format = "fasta"
 htrss.format_doc = "the format url"
-htrss.private_files = True
+htrss.local_file = temp_file
+htrss.private_files = False
 
 # HostTranscriptomicsRawSeqSets are 'sequenced_from' HostSeqPrep nodes
 htrss.links = { "sequenced_from": [ "88af6472fb03642dd5eaf8cddc70c8ec" ] }

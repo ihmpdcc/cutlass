@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -33,12 +36,12 @@ print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
-vss.local_file = temp_file
-
 # Optional properties
 vss.comment = "test viral_seq_set comment"
 vss.format = "gff3"
 vss.format_doc = "the format url"
+vss.local_file = temp_file
+vss.private_files = False
 
 # ViralSeqSets are 'computed_from' WgsRawSeqSet nodes
 vss.links = { "computed_from": [ "b9af32d3ab623bcfbdce2ea3a502c015" ] }

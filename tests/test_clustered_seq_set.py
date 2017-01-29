@@ -9,15 +9,18 @@ from cutlass import iHMPSession
 from cutlass import ClusteredSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class ClusteredSeqSetTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -47,23 +50,9 @@ class ClusteredSeqSetTest(unittest.TestCase):
     def testComment(self):
         css = self.session.create_clustered_seq_set()
 
-        with self.assertRaises(ValueError):
-            css.comment = 3
+        self.util.stringTypeTest(self, css, "comment")
 
-        with self.assertRaises(ValueError):
-            css.comment = {}
-
-        with self.assertRaises(ValueError):
-            css.comment = []
-
-        with self.assertRaises(ValueError):
-            css.comment = 3.5
-
-        comment = "test activity change 30d"
-        css.comment = comment
-
-        self.assertEquals(comment, css.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, css, "comment")
 
     def testChecksums(self):
         css = self.session.create_clustered_seq_set()
@@ -84,44 +73,22 @@ class ClusteredSeqSetTest(unittest.TestCase):
     def testClusteringProcess(self):
         css = self.session.create_clustered_seq_set()
 
-        with self.assertRaises(ValueError):
-            css.clustering_process = 3
+        self.util.stringTypeTest(self, css, "clustering_process")
 
-        with self.assertRaises(ValueError):
-            css.clustering_process = {}
-
-        with self.assertRaises(ValueError):
-            css.clustering_process = []
-
-        with self.assertRaises(ValueError):
-            css.clustering_process = 3.5
-
-        clustering_process = "Test clustering process"
-        css.clustering_process = clustering_process
-
-        self.assertEquals(clustering_process, css.clustering_process,
-                          "clustering_process property works.")
+        self.util.stringPropertyTest(self, css, "clustering_process")
 
     def testSize(self):
         css = self.session.create_clustered_seq_set()
 
-        with self.assertRaises(ValueError):
-            css.size = "size"
+        self.util.intTypeTest(self, css, "size")
 
-        with self.assertRaises(ValueError):
-            css.size = {}
+        self.util.intPropertyTest(self, css, "size")
 
-        with self.assertRaises(ValueError):
-            css.size = []
+    def testSizeNegative(self):
+        css = self.session.create_clustered_seq_set()
 
-        with self.assertRaises(ValueError):
-            css.size = 3.5
-
-        size = 1000
-        css.size = size
-
-        self.assertEquals(size, css.size,
-                          "size property works.")
+        with self.assertRaises(Exception):
+            css.size = -1
 
     def testToJson(self):
         css = self.session.create_clustered_seq_set()
@@ -130,9 +97,10 @@ class ClusteredSeqSetTest(unittest.TestCase):
         comment = "test clustered_seq_set comment"
         clustering_process = "test clustering software 1.0"
         study = "prediabetes"
-        format_ = "gff3"
+        format_ = "nucleotide_fsa"
         size = 131313
         format_doc = "test_format_doc"
+        private_files = False
 
         css.clustering_process = clustering_process
         css.comment = comment
@@ -140,6 +108,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         css.study = study
         css.format = format_
         css.format_doc = format_doc
+        css.private_files = private_files
 
         css_json = None
 
@@ -162,6 +131,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
 
         self.assertTrue(parse_success,
                         "to_json() did not throw an exception.")
+
         self.assertTrue(css_data is not None,
                         "to_json() returned parsable JSON.")
 
@@ -197,11 +167,16 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          "'format_doc' in JSON had expected value."
                          )
 
+        self.assertEqual(css_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
+                         )
+
     def testDataInJson(self):
         css = self.session.create_clustered_seq_set()
         success = False
         comment = "test_comment"
-        format_ = "gff3"
+        format_ = "nucleotide_fsa"
         format_doc = "test_format_doc"
 
         css.comment = comment
@@ -344,10 +319,11 @@ class ClusteredSeqSetTest(unittest.TestCase):
         css.links = {"computed_from": ["88af6472fb03642dd5eaf8cddc2f3405"]}
 
         css.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
-        css.format = "gff3"
+        css.format = "nucleotide_fsa"
+        css.sequence_type = "nucleotide"
         css.size = 1313
         css.clustering_process = "clustering software 1.0"
-        css.format_doc = "peptide_fsa"
+        css.format_doc = "nucleotide_fsa"
         css.study = "prediabetes"
         css.local_file = temp_file
 

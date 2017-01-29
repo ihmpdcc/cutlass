@@ -3,6 +3,7 @@
 import unittest
 import json
 import sys
+import tempfile
 
 from cutlass import iHMPSession
 from cutlass import AbundanceMatrix
@@ -19,6 +20,7 @@ class AbundanceMatrixTest(unittest.TestCase):
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -77,65 +79,17 @@ class AbundanceMatrixTest(unittest.TestCase):
 
     def testFormatDoc(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        format_doc = "test format doc"
 
-        try:
-            matrix.format_doc = format_doc
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, matrix, "format_doc")
 
-        self.assertTrue(success, "Able to use 'format_doc' setter.")
-
-        self.assertEqual(
-                matrix.format_doc,
-                format_doc,
-                "Property getter for 'format_doc' works."
-                )
-
-    def testFormatDocInt(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.format_doc = 3
-
-    def testFormatDocList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.format_doc = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, matrix, "format_doc")
 
     def testMatrixType(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        matrix_type = "test matrix type"
 
-        try:
-            matrix.matrix_type = matrix_type
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, matrix, "matrix_type")
 
-        self.assertTrue(success, "Able to use 'matrix_type' setter.")
-
-        self.assertEqual(
-                matrix.matrix_type,
-                matrix_type,
-                "Property getter for 'matrix_type' works."
-                )
-
-    def testMatrixTypeInt(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.matrix_type = 3
-
-    def testMatrixTypeList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.matrix_type = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, matrix, "matrix_type")
 
     def testPrivateFiles(self):
         matrix = self.session.create_abundance_matrix()
@@ -146,65 +100,23 @@ class AbundanceMatrixTest(unittest.TestCase):
 
     def testSize(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        size = 1000
 
-        try:
-            matrix.size = size
-            success = True
-        except:
-            pass
+        self.util.intTypeTest(self, matrix, "size")
 
-        self.assertTrue(success, "Able to use 'size' setter.")
+        self.util.intPropertyTest(self, matrix, "size")
 
-        self.assertEqual(
-                matrix.size,
-                size,
-                "Property getter for 'size' works."
-                )
-
-    def testSizeStr(self):
+    def testSizeNegative(self):
         matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
-            matrix.size = "size"
-
-    def testSizeList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.size = [ "a", "b", "c" ]
+            matrix.size = -1
 
     def testStudy(self):
         matrix = self.session.create_abundance_matrix()
-        success = False
-        study = "test study"
 
-        try:
-            matrix.study = study
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, matrix, "study")
 
-        self.assertTrue(success, "Able to use 'study' setter.")
-
-        self.assertEqual(
-                matrix.study,
-                study,
-                "Property getter for 'study' works."
-                )
-
-    def testStudyInt(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.study = 3
-
-    def testStudyList(self):
-        matrix = self.session.create_abundance_matrix()
-
-        with self.assertRaises(ValueError):
-            matrix.study = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, matrix, "study")
 
     def testToJson(self):
         matrix = self.session.create_abundance_matrix()
@@ -439,6 +351,8 @@ class AbundanceMatrixTest(unittest.TestCase):
                         "required_fields() did not return empty value.")
 
     def testLoadSaveDeleteAbundanceMatrix(self):
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
         # Attempt to save the sample at all points before and after adding
         # the required fields
         matrix = self.session.create_abundance_matrix()
@@ -465,6 +379,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         matrix.matrix_type = "Test matrix type"
         matrix.size = 1000
         matrix.study = "prediabetes"
+        matrix.local_file = temp_file
 
         matrix.add_tag("test")
 

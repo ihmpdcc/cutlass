@@ -36,12 +36,11 @@ print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
-cyto.local_file = temp_file
-
 # Optional properties
 cyto.comment = "test cytokine comment"
 cyto.format = "gff3"
 cyto.format_doc = "the format url"
+cyto.local_file = temp_file
 cyto.private_files = False
 
 # Cytokines are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps

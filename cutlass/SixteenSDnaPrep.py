@@ -204,9 +204,11 @@ class SixteenSDnaPrep(Base):
 
     @property
     def lib_selection(self):
-        """ str: A controlled vocabulary of terms describing selection or reduction
-            method used in library construction. Terms used by TCGA include
-            (random, hybrid selection) """
+        """
+        str: A controlled vocabulary of terms describing selection or reduction
+             method used in library construction. Terms used by TCGA include
+             (random, hybrid selection)
+        """
         self.logger.debug("In lib_selection getter.")
 
         return self._lib_selection
@@ -364,7 +366,9 @@ class SixteenSDnaPrep(Base):
 
     @property
     def sequencing_contact(self):
-        """ str: Name and email of the primary contact at the sequencing center. """
+        """
+        str: Name and email of the primary contact at the sequencing center.
+        """
         self.logger.debug("In sequencing_contact getter.")
 
         return self._sequencing_contact

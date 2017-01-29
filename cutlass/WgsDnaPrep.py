@@ -286,7 +286,9 @@ class WgsDnaPrep(Base):
 
     @property
     def prep_id(self):
-        """ str: Nucleic Acid Prep ID. """
+        """
+        str: Nucleic Acid Prep ID.
+        """
         self.logger.debug("In 'prep_id' getter.")
 
         return self._prep_id

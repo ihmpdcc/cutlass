@@ -376,7 +376,9 @@ class MicrobTranscriptomicsRawSeqSet(Base):
 
     @property
     def study(self):
-        """ str: One of the 3 studies that are part of the iHMP. """
+        """
+        str: One of the 3 studies that are part of the iHMP.
+        """
         self.logger.debug("In 'study' getter.")
 
         return self._study
@@ -526,7 +528,7 @@ class MicrobTranscriptomicsRawSeqSet(Base):
         return result_list
 
     @staticmethod
-    def load_microb_transcriptomics_raw_set_set(seq_set_data):
+    def load_microb_transcriptomics_raw_seq_set(seq_set_data):
         """
         Takes the provided JSON string and converts it to a
         MicrobTranscriptomicsRawSeqSet object.

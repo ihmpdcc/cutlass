@@ -9,15 +9,18 @@ from cutlass import iHMPSession
 from cutlass import Lipidome
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class LipidomeTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -44,27 +47,12 @@ class LipidomeTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(lip is None)
 
-
     def testComment(self):
         lip = self.session.create_lipidome()
 
-        with self.assertRaises(ValueError):
-            lip.comment = 3
+        self.util.stringTypeTest(self, lip, "comment")
 
-        with self.assertRaises(ValueError):
-            lip.comment = {}
-
-        with self.assertRaises(ValueError):
-            lip.comment = []
-
-        with self.assertRaises(ValueError):
-            lip.comment = 3.5
-
-        comment = "test lipidome comment"
-        lip.comment = comment
-
-        self.assertEquals(comment, lip.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, lip, "comment")
 
     def testChecksumsLegal(self):
         lip = self.session.create_lipidome()
@@ -82,6 +70,13 @@ class LipidomeTest(unittest.TestCase):
         self.assertEqual(lip.checksums['md5'], checksums['md5'],
                          "Property getter for 'checksums' works.")
 
+    def testPrivateFiles(self):
+        lip = self.session.create_lipidome()
+
+        self.util.boolTypeTest(self, lip, "private_files")
+
+        self.util.boolPropertyTest(self, lip, "private_files")
+
     def testToJson(self):
         lip = self.session.create_lipidome()
         success = False
@@ -91,12 +86,14 @@ class LipidomeTest(unittest.TestCase):
         subtype = "host"
         format_ = "gff3"
         format_doc = "test_format_doc"
+        private_files = False
 
         lip.comment = comment
         lip.study = study
         lip.format = format_
         lip.format_doc = format_doc
         lip.subtype = subtype
+        lip.private_files = private_files
 
         lip_json = None
 
@@ -147,6 +144,11 @@ class LipidomeTest(unittest.TestCase):
         self.assertEqual(lip_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
+                         )
+
+        self.assertEqual(lip_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
                          )
 
     def testDataInJson(self):

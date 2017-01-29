@@ -9,15 +9,18 @@ from cutlass import iHMPSession
 from cutlass import ViralSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class ViralSeqSetTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -129,6 +132,13 @@ class ViralSeqSetTest(unittest.TestCase):
         self.assertEquals(format_doc, vss.format_doc,
                           "format_doc property works.")
 
+    def testPrivateFiles(self):
+        vss = self.session.create_viral_seq_set()
+
+        self.util.boolTypeTest(self, vss, "private_files")
+
+        self.util.boolPropertyTest(self, vss, "private_files")
+
     def testToJson(self):
         vss = self.session.create_viral_seq_set()
         success = False
@@ -137,11 +147,13 @@ class ViralSeqSetTest(unittest.TestCase):
         study = "prediabetes"
         format_ = "gff3"
         format_doc = "test_format_doc"
+        private_files = False
 
         vss.comment = comment
         vss.study = study
         vss.format = format_
         vss.format_doc = format_doc
+        vss.private_files = private_files
 
         vss_json = None
 
@@ -189,16 +201,23 @@ class ViralSeqSetTest(unittest.TestCase):
                          "'format_doc' in JSON had expected value."
                          )
 
+        self.assertEqual(vss_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
+                         )
+
     def testDataInJson(self):
         vss = self.session.create_viral_seq_set()
         success = False
         comment = "test_comment"
         format_ = "gff3"
         format_doc = "test_format_doc"
+        study = "prediabetes"
 
         vss.comment = comment
         vss.format = format_
         vss.format_doc = format_doc
+        vss.study = study
 
         vss_json = None
 
@@ -239,6 +258,11 @@ class ViralSeqSetTest(unittest.TestCase):
         self.assertEqual(vss_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
+                         )
+
+        self.assertEqual(vss_data['meta']['study'],
+                         study,
+                         "'study' in JSON had expected value."
                          )
 
     def testId(self):
@@ -333,7 +357,7 @@ class ViralSeqSetTest(unittest.TestCase):
             )
 
         # ViralSeqSet nodes are "computed_from" WgsRawSeqSets
-        vss.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b93c50"]}
+        vss.links = {"computed_from": ["b9af32d3ab623bcfbdce2ea3a502c015"]}
 
         vss.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
         vss.format = "gff3"

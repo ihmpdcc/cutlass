@@ -50,8 +50,10 @@ class Visit(Base):
 
     @property
     def visit_id(self):
-        """ str: The identifier used by the sequence center to uniquely
-                 identify the visit. """
+        """
+        str: The identifier used by the sequence center to uniquely
+             identify the visit.
+        """
         self.logger.debug("In visit_id getter.")
 
         return self._visit_id

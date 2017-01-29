@@ -26,6 +26,8 @@ class Lipidome(Base):
     """
     namespace = "ihmp"
 
+    aspera_server = "aspera.ihmpdcc.org"
+
     def __init__(self):
         """
         Constructor for the Lipidome class. This initializes the
@@ -53,6 +55,8 @@ class Lipidome(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
+        self._local_file = None
+        self._private_files = None
 
     @property
     def checksums(self):
@@ -86,6 +90,7 @@ class Lipidome(Base):
         str: A descriptive comment for the lipidome.
         """
         self.logger.debug("In 'comment' getter.")
+
         return self._comment
 
     @comment.setter
@@ -205,7 +210,9 @@ class Lipidome(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -226,6 +233,33 @@ class Lipidome(Base):
         self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
+
+    @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
 
     @property
     def urls(self):
@@ -264,6 +298,15 @@ class Lipidome(Base):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
         if 'derived_from' not in self._links.keys():
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
@@ -287,14 +330,11 @@ class Lipidome(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'derived_from' not in self._links.keys():
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -317,7 +357,7 @@ class Lipidome(Base):
         """
         self.logger.debug("In _get_raw_doc.")
 
-        lip_doc = {
+        doc = {
             'acl': {
                 'read': [ 'all' ],
                 'write': [ Lipidome.namespace ]
@@ -335,27 +375,31 @@ class Lipidome(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Lipidome object has the OSDF id set.")
-           lip_doc['id'] = self._id
+           self.logger.debug("Object has the OSDF id set.")
+           doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Lipidome object has the OSDF version set.")
-           lip_doc['ver'] = self._version
+           self.logger.debug("Object has the OSDF version set.")
+           doc['ver'] = self._version
 
-        # Handle Lipidome optional properties
+        # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("Lipidome object has the 'comment' property set.")
-           lip_doc['meta']['comment'] = self._comment
+           self.logger.debug("Object has the 'comment' property set.")
+           doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-           self.logger.debug("Lipidome object has the 'format' property set.")
-           lip_doc['meta']['format'] = self._format
+           self.logger.debug("Object has the 'format' property set.")
+           doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-           self.logger.debug("Lipidome object has the 'format_doc' property set.")
-           lip_doc['meta']['format_doc'] = self._format_doc
+           self.logger.debug("Object has the 'format_doc' property set.")
+           doc['meta']['format_doc'] = self._format_doc
 
-        return lip_doc
+        if self._private_files is not None:
+           self.logger.debug("Object has the 'private_files' property set.")
+           doc['meta']['private_files'] = self._private_files
+
+        return doc
 
     @staticmethod
     def required_fields():
@@ -368,7 +412,7 @@ class Lipidome(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "local_file", "subtype", "study", "tags")
+        return ("checksums", "subtype", "study", "tags")
 
     def delete(self):
         """
@@ -490,6 +534,9 @@ class Lipidome(Base):
         if 'format_doc' in lip_data['meta']:
             lip._format_doc = lip_data['meta']['format_doc']
 
+        if 'private_files' in lip_data['meta']:
+            lip._private_files = lip_data['meta']['private_files']
+
         module_logger.debug("Returning loaded Lipidome.")
         return lip
 
@@ -512,68 +559,16 @@ class Lipidome(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         lip_data = session.get_osdf().get_node(lip_id)
-
-        module_logger.info("Creating a template Lipidome.")
-        lip = Lipidome()
-
-        module_logger.debug("Filling in Lipidome details.")
-
-        # Node required fields
-        lip._set_id(lip_data['id'])
-        lip._links = lip_data['linkage']
-        lip._version = lip_data['ver']
-
-        # Required fields
-        lip._checksums = lip_data['meta']['checksums']
-        lip._format = lip_data['meta']['format']
-        lip._format_doc = lip_data['meta']['format_doc']
-        lip._study = lip_data['meta']['study']
-        lip._tags = lip_data['meta']['tags']
-        lip._urls = lip_data['meta']['urls']
-
-        # Handle Lipidome optional properties
-        if 'comment' in lip_data['meta']:
-            lip._comment = lip_data['meta']['comment']
-
-        if 'format' in lip_data['meta']:
-            lip._format = lip_data['meta']['format']
-
-        if 'format_doc' in lip_data['meta']:
-            lip._format_doc = lip_data['meta']['format_doc']
+        lip = Lipidome.load_lipidome(lip_data)
 
         module_logger.debug("Returning loaded Lipidome.")
+
         return lip
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
-
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-        aspera_server = "aspera.ihmpdcc.org"
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
         study = self._study
 
         study2dir = { "ibd": "ibd",
@@ -595,23 +590,60 @@ class Lipidome(Base):
         remote_path = "/".join(["/" + study_dir, "lipidome", self._subtype, remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
-        success = False
-
-        upload_result = aspera.upload_file(aspera_server,
+        upload_result = aspera.upload_file(Lipidome.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence " + \
-                              "set. Aborting save.")
-            return success
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to upload lipidome.")
+        else:
+            self._urls = [ "fasp://" + Lipidome.aspera_server + remote_path ]
 
-        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, aspera_server))
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is first validated. If the data is not valid, then the data
+        will not be saved. If the instance was saved previously, then the node
+        ID is assigned the alphanumeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful
+        save, will be assigned to the alphanumeric ID found in OSDF.
 
-        self._urls = [ "fasp://" + aspera_server + remote_path ]
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logger.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
+
+        success = False
 
         if self._id is None:
             # The document has not yet been saved
@@ -624,7 +656,8 @@ class Lipidome(Base):
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(data)
+                node_id = osdf.insert_node(data)
+
                 self._set_id(node_id)
                 self._version = 1
 
@@ -643,15 +676,14 @@ class Lipidome(Base):
                 lip_data = self._get_raw_doc()
                 lip_id = self._id
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % lip_id)
-                session.get_osdf().edit_node(lip_data)
+                osdf.edit_node(lip_data)
                 self.logger.info("Update for " + __name__ + " %s successful." % self._id)
 
-                lip_data = session.get_osdf().get_node(lip_id)
+                lip_data = osdf.get_node(lip_id)
                 latest_version = lip_data['ver']
 
-                self._version = latest_version
                 self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
-
+                self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)

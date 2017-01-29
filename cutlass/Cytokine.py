@@ -54,6 +54,7 @@ class Cytokine(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
+        self._local_file = None
         self._private_files = None
 
     @property
@@ -62,6 +63,7 @@ class Cytokine(Base):
         dict: The cytokines's checksum data.
         """
         self.logger.debug("In 'checksums' getter.")
+
         return self._checksums
 
     @checksums.setter
@@ -162,6 +164,7 @@ class Cytokine(Base):
         be uploaded to the DCC. Defaults to false.
         """
         self.logger.debug("In 'private_files' getter.")
+
         return self._private_files
 
     @private_files.setter
@@ -208,7 +211,9 @@ class Cytokine(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -300,14 +305,11 @@ class Cytokine(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'derived_from' not in self._links.keys():
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -316,11 +318,11 @@ class Cytokine(Base):
 
     def _get_raw_doc(self):
         """
-        Generates the raw JSON document for the current object. All required fields are
-        filled into the JSON document, regardless they are set or not. Any remaining
-        fields are included only if they are set. This allows the user to visualize
-        the JSON to ensure fields are set appropriately before saving into the
-        database.
+        Generates the raw JSON document for the current object. All required
+        fields are filled into the JSON document, regardless of whether they
+        were set or not. Any remaining fields are included only if they are
+        set. This allows the user to visualize the JSON to ensure fields are set
+        appropriately before saving into the database.
 
         Args:
             None
@@ -330,7 +332,7 @@ class Cytokine(Base):
         """
         self.logger.debug("In _get_raw_doc.")
 
-        cyto_doc = {
+        doc = {
             'acl': {
                 'read': [ 'all' ],
                 'write': [ Cytokine.namespace ]
@@ -348,35 +350,35 @@ class Cytokine(Base):
         }
 
         if self._id is not None:
-            self.logger.debug("Cytokine object has the OSDF id set.")
-            cyto_doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug("Cytokine object has the OSDF version set.")
-            cyto_doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
-        # Handle Cytokine optional properties
+        # Handle optional properties
         if self._comment is not None:
-            self.logger.debug("Cytokine object has the 'comment' property set.")
-            cyto_doc['meta']['comment'] = self._comment
+            self.logger.debug("Object has the 'comment' property set.")
+            doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-            self.logger.debug("Cytokine object has the 'format' property set.")
-            cyto_doc['meta']['format'] = self._format
+            self.logger.debug("Object has the 'format' property set.")
+            doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-            self.logger.debug("Cytokine object has the 'format_doc' property set.")
-            cyto_doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
 
         if self._format_doc is not None:
-            self.logger.debug("Cytokine object has the 'format_doc' property set.")
-            cyto_doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
 
         if self._private_files is not None:
             self.logger.debug("Object has the 'private_files' property set.")
-            cyto_doc['meta']['private_files'] = self._private_files
+            doc['meta']['private_files'] = self._private_files
 
-        return cyto_doc
+        return doc
 
     @staticmethod
     def required_fields():
@@ -566,8 +568,6 @@ class Cytokine(Base):
         remote_path = "/".join(["/" + study_dir, "cytokine", "host", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
-        success = False
-
         upload_result = aspera.upload_file(Cytokine.aspera_server,
                                            session.username,
                                            session.password,
@@ -578,22 +578,17 @@ class Cytokine(Base):
             self.logger.error("Experienced an error uploading the data. " + \
                               "Aborting save.")
             raise Exception("Unable to upload cytokine.")
-
-        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, Cytokine.aspera_server))
-
-        self._urls = [ "fasp://" + Cytokine.aspera_server + remote_path ]
-
+        else:
+            self._urls = [ "fasp://" + Cytokine.aspera_server + remote_path ]
 
     def save(self):
         """
         Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
+        instance is first validated. If the data is not valid, then the data
+        will not be saved. If the instance was saved previously, then the node
+        ID is assigned the alphanumeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful
+        save, will be assigned to the alphanumeric ID found in OSDF.
 
         Args:
             None
@@ -625,6 +620,8 @@ class Cytokine(Base):
                 return False
 
         osdf = session.get_osdf()
+
+        success = False
 
         if self._id is None:
             # The document has not yet been saved

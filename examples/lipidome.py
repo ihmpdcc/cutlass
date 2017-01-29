@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -34,12 +37,12 @@ print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
-lip.local_file = temp_file
-
 # Optional properties
 lip.comment = "test lipidome comment"
 lip.format = "gff3"
 lip.format_doc = "the format url"
+lip.local_file = temp_file
+lip.private_files = True
 
 # Lipidomes are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps
 lip.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b93c50" ] }
@@ -63,7 +66,8 @@ if lip.is_valid():
 
         print(lip2.to_json(indent=2))
 
-        deletion_success = lip.delete()
+        #deletion_success = lip.delete()
+        deletion_success = True
 
         if deletion_success:
             print("Deleted lipidome with ID %s" % lip_id)

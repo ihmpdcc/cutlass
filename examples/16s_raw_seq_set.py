@@ -39,15 +39,13 @@ seq_set.sequence_type = "nucleotide"
 seq_set.size = 3000
 seq_set.study = "prediabetes"
 
-
 print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
-seq_set.local_file = temp_file
-
 # Optional properties
-seq_set.private_files = True
+seq_set.local_file = temp_file
+seq_set.private_files = False
 
 # SixteenSRawSeqSets are 'sequenced_from' other nodes
 seq_set.links = { "sequenced_from": [ "610a4911a5ca67de12cdc1e4b4014133" ] }

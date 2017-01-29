@@ -277,6 +277,7 @@ class Annotation(Base):
         be uploaded to the DCC. Defaults to false.
         """
         self.logger.debug("In 'private_files' getter.")
+
         return self._private_files
 
     @private_files.setter
@@ -376,7 +377,9 @@ class Annotation(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file

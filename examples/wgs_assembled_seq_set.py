@@ -43,8 +43,10 @@ seq_set.sequence_type = "nucleotide"
 seq_set.size = 5000
 seq_set.study = "prediabetes"
 seq_set.links = { "computed_from": [ "b9af32d3ab623bcfbdce2ea3a502c015" ] }
+
+# Optional properties
 seq_set.local_file = temp_file
-seq_set.private_files = True
+seq_set.private_files = False
 
 seq_set.tags = [ "test", "wgs", "ihmp" ]
 seq_set.add_tag("another")

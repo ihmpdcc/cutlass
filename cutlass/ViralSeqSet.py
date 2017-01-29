@@ -26,6 +26,8 @@ class ViralSeqSet(Base):
     """
     namespace = "ihmp"
 
+    aspera_server = "aspera.ihmpdcc.org"
+
     def __init__(self):
         """
         Constructor for the ViralSeqSet class. This initializes the
@@ -53,6 +55,8 @@ class ViralSeqSet(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
+        self._local_file = None
+        self._private_files = None
 
     @property
     def checksums(self):
@@ -86,6 +90,7 @@ class ViralSeqSet(Base):
         str: A descriptive comment for the viral seq set.
         """
         self.logger.debug("In 'comment' getter.")
+
         return self._comment
 
     @comment.setter
@@ -135,6 +140,7 @@ class ViralSeqSet(Base):
         str: URL for documentation of file format.
         """
         self.logger.debug("In 'format_doc' getter.")
+
         return self._format_doc
 
     @format_doc.setter
@@ -180,7 +186,9 @@ class ViralSeqSet(Base):
 
     @property
     def local_file(self):
-        """ str: Path to the local file to upload to the server. """
+        """
+        str: Path to the local file to upload to the server.
+        """
         self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
@@ -201,6 +209,33 @@ class ViralSeqSet(Base):
         self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
+
+    @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
 
     @property
     def urls(self):
@@ -235,15 +270,25 @@ class ViralSeqSet(Base):
         (valid, error_message) = session.get_osdf().validate_node(document)
 
         problems = []
+
         if not valid:
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
         if 'computed_from' not in self._links.keys():
-            problems.append("Must have a 'computed_from' link to a " + \
-                            "wgs_raw_seq_set.")
+            problems.append("Must have a 'computed_from' link.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
+
         return problems
 
     def is_valid(self):
@@ -262,14 +307,11 @@ class ViralSeqSet(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'computed_from' not in self._links.keys():
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -310,25 +352,29 @@ class ViralSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("ViralSeqSet object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("ViralSeqSet object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
-        # Handle ViralSeqSet optional properties
+        # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("ViralSeqSet object has the 'comment' property set.")
-           doc['meta']['comment'] = self._comment
+            self.logger.debug("Object has the 'comment' property set.")
+            doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-           self.logger.debug("ViralSeqSet object has the 'format' property set.")
-           doc['meta']['format'] = self._format
+            self.logger.debug("Object has the 'format' property set.")
+            doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-           self.logger.debug("ViralSeqSet object has the 'format_doc' property set.")
-           doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
+
+        if self._private_files is not None:
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -343,7 +389,8 @@ class ViralSeqSet(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "local_file", "study", "tags")
+
+        return ("checksums", "study", "tags")
 
     def delete(self):
         """
@@ -464,6 +511,9 @@ class ViralSeqSet(Base):
         if 'format_doc' in data['meta']:
             node._format_doc = data['meta']['format_doc']
 
+        if 'private_files' in data['meta']:
+            node._private_files = data['meta']['private_files']
+
         module_logger.debug("Returning loaded ViralSeqSet.")
         return node
 
@@ -486,67 +536,16 @@ class ViralSeqSet(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         node_data = session.get_osdf().get_node(node_id)
+        node = ViralSeqSet.load_viral_seq_set(node_data) 
 
-        module_logger.info("Creating a template ViralSeqSet.")
-        node = ViralSeqSet()
+        module_logger.debug("Returning loaded %s." % __name__)
 
-        module_logger.debug("Filling in ViralSeqSet details.")
-
-        # Node required fields
-        node._set_id(node_data['id'])
-        node._links = node_data['linkage']
-        node._version = node_data['ver']
-
-        # Required fields
-        node._checksums = node_data['meta']['checksums']
-        node._format = node_data['meta']['format']
-        node._format_doc = node_data['meta']['format_doc']
-        node._study = node_data['meta']['study']
-        node._tags = node_data['meta']['tags']
-        node._urls = node_data['meta']['urls']
-
-        # Handle ViralSeqSet optional properties
-        if 'comment' in node_data['meta']:
-            node._comment = node_data['meta']['comment']
-
-        if 'format' in node_data['meta']:
-            node._format = node_data['meta']['format']
-
-        if 'format_doc' in node_data['meta']:
-            node._format_doc = node_data['meta']['format_doc']
-
-        module_logger.debug("Returning loaded ViralSeqSet.")
         return node
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-        aspera_server = "aspera.ihmpdcc.org"
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        session = iHMPSession.get_session() 
 
         study = self._study
 
@@ -572,34 +571,72 @@ class ViralSeqSet(Base):
 
         success = False
 
-        upload_result = aspera.upload_file(aspera_server,
+        upload_result = aspera.upload_file(ViralSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence " + \
-                              "set. Aborting save.")
-            return success
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to upload viral sequence set.")
+        else:
+            self._urls = [ "fasp://" + ViralSeqSet.aspera_server + remote_path ]
 
-        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, aspera_server))
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously,
+        then the node ID is assigned the alpha numeric found in the OSDF
+        instance. If not saved previously, then the node ID is 'None', and upon
+        a successful save, will be assigned to the alphanumeric ID found in OSDF.
 
-        self._urls = [ "fasp://" + aspera_server + remote_path ]
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        success = False
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logger.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
 
         if self._id is None:
-            # The document has not yet been saved
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
             self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
             data = json.loads( self.to_json() )
-            self.logger.info("Got the raw JSON document.")
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(data)
+                node_id = osdf.insert_node(data)
+
                 self._set_id(node_id)
                 self._version = 1
 
@@ -618,15 +655,14 @@ class ViralSeqSet(Base):
                 node_data = self._get_raw_doc()
                 node_id = self._id
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % node_id)
-                session.get_osdf().edit_node(node_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                osdf.edit_node(node_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % node_id)
 
-                node_data = session.get_osdf().get_node(node_id)
+                node_data = osdf.get_node(node_id)
                 latest_version = node_data['ver']
 
-                self._version = latest_version
                 self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
-
+                self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)

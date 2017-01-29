@@ -50,22 +50,22 @@ class AbundanceMatrix(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
-        self._local_file = None
         self._matrix_type = None
         self._size = None
         self._study = None
         self._urls = ['']
 
         # Optional properties
-        self._sop = None
+        self._local_file = None
         self._private_files = None
+        self._sop = None
 
     @property
     def checksums(self):
         """
         dict: The checksum data.
         """
-        self.logger.debug("In checksums getter.")
+        self.logger.debug("In 'checksums' getter.")
         return self._checksums
 
     @checksums.setter
@@ -80,7 +80,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
+        self.logger.debug("In 'checksums' setter.")
 
         self._checksums = checksums
 
@@ -89,7 +89,7 @@ class AbundanceMatrix(Base):
         """
         str: A descriptive comment for the abundance matrix.
         """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
         return self._comment
 
     @comment.setter
@@ -104,7 +104,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
+        self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
 
@@ -114,7 +114,7 @@ class AbundanceMatrix(Base):
         """
         str: The file format of the matrix file. eg.g. tbl, csv, biom.
         """
-        self.logger.debug("In format getter.")
+        self.logger.debug("In 'format' getter.")
         return self._format
 
     @format.setter
@@ -152,7 +152,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In format_doc setter.")
+        self.logger.debug("In 'format_doc' setter.")
 
         self._format_doc = format_doc
 
@@ -161,7 +161,7 @@ class AbundanceMatrix(Base):
         """
         str: The path to the local file to upload to the iHMP DCC.
         """
-        self.logger.debug("In local_file getter.")
+        self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
 
@@ -189,6 +189,7 @@ class AbundanceMatrix(Base):
         lipidomic, transcriptomic.
         """
         self.logger.debug("In 'matrix_type' getter.")
+
         return self._matrix_type
 
     @matrix_type.setter
@@ -214,6 +215,7 @@ class AbundanceMatrix(Base):
         be uploaded to the DCC. Defaults to false.
         """
         self.logger.debug("In 'private_files' getter.")
+
         return self._private_files
 
     @private_files.setter
@@ -239,6 +241,7 @@ class AbundanceMatrix(Base):
         int: The size of the file in bytes.
         """
         self.logger.debug("In 'size' getter.")
+
         return self._size
 
     @size.setter
@@ -255,6 +258,9 @@ class AbundanceMatrix(Base):
         """
         self.logger.debug("In 'size' setter.")
 
+        if size < 0:
+            raise ValueError("The size must be non-negative.")
+
         self._size = size
 
     @property
@@ -263,7 +269,8 @@ class AbundanceMatrix(Base):
         str: URL pointing to a description of the process used to generate
         the matrix.
         """
-        self.logger.debug("In sop getter.")
+        self.logger.debug("In 'sop' getter.")
+
         return self._sop
 
     @sop.setter
@@ -279,7 +286,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In sop setter.")
+        self.logger.debug("In 'sop' setter.")
 
         self._sop = sop
 
@@ -288,7 +295,8 @@ class AbundanceMatrix(Base):
         """
         str: One of the 3 studies that are part of the iHMP.
         """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
+
         return self._study
 
     @study.setter
@@ -303,7 +311,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         self._study = study
 
@@ -367,26 +375,11 @@ class AbundanceMatrix(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if self._private_files:
-            self.logger.info("User specified the files are private.")
-        else:
-            self.logger.info("Data is NOT private, so check that local_file is set.")
-            if self._local_file is None:
-                self.logger.error("Local file is not yet set.")
-                valid = False
-            elif not os.path.isfile(self._local_file):
-                self.logger.error("Local file does not point to an actual file.")
-                valid = False
-
-        if 'computed_from' not in self._links.keys():
-            self.logger.error("Must have a 'computed_from' linkage.")
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -590,7 +583,7 @@ class AbundanceMatrix(Base):
         """
         Loads the data for the specified input ID from the OSDF instance to
         this object. If the provided ID does not exist, then an error message
-        is provided stating the project does not exist.
+        is provided.
 
         Args:
             matrix_id (str): The OSDF ID for the document to load.
@@ -677,12 +670,11 @@ class AbundanceMatrix(Base):
     def save(self):
         """
         Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
+        instance is first validated. If the data is not valid, then the data
+        will not be saved. If the instance was saved previously, then the node
+        ID is assigned the alphanumeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful
+        save, will be assigned to the alphanumeric ID found in OSDF.
 
         Args:
             None

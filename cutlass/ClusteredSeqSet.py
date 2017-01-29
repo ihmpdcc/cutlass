@@ -26,6 +26,8 @@ class ClusteredSeqSet(Base):
     """
     namespace = "ihmp"
 
+    aspera_server = "aspera.ihmpdcc.org"
+
     date_format = '%Y-%m-%d'
 
     def __init__(self):
@@ -59,6 +61,8 @@ class ClusteredSeqSet(Base):
         # Optional properties
         self._date = None
         self._format_doc = None
+        self._local_file = None
+        self._private_files = None
         self._sop = None
 
     @property
@@ -211,6 +215,33 @@ class ClusteredSeqSet(Base):
         self._format_doc = format_doc
 
     @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
+
+    @property
     def sequence_type(self):
         """
         str: Specifies whether the file contains peptide or nucleotide data.
@@ -257,6 +288,9 @@ class ClusteredSeqSet(Base):
             None
         """
         self.logger.debug("In 'size' setter.")
+
+        if size < 0:
+            raise ValueError("The size must be non-negative.")
 
         self._size = size
 
@@ -374,6 +408,15 @@ class ClusteredSeqSet(Base):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link to an annotation.")
 
@@ -397,14 +440,11 @@ class ClusteredSeqSet(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'computed_from' not in self._links.keys():
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -414,9 +454,9 @@ class ClusteredSeqSet(Base):
     def _get_raw_doc(self):
         """
         Generates the raw JSON document for the current object. All required
-        fields are filled into the JSON document, regardless they are set or
-        not. Any remaining fields are included only if they are set. This
-        allows the user to visualize the JSON to ensure fields are set
+        fields are filled into the JSON document, regardless of whether they
+        were set or not. Any remaining fields are included only if they are
+        set. This allows the user to visualize the JSON to ensure fields are set
         appropriately before saving into the database.
 
         Args:
@@ -450,25 +490,29 @@ class ClusteredSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("ClusteredSeqSet object has the OSDF id set.")
+           self.logger.debug("Object has the OSDF id set.")
            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("ClusteredSeqSet object has the OSDF version set.")
+           self.logger.debug("Object has the OSDF version set.")
            doc['ver'] = self._version
 
-        # Handle ClusteredSeqSet optional properties
+        # Handle optional properties
         if self._date is not None:
-           self.logger.debug("ClusteredSeqSet object has the 'date' property set.")
+           self.logger.debug("Object has the 'date' property set.")
            doc['meta']['date'] = self._date
 
         if self._format_doc is not None:
-           self.logger.debug("ClusteredSeqSet object has the 'format_doc' property set.")
+           self.logger.debug("Object has the 'format_doc' property set.")
            doc['meta']['format_doc'] = self._format_doc
 
         if self._sop is not None:
-           self.logger.debug("ClusteredSeqSet object has the 'sop' property set.")
+           self.logger.debug("Object has the 'sop' property set.")
            doc['meta']['sop'] = self._sop
+
+        if self._private_files is not None:
+           self.logger.debug("Object has the 'private_files' property set.")
+           doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -484,8 +528,7 @@ class ClusteredSeqSet(Base):
         """
         module_logger.debug("In required fields.")
         return ("checksums", "comment", "format", "clustering_process",
-                "sequence_type", "size", "study", "local_file",
-                "tags")
+                "sequence_type", "size", "study", "tags")
 
     def delete(self):
         """
@@ -608,6 +651,9 @@ class ClusteredSeqSet(Base):
         if 'sop' in css_data['meta']:
             css._format = css_data['meta']['sop']
 
+        if 'private_files' in css_data['meta']:
+            css._private_files = css_data['meta']['private_files']
+
         module_logger.debug("Returning loaded ClusteredSeqSet.")
         return css
 
@@ -630,71 +676,16 @@ class ClusteredSeqSet(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         css_data = session.get_osdf().get_node(seq_set_id)
-
-        module_logger.info("Creating a template ClusteredSeqSet.")
-        css = ClusteredSeqSet()
-
-        module_logger.debug("Filling in ClusteredSeqSet details.")
-
-        # Node required fields
-        css._set_id(css_data['id'])
-        css._links = css_data['linkage']
-        css._version = css_data['ver']
-
-        # Required fields
-        css._checksums = css_data['meta']['checksums']
-        css._comment = css_data['meta']['comment']
-        css._format = css_data['meta']['format']
-        css._clustering_process = css_data['meta']['clustering_process']
-        css._sequence_type = css_data['meta']['sequence_type']
-        css._size = css_data['meta']['size']
-        css._study = css_data['meta']['study']
-        css._subtype = css_data['meta']['subtype']
-        css._tags = css_data['meta']['tags']
-        css._urls = css_data['meta']['urls']
-
-        # Handle ClusteredSeqSet optional properties
-        if 'date' in css_data['meta']:
-            css._date = css_data['meta']['date']
-
-        if 'format_doc' in css_data['meta']:
-            css._format_doc = css_data['meta']['format_doc']
-
-        if 'sop' in css_data['meta']:
-            css._sop = css_data['meta']['sop']
+        css = ClusteredSeqSet.load_clustered_seq_set(css_data)
 
         module_logger.debug("Returning loaded ClusteredSeqSet.")
+
         return css
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-        """
-        self.logger.debug("In save.")
-        aspera_server = "aspera.ihmpdcc.org"
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
+	session = iHMPSession.get_session()
         study = self._study
 
         study2dir = { "ibd": "ibd",
@@ -717,23 +708,59 @@ class ClusteredSeqSet(Base):
                                 "analysis", "hmgc", remote_base])
         self.logger.debug("Remote path for this file will be %s." % remote_path)
 
-        success = False
-
-        upload_result = aspera.upload_file(aspera_server,
+        upload_result = aspera.upload_file(ClusteredSeqSet.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence " + \
-                              "set. Aborting save.")
-            return success
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to load clustered sequence set.")
+	else:
+            self._urls = [ "fasp://" + ClusteredSeqSet.aspera_server + remote_path ]
 
-        self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, aspera_server))
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is first validated. If the data is not valid, then the data
+        will not be saved. If the instance was saved previously, then the node
+        ID is assigned the alphanumeric found in the OSDF instance. If not
+        saved previously, then the node ID is 'None', and upon a successful
+        save, will be assigned to the alpha numeric ID found in OSDF.
 
-        self._urls = [ "fasp://" + aspera_server + remote_path ]
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logg.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
+
+        success = False
 
         if self._id is None:
             # The document has not yet been saved
@@ -746,7 +773,8 @@ class ClusteredSeqSet(Base):
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(data)
+                node_id = osdf.insert_node(data)
+
                 self._set_id(node_id)
                 self._version = 1
 
@@ -762,18 +790,17 @@ class ClusteredSeqSet(Base):
             self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
-                cyto_data = self._get_raw_doc()
-                cyto_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % cyto_id)
-                session.get_osdf().edit_node(cyto_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                css_data = self._get_raw_doc()
+                css_id = self._id
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % css_id)
+                osdf.edit_node(css_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % css_id)
 
-                cyto_data = session.get_osdf().get_node(cyto_id)
-                latest_version = cyto_data['ver']
+                css_data = osdf.get_node(css_id)
+                latest_version = css_data['ver']
 
-                self._version = latest_version
                 self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
-
+                self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)
