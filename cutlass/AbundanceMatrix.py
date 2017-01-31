@@ -58,6 +58,7 @@ class AbundanceMatrix(Base):
 
         # Optional properties
         self._sop = None
+        self._private_files = None
 
     @property
     def checksums(self):
@@ -177,7 +178,7 @@ class AbundanceMatrix(Base):
         Returns:
             None
         """
-        self.logger.debug("In local_file setter.")
+        self.logger.debug("In 'local_file' setter.")
 
         self._local_file = local_file
 
@@ -205,6 +206,32 @@ class AbundanceMatrix(Base):
         self.logger.debug("In 'matrix_type' setter.")
 
         self._matrix_type = matrix_type
+
+    @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
 
     @property
     def size(self):
@@ -303,19 +330,25 @@ class AbundanceMatrix(Base):
         (valid, error_message) = session.get_osdf().validate_node(document)
 
         problems = []
+
         if not valid:
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
-        if self._local_file is None:
-            problems.append("Local file is not yet set.")
-        elif not os.path.isfile(self._local_file):
-            problems.append("Local file does not point to an actual file.")
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
 
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
+
         return problems
 
     def is_valid(self):
@@ -341,14 +374,19 @@ class AbundanceMatrix(Base):
 
         (valid, error_message) = session.get_osdf().validate_node(document)
 
-        if self._local_file is None:
-            self.logger.error("Must set the local file of the abundance matrix.")
-            valid = False
-        elif not os.path.isfile(self._local_file):
-            self.logger.error("Local file does not point to an actual file.")
-            valid = False
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                self.logger.error("Local file is not yet set.")
+                valid = False
+            elif not os.path.isfile(self._local_file):
+                self.logger.error("Local file does not point to an actual file.")
+                valid = False
 
         if 'computed_from' not in self._links.keys():
+            self.logger.error("Must have a 'computed_from' linkage.")
             valid = False
 
         self.logger.debug("Valid? %s" % str(valid))
@@ -358,8 +396,8 @@ class AbundanceMatrix(Base):
     def _get_raw_doc(self):
         """
         Generates the raw JSON document for the current object. All required
-        fields are filled into the JSON document, regardless of whether they
-        are set or not. Any remaining fields are included only if they are set.
+        fields are filled in, regardless of whether they are set or not. Any
+        remaining fields are included only if they are set.
 
         Args:
             None
@@ -392,17 +430,21 @@ class AbundanceMatrix(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Annotation object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Annotation object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._sop is not None:
-           self.logger.debug("Object has the 'sop' property set.")
-           doc['meta']['sop'] = self._sop
+            self.logger.debug("Object has the 'sop' property set.")
+            doc['meta']['sop'] = self._sop
+
+        if self._private_files is not None:
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -417,7 +459,7 @@ class AbundanceMatrix(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "comment", "format", "format_doc", "local_file",
+        return ("checksums", "comment", "format", "format_doc",
                 "matrix_type", "size", "study")
 
     def delete(self):
@@ -537,6 +579,9 @@ class AbundanceMatrix(Base):
         if 'sop' in matrix_data['meta']:
             matrix._sop = matrix_data['meta']['sop']
 
+        if 'private_files' in matrix_data['meta']:
+            matrix._private_files = matrix_data['meta']['private_files']
+
         module_logger.debug("Returning loaded %s." % __name__)
         return matrix
 
@@ -561,37 +606,14 @@ class AbundanceMatrix(Base):
         matrix_data = session.get_osdf().get_node(matrix_id)
         matrix = AbundanceMatrix.load_abundance_matrix(matrix_data)
 
+        module_logger.debug("Returning loaded %s." % __name__)
+
         return matrix
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
-
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
         study = self._study
 
         study2dir = { "ibd": "ibd",
@@ -646,15 +668,54 @@ class AbundanceMatrix(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the " + \
-                              "abundance matrix. Aborting save.")
-            return False
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to upload abundance matrix.")
         else:
             self._urls = [ "fasp://" + AbundanceMatrix.aspera_server + remote_path ]
 
-        osdf = session.get_osdf()
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously,
+        then the node ID is assigned the alpha numeric found in the OSDF
+        instance. If not saved previously, then the node ID is 'None', and upon
+        a successful, will be assigned to the alpha numeric ID found in OSDF.
+        Also, the version is updated as the data is saved in OSDF.
+
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
 
         success = False
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logger.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
 
         if self._id is None:
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
@@ -664,35 +725,40 @@ class AbundanceMatrix(Base):
             data = json.loads( self.to_json() )
 
             try:
+                self.logger.info("Attempting to save a new node.")
                 node_id = osdf.insert_node(data)
 
                 self._set_id(node_id)
                 self._version = 1
+
+                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
+                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+
                 success = True
             except Exception as e:
                 self.logger.exception(e)
-                self.logger.error("An error occurred when saving %s.", self)
+                self.logger.error("An error occurred while saving " + __name__ + ". " + \
+                                  "Reason: %s" % e)
         else:
-            self.logger.info("AbundanceMatrix already has an ID, " + \
-                             "so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
 
             try:
                 matrix_data = self._get_raw_doc()
-                self.logger.info("AbundanceMatrix already has an ID, " + \
-                                 "so we do an update (not an insert).")
                 matrix_id = self._id
-                self.logger.debug("AbundanceMatrix OSDF ID to update: %s." % matrix_id)
+                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % matrix_id)
                 osdf.edit_node(matrix_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % matrix_id)
 
                 matrix_data = osdf.get_node(matrix_id)
                 latest_version = matrix_data['ver']
 
-                self.logger.debug("The version of this AbundanceMatrix " + \
-                                  "is now: %s" % str(latest_version))
+                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
                 self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)
-                self.logger.error("An error occurred when updating %s.", self)
+                self.logger.error("An error occurred while updating " + \
+                                  "%s %s. Reason: %s.", (__name__, self._id, e))
 
+        self.logger.debug("Returning " + str(success))
         return success

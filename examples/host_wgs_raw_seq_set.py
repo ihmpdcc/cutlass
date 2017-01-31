@@ -11,6 +11,17 @@ import sys
 username = "test"
 password = "test"
 
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
+
 session = iHMPSession(username, password)
 
 print("Required fields: ")
@@ -33,6 +44,9 @@ temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
 seq_set.local_file = temp_file
+
+# Optional properties
+seq_set.private_files = False
 
 seq_set.links = { "sequenced_from": [ "88af6472fb03642dd5eaf8cddc70c8ec" ] }
 

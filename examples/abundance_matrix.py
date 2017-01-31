@@ -35,12 +35,13 @@ matrix = AbundanceMatrix()
 
 matrix.comment = "test comment"
 matrix.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
-matrix.format = "fastq"
+matrix.format = "csv"
 matrix.format_doc = "http://format.url"
 matrix.matrix_type = "host_cytokine"
 matrix.study = "prediabetes"
 matrix.size = 1000
 matrix.local_file = temp_file
+matrix.private_files = False
 
 # Optional properties
 matrix.sop = "the SOP"

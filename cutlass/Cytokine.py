@@ -26,6 +26,8 @@ class Cytokine(Base):
     """
     namespace = "ihmp"
 
+    aspera_server = "aspera.ihmpdcc.org"
+
     def __init__(self):
         """
         Constructor for the Cytokine class. This initializes the
@@ -52,6 +54,7 @@ class Cytokine(Base):
         self._comment = None
         self._format = None
         self._format_doc = None
+        self._private_files = None
 
     @property
     def checksums(self):
@@ -153,6 +156,32 @@ class Cytokine(Base):
         self._format_doc = format_doc
 
     @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
+
+    @property
     def study(self):
         """
         str: One of the 3 studies that are part of the iHMP.
@@ -238,11 +267,21 @@ class Cytokine(Base):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
+        if self._private_files:
+            self.logger.info("User specified the files are private.")
+        else:
+            self.logger.info("Data is NOT private, so check that local_file is set.")
+            if self._local_file is None:
+                problems.append("Local file is not yet set.")
+            elif not os.path.isfile(self._local_file):
+                problems.append("Local file does not point to an actual file.")
+
         if 'derived_from' not in self._links.keys():
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
 
         self.logger.debug("Number of validation problems: %s." % len(problems))
+
         return problems
 
     def is_valid(self):
@@ -309,25 +348,33 @@ class Cytokine(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Cytokine object has the OSDF id set.")
-           cyto_doc['id'] = self._id
+            self.logger.debug("Cytokine object has the OSDF id set.")
+            cyto_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Cytokine object has the OSDF version set.")
-           cyto_doc['ver'] = self._version
+            self.logger.debug("Cytokine object has the OSDF version set.")
+            cyto_doc['ver'] = self._version
 
         # Handle Cytokine optional properties
         if self._comment is not None:
-           self.logger.debug("Cytokine object has the 'comment' property set.")
-           cyto_doc['meta']['comment'] = self._comment
+            self.logger.debug("Cytokine object has the 'comment' property set.")
+            cyto_doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-           self.logger.debug("Cytokine object has the 'format' property set.")
-           cyto_doc['meta']['format'] = self._format
+            self.logger.debug("Cytokine object has the 'format' property set.")
+            cyto_doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-           self.logger.debug("Cytokine object has the 'format_doc' property set.")
-           cyto_doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Cytokine object has the 'format_doc' property set.")
+            cyto_doc['meta']['format_doc'] = self._format_doc
+
+        if self._format_doc is not None:
+            self.logger.debug("Cytokine object has the 'format_doc' property set.")
+            cyto_doc['meta']['format_doc'] = self._format_doc
+
+        if self._private_files is not None:
+            self.logger.debug("Object has the 'private_files' property set.")
+            cyto_doc['meta']['private_files'] = self._private_files
 
         return cyto_doc
 
@@ -342,7 +389,7 @@ class Cytokine(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "local_file", "study", "tags")
+        return ("checksums", "study", "tags")
 
     def delete(self):
         """
@@ -463,6 +510,9 @@ class Cytokine(Base):
         if 'format_doc' in cyto_data['meta']:
             cyto._format_doc = cyto_data['meta']['format_doc']
 
+        if 'private_files' in cyto_data['meta']:
+            cyto._private_files = cyto_data['meta']['private_files']
+
         module_logger.debug("Returning loaded Cytokine.")
         return cyto
 
@@ -485,68 +535,16 @@ class Cytokine(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         cyto_data = session.get_osdf().get_node(cyto_id)
-
-        module_logger.info("Creating a template Cytokine.")
-        cyto = Cytokine()
-
-        module_logger.debug("Filling in Cytokine details.")
-
-        # Node required fields
-        cyto._set_id(cyto_data['id'])
-        cyto._links = cyto_data['linkage']
-        cyto._version = cyto_data['ver']
-
-        # Required fields
-        cyto._checksums = cyto_data['meta']['checksums']
-        cyto._format = cyto_data['meta']['format']
-        cyto._format_doc = cyto_data['meta']['format_doc']
-        cyto._study = cyto_data['meta']['study']
-        cyto._tags = cyto_data['meta']['tags']
-        cyto._urls = cyto_data['meta']['urls']
-
-        # Handle Cytokine optional properties
-        if 'comment' in cyto_data['meta']:
-            cyto._comment = cyto_data['meta']['comment']
-
-        if 'format' in cyto_data['meta']:
-            cyto._format = cyto_data['meta']['format']
-
-        if 'format_doc' in cyto_data['meta']:
-            cyto._format_doc = cyto_data['meta']['format_doc']
+        cyto = Cytokine.load_cytokine(cyto_data)
 
         module_logger.debug("Returning loaded Cytokine.")
+
         return cyto
 
-    def save(self):
-        """
-        Saves the data in OSDF. The JSON form of the current data for the
-        instance is validated in the save function. If the data is not valid,
-        then the data will not be saved. If the instance was saved previously,
-        then the node ID is assigned the alpha numeric found in the OSDF
-        instance. If not saved previously, then the node ID is 'None', and upon
-        a successful, will be assigned to the alpha numeric ID found in OSDF.
-        Also, the version is updated as the data is saved in OSDF.
-
-        Args:
-            None
-
-        Returns;
-            True if successful, False otherwise.
-
-        """
-        self.logger.debug("In save.")
-        aspera_server = "aspera.ihmpdcc.org"
-
-        # If node previously saved, use edit_node instead since ID
-        # is given (an update in a way)
-        # can also use get_node to check if the node already exists
-        if not self.is_valid():
-            self.logger.error("Cannot save, data is invalid.")
-            return False
+    def _upload_data(self):
+        self.logger.debug("In _upload_data.")
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
         study = self._study
 
         study2dir = { "ibd": "ibd",
@@ -570,21 +568,63 @@ class Cytokine(Base):
 
         success = False
 
-        upload_result = aspera.upload_file(aspera_server,
+        upload_result = aspera.upload_file(Cytokine.aspera_server,
                                            session.username,
                                            session.password,
                                            self._local_file,
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence " + \
-                              "set. Aborting save.")
-            return success
+            self.logger.error("Experienced an error uploading the data. " + \
+                              "Aborting save.")
+            raise Exception("Unable to upload cytokine.")
 
         self.logger.info("Uploaded the %s to the iHMP Aspera server (%s) successfully." %
-                         (self._local_file, aspera_server))
+                         (self._local_file, Cytokine.aspera_server))
 
-        self._urls = [ "fasp://" + aspera_server + remote_path ]
+        self._urls = [ "fasp://" + Cytokine.aspera_server + remote_path ]
+
+
+    def save(self):
+        """
+        Saves the data in OSDF. The JSON form of the current data for the
+        instance is validated in the save function. If the data is not valid,
+        then the data will not be saved. If the instance was saved previously,
+        then the node ID is assigned the alpha numeric found in the OSDF
+        instance. If not saved previously, then the node ID is 'None', and upon
+        a successful, will be assigned to the alpha numeric ID found in OSDF.
+        Also, the version is updated as the data is saved in OSDF.
+
+        Args:
+            None
+
+        Returns;
+            True if successful, False otherwise.
+
+        """
+        self.logger.debug("In save.")
+
+        # If node previously saved, use edit_node instead since ID
+        # is given (an update in a way)
+        # can also use get_node to check if the node already exists
+        if not self.is_valid():
+            self.logger.error("Cannot save, data is invalid.")
+            return False
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        if self._private_files:
+            self._urls = [ "<private>" ]
+        else:
+            try:
+                self._upload_data()
+            except Exception as e:
+                self.logg.exception(e)
+                # Don't bother continuing...
+                return False
+
+        osdf = session.get_osdf()
 
         if self._id is None:
             # The document has not yet been saved
@@ -597,7 +637,8 @@ class Cytokine(Base):
 
             try:
                 self.logger.info("Attempting to save a new node.")
-                node_id = session.get_osdf().insert_node(data)
+                node_id = osdf.insert_node(data)
+
                 self._set_id(node_id)
                 self._version = 1
 
@@ -616,15 +657,14 @@ class Cytokine(Base):
                 cyto_data = self._get_raw_doc()
                 cyto_id = self._id
                 self.logger.info("Attempting to update " + __name__ + " with ID: %s." % cyto_id)
-                session.get_osdf().edit_node(cyto_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                osdf.edit_node(cyto_data)
+                self.logger.info("Update for " + __name__ + " %s successful." % cyto_id)
 
-                cyto_data = session.get_osdf().get_node(cyto_id)
+                cyto_data = osdf.get_node(cyto_id)
                 latest_version = cyto_data['ver']
 
-                self._version = latest_version
                 self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
-
+                self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)

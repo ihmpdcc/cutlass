@@ -11,6 +11,7 @@ from cutlass import iHMPSession
 from cutlass import WgsRawSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -18,11 +19,13 @@ def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
 class WgsRawSeqSetTest(unittest.TestCase):
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -53,8 +56,11 @@ class WgsRawSeqSetTest(unittest.TestCase):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
         comment = "Test comment"
+        private_files = False
 
         wgsRawSeqSet.comment = comment
+        wgsRawSeqSet.private_files = private_files
+
         wgsRawSeqSet_json = None
 
         try:
@@ -86,6 +92,9 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.assertEqual(wgsRawSeqSet_data['meta']['comment'],
                          comment, "'comment' in JSON had expected value.")
 
+        self.assertEqual(wgsRawSeqSet_data['meta']['private_files'],
+                         private_files, "'private_files' in JSON had expected value.")
+
     def testId(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
@@ -104,27 +113,12 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             wgsRawSeqSet.version = "test"
 
-    def testCommentIllegal(self):
+    def testComment(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
-        with self.assertRaises(Exception):
-            wgsRawSeqSet.comment = 1
+        self.util.stringTypeTest(self, wgsRawSeqSet, "comment")
 
-    def testCommentLegal(self):
-        wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-        success = False
-        comment = "This is a test comment"
-
-        try:
-            wgsRawSeqSet.comment = comment
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the comment setter")
-
-        self.assertEqual(wgsRawSeqSet.comment, comment,
-                         "Property getter for 'comment' works.")
+        self.util.stringPropertyTest(self, wgsRawSeqSet, "comment")
 
     def testExpLengthNegative(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
@@ -132,26 +126,17 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.exp_length = -1
 
-    def testExpLengthLegal(self):
+    def testExpLength(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-        success = False
-        exp_length = 1020
 
-        try:
-            wgsRawSeqSet.exp_length = exp_length
-            success = True
-        except:
-            pass
+        self.util.intTypeTest(self, wgsRawSeqSet, "exp_length")
 
-        self.assertTrue(success, "Able to use the exp_length setter")
-
-        self.assertEqual(wgsRawSeqSet.exp_length, exp_length,
-                         "Property getter for 'exp_length' works.")
+        self.util.intPropertyTest(self, wgsRawSeqSet, "exp_length")
 
     def testChecksumsLegal(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
-        checksums = {"md5":"asdf32qrfrae"}
+        checksums = { "md5": "asdf32qrfrae" }
 
         try:
             wgsRawSeqSet.checksums= checksums
@@ -186,21 +171,20 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.format = "asbdasidsa"
 
-    def testFormatDocLegal(self):
+    def testFormatDoc(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
-        format_doc = "http://www.google.com"
 
-        try:
-            wgsRawSeqSet.format_doc = format_doc
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, wgsRawSeqSet, "format_doc")
 
-        self.assertTrue(success, "Able to use the format_doc setter")
+        self.util.stringPropertyTest(self, wgsRawSeqSet, "format_doc")
 
-        self.assertEqual(wgsRawSeqSet.format_doc, format_doc,
-                         "Property getter for 'format_doc' works.")
+    def testPrivateFiles(self):
+        wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
+
+        self.util.boolTypeTest(self, wgsRawSeqSet, "private_files")
+
+        self.util.boolPropertyTest(self, wgsRawSeqSet, "private_files")
 
     def testSequenceTypeLegal(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
@@ -224,36 +208,19 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.sequence_type = "asbdasidsa"
 
-    def testSeqModelLegal(self):
+    def testSeqModel(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-        success = False
-        seq_model = "Test seq model"
 
-        try:
-            wgsRawSeqSet.seq_model = seq_model
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, wgsRawSeqSet, "seq_model")
 
-        self.assertTrue(success, "Able to use the seq_model setter")
+        self.util.stringPropertyTest(self, wgsRawSeqSet, "seq_model")
 
-        self.assertEqual(wgsRawSeqSet.seq_model, seq_model,
-                         "Property getter for 'seq_model' works.")
-
-    def testSizeLegal(self):
+    def testSize(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-        success = False
-        size = 10
 
-        try:
-            wgsRawSeqSet.size = size
-            success = True
-        except:
-            pass
+        self.util.intTypeTest(self, wgsRawSeqSet, "size")
 
-        self.assertTrue(success, "Able to use the size setter")
-
-        self.assertEqual(wgsRawSeqSet.size, size, "Property getter for 'size' works.")
+        self.util.intPropertyTest(self, wgsRawSeqSet, "size")
 
     def testSizeNegative(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
@@ -282,12 +249,6 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.study = "adfadsf"
 
-    def testSRSIDIllegal(self):
-        wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-
-        with self.assertRaises(Exception):
-            wgsRawSeqSet.study = 1
-
     def testTags(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
@@ -307,7 +268,6 @@ class WgsRawSeqSetTest(unittest.TestCase):
 
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
-
 
     def testAddTag(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
@@ -348,7 +308,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         test_comment = "Test comment"
-        checksums = {"md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
+        checksums = { "md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb" }
         exp_length = 100
         test_format = "fasta"
         format_doc = "http://www.google.com"

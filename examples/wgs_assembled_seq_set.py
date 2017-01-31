@@ -11,6 +11,17 @@ import sys
 username = "test"
 password = "test"
 
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
+
 session = iHMPSession(username, password)
 
 print("Creating a temp file for example/testing purposes.")
@@ -33,6 +44,7 @@ seq_set.size = 5000
 seq_set.study = "prediabetes"
 seq_set.links = { "computed_from": [ "b9af32d3ab623bcfbdce2ea3a502c015" ] }
 seq_set.local_file = temp_file
+seq_set.private_files = True
 
 seq_set.tags = [ "test", "wgs", "ihmp" ]
 seq_set.add_tag("another")

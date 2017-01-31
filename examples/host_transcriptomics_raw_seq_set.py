@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -42,6 +45,7 @@ htrss.exp_length = 2000
 htrss.comment = "test host transcriptomics_raw_seq_set comment"
 htrss.format = "fasta"
 htrss.format_doc = "the format url"
+htrss.private_files = True
 
 # HostTranscriptomicsRawSeqSets are 'sequenced_from' HostSeqPrep nodes
 htrss.links = { "sequenced_from": [ "88af6472fb03642dd5eaf8cddc70c8ec" ] }

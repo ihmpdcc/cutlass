@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -39,6 +42,7 @@ cyto.local_file = temp_file
 cyto.comment = "test cytokine comment"
 cyto.format = "gff3"
 cyto.format_doc = "the format url"
+cyto.private_files = False
 
 # Cytokines are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps
 cyto.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b93c50" ] }
