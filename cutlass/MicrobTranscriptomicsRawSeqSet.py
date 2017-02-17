@@ -526,7 +526,7 @@ class MicrobTranscriptomicsRawSeqSet(Base):
         return result_list
 
     @staticmethod
-    def load_microb_transcriptomics_raw_set_set(seq_set_data):
+    def load_microb_transcriptomics_raw_seq_set(seq_set_data):
         """
         Takes the provided JSON string and converts it to a
         MicrobTranscriptomicsRawSeqSet object.
