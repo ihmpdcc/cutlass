@@ -8,16 +8,19 @@ from pprint import pprint
 import tempfile
 import sys
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
-
 username = "test"
 password = "test"
+
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -40,8 +43,11 @@ print("Creating a temp file for example/testing purposes.")
 temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
+# Optional properties
 seq_set.local_file = temp_file
+seq_set.private_files = False
 
+# SixteenSTrimmedSeqSet nodes are 'computed_from' 16s_raw_seq_set nodes
 seq_set.links = { "computed_from": [ "610a4911a5ca67de12cdc1e4b4014cd0" ] }
 
 seq_set.tags = [ "16s_trimmed_seq_set", "ihmp" ]

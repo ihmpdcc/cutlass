@@ -40,6 +40,7 @@ class AbundanceMatrix(Base):
 
         self.logger.addHandler(logging.NullHandler())
 
+        # These are common to all objects
         self._id = None
         self._version = None
         self._links = {}
@@ -363,7 +364,7 @@ class AbundanceMatrix(Base):
         """
         Validates the current object's data/JSON against the current schema
         in the OSDF instance for the specific object. However, unlike
-        validates(), this method does not provide exact error messages,
+        validate(), this method does not provide exact error messages,
         it states if the validation was successful or not.
 
         Args:
@@ -378,6 +379,7 @@ class AbundanceMatrix(Base):
         problems = self.validate()
 
         valid = True
+
         if len(problems):
             self.logger.error("There were %s problems." % str(len(problems)))
             valid = False
@@ -553,6 +555,8 @@ class AbundanceMatrix(Base):
         matrix = AbundanceMatrix()
 
         module_logger.debug("Filling in %s details." % __name__)
+
+        # The attributes commmon to all iHMP nodes
         matrix._set_id(matrix_data['id'])
         matrix._links = matrix_data['linkage']
         matrix._version = matrix_data['ver']
