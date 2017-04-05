@@ -48,25 +48,11 @@ class ViralSeqSetTest(unittest.TestCase):
         self.failIf(vss is None)
 
     def testComment(self):
-        vss = self.session.create_viral_seq_set()
+        seq_set = self.session.create_viral_seq_set()
 
-        with self.assertRaises(ValueError):
-            vss.comment = 3
+        self.util.stringTypeTest(self, seq_set, "comment")
 
-        with self.assertRaises(ValueError):
-            vss.comment = {}
-
-        with self.assertRaises(ValueError):
-            vss.comment = []
-
-        with self.assertRaises(ValueError):
-            vss.comment = 3.5
-
-        comment = "test viral_seq_set comment"
-        vss.comment = comment
-
-        self.assertEquals(comment, vss.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, seq_set, "comment")
 
     def testChecksums(self):
         vss = self.session.create_viral_seq_set()
@@ -85,52 +71,18 @@ class ViralSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormat(self):
-        vss = self.session.create_viral_seq_set()
+        seq_set = self.session.create_viral_seq_set()
 
-        with self.assertRaises(ValueError):
-            vss.format = 30
+        self.util.stringTypeTest(self, seq_set, "format")
 
-        with self.assertRaises(ValueError):
-            vss.format = True
-
-        with self.assertRaises(ValueError):
-            vss.format = {}
-
-        with self.assertRaises(ValueError):
-            vss.format = []
-
-        with self.assertRaises(ValueError):
-            vss.format = 3.5
-
-        format = "test format"
-        vss.format = format
-
-        self.assertEquals(format, vss.format,
-                          "format property works.")
+        self.util.stringPropertyTest(self, seq_set, "format")
 
     def testFormatDoc(self):
-        vss = self.session.create_viral_seq_set()
+        seq_set = self.session.create_viral_seq_set()
 
-        with self.assertRaises(ValueError):
-            vss.format_doc = 30
+        self.util.stringTypeTest(self, seq_set, "format_doc")
 
-        with self.assertRaises(ValueError):
-            vss.format_doc = True
-
-        with self.assertRaises(ValueError):
-            vss.format_doc = {}
-
-        with self.assertRaises(ValueError):
-            vss.format_doc = []
-
-        with self.assertRaises(ValueError):
-            vss.format_doc = 3.5
-
-        format_doc = "test format_doc"
-        vss.format_doc = format_doc
-
-        self.assertEquals(format_doc, vss.format_doc,
-                          "format_doc property works.")
+        self.util.stringPropertyTest(self, seq_set, "format_doc")
 
     def testPrivateFiles(self):
         vss = self.session.create_viral_seq_set()
