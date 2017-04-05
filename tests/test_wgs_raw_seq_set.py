@@ -120,18 +120,18 @@ class WgsRawSeqSetTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, wgsRawSeqSet, "comment")
 
-    def testExpLengthNegative(self):
-        wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-
-        with self.assertRaises(Exception):
-            wgsRawSeqSet.exp_length = -1
-
     def testExpLength(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.intTypeTest(self, wgsRawSeqSet, "exp_length")
 
         self.util.intPropertyTest(self, wgsRawSeqSet, "exp_length")
+
+    def testExpLengthNegative(self):
+        wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
+
+        with self.assertRaises(Exception):
+            wgsRawSeqSet.exp_length = -1
 
     def testChecksumsLegal(self):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
