@@ -11,13 +11,16 @@ import sys
 username = "test"
 password = "test"
 
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
+def set_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -42,6 +45,7 @@ mtrss.exp_length = 2000
 mtrss.comment = "test microb_transcriptomics_raw_seq_set comment"
 mtrss.format = "fasta"
 mtrss.format_doc = "the format url"
+mtrss.private_files = False
 
 # MicrobTranscriptomicsRawSeqSets are 'sequenced_from' WgsDnaPrep nodes
 mtrss.links = { "sequenced_from": [ "b9af32d3ab623bcfbdce2ea3a5016b61" ] }
@@ -68,9 +72,11 @@ if mtrss.is_valid():
         deletion_success = mtrss.delete()
 
         if deletion_success:
-            print("Deleted microb_transcriptomics_raw_seq_set with ID %s" % mtrss_id)
+            print("Deleted microb_transcriptomics_raw_seq_set " + \
+                  "with ID %s" % mtrss_id)
         else:
-            print("Deletion of microb_transcriptomics_raw_seq_set %s failed." % mtrss_id)
+            print("Deletion of microb_transcriptomics_raw_seq_set " + \
+                  "%s failed." % mtrss_id)
     else:
         print("Save failed")
 else:

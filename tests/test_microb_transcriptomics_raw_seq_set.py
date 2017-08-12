@@ -8,9 +8,19 @@ import tempfile
 from cutlass import iHMPSession
 from cutlass import MicrobTranscriptomicsRawSeqSet
 
-session = iHMPSession("bar", "bar")
+from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
+
+    session = None
+    util = None
+
+    @classmethod
+    def setUpClass(cls):
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
         success = False
@@ -28,7 +38,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
         mtrss = None
 
         try:
-            mtrss = session.create_microb_transcriptomics_raw_seq_set()
+            mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
             success = True
         except:
@@ -38,28 +48,14 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
         self.failIf(mtrss is None)
 
     def testComment(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.comment = 3
+        self.util.stringTypeTest(self, mtrss, "comment")
 
-        with self.assertRaises(ValueError):
-            mtrss.comment = {}
-
-        with self.assertRaises(ValueError):
-            mtrss.comment = []
-
-        with self.assertRaises(ValueError):
-            mtrss.comment = 3.5
-
-        comment = "test microb_transcriptomics_raw_seq_set comment"
-        mtrss.comment = comment
-
-        self.assertEquals(comment, mtrss.comment,
-                          "comment property works.")
+        self.util.stringPropertyTest(self, mtrss, "comment")
 
     def testChecksums(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
@@ -75,127 +71,54 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testExpLength(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.exp_length = "test exp_length"
+	self.util.intTypeTest(self, mtrss, "exp_length")
 
-        with self.assertRaises(ValueError):
-            mtrss.exp_length = True
+        self.util.intPropertyTest(self, mtrss, "exp_length")
 
-        with self.assertRaises(ValueError):
-            mtrss.exp_length = {}
+    def testExpLengthNegative(self):
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.exp_length = []
-
-        with self.assertRaises(ValueError):
-            mtrss.exp_length = 3.5
-
-        exp_length = 13
-        mtrss.exp_length = exp_length
-
-        self.assertEquals(exp_length, mtrss.exp_length,
-                          "exp_length property works.")
+        with self.assertRaises(Exception):
+            mtrss.exp_length = -1
 
     def testFormat(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.format = 30
+        self.util.stringTypeTest(self, mtrss, "format")
 
-        with self.assertRaises(ValueError):
-            mtrss.format = True
-
-        with self.assertRaises(ValueError):
-            mtrss.format = {}
-
-        with self.assertRaises(ValueError):
-            mtrss.format = []
-
-        with self.assertRaises(ValueError):
-            mtrss.format = 3.5
-
-        format = "test format"
-        mtrss.format = format
-
-        self.assertEquals(format, mtrss.format,
-                          "format property works.")
+        self.util.stringPropertyTest(self, mtrss, "format")
 
     def testFormatDoc(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.format_doc = 30
+        self.util.stringTypeTest(self, mtrss, "format_doc")
 
-        with self.assertRaises(ValueError):
-            mtrss.format_doc = True
-
-        with self.assertRaises(ValueError):
-            mtrss.format_doc = {}
-
-        with self.assertRaises(ValueError):
-            mtrss.format_doc = []
-
-        with self.assertRaises(ValueError):
-            mtrss.format_doc = 3.5
-
-        format_doc = "test format_doc"
-        mtrss.format_doc = format_doc
-
-        self.assertEquals(format_doc, mtrss.format_doc,
-                          "format_doc property works.")
+        self.util.stringPropertyTest(self, mtrss, "format_doc")
 
     def testSeqModel(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.seq_model = 30
+        self.util.stringTypeTest(self, mtrss, "seq_model")
 
-        with self.assertRaises(ValueError):
-            mtrss.seq_model = True
-
-        with self.assertRaises(ValueError):
-            mtrss.seq_model = {}
-
-        with self.assertRaises(ValueError):
-            mtrss.seq_model = []
-
-        with self.assertRaises(ValueError):
-            mtrss.seq_model = 3.5
-
-        seq_model = "test seq_model"
-        mtrss.seq_model = seq_model
-
-        self.assertEquals(seq_model, mtrss.seq_model,
-                          "seq_model property works.")
+        self.util.stringPropertyTest(self, mtrss, "seq_model")
 
     def testSize(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.size = "test size"
+        self.util.intTypeTest(self, mtrss, "size")
 
-        with self.assertRaises(ValueError):
-            mtrss.size = True
+        self.util.intPropertyTest(self, mtrss, "size")
 
-        with self.assertRaises(ValueError):
-            mtrss.size = {}
+    def testSizeNegative(self):
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
-        with self.assertRaises(ValueError):
-            mtrss.size = []
-
-        with self.assertRaises(ValueError):
-            mtrss.size = 3.5
-
-        size = 30
-        mtrss.size = size
-
-        self.assertEquals(size, mtrss.size,
-                          "size property works.")
+        with self.assertRaises(Exception):
+            mtrss.size = -1
 
     def testStudy(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
         with self.assertRaises(ValueError):
             mtrss.study = 30
@@ -218,68 +141,8 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
         self.assertEquals(study, mtrss.study,
                           "study property works.")
 
-    def testToJson(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
-        success = False
-
-        comment = "test microb_transcriptomics_raw_seq_set comment"
-        study = "prediabetes"
-        format_ = "fasta"
-        format_doc = "test_format_doc"
-
-        mtrss.comment = comment
-        mtrss.study = study
-        mtrss.format = format_
-        mtrss.format_doc = format_doc
-
-        mtrss_json = None
-
-        try:
-            mtrss_json = mtrss.to_json()
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'to_json'.")
-        self.assertTrue(mtrss_json is not None, "to_json() returned data.")
-
-        parse_success = False
-
-        try:
-            mtrss_data = json.loads(mtrss_json)
-            parse_success = True
-        except:
-            pass
-
-        self.assertTrue(parse_success,
-                        "to_json() did not throw an exception.")
-        self.assertTrue(mtrss_data is not None,
-                        "to_json() returned parsable JSON.")
-
-        self.assertTrue('meta' in mtrss_data, "JSON has 'meta' key in it.")
-
-        self.assertEqual(mtrss_data['meta']['comment'],
-                         comment,
-                         "'comment' in JSON had expected value."
-                         )
-
-        self.assertEqual(mtrss_data['meta']['format'],
-                         format_,
-                         "'format' in JSON had expected value."
-                         )
-
-        self.assertEqual(mtrss_data['meta']['study'],
-                         study,
-                         "'study' in JSON had expected value."
-                         )
-
-        self.assertEqual(mtrss_data['meta']['format_doc'],
-                         format_doc,
-                         "'format_doc' in JSON had expected value."
-                         )
-
     def testId(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
         self.assertTrue(mtrss.id is None,
                         "New template microb_transcriptomics_raw_seq_set " + \
@@ -289,7 +152,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
             mtrss.id = "test"
 
     def testVersion(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
         self.assertTrue(mtrss.version is None,
                         "New template microb_transcriptomics_raw_seq_set has no version.")
@@ -298,7 +161,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
             mtrss.version = "test"
 
     def testTags(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
         tags = mtrss.tags
         self.assertTrue(type(tags) == list, "MicrobTranscriptomicsRawSeqSet " + \
@@ -321,7 +184,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
 
         mtrss.add_tag("test")
         self.assertEqual(mtrss.tags, [ "test" ],
@@ -352,23 +215,21 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
         self.assertTrue(len(required) > 0,
                         "required_fields() did not return empty value.")
 
-    def testDataInJson(self):
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
-
+    def testToJson(self):
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
         success = False
-        comment = "test_comment"
+
+        comment = "test microb_transcriptomics_raw_seq_set comment"
+        study = "prediabetes"
         format_ = "fasta"
         format_doc = "test_format_doc"
-        exp_length = 200
-        size = 1313
-        study = "prediabetes"
+        private_files = False
 
         mtrss.comment = comment
-        mtrss.exp_length = exp_length
+        mtrss.study = study
         mtrss.format = format_
         mtrss.format_doc = format_doc
-        mtrss.size = size
-        mtrss.study = study
+        mtrss.private_files = private_files
 
         mtrss_json = None
 
@@ -401,24 +262,9 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
                          "'comment' in JSON had expected value."
                          )
 
-        self.assertEqual(mtrss_data['meta']['exp_length'],
-                         exp_length,
-                         "'exp_length' in JSON had expected value."
-                         )
-
         self.assertEqual(mtrss_data['meta']['format'],
                          format_,
                          "'format' in JSON had expected value."
-                         )
-
-        self.assertEqual(mtrss_data['meta']['format_doc'],
-                         format_doc,
-                         "'format_doc' in JSON had expected value."
-                         )
-
-        self.assertEqual(mtrss_data['meta']['size'],
-                         size,
-                         "'size' in JSON had expected value."
                          )
 
         self.assertEqual(mtrss_data['meta']['study'],
@@ -426,44 +272,65 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
                          "'study' in JSON had expected value."
                          )
 
+        self.assertEqual(mtrss_data['meta']['format_doc'],
+                         format_doc,
+                         "'format_doc' in JSON had expected value."
+                         )
+
+        self.assertEqual(mtrss_data['meta']['private_files'],
+                         private_files,
+                         "'private_files' in JSON had expected value."
+                         )
+
     def testLoadSaveDeleteMicrobTranscriptomicsRawSeqSet(self):
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
         # Attempt to save the microb_transcriptomics_raw_seq_set at all points
         # before and after adding the required fields
-        mtrss = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss = self.session.create_microb_transcriptomics_raw_seq_set()
+
+        test_comment = "Test microb_transcriptomics_raw_seq_set comment"
+        checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
+        exp_length = 1313
+        test_format = "fasta"
+        format_doc = "Test format_doc"
+        seq_model = "sequencer model 1.0"
+        study = "prediabetes"
+        size = 200
+        test_links = {"sequenced_from": ["b9af32d3ab623bcfbdce2ea3a5016b61"]}
+        tag = "Test tag"
+
         self.assertFalse(
                 mtrss.save(),
                 "MicrobTranscriptomicsRawSeqSet not saved successfully, " + \
                 "no required fields"
                 )
 
-        mtrss.comment = "Test microb_transcriptomics_raw_seq_set comment"
+        mtrss.comment = test_comment
 
-        self.assertFalse(
-            mtrss.save(),
-            "MicrobTranscriptomicsRawSeqSet not saved successfully, " + \
-            "missing some required fields."
-            )
+        self.assertFalse(mtrss.save(),
+            "MicrobTranscriptomicsRawSeqSet not saved successfully")
 
-        # MicrobTranscriptomicsRawSeqSet nodes are "sequenced_from" WgsDnaPrep
-        # nodes
-        mtrss.links = {"sequenced_from": ["b9af32d3ab623bcfbdce2ea3a5016b61"]}
+        mtrss.checksums = checksums
 
-        mtrss.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
-        mtrss.exp_length = 1313
-        mtrss.format = "fasta"
-        mtrss.format_doc = "Test format_doc"
-        mtrss.seq_model = "sequrencer model 1.0"
-        mtrss.study = "prediabetes"
+        self.assertFalse(mtrss.save(),
+            "MicrobTranscriptomicsRawSeqSet not saved successfully")
+
+        mtrss.links = test_links
+
+        self.assertFalse(mtrss.save(),
+            "MicrobTranscriptomicsRawSeqSet not saved successfully")
+
+        mtrss.exp_length = exp_length
+        mtrss.format = test_format
+        mtrss.format_doc = format_doc
+        mtrss.seq_model = seq_model
+        mtrss.study = study
         mtrss.local_file = temp_file
-        mtrss.size = 200
+        mtrss.size = size
+        mtrss.add_tag(tag)
 
-        mtrss.add_tag("test")
-        mtrss.add_tag("microb_transcriptomics_raw_seq_set")
-
-        # Make sure microb_transcriptomics_raw_seq_set does not delete if it
-        # does not exist
+        # Make sure seq_set does not delete if it does not exist
         with self.assertRaises(Exception):
             mtrss.delete()
 
@@ -472,7 +339,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
 
         # Load the microb_transcriptomics_raw_seq_set that was just saved
         # from the OSDF instance
-        mtrss_loaded = session.create_microb_transcriptomics_raw_seq_set()
+        mtrss_loaded = self.session.create_microb_transcriptomics_raw_seq_set()
         mtrss_loaded = mtrss.load(mtrss.id)
 
         # Check all fields were saved and loaded successfully
@@ -489,7 +356,7 @@ class MicrobTranscriptomicsRawSeqSetTest(unittest.TestCase):
 
         # The microb_transcriptomics_raw_seq_set of the initial ID should
         # not load successfully
-        load_test = session.create_microb_transcriptomics_raw_seq_set()
+        load_test = self.session.create_microb_transcriptomics_raw_seq_set()
         with self.assertRaises(Exception):
             load_test = load_test.load(mtrss.id)
 

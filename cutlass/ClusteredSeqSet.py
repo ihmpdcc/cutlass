@@ -42,6 +42,7 @@ class ClusteredSeqSet(Base):
 
         self.logger.addHandler(logging.NullHandler())
 
+        # These are common to all objects
         self._id = None
         self._version = None
         self._links = {}
@@ -215,6 +216,32 @@ class ClusteredSeqSet(Base):
         self._format_doc = format_doc
 
     @property
+    def local_file(self):
+        """
+        str: Path to the local file to upload to the server.
+        """
+        self.logger.debug("In 'local_file' getter.")
+
+        return self._local_file
+
+    @local_file.setter
+    @enforce_string
+    def local_file(self, local_file):
+        """
+        The setter for the ClusteredSeqSet local file.
+
+        Args:
+            local_file (str): The path to the local file that should be uploaded
+            to the server.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'local_file' setter.")
+
+        self._local_file = local_file
+
+    @property
     def private_files(self):
         """
         bool: Whether this object describes private data that should not
@@ -346,32 +373,6 @@ class ClusteredSeqSet(Base):
         self._study = study
 
     @property
-    def local_file(self):
-        """
-        str: Path to the local file to upload to the server.
-        """
-        self.logger.debug("In 'local_file' getter.")
-
-        return self._local_file
-
-    @local_file.setter
-    @enforce_string
-    def local_file(self, local_file):
-        """
-        The setter for the ClusteredSeqSet local file.
-
-        Args:
-            local_file (str): The path to the local file that should be uploaded
-            to the server.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'local_file' setter.")
-
-        self._local_file = local_file
-
-    @property
     def urls(self):
         """
         array: An array of string URLs from where the file can be obtained,
@@ -404,6 +405,7 @@ class ClusteredSeqSet(Base):
         (valid, error_message) = session.get_osdf().validate_node(document)
 
         problems = []
+
         if not valid:
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
@@ -629,7 +631,9 @@ class ClusteredSeqSet(Base):
         module_logger.info("Creating a template ClusteredSeqSet.")
         css = ClusteredSeqSet()
 
-        module_logger.debug("Filling in ClusteredSeqSet details.")
+        module_logger.debug("Filling in " + __name__ + " details.")
+
+        # The attributes commmon to all iHMP nodes
         css._set_id(css_data['id'])
         css._links = css_data['linkage']
         css._version = css_data['ver']
@@ -654,7 +658,8 @@ class ClusteredSeqSet(Base):
         if 'private_files' in css_data['meta']:
             css._private_files = css_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded ClusteredSeqSet.")
+        module_logger.debug("Returning loaded " + __name__)
+
         return css
 
     @staticmethod
@@ -728,7 +733,7 @@ class ClusteredSeqSet(Base):
         will not be saved. If the instance was saved previously, then the node
         ID is assigned the alphanumeric found in the OSDF instance. If not
         saved previously, then the node ID is 'None', and upon a successful
-        save, will be assigned to the alpha numeric ID found in OSDF.
+        save, will be assigned to the alphanumeric ID found in OSDF.
 
         Args:
             None
