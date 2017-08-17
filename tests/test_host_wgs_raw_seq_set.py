@@ -40,44 +40,44 @@ class HostWgsRawSeqSetTest(unittest.TestCase):
 
     def testSessionCreate(self):
         success = False
-        hostWgsRawSeqSet = None
+        seq_set = None
 
         try:
-            hostWgsRawSeqSet = self.session.create_object("host_wgs_raw_seq_set")
+            seq_set = self.session.create_object("host_wgs_raw_seq_set")
 
             success = True
         except:
             pass
 
         self.failUnless(success)
-        self.failIf(hostWgsRawSeqSet is None)
+        self.failIf(seq_set is None)
 
     def testToJson(self):
-        hostWgsRawSeqSet = self.session.create_object("host_wgs_raw_seq_set")
+        seq_set = self.session.create_object("host_wgs_raw_seq_set")
         success = False
 
         comment = "Test comment"
         private_files = False
 
-        hostWgsRawSeqSet.comment = comment
-        hostWgsRawSeqSet.private_files = private_files
+        seq_set.comment = comment
+        seq_set.private_files = private_files
 
-        hostWgsRawSeqSet_json = None
+        seq_set_json = None
 
         try:
-            hostWgsRawSeqSet_json = hostWgsRawSeqSet.to_json()
+            seq_set_json = seq_set.to_json()
             success = True
         except:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
-        self.assertTrue(hostWgsRawSeqSet_json is not None,
+        self.assertTrue(seq_set_json is not None,
                         "to_json() returned data.")
 
         parse_success = False
 
         try:
-            hostWgsRawSeqSet_data = json.loads(hostWgsRawSeqSet_json)
+            seq_set_data = json.loads(seq_set_json)
             parse_success = True
         except:
             pass
@@ -85,18 +85,18 @@ class HostWgsRawSeqSetTest(unittest.TestCase):
         self.assertTrue(parse_success,
                         "to_json() did not throw an exception.")
 
-        self.assertTrue(hostWgsRawSeqSet_data is not None,
+        self.assertTrue(seq_set_data is not None,
                         "to_json() returned parsable JSON.")
 
-        self.assertTrue('meta' in hostWgsRawSeqSet_data,
+        self.assertTrue('meta' in seq_set_data,
                         "JSON has 'meta' key in it.")
 
-        self.assertEqual(hostWgsRawSeqSet_data['meta']['comment'],
+        self.assertEqual(seq_set_data['meta']['comment'],
                          comment,
                          "'comment' in JSON had expected value."
                          )
 
-        self.assertEqual(hostWgsRawSeqSet_data['meta']['private_files'],
+        self.assertEqual(seq_set_data['meta']['private_files'],
                          private_files,
                          "'private_files' in JSON had expected value."
                          )
@@ -184,6 +184,13 @@ class HostWgsRawSeqSetTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, seq_set, "format_doc")
 
+    def testPrivateFiles(self):
+        seq_set = self.session.create_object("host_wgs_raw_seq_set")
+
+        self.util.boolTypeTest(self, seq_set, "private_files")
+
+        self.util.boolPropertyTest(self, seq_set, "private_files")
+
     def testSequenceTypeLegal(self):
         seq_set = self.session.create_object("host_wgs_raw_seq_set")
         success = False
@@ -226,21 +233,16 @@ class HostWgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             seq_set.size = -1
 
-    def testStudyLegal(self):
+    def testStudy(self):
         seq_set = self.session.create_object("host_wgs_raw_seq_set")
-        success = False
-        study = "ibd"
 
-        try:
-            seq_set.study = study
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, seq_set, "study")
 
-        self.assertTrue(success, "Able to use the study setter")
+        study = "prediabetes"
+        seq_set.study = study
 
-        self.assertEqual(seq_set.study, study,
-                         "Property getter for 'study' works.")
+        self.assertEquals(study, seq_set.study,
+                          "study property works.")
 
     def testStudyIllegal(self):
         seq_set = self.session.create_object("host_wgs_raw_seq_set")

@@ -150,8 +150,11 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          checksums['md5'],
                          "Property getter for 'checksums' works.")
 
-    def testFormatLegal(self):
+    def testFormat(self):
         seq_set = self.session.create_16s_raw_seq_set()
+
+        self.util.stringTypeTest(self, seq_set, "format")
+
         success = False
         test_format = "fasta"
 
@@ -179,8 +182,11 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, seq_set, "format_doc")
 
-    def testSequenceTypeLegal(self):
+    def testSequenceType(self):
         seq_set = self.session.create_16s_raw_seq_set()
+
+        self.util.stringTypeTest(self, seq_set, "sequence_type")
+
         success = False
         sequence_type = "peptide"
 
@@ -221,27 +227,16 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             seq_set.size = -1
 
-    def testStudyLegal(self):
-        seq_set = self.session.create_16s_raw_seq_set()
-        success = False
-        study = "ibd"
-
-        try:
-            seq_set.study = study
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the study setter")
-
-        self.assertEqual(seq_set.study, study,
-                         "Property getter for 'study' works.")
-
-    def testStudyIllegal(self):
+    def testStudy(self):
         seq_set = self.session.create_16s_raw_seq_set()
 
-        with self.assertRaises(Exception):
-            seq_set.study = "adfadsf"
+        self.util.stringTypeTest(self, seq_set, "study")
+
+        study = "prediabetes"
+        seq_set.study = study
+
+        self.assertEquals(study, seq_set.study,
+                          "study property works.")
 
     def testTags(self):
         seq_set = self.session.create_16s_raw_seq_set()

@@ -736,7 +736,8 @@ class HostWgsRawSeqSet(Base):
                 self.logger.error("An error occurred while saving " + __name__ + ". " +
                                   "Reason: %s" % e)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update " +
+                             "(not an insert)." % __name__)
 
             try:
                 seq_set_data = self._get_raw_doc()
