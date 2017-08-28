@@ -569,3 +569,31 @@ class Visit(Base):
             if res_count < 1:
                 break
 
+    def visit_attributes(self):
+        """
+        Return an iterator of the visit attributes associated with this 
+        specific visit.
+
+        Args:
+            None
+
+        Returns:
+            A collection of all VisitAttribute objects associated with
+            this Visit.
+        """
+        from VisitAttribute import VisitAttribute
+
+        linkage_query = '"{}"[linkage.associated_with]'.format(self.id)
+        query = iHMPSession.get_session().get_osdf().oql_query
+
+        for page_no in count(1):
+            res = query(Visit.namespace, linkage_query, page=page_no)
+            res_count = res['result_count']
+
+            for doc in res['results']:
+                yield VisitAttribute.load_visit_attr(doc)
+
+            res_count -= len(res['results'])
+
+            if res_count < 1:
+                break
