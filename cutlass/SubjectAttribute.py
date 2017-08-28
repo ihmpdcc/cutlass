@@ -1396,34 +1396,6 @@ class SubjectAttribute(Base):
         return result_list
 
     @staticmethod
-    def load_sample_attr(attrib_data):
-        """
-        Takes the provided JSON string and converts it to a
-        SampleAttribute object
-        Args:
-            attrib_data (str): The JSON string to convert
-        Returns:
-            Returns a SampleAttribute instance.
-        """
-        module_logger.info("Creating a template " + __name__ + ".")
-        attrib = SampleAttribute()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-        attrib._set_id(attrib_data['id'])
-        attrib._links = attrib_data['linkage']
-        attrib._version = attrib_data['ver']
-
-        # Required fields
-        attrib._fecalcal = attrib_data['meta']['fecalcal']
-        attrib._study = attrib_data['meta']['study']
-        attrib._tags = attrib_data['meta']['tags']
-
-        module_logger.debug("Returning loaded " + __name__ + ".")
-        return attrib
-
-
-
-    @staticmethod
     def load_subject_attr(attrib_data):
         """
         Takes the provided JSON string and converts it to an object.
@@ -1504,12 +1476,11 @@ class SubjectAttribute(Base):
         if 'lmp' in attrib_data['meta']:
             attrib._lmp = attrib_data['meta']['lmp']
 
-
         if 'mother' in attrib_data['meta']:
             attrib._mother = attrib_data['meta']['mother']
 
         if 'occupation' in attrib_data['meta']:
-            attrib._occupation = attrib_data['meta']
+            attrib._occupation = attrib_data['meta']['occupation']
 
         if 'osa' in attrib_data['meta']:
             attrib._osa = attrib_data['meta']['osa']
