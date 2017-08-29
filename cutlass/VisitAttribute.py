@@ -307,7 +307,9 @@ class VisitAttribute(Base):
         attrib.tags = attrib_data['meta']['tags']
 
         # Handle optional fields
+        attrib_metadata = attrib_data['meta']
         for (propname, spec) in VisitAttribute.__dict.iteritems():
+            _cls = spec[0]
             section = spec[1]
 
             ## We need to handle any DiseaseMeta props separately here
@@ -316,26 +318,23 @@ class VisitAttribute(Base):
 
             module_logger.debug("In section " + section)
 
-            # Couple special cases to handle here.
+            # Handle any special cases that we need too.
             if (section == "excercise" or
                (propname.startswith('breakfast') or propname.startswith('lunch') or
                 propname.startswith('dinner'))):
                 (propbase, propkey) = propname.split('_', 1)
 
-                propval = attrib_data['meta'].get(section, {}).get(propbase, {}).get(propkey)
+                propval = attrib_metadata.get(section, {}).get(propbase, {}).get(propkey)
+            elif propname == "sixtym_gluc":
+                propval = attrib_metadata.get(section, {}).get('60m_gluc')
+            elif propname == "thirtym_gluc":
+                propval = attrib_metadata.get(section, {}).get('30m_gluc')
             else:
-                if propname == "sixtym_gluc":
-                    propname = "60m_gluc"
-                elif propname == "thirtym_gluc":
-                    propname = "30m_gluc"
-
-                propval = attrib_data['meta'].get(section, {}).get(propname)
-
-            module_logger.debug("Prop: %s, value: %s" % (propname, propval))
+                propval = attrib_metadata.get(section, {}).get(propname)
 
             if propval:
                 module_logger.debug("Setting prop %s to %s" % (propname, propval))
-                setattr(attrib, propname, propval)
+                setattr(attrib, propname, _cls(propval))
 
         # If any of the DiseaseMeta props exist we can handle them now
         if attrib_data['meta'].get('disease'):
