@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the lipidome object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class Lipidome(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Lipidome class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -58,6 +61,8 @@ class Lipidome(Base):
         self._local_file = None
         self._private_files = None
 
+        super(Lipidome, self).__init__(*args, **kwargs)
+
     @property
     def checksums(self):
         """
@@ -79,8 +84,6 @@ class Lipidome(Base):
             None
         """
         self.logger.debug("In 'checksums' setter.")
-        if type(checksums) is not dict:
-            raise ValueError("Invalid type for checksums.")
 
         self._checksums = checksums
 
@@ -311,7 +314,7 @@ class Lipidome(Base):
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -334,10 +337,10 @@ class Lipidome(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -359,8 +362,8 @@ class Lipidome(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Lipidome.namespace ]
+                'read': ['all'],
+                'write': [Lipidome.namespace]
             },
             'linkage': self._links,
             'ns': Lipidome.namespace,
@@ -375,29 +378,29 @@ class Lipidome(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("Object has the 'comment' property set.")
-           doc['meta']['comment'] = self._comment
+            self.logger.debug("Object has the 'comment' property set.")
+            doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-           self.logger.debug("Object has the 'format' property set.")
-           doc['meta']['format'] = self._format
+            self.logger.debug("Object has the 'format' property set.")
+            doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-           self.logger.debug("Object has the 'format_doc' property set.")
-           doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
 
         if self._private_files is not None:
-           self.logger.debug("Object has the 'private_files' property set.")
-           doc['meta']['private_files'] = self._private_files
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -443,17 +446,17 @@ class Lipidome(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Lipidome with ID %s." % lipidome_id)
+            self.logger.info("Deleting Lipidome with ID %s.", lipidome_id)
             session.get_osdf().delete_node(lipidome_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"lipidome\"[node_type]"):
+    def search(query="\"lipidome\"[node_type]"):
         """
         Searches OSDF for Lipidome nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -482,7 +485,7 @@ class Lipidome(Base):
         if query != '"lipidome"[node_type]':
             query = '({}) && "lipidome"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         lip_data = session.get_osdf().oql_query(Lipidome.namespace, query)
 
@@ -514,30 +517,32 @@ class Lipidome(Base):
 
         module_logger.debug("Filling in Lipidome details.")
         lip._set_id(lip_data['id'])
-        lip._links = lip_data['linkage']
-        lip._version = lip_data['ver']
+        lip.links = lip_data['linkage']
+        lip.version = lip_data['ver']
 
         # Required fields
-        lip._checksums = lip_data['meta']['checksums']
-        lip._subtype = lip_data['meta']['subtype']
-        lip._study = lip_data['meta']['study']
-        lip._tags = lip_data['meta']['tags']
+        lip.checksums = lip_data['meta']['checksums']
+        lip.subtype = lip_data['meta']['subtype']
+        lip.study = lip_data['meta']['study']
+        lip.tags = lip_data['meta']['tags']
+        # We need to use the private attribute here because there is no
+        # public setter.
         lip._urls = lip_data['meta']['urls']
 
         # Optional fields
         if 'comment' in lip_data['meta']:
-            lip._comment = lip_data['meta']['comment']
+            lip.comment = lip_data['meta']['comment']
 
         if 'format' in lip_data['meta']:
-            lip._format = lip_data['meta']['format']
+            lip.format = lip_data['meta']['format']
 
         if 'format_doc' in lip_data['meta']:
-            lip._format_doc = lip_data['meta']['format_doc']
+            lip.format_doc = lip_data['meta']['format_doc']
 
         if 'private_files' in lip_data['meta']:
-            lip._private_files = lip_data['meta']['private_files']
+            lip.private_files = lip_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded Lipidome.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return lip
 
     @staticmethod
@@ -554,14 +559,14 @@ class Lipidome(Base):
             A Lipidome object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % lip_id)
+        module_logger.debug("In load. Specified ID: %s", lip_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         lip_data = session.get_osdf().get_node(lip_id)
         lip = Lipidome.load_lipidome(lip_data)
 
-        module_logger.debug("Returning loaded Lipidome.")
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return lip
 
@@ -571,24 +576,25 @@ class Lipidome(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
-            raise ValueError("Invalid study. No directory mapping for %s" % study)
+            raise ValueError("Invalid study. No directory mapping for %s", study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "lipidome", self._subtype, remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(Lipidome.aspera_server,
                                            session.username,
@@ -599,9 +605,9 @@ class Lipidome(Base):
         if not upload_result:
             self.logger.error("Experienced an error uploading the data. " + \
                               "Aborting save.")
-            raise Exception("Unable to upload lipidome.")
+            raise Exception("Unable to upload %s.", __name__)
         else:
-            self._urls = [ "fasp://" + Lipidome.aspera_server + remote_path ]
+            self._urls = ["fasp://" + Lipidome.aspera_server + remote_path]
 
     def save(self):
         """
@@ -632,7 +638,7 @@ class Lipidome(Base):
         self.logger.info("Got iHMP session.")
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
@@ -647,11 +653,11 @@ class Lipidome(Base):
 
         if self._id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -661,34 +667,38 @@ class Lipidome(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update " + \
+                             "(not an insert).", __name__)
 
             try:
                 lip_data = self._get_raw_doc()
                 lip_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % lip_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, lip_id)
                 osdf.edit_node(lip_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
 
                 lip_data = osdf.get_node(lip_id)
                 latest_version = lip_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s", __name__,
+                                  str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+            except Exception as edit_exception:
+                self.logger.exception(edit_exception)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s.", __name__, self._id,
+                                  edit_exception
+                                 )
 
         self.logger.debug("Returning " + str(success))
         return success

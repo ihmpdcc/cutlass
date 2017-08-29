@@ -4,12 +4,9 @@ import unittest
 import json
 import random
 import string
-import sys
-
+import tempfile
 from cutlass import iHMPSession
 from cutlass import WgsAssembledSeqSet
-from cutlass import MIMS, MimsException
-
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
@@ -99,7 +96,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.assertEqual(seqset_data['meta']['private_files'],
                          private_files,
                          "'private_files' in JSON had expected value."
-                         )
+                        )
 
     def testId(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -195,11 +192,11 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            seq_set.sequence_type = [ 'a', 'b', 'c' ]
+            seq_set.sequence_type = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            seq_set.sequence_type = { 'a': 1, 'b': 2 }
+            seq_set.sequence_type = {'a': 1, 'b': 2}
 
     def testLegalSequenceType(self):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -231,7 +228,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.assertTrue(type(tags) == list, "tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template object 'tags' list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         seq_set.tags = new_tags
         self.assertEqual(seq_set.tags, new_tags,
@@ -249,13 +246,13 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         seq_set.add_tag("test")
-        self.assertEqual(seq_set.tags, [ "test" ],
+        self.assertEqual(seq_set.tags, ["test"],
                          "Can add a tag to a WgsAssembledSeqSet.")
 
         json_str = seq_set.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -265,7 +262,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         json_str = seq_set.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
@@ -278,6 +275,8 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteWgsAssembledSeqSet(self):
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+
         # attempt to save the WgsAssembledSeqSet at all points before and
         # after adding the required fields
         seq_set = self.session.create_object("wgs_assembled_seq_set")
@@ -316,6 +315,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         seq_set.sequence_type = sequence_type
         seq_set.size = size
         seq_set.study = study
+        seq_set.local_file = temp_file
 
         # make sure seq_set does not delete if it does not exist
         with self.assertRaises(Exception):
@@ -330,11 +330,8 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
 
         # check all fields were saved and loaded successfully
         self.assertEqual(seq_set.comment,
-                seq_set_loaded.comment,
-                "WgsAssembledSeqSet comment not saved & loaded successfully.")
-        self.assertEqual(seq_set.mims["biome"],
-                seq_set_loaded.mims["biome"],
-                "WgsAssembledSeqSet mims not saved & loaded successfully.")
+                         seq_set_loaded.comment,
+                         "WgsAssembledSeqSet comment not saved & loaded successfully.")
 
         # WgsAssembledSeqSet is deleted successfully
         self.assertTrue(seq_set.delete(),

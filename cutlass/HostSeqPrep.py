@@ -1,12 +1,15 @@
-#!/usr/bin/env python
+"""
+This module models the HostSeqPrep object.
+"""
 
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from mims import MIMS, MimsException
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.mims import MIMS, MimsException
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, R0912, R0915, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -23,7 +26,7 @@ class HostSeqPrep(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the class. This initializes the fields specific
         to the HostSeqPrep class, and inherits from the Base class.
@@ -66,6 +69,8 @@ class HostSeqPrep(Base):
         self._rindex = None
         self._lib_screen = None
 
+        super(HostSeqPrep, self).__init__(*args, **kwargs)
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -91,13 +96,13 @@ class HostSeqPrep(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if 'prepared_from' not in self._links.keys():
             problems.append("Must add a 'prepared_from' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -121,13 +126,14 @@ class HostSeqPrep(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        # _error_message is intentionally unused
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'prepared_from' not in self._links.keys():
             self.logger.error("Must have a 'prepared_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -188,6 +194,38 @@ class HostSeqPrep(Base):
             raise Exception("Comment is too long, must be less than 512 characters.")
 
         self._comment = comment
+
+    @property
+    def experimental_factor(self):
+        """
+        str: Experimental factors are essentially the variable aspects of an
+        experiment design which can be used to describe an experiment, or set
+        of experiments, in an increasingly detailed manner. This field accepts
+        ontology terms from Experimental Factor Ontology (EFO) and/or Ontology
+        for Biomedical Investigations (OBI). For a browser of EFO (v 2.43)
+        terms, please see http://purl.bioontology.org/ontology/EFO; for a
+        browser of OBI (v 2013-10-25) terms please see
+        http://purl.bioontology.org/ontology/OBI
+        """
+        self.logger.debug("In 'experimental_factor' getter.")
+
+        return self._experimental_factor
+
+    @experimental_factor.setter
+    @enforce_string
+    def experimental_factor(self, experimental_factor):
+        """
+        The setter for the experimental factor.
+
+        Args:
+            experimental_factor (str): The new experimental factor
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'experimental_factor' setter.")
+
+        self._experimental_factor = experimental_factor
 
     @property
     def findex(self):
@@ -462,6 +500,56 @@ class HostSeqPrep(Base):
         self._ncbi_taxon_id = ncbi_taxon_id
 
     @property
+    def nucl_acid_amp(self):
+        """
+        str: Nucleic acid amplification.
+        """
+        self.logger.debug("In 'nucl_acid_amp' getter.")
+
+        return self._nucl_acid_amp
+
+    @nucl_acid_amp.setter
+    @enforce_string
+    def nucl_acid_amp(self, nucl_acid_amp):
+        """
+        The setter for the nucleic acid amplification.
+
+        Args:
+            nucl_acid_amp (str): The nucleic acid amplification.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'nucl_acid_amp' setter.")
+
+        self._nucl_acid_amp = nucl_acid_amp
+
+    @property
+    def nucl_acid_ext(self):
+        """
+        str: Nucleic acid extraction.
+        """
+        self.logger.debug("In 'nucl_acid_ext' getter.")
+
+        return self._nucl_acid_ext
+
+    @nucl_acid_ext.setter
+    @enforce_string
+    def nucl_acid_ext(self, nucl_acid_ext):
+        """
+        The setter for the nucleic acid extraction.
+
+        Args:
+            nucl_acid_ext (str): The nucleic acid extraction.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'nucl_acid_ext' setter.")
+
+        self._nucl_acid_ext = nucl_acid_ext
+
+    @property
     def prep_id(self):
         """
         str: nucleic acid prep ID.
@@ -596,6 +684,34 @@ class HostSeqPrep(Base):
         self._srs_id = srs_id
 
     @property
+    def samp_mat_process(self):
+        """
+        str: Any processing applied to the sample during or after retrieving
+        the sample from environment. This field accepts OBI, for a browser of
+        OBI (v 2013-10-25) terms please see
+        http://purl.bioontology.org/ontology/OBI
+        """
+        self.logger.debug("In 'samp_mat_process' getter.")
+
+        return self._samp_mat_process
+
+    @samp_mat_process.setter
+    @enforce_int
+    def samp_mat_process(self, samp_mat_process):
+        """
+        The setter for 'samp_mat_process'.
+
+        Args:
+            samp_mat_process (str): The samp_mat_process value.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'samp_mat_process' setter.")
+
+        self._samp_mat_process = samp_mat_process
+
+    @property
     def storage_duration(self):
         """
         int: Duration for which sample was stored in days.
@@ -635,9 +751,9 @@ class HostSeqPrep(Base):
             None
         """
         module_logger.debug("In required fields.")
-        return ( "comment", "lib_layout", "lib_selection",
-                 "ncbi_taxon_id", "prep_id", "sequencing_center",
-                 "sequencing_contact", "storage_duration", "tags" )
+        return ("comment", "lib_layout", "lib_selection",
+                "ncbi_taxon_id", "prep_id", "sequencing_center",
+                "sequencing_contact", "storage_duration", "tags")
 
     def _get_raw_doc(self):
         """
@@ -657,8 +773,8 @@ class HostSeqPrep(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ HostSeqPrep.namespace ]
+                'read': ['all'],
+                'write': [HostSeqPrep.namespace]
             },
             'linkage': self._links,
             'ns': HostSeqPrep.namespace,
@@ -678,63 +794,63 @@ class HostSeqPrep(Base):
         }
 
         if self._id is not None:
-            self.logger.debug(__name__ + " object has the OSDF id set.")
+            self.logger.debug("%s object has the OSDF id set.", __name__)
             doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug(__name__ + " object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             doc['ver'] = self._version
 
         if self._adapters is not None:
-            self.logger.debug(__name__ + " object has adapters set.")
+            self.logger.debug("%s object has adapters set.", __name__)
             doc['meta']['adapters'] = self._adapters
 
         if self._experimental_factor is not None:
-            self.logger.debug(__name__ + " object has experimental_factor set.")
+            self.logger.debug("%s object has experimental_factor set.", __name__)
             doc['meta']['experimental_factor'] = self._experimental_factor
 
         if self._findex is not None:
-            self.logger.debug(__name__ + " object has findex set.")
+            self.logger.debug("%s object has findex set.", __name__)
             doc['meta']['findex'] = self._findex
 
         if self._frag_size is not None:
-            self.logger.debug(__name__ + " object has frag_size set.")
+            self.logger.debug("%s object has frag_size set.", __name__)
             doc['meta']['frag_size'] = self._frag_size
 
         if self._lib_const_meth is not None:
-            self.logger.debug(__name__ + " object has lib_const_meth set.")
+            self.logger.debug("%s object has lib_const_meth set.", __name__)
             doc['meta']['lib_const_meth'] = self._lib_const_meth
 
         if self._lib_screen is not None:
-            self.logger.debug(__name__ + " object has lib_screen set.")
+            self.logger.debug("%s object has lib_screen set.", __name__)
             doc['meta']['lib_screen'] = self._lib_screen
 
         if self._lib_size is not None:
-            self.logger.debug(__name__ + " object has lib_size set.")
+            self.logger.debug("%s object has lib_size set.", __name__)
             doc['meta']['lib_size'] = self._lib_size
 
         if self._lib_vector is not None:
-            self.logger.debug(__name__ + " object has lib_vector set.")
+            self.logger.debug("%s object has lib_vector set.", __name__)
             doc['meta']['lib_vector'] = self._lib_vector
 
         if self._mims is not None:
-            self.logger.debug(__name__ + " object has mims set.")
+            self.logger.debug("%s object has mims set.", __name__)
             doc['meta']['mims'] = self._mims
 
         if self._nucl_acid_amp is not None:
-            self.logger.debug(__name__ + " object has nucl_acid_amp set.")
+            self.logger.debug("%s object has nucl_acid_amp set.", __name__)
             doc['meta']['nucl_acid_amp'] = self._nucl_acid_amp
 
         if self._nucl_acid_ext is not None:
-            self.logger.debug(__name__ + " object has nucl_acid_ext set.")
+            self.logger.debug("%s object has nucl_acid_ext set.", __name__)
             doc['meta']['nucl_acid_ext'] = self._nucl_acid_ext
 
         if self._rindex is not None:
-            self.logger.debug(__name__ + " object has rindex set.")
+            self.logger.debug("%s object has rindex set.", __name__)
             doc['meta']['rindex'] = self._rindex
 
         if self._srs_id is not None:
-            self.logger.debug(__name__ + " object has srs_id set.")
+            self.logger.debug("%s object has srs_id set.", __name__)
             doc['meta']['srs_id'] = self._srs_id
 
         return doc
@@ -750,84 +866,84 @@ class HostSeqPrep(Base):
         Returns:
             Returns a HostSeqPrep instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         prep = HostSeqPrep()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         prep._set_id(prep_data['id'])
-        prep._version = prep_data['ver']
-        prep._links = prep_data['linkage']
-        prep._tags = prep_data['meta']['tags']
+        prep.version = prep_data['ver']
+        prep.links = prep_data['linkage']
+        prep.tags = prep_data['meta']['tags']
 
         # The attributes that are particular to HostSeqPrep documents
-        prep._comment = prep_data['meta']['comment']
-        prep._lib_layout = prep_data['meta']['lib_layout']
-        prep._lib_selection = prep_data['meta']['lib_selection']
-        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._sequencing_center = prep_data['meta']['sequencing_center']
-        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
-        prep._storage_duration = prep_data['meta']['storage_duration']
+        prep.comment = prep_data['meta']['comment']
+        prep.lib_layout = prep_data['meta']['lib_layout']
+        prep.lib_selection = prep_data['meta']['lib_selection']
+        prep.ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.sequencing_center = prep_data['meta']['sequencing_center']
+        prep.sequencing_contact = prep_data['meta']['sequencing_contact']
+        prep.storage_duration = prep_data['meta']['storage_duration']
 
         if 'adapters' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'adapters' present.")
-            prep._adapters = prep_data['meta']['adapters']
+            module_logger.info("%s data has 'adapters' present.", __name__)
+            prep.adapters = prep_data['meta']['adapters']
 
         if 'experimental_factor' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'experimental_factor' present.")
-            prep._experimental_factor = prep_data['meta']['experimental_factor']
+            module_logger.info("%s data has 'experimental_factor' present.", __name__)
+            prep.experimental_factor = prep_data['meta']['experimental_factor']
 
         if 'findex' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'findex' present.")
-            prep._findex = prep_data['meta']['findex']
+            module_logger.info("%s data has 'findex' present.", __name__)
+            prep.findex = prep_data['meta']['findex']
 
         if 'frag_size' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'frag_size' present.")
-            prep._frag_size = prep_data['meta']['frag_size']
+            module_logger.info("%s data has 'frag_size' present.", __name__)
+            prep.frag_size = prep_data['meta']['frag_size']
 
         if 'lib_const_meth' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'lib_const_meth' present.")
-            prep._lib_const_meth = prep_data['meta']['lib_const_meth']
+            module_logger.info("%s data has 'lib_const_meth' present.", __name__)
+            prep.lib_const_meth = prep_data['meta']['lib_const_meth']
 
         if 'lib_screen' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'lib_screen' present.")
-            prep._lib_screen = prep_data['meta']['lib_screen']
+            module_logger.info("%s data has 'lib_screen' present.", __name__)
+            prep.lib_screen = prep_data['meta']['lib_screen']
 
         if 'lib_size' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'lib_size' present.")
-            prep._lib_size = prep_data['meta']['lib_size']
+            module_logger.info("%s data has 'lib_size' present.", __name__)
+            prep.lib_size = prep_data['meta']['lib_size']
 
         if 'lib_vector' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'lib_vector' present.")
-            prep._lib_vector = prep_data['meta']['lib_vector']
+            module_logger.info("%s data has 'lib_vector' present.", __name__)
+            prep.lib_vector = prep_data['meta']['lib_vector']
 
         if 'mims' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'mims' present.")
-            prep._mims = prep_data['meta']['mims']
+            module_logger.info("%s data has 'mims' present.", __name__)
+            prep.mims = prep_data['meta']['mims']
 
         if 'nucl_acid_amp' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'nucl_acid_amp' present.")
-            prep._nucl_acid_amp = prep_data['meta']['nucl_acid_amp']
+            module_logger.info("%s data has 'nucl_acid_amp' present.", __name__)
+            prep.nucl_acid_amp = prep_data['meta']['nucl_acid_amp']
 
         if 'nucl_acid_ext' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'nucl_acid_amp' present.")
-            prep._nucl_acid_ext = prep_data['meta']['nucl_acid_ext']
+            module_logger.info("%s data has 'nucl_acid_amp' present.", __name__)
+            prep.nucl_acid_ext = prep_data['meta']['nucl_acid_ext']
 
         if 'rindex' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'rindex' present.")
-            prep._rindex = prep_data['meta']['rindex']
+            module_logger.info("%s data has 'rindex' present.", __name__)
+            prep.rindex = prep_data['meta']['rindex']
 
         if 'samp_mat_process' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'samp_mat_process' present.")
-            prep._samp_mat_process = prep_data['meta']['samp_mat_process']
+            module_logger.info("%s data has 'samp_mat_process' present.", __name__)
+            prep.samp_mat_process = prep_data['meta']['samp_mat_process']
 
         if 'srs_id' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'srs_id' present.")
-            prep._srs_id = prep_data['meta']['srs_id']
+            module_logger.info("%s data has 'srs_id' present.", __name__)
+            prep.srs_id = prep_data['meta']['srs_id']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return prep
 
@@ -844,12 +960,12 @@ class HostSeqPrep(Base):
         Returns:
             A HostSeqPrep object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s", prep_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
-        module_logger.info("Retrieving data for " + __name__ + ".")
+        module_logger.info("Retrieving data for %s.", __name__)
         prep_data = session.get_osdf().get_node(prep_id)
 
         prep = HostSeqPrep.load_host_seq_prep(prep_data)
@@ -892,30 +1008,35 @@ class HostSeqPrep(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(prep_data)
-                self.logger.info("Save for HostSeqPrep %s successful." % node_id)
-                self.logger.info("Setting ID for HostSeqPrep %s." % node_id)
+                self.logger.info("Save for HostSeqPrep %s successful.", node_id)
+                self.logger.info("Setting ID for HostSeqPrep %s.", node_id)
+
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
+            except Exception as insert_exception:
                 self.logger.error("An error occurred while inserting " + \
-                                  "HostSeqPrep %s. Reason: %s" % self._id, e)
+                                  "%s %s. Reason: %s", __name__, self._id,
+                                  insert_exception
+                                 )
         else:
             prep_data = self._get_raw_doc()
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self._id)
                 session.get_osdf().edit_node(prep_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as edit_exception:
+                self.logger.error("An error occurred while updating %s " + \
+                                  " %s. Reason: %s", __name__, self._id,
+                                  edit_exception
+                                 )
 
         return success
 
     @staticmethod
-    def search(query = "\"host_seq_prep\"[node_type]"):
+    def search(query="\"host_seq_prep\"[node_type]"):
         """
         Searches the OSDF database through all HostSeqPrep nodes. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -943,7 +1064,7 @@ class HostSeqPrep(Base):
         if query != '"host_seq_prep"[node_type]':
             query = '({}) && "host_seq_prep"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         prep_data = session.get_osdf().oql_query(HostSeqPrep.namespace, query)
 
@@ -981,11 +1102,11 @@ class HostSeqPrep(Base):
         """
         self.logger.debug("In derivations().")
 
-        from HostWgsRawSeqSet import HostWgsRawSeqSet
-        from HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
+        from cutlass.HostWgsRawSeqSet import HostWgsRawSeqSet
+        from cutlass.HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
 
         for doc in self._derived_docs():
             if doc['node_type'] == "host_transcriptomics_raw_seq_set":
-                yield HostTranscriptomicsRawSeqSet.load_host_transcriptomics_raw_set_set(doc)
+                yield HostTranscriptomicsRawSeqSet.load_host_transcriptomics_raw_seq_set(doc)
             elif doc['node_type'] == "host_wgs_raw_seq_set":
                 yield HostWgsRawSeqSet.load_hostWgsRawSeqSet(doc)

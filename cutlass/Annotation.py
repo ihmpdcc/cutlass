@@ -1,15 +1,18 @@
-#!/usr/bin/env python
+"""
+Models the annotation object.
+"""
 
 import json
 import logging
 import os
 import string
-from datetime import datetime
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -32,7 +35,7 @@ class Annotation(Base):
 
     date_format = '%Y-%m-%d'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Annotation class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -66,6 +69,8 @@ class Annotation(Base):
         self._sop = None
         self._annotation_source = None
         self._private_files = None
+
+        super(Annotation, self).__init__(*args, **kwargs)
 
     @property
     def annotation_pipeline(self):
@@ -130,6 +135,7 @@ class Annotation(Base):
         return self._checksums
 
     @checksums.setter
+    @enforce_dict
     def checksums(self, checksums):
         """
         The setter for the Annotation's checksums.
@@ -140,9 +146,7 @@ class Annotation(Base):
         Returns:
             None
         """
-        self.logger.debug("In checksums setter.")
-        if type(checksums) is not dict:
-            raise ValueError("Invalid type for checksums.")
+        self.logger.debug("In 'checksums' setter.")
 
         self._checksums = checksums
 
@@ -151,7 +155,7 @@ class Annotation(Base):
         """
         str: A descriptive comment for the annotation.
         """
-        self.logger.debug("In comment getter.")
+        self.logger.debug("In 'comment' getter.")
         return self._comment
 
     @comment.setter
@@ -450,7 +454,7 @@ class Annotation(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -470,17 +474,16 @@ class Annotation(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
+        problems = self.validate()
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        valid = True
 
-        if 'computed_from' not in self._links.keys():
+        if len(problems):
+            self.logger.error("There were %s problems.", str(len(problems)))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -500,8 +503,8 @@ class Annotation(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Annotation.namespace ]
+                'read': ['all'],
+                'write': [Annotation.namespace]
             },
             'linkage': self._links,
             'ns': Annotation.namespace,
@@ -594,7 +597,7 @@ class Annotation(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Annotation with ID %s." % annotation_id)
+            self.logger.info("Deleting Annotation with ID %s.", annotation_id)
             session.get_osdf().delete_node(annotation_id)
             success = True
         except Exception as e:
@@ -604,7 +607,7 @@ class Annotation(Base):
         return success
 
     @staticmethod
-    def search(query = "\"annotation\"[node_type]"):
+    def search(query="\"annotation\"[node_type]"):
         """
         Searches OSDF for Annotation nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -632,7 +635,7 @@ class Annotation(Base):
         if query != '"annotation"[node_type]':
             query = '({}) && "annotation"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         annot_data = session.get_osdf().oql_query(Annotation.namespace, query)
 
@@ -666,35 +669,37 @@ class Annotation(Base):
 
         # The attributes commmon to all iHMP nodes
         annot._set_id(annot_data['id'])
-        annot._links = annot_data['linkage']
-        annot._version = annot_data['ver']
+        annot.links = annot_data['linkage']
+        annot.version = annot_data['ver']
 
         # Required fields
-        annot._annotation_pipeline = annot_data['meta']['annotation_pipeline']
-        annot._checksums = annot_data['meta']['checksums']
-        annot._format = annot_data['meta']['format']
-        annot._format_doc = annot_data['meta']['format_doc']
-        annot._study = annot_data['meta']['study']
-        annot._tags = annot_data['meta']['tags']
+        annot.annotation_pipeline = annot_data['meta']['annotation_pipeline']
+        annot.checksums = annot_data['meta']['checksums']
+        annot.format = annot_data['meta']['format']
+        annot.format_doc = annot_data['meta']['format_doc']
+        annot.study = annot_data['meta']['study']
+        annot.tags = annot_data['meta']['tags']
+        # We need to use the private attribute here because there is no
+        # public setter.
         annot._urls = annot_data['meta']['urls']
 
         # Optional fields
         if 'comment' in annot_data['meta']:
-            annot._comment = annot_data['meta']['comment']
+            annot.comment = annot_data['meta']['comment']
 
         if 'date' in annot_data['meta']:
-            annot._date = annot_data['meta']['date']
+            annot.date = annot_data['meta']['date']
 
         if 'sop' in annot_data['meta']:
-            annot._sop = annot_data['meta']['sop']
+            annot.sop = annot_data['meta']['sop']
 
         if 'annotation_source' in annot_data['meta']:
-            annot._annotation_source = annot_data['meta']['annotation_source']
+            annot.annotation_source = annot_data['meta']['annotation_source']
 
         if 'private_files' in annot_data['meta']:
-            annot._private_file = annot_data['meta']['private_files']
+            annot.private_files = annot_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
         return annot
 
     @staticmethod
@@ -711,7 +716,7 @@ class Annotation(Base):
             A Annotation object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % annot_id)
+        module_logger.debug("In load. Specified ID: %s", annot_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
@@ -728,17 +733,18 @@ class Annotation(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -746,7 +752,7 @@ class Annotation(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
                                 "analysis", "hmgi", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(Annotation.aspera_server,
@@ -760,7 +766,7 @@ class Annotation(Base):
                               "Aborting save.")
             raise Exception("Unable to upload annotation.")
         else:
-            self._urls = [ "fasp://" + Annotation.aspera_server + remote_path ]
+            self._urls = ["fasp://" + Annotation.aspera_server + remote_path]
 
     def save(self):
         """
@@ -794,7 +800,7 @@ class Annotation(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
@@ -807,11 +813,11 @@ class Annotation(Base):
 
         if self._id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -824,30 +830,33 @@ class Annotation(Base):
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 annot_data = self._get_raw_doc()
                 annot_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % annot_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, annot_id)
                 osdf.edit_node(annot_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % annot_id)
+                self.logger.info("Update for %s %s successful.", __name__, annot_id)
 
                 annot_data = osdf.get_node(annot_id)
                 latest_version = annot_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+                                  "%s %s. Reason: %s.", __name__, self._id, update_exception)
 
         self.logger.debug("Returning " + str(success))
         return success
@@ -862,7 +871,7 @@ class Annotation(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from ClusteredSeqSet import ClusteredSeqSet
+        from cutlass.ClusteredSeqSet import ClusteredSeqSet
 
         for page_no in count(1):
             res = query(Annotation.namespace, linkage_query, page=page_no)

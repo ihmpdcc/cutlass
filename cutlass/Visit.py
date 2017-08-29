@@ -1,13 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the visit object.
+"""
 
 import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Sample import Sample
-from VisitAttribute import VisitAttribute
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Sample import Sample
+from cutlass.VisitAttribute import VisitAttribute
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -25,7 +29,7 @@ class Visit(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Visit class. This initializes the fields specific to
         the Visit class, and inherits from the Base class.
@@ -47,6 +51,8 @@ class Visit(Base):
         self._date = None
         self._interval = None
         self._clinic_id = None
+
+        super(Visit, self).__init__(*args, **kwargs)
 
     @property
     def visit_id(self):
@@ -70,7 +76,7 @@ class Visit(Base):
         Returns:
             None
         """
-        self.logger.debug("In visit_id setter.")
+        self.logger.debug("In 'visit_id' setter.")
 
         self._visit_id = visit_id
 
@@ -80,7 +86,7 @@ class Visit(Base):
         int: A sequential number that is assigned as visits occur for
         that subject.
         """
-        self.logger.debug("In visit_number getter.")
+        self.logger.debug("In 'visit_number' getter.")
 
         return self._visit_number
 
@@ -203,7 +209,8 @@ class Visit(Base):
         Returns:
             None
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
+
         return ("visit_id", "visit_number", "interval", "tags")
 
     def _get_raw_doc(self):
@@ -224,8 +231,8 @@ class Visit(Base):
 
         visit_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Visit.namespace ]
+                'read': ['all'],
+                'write': [Visit.namespace]
             },
             'linkage': self._links,
             'ns': Visit.namespace,
@@ -284,12 +291,12 @@ class Visit(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'by' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -312,12 +319,12 @@ class Visit(Base):
 
         json_str = json.dumps(visit_doc, indent=indent)
 
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
+        self.logger.debug("Dump to JSON successful. Length: %s characters", len(json_str))
 
         return json_str
 
     @staticmethod
-    def search(query = "\"visit\"[node_type]"):
+    def search(query="\"visit\"[node_type]"):
         """
         Searches the OSDF database through all Visit node types. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -345,7 +352,7 @@ class Visit(Base):
         if query != '"visit"[node_type]':
             query = '({}) && "visit"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         visit_data = session.get_osdf().oql_query(Visit.namespace, query)
 
@@ -354,8 +361,8 @@ class Visit(Base):
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                visit_result = Visit.load_visit(i)
+            for result in all_results:
+                visit_result = Visit.load_visit(result)
                 result_list.append(visit_result)
 
         return result_list
@@ -378,27 +385,27 @@ class Visit(Base):
 
         # The attributes commmon to all iHMP nodes
         visit._set_id(visit_data['id'])
-        visit._version = visit_data['ver']
-        visit._links = visit_data['linkage']
+        visit.version = visit_data['ver']
+        visit.links = visit_data['linkage']
 
         # The attributes that are particular to Visit objects
-        visit._visit_id = visit_data['meta']['visit_id']
-        visit._visit_number = visit_data['meta']['visit_number']
-        visit._interval = visit_data['meta']['interval']
+        visit.visit_id = visit_data['meta']['visit_id']
+        visit.visit_number = visit_data['meta']['visit_number']
+        visit.interval = visit_data['meta']['interval']
 
         if 'date' in visit_data['meta']:
             module_logger.info("Visit data has 'date' present.")
-            visit._date = visit_data['meta']['date']
+            visit.date = visit_data['meta']['date']
 
         if 'clinic_id' in visit_data['meta']:
             module_logger.info("Visit data has 'clinic_id' present.")
-            visit._clinic_id = visit_data['meta']['clinic_id']
+            visit.clinic_id = visit_data['meta']['clinic_id']
 
         if 'tags' in visit_data['meta']:
             module_logger.info("Visit data has 'tags' present.")
-            visit._tags= visit_data['meta']['tags']
+            visit.tags = visit_data['meta']['tags']
 
-        module_logger.debug("Returning loaded Visit.")
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return visit
 
@@ -431,12 +438,14 @@ class Visit(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Visit with OSDF ID %s." % visit_node_id)
+            self.logger.info("Deleting %s with OSDF ID %s.", __name__, visit_node_id)
             session.get_osdf().delete_node(visit_node_id)
             success = True
-        except Exception as e:
-            self.logger.error("An error occurred when deleting Visit %s." +
-                              "Reason: %s" % visit_node_id, e)
+        except Exception as delete_exception:
+            self.logger.error("An error occurred when deleting %s %s." + \
+                              "Reason: %s", __name__, visit_node_id,
+                              delete_exception
+                             )
 
         return success
 
@@ -453,39 +462,39 @@ class Visit(Base):
         Returns:
             A Visit object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % visit_node_id)
+        module_logger.debug("In load. Specified ID: %s", visit_node_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         visit_data = session.get_osdf().get_node(visit_node_id)
 
-        module_logger.info("Creating a template Visit.")
+        module_logger.info("Creating a template %s.", __name__)
         visit = Visit()
 
-        module_logger.debug("Filling in Visit details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         visit._set_id(visit_data['id'])
-        visit._version = visit_data['ver']
-        visit._links = visit_data['linkage']
+        visit.version = visit_data['ver']
+        visit.links = visit_data['linkage']
 
         # The attributes that are particular to Visit objects
-        visit._visit_id = visit_data['meta']['visit_id']
-        visit._visit_number = visit_data['meta']['visit_number']
-        visit._interval = visit_data['meta']['interval']
+        visit.visit_id = visit_data['meta']['visit_id']
+        visit.visit_number = visit_data['meta']['visit_number']
+        visit.interval = visit_data['meta']['interval']
 
         if 'date' in visit_data['meta']:
-            module_logger.info("Visit data has 'date' present.")
-            visit._date = visit_data['meta']['date']
+            module_logger.info("%s data has 'date' present.", __name__)
+            visit.date = visit_data['meta']['date']
 
         if 'clinic_id' in visit_data['meta']:
-            module_logger.info("Visit data has 'clinic_id' present.")
-            visit._clinic_id = visit_data['meta']['clinic_id']
+            module_logger.info("%s data has 'clinic_id' present.", __name__)
+            visit.clinic_id = visit_data['meta']['clinic_id']
 
         if 'tags' in visit_data['meta']:
-            module_logger.info("Visit data has 'tags' present.")
-            visit._tags= visit_data['meta']['tags']
+            module_logger.info("%s data has 'tags' present.", __name__)
+            visit.tags = visit_data['meta']['tags']
 
         module_logger.debug("Returning loaded Visit.")
 
@@ -527,25 +536,24 @@ class Visit(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(visit_data)
-                self.logger.info("Save for visit %s successful." % node_id)
-                self.logger.debug("Setting ID for visit %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.debug("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while inserting visit %s." +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.error("An error occurred while inserting %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
             visit_data = self._get_raw_doc()
             try:
-                self.logger.info("Attempting to update visit with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self._id)
                 session.get_osdf().edit_node(visit_data)
-                self.logger.info("Update for visit %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
                 success = True
-
-            except Exception as e:
-                self.logger.error("An error occurred while updating visit %s." +
-                                  "Reason: %s" % self._id, e)
+            except Exception as edit_exception:
+                self.logger.error("An error occurred while updating visit %s." + \
+                                  "Reason: %s", self._id, edit_exception)
 
         return success
 
@@ -568,4 +576,3 @@ class Visit(Base):
 
             if res_count < 1:
                 break
-

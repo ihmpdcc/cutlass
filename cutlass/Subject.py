@@ -1,11 +1,15 @@
-#!/usr/bin/env python
+"""
+Models the subject object.
+"""
 
 import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -23,9 +27,9 @@ class Subject(Base):
     """
     namespace = "ihmp"
 
-    valid_races = ( "african_american", "american_indian_or_alaska_native",
-                    "asian", "caucasian", "hispanic_or_latino", "native_hawaiian",
-                    "ethnic_other", "unknown")
+    valid_races = ("african_american", "american_indian_or_alaska_native",
+                   "asian", "caucasian", "hispanic_or_latino", "native_hawaiian",
+                   "ethnic_other", "unknown")
 
     valid_genders = ("male", "female", "unknown")
 
@@ -167,7 +171,7 @@ class Subject(Base):
         if 'participates_in' not in self._links.keys():
             problems.append("Must have a 'participates_in' link to a study.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -191,12 +195,12 @@ class Subject(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'participates_in' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -218,8 +222,8 @@ class Subject(Base):
 
         subject_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Subject.namespace ]
+                'read': ['all'],
+                'write': [Subject.namespace]
             },
             'linkage': self._links,
             'ns': Subject.namespace,
@@ -233,17 +237,17 @@ class Subject(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Subject object has the OSDF id set.")
-           subject_doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            subject_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Subject object has the OSDF version set.")
-           subject_doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            subject_doc['ver'] = self._version
 
         # Handle optional properties
         if self._race is not None:
-           self.logger.debug("Subject object has the race property set.")
-           subject_doc['meta']['race'] = self._race
+            self.logger.debug("Subject object has the race property set.")
+            subject_doc['meta']['race'] = self._race
 
         return subject_doc
 
@@ -257,7 +261,7 @@ class Subject(Base):
         Returns:
             None
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("rand_subject_id", "gender", "tags")
 
     def delete(self):
@@ -277,8 +281,8 @@ class Subject(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Subject with no ID.")
-            raise Exception("Subject does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID.", __name__)
 
         subject_id = self._id
 
@@ -289,17 +293,17 @@ class Subject(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Subject with ID %s." % subject_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, subject_id)
             session.get_osdf().delete_node(subject_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"subject\"[node_type]"):
+    def search(query="\"subject\"[node_type]"):
         """
         Searches the OSDF database through all Subject node types. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -327,7 +331,7 @@ class Subject(Base):
         if query != '"subject"[node_type]':
             query = '({}) && "subject"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         subject_data = session.get_osdf().oql_query(Subject.namespace, query)
 
@@ -336,8 +340,8 @@ class Subject(Base):
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                subject_result = Subject.load_subject(i)
+            for result in all_results:
+                subject_result = Subject.load_subject(result)
                 result_list.append(subject_result)
 
         return result_list
@@ -353,22 +357,22 @@ class Subject(Base):
         Returns:
             Returns a Subject instance.
         """
-        module_logger.info("Creating a template Subject.")
+        module_logger.info("Creating a template %s.", __name__)
         subject = Subject()
 
         module_logger.debug("Filling in Subject details.")
         subject._set_id(subject_data['id'])
-        subject._links = subject_data['linkage']
-        subject._version = subject_data['ver']
+        subject.links = subject_data['linkage']
+        subject.version = subject_data['ver']
 
-        subject._gender = subject_data['meta']['gender']
-        subject._rand_subject_id = subject_data['meta']['rand_subject_id']
-        subject._tags = subject_data['meta']['tags']
+        subject.gender = subject_data['meta']['gender']
+        subject.rand_subject_id = subject_data['meta']['rand_subject_id']
+        subject.tags = subject_data['meta']['tags']
 
         if 'race' in subject_data['meta']:
-            subject._race = subject_data['meta']['race']
+            subject.race = subject_data['meta']['race']
 
-        module_logger.debug("Returning loaded Subject.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return subject
 
     @staticmethod
@@ -384,28 +388,14 @@ class Subject(Base):
         Returns:
             A Subject object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % subject_id)
+        module_logger.debug("In load. Specified ID: %s", subject_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         subject_data = session.get_osdf().get_node(subject_id)
+        subject = Subject.load_subject(subject_data)
 
-        module_logger.info("Creating a template Subject.")
-        subject = Subject()
-
-        module_logger.debug("Filling in Subject details.")
-        subject._set_id(subject_data['id'])
-        subject._links = subject_data['linkage']
-        subject._version = subject_data['ver']
-
-        subject._gender = subject_data['meta']['gender']
-        subject._rand_subject_id = subject_data['meta']['rand_subject_id']
-        subject._tags = subject_data['meta']['tags']
-
-        if 'race' in subject_data['meta']:
-            subject._race = subject_data['meta']['race']
-
-        module_logger.debug("Returning loaded Subject.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return subject
 
     def save(self):
@@ -442,11 +432,11 @@ class Subject(Base):
         success = False
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting Subject to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -454,23 +444,25 @@ class Subject(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("Subject already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 subject_data = self._get_raw_doc()
                 self.logger.info("Subject already has an ID, so we do an update (not an insert).")
                 subject_id = self._id
-                self.logger.debug("Subject OSDF ID to update: %s." % subject_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, subject_id)
                 osdf.edit_node(subject_data)
 
                 subject_data = osdf.get_node(subject_id)
                 latest_version = subject_data['ver']
 
-                self.logger.debug("The version of this Subject is now: %s" % str(latest_version))
+                self.logger.debug("The version of this %s is now: %s", __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
             except Exception as e:
@@ -483,7 +475,7 @@ class Subject(Base):
         """
         Return iterator of all visits by this subject.
         """
-        from Visit import Visit
+        from cutlass.Visit import Visit
 
         linkage_query = '"{}"[linkage.by]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
@@ -505,7 +497,7 @@ class Subject(Base):
         Return iterator of all subject attribute objects associoted with this
         subject.
         """
-        from SubjectAttribute import SubjectAttribute
+        from cutlass.SubjectAttribute import SubjectAttribute
 
         linkage_query = '"{}"[linkage.associated_with]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
@@ -515,7 +507,7 @@ class Subject(Base):
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield SubjectAttribute.load_subject_attribute(doc)
+                yield SubjectAttribute.load_subject_attr(doc)
 
             res_count -= len(res['results'])
 
@@ -535,4 +527,3 @@ class Subject(Base):
         self.logger.debug("Fetching subject attributes.")
         for subj_attrib in self.attributes():
             yield subj_attrib
-

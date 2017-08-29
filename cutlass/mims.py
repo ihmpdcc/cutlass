@@ -1,37 +1,44 @@
-#!/usr/bin/env python
+"""
+This module models the MIMS metadata and provides a specialized MIMSException
+class as well.
+"""
 
 import logging
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
+
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
 class MimsException(Exception):
     """
     Exception for the MIMS
-    
+
     Attributes:
         key (str): The key for the exception.
-        message (str): The error message to provide for when the exception is thrown. 
+        message (str): The error message to provide for when the exception is thrown.
     """
     def __init__(self, message, key=None):
+        super(MimsException, self).__init__(message)
         self.key = key
         self.message = message
 
     def __str__(self):
+        msg = "Error: %s" % self.message
+
         if self.key is not None:
-            return "Error [%s]: %s" % (self.key, self.message)
-        else:
-            return "Error: %s" % self.message
+            msg = "Error [%s]: %s" % (self.key, self.message)
+
+        return msg
 
 class MIMS(object):
     """
     The MIMS class. This class contains all required fields, as well as validation
     of the passed in dictionary to ensure all fields are there.
-    
+
     Attributes:
-        fields (dict): The required fields and their specific type. 
+        fields (dict): The required fields and their specific type.
     """
     _fields = {
         "adapters": str,
@@ -75,11 +82,11 @@ class MIMS(object):
     def required_fields():
         """
         A static method. The required fields for the class.
-        
+
         Args:
             None
         Returns:
-            Tuple containing the required fields. 
+            Tuple containing the required fields.
         """
         return tuple(MIMS._fields.keys())
 
@@ -89,32 +96,38 @@ class MIMS(object):
         A static method. Validates to ensure that the provided
         candidate dictionary contains all the necessary fields to
         save and ensure data validation when inserted to the OSDF
-        instance. 
-        
+        instance.
+
         Args:
-            candidate (dict): The possible MIMS dictionary passed in. 
+            candidate (dict): The possible MIMS dictionary passed in.
         Returns:
-            True if the candidate is valid, False otherwise. 
+            True if the candidate is valid, False otherwise.
         """
         valid = True
 
         for mims_key in MIMS.required_fields():
             if mims_key not in candidate:
                 valid = False
-                module_logger.error("MIMS field %s is not present." % mims_key)
+                module_logger.error("MIMS field %s is not present.", mims_key)
                 break
 
         if valid:
             for candidate_key in candidate:
                 if candidate_key not in MIMS.required_fields():
-                    module_logger.error("Provided MIMS field %s is not a valid field name." % candidate_key)
+                    module_logger.error(
+                        "Provided MIMS field %s is not a valid field name.",
+                        candidate_key
+                    )
                     valid = False
                     break
 
                 # The provided key IS in the MIMS table, now we
                 # need to check the type...
                 if not isinstance(candidate[candidate_key], MIMS._fields[candidate_key]):
-                    module_logger.error("Provided MIMS field of %s is not the right type!" % candidate_key)
+                    module_logger.error(
+                        "Provided MIMS field of %s is not the right type!",
+                        candidate_key
+                    )
                     valid = False
                     break
 

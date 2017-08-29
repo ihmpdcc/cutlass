@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-
-from datetime import datetime
 import json
 import logging
-from iHMPSession import iHMPSession
 from osdf import OSDF
 from itertools import islice
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -171,7 +168,7 @@ class Base(object):
             self.logger.info("Validation did not succeed.")
             problems.append(error_message)
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", str(len(problems)))
         return problems
 
     def is_valid(self):
@@ -197,7 +194,7 @@ class Base(object):
 
         (valid, error_message) = session.get_osdf().validate_node(document)
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -220,7 +217,7 @@ class Base(object):
 
         json_str = json.dumps(doc, indent=indent)
 
-        self.logger.debug("Dump to JSON successful. Length: %s characters" % len(json_str))
+        self.logger.debug("Dump to JSON successful. Length: %s characters", str(len(json_str)))
 
         return json_str
 

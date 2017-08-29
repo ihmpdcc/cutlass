@@ -1,14 +1,18 @@
-#!/usr/bin/env python
+"""
+Models the 16S raw sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +32,7 @@ class SixteenSRawSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the SixteenSRawSeqSet class. This initializes the fields
         specific to the SixteenSRawSeqSet class, and inherits from the Base class.
@@ -62,6 +66,8 @@ class SixteenSRawSeqSet(Base):
         # Optional properties
         self._private_files = None
 
+        super(SixteenSRawSeqSet, self).__init__(*args, **kwargs)
+
     def validate(self):
         """
         Validates the current object's data against the schema in the OSDF instance.
@@ -85,7 +91,7 @@ class SixteenSRawSeqSet(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if self._private_files:
@@ -100,7 +106,7 @@ class SixteenSRawSeqSet(Base):
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link to a 16s_dna_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -124,10 +130,10 @@ class SixteenSRawSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -441,14 +447,6 @@ class SixteenSRawSeqSet(Base):
 
         return self._urls
 
-    def add_url(self, url):
-        self.logger.debug("In the add URL")
-
-        if url not in self._urls:
-            self._urls.append(url)
-        else:
-            raise Exception("URL Already present")
-
     @staticmethod
     def required_fields():
         """
@@ -481,8 +479,8 @@ class SixteenSRawSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ SixteenSRawSeqSet.namespace ]
+                'read': ['all'],
+                'write': [SixteenSRawSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': SixteenSRawSeqSet.namespace,
@@ -522,88 +520,7 @@ class SixteenSRawSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"16s_raw_seq_set\"[node_type]"):
-        """
-        Searches OSDF for 16s DNA prep nodes. Any criteria the user wishes to
-        add is provided by the user in the query language specifications
-        provided in the OSDF documentation. A general format is (including the
-        quotes and brackets):
-
-        "search criteria"[field to search]
-
-        If there are any results, they are returned as a instance,
-        otherwise an empty list will be returned.
-
-        Args:
-            query (str): The OQL query for OSDF.
-
-        Returns:
-            Returns an array of objects. It returns an empty list if
-            there are no results.
-        """
-        module_logger.debug("In search.")
-
-        session = iHMPSession.get_session()
-        module_logger.info("Got iHMP session.")
-
-        if query != '"16s_raw_seq_set"[node_type]':
-            query = '({}) && "16s_raw_seq_set"[node_type]'.format(query)
-
-        module_logger.debug("Submitting OQL query: {}".format(query))
-
-        seq_set_data = session.get_osdf().oql_query(SixteenSRawSeqSet.namespace, query)
-
-        all_results = seq_set_data['results']
-
-        result_list = list()
-
-        if len(all_results) > 0:
-            for result in all_results:
-                prep = SixteenSRawSeqSet.load_16s_raw_seq_set(result)
-                result_list.append(prep)
-
-        return result_list
-
-    def delete(self):
-        """
-        Deletes the current object (self) from the OSDF instance. If the object
-        has not been saved previously (node ID is not set), then an error message
-        will be logged stating the object was not deleted. If the ID is set, and
-        exists in the OSDF instance, then the object will be deleted from the
-        OSDF instance, and this object must be re-saved in order to use it again.
-
-        Args:
-            None
-
-        Returns:
-            True upon successful deletion, False otherwise.
-        """
-        self.logger.debug("In delete.")
-
-        if self._id is None:
-            self.logger.warn("Attempt to delete a sixteensdnaprep with no ID.")
-            raise Exception("Object does not have an ID.")
-
-        prep_id = self._id
-
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        # Assume failure
-        success = False
-
-        try:
-            self.logger.info("Deleting " + __name__ + " with OSDF ID %s." % prep_id)
-            session.get_osdf().delete_node(prep_id)
-            success = True
-        except Exception as e:
-            self.logger.exception(e)
-            self.logger.error("An error occurred when deleting %s.", self)
-
-        return success
-
-    @staticmethod
-    def search(query = "\"16s_raw_seq_set\"[node_type]"):
+    def search(query="\"16s_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all SixteenSRawSeqSet node types.
         Any criteria the user wishes to add is provided by the user in the
@@ -646,6 +563,45 @@ class SixteenSRawSeqSet(Base):
 
         return result_list
 
+
+    def delete(self):
+        """
+        Deletes the current object (self) from the OSDF instance. If the object
+        has not been saved previously (node ID is not set), then an error message
+        will be logged stating the object was not deleted. If the ID is set, and
+        exists in the OSDF instance, then the object will be deleted from the
+        OSDF instance, and this object must be re-saved in order to use it again.
+
+        Args:
+            None
+
+        Returns:
+            True upon successful deletion, False otherwise.
+        """
+        self.logger.debug("In delete.")
+
+        if self._id is None:
+            self.logger.warn("Attempt to delete a sixteensdnaprep with no ID.")
+            raise Exception("Object does not have an ID.")
+
+        prep_id = self._id
+
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        # Assume failure
+        success = False
+
+        try:
+            self.logger.info("Deleting %s with OSDF ID %s.", __name__, prep_id)
+            session.get_osdf().delete_node(prep_id)
+            success = True
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
+            self.logger.error("An error occurred when deleting %s.", self)
+
+        return success
+
     @staticmethod
     def load_16s_raw_seq_set(seq_set_data):
         """
@@ -658,34 +614,34 @@ class SixteenSRawSeqSet(Base):
         Returns:
             Returns a SixteenSRawSeqSet instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         seq_set = SixteenSRawSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
 
         # The attributes that are required
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.exp_length = seq_set_data['meta']['exp_length']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.seq_model = seq_set_data['meta']['seq_model']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.tags = seq_set_data['meta']['tags']
+        seq_set.study = seq_set_data['meta']['study']
         seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
 
         # Optional fields.
         if 'sequence_type' in seq_set_data['meta']:
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+            seq_set.sequence_type = seq_set_data['meta']['sequence_type']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
         module_logger.debug("Returning loaded " + __name__)
         return seq_set
@@ -704,7 +660,7 @@ class SixteenSRawSeqSet(Base):
             A SixteenSRawSeqSet object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
@@ -722,17 +678,18 @@ class SixteenSRawSeqSet(Base):
 
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -740,7 +697,7 @@ class SixteenSRawSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
                                 "raw", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(SixteenSRawSeqSet.aspera_server,
@@ -754,7 +711,7 @@ class SixteenSRawSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to load 16S raw sequence set.")
         else:
-            self._urls = [ "fasp://" + SixteenSRawSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + SixteenSRawSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -784,23 +741,23 @@ class SixteenSRawSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
         osdf = session.get_osdf()
 
         if self.id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.info("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.info("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 self.logger.info("Attempting to save a new node.")
@@ -813,30 +770,35 @@ class SixteenSRawSeqSet(Base):
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, seq_set_id)
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+                self.logger.info("Update for %s %s successful.", __name__, seq_set_id)
 
                 seq_set_data = osdf.get_node(seq_set_id)
                 latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
             except Exception as e:
                 self.logger.exception(e)
                 self.logger.error("An error occurred while updating %s %s.",
-                                    __name__, self._id)
+                                  __name__,
+                                  self._id
+                                 )
 
         self.logger.debug("Returning " + str(success))
         return success
@@ -849,7 +811,7 @@ class SixteenSRawSeqSet(Base):
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
+        from cutlass.SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 
         for page_no in count(1):
             res = query("ihmp", linkage_query, page=page_no)

@@ -1,14 +1,18 @@
-#!/usr/bin/env python
+"""
+Models the WGS assembled sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -32,9 +36,7 @@ class WgsAssembledSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    date_format = '%Y-%m-%d'
-
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the WgsAssembledSeqSet class. This initializes the
         fields specific to the WgsAssembledSeqSet class, and inherits from the
@@ -68,8 +70,11 @@ class WgsAssembledSeqSet(Base):
 
         # Optional properties
         self._date = None
+        self._contact = None
         self._sop = None
         self._private_files = None
+
+        super(WgsAssembledSeqSet, self).__init__(*args, **kwargs)
 
     @property
     def assembler(self):
@@ -178,6 +183,55 @@ class WgsAssembledSeqSet(Base):
         self._comment = comment
 
     @property
+    def contact(self):
+        """
+        str: The primary contact.
+        """
+        self.logger.debug("In 'contact' getter.")
+
+        return self._contact
+
+    @contact.setter
+    @enforce_string
+    def contact(self, contact):
+        """
+        The primary contact
+
+        Args:
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'contact' setter.")
+
+        self._contact = contact
+
+    @property
+    def date(self):
+        """
+        str: Date on which the assembly was generated.
+        """
+        self.logger.debug("In 'date' getter.")
+
+        return self._date
+
+    @date.setter
+    @enforce_past_date
+    def date(self, date):
+        """
+        The setter for the date on which the assembly was generated.
+
+        Args:
+            date (str): Date.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'date' setter.")
+
+        self._date = date
+
+    @property
     def format(self):
         """
         str: The file format of the sequence file.
@@ -199,9 +253,6 @@ class WgsAssembledSeqSet(Base):
             None
         """
         self.logger.debug("In 'format' setter.")
-
-        if type(format_str) != str:
-            raise ValueError("Format must be a string.")
 
         formats = ["fasta", "fastq"]
         if format_str in formats:
@@ -347,6 +398,31 @@ class WgsAssembledSeqSet(Base):
         self._size = size
 
     @property
+    def sop(self):
+        """
+        str: Retrieve the standard operating procedure (SOP).
+        """
+        self.logger.debug("In 'sop' getter.")
+
+        return self._sop
+
+    @sop.setter
+    @enforce_string
+    def sop(self, sop):
+        """
+        The setter for the standard operating procedure.
+
+        Args:
+            sop (str): The SOP URL.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'sop' setter.")
+
+        self._sop = sop
+
+    @property
     def study(self):
         """
         str: One of the 3 studies that are part of the iHMP.
@@ -419,8 +495,8 @@ class WgsAssembledSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ WgsAssembledSeqSet.namespace ]
+                'read': ['all'],
+                'write': [WgsAssembledSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': WgsAssembledSeqSet.namespace,
@@ -442,21 +518,25 @@ class WgsAssembledSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
+        if self._contact is not None:
+            self.logger.debug("Object has the contact set.")
+            doc['meta']['contact'] = self._contact
+
         if self._date is not None:
-           self.logger.debug("Object has the date set.")
-           doc['meta']['date'] = self._date
+            self.logger.debug("Object has the date set.")
+            doc['meta']['date'] = self._date
 
         if self._sop is not None:
-           self.logger.debug("Object has the sop set.")
-           doc['meta']['sop'] = self._sop
+            self.logger.debug("Object has the sop set.")
+            doc['meta']['sop'] = self._sop
 
         if self._private_files is not None:
             self.logger.debug("Object has the 'private_files' property set.")
@@ -465,7 +545,7 @@ class WgsAssembledSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"wgs_assembled_seq_set\"[node_type]"):
+    def search(query="\"wgs_assembled_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all WgsAssembledSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query language
@@ -493,7 +573,7 @@ class WgsAssembledSeqSet(Base):
         if query != '"wgs_assembled_seq_set"[node_type]':
             query = '({}) && "wgs_assembled_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         wgsAssembledSeqSet_data = session.get_osdf().oql_query(
             WgsAssembledSeqSet.namespace, query
@@ -522,43 +602,43 @@ class WgsAssembledSeqSet(Base):
         Returns:
             Returns a WgsAssembledSeqSet instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         seq_set = WgsAssembledSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
 
         # The attributes that are particular to WgsAssembledSeqSet documents
-        seq_set._assembler = seq_set_data['meta']['assembler']
-        seq_set._assembly_name = seq_set_data['meta']['assembly_name']
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._sequence_type = seq_set_data['meta']['sequence_type']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
+        seq_set.assembler = seq_set_data['meta']['assembler']
+        seq_set.assembly_name = seq_set_data['meta']['assembly_name']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.sequence_type = seq_set_data['meta']['sequence_type']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.tags = seq_set_data['meta']['tags']
         seq_set._study = seq_set_data['meta']['study']
+        seq_set._urls = seq_set_data['meta']['urls']
 
         # Optional fields
         if 'contact' in seq_set_data['meta']:
-            seq_set._date = seq_set_data['meta']['contact']
+            seq_set.contact = seq_set_data['meta']['contact']
 
         if 'date' in seq_set_data['meta']:
-            seq_set._date = seq_set_data['meta']['date']
+            seq_set.date = seq_set_data['meta']['date']
 
         if 'sop' in seq_set_data['meta']:
-            seq_set._sop = seq_set_data['meta']['sop']
+            seq_set.sop = seq_set_data['meta']['sop']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
         return seq_set
 
     @staticmethod
@@ -574,14 +654,14 @@ class WgsAssembledSeqSet(Base):
         Returns:
             A WgsAssembledSeqSet object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         seq_set_data = session.get_osdf().get_node(seq_set_id)
         seq_set = WgsAssembledSeqSet.load_wgsAssembledSeqSet(seq_set_data)
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return seq_set
 
@@ -610,7 +690,7 @@ class WgsAssembledSeqSet(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if self._private_files:
@@ -625,7 +705,7 @@ class WgsAssembledSeqSet(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must add a 'computed_from' link to a wgs_dna_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -650,10 +730,10 @@ class WgsAssembledSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -663,17 +743,18 @@ class WgsAssembledSeqSet(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -681,7 +762,7 @@ class WgsAssembledSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
                                 "analysis", "hmasm", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(WgsAssembledSeqSet.aspera_server,
@@ -695,8 +776,7 @@ class WgsAssembledSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to upload WGS assembled sequence set.")
         else:
-            self._urls = [ "fasp://" + WgsAssembledSeqSet.aspera_server + remote_path ]
-
+            self._urls = ["fasp://" + WgsAssembledSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -731,12 +811,12 @@ class WgsAssembledSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
@@ -744,11 +824,11 @@ class WgsAssembledSeqSet(Base):
 
         if self.id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -757,35 +837,40 @@ class WgsAssembledSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " +
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, seq_set_id)
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+                self.logger.info("Update for %s %s successful.", __name__, seq_set_id)
 
                 seq_set_data = osdf.get_node(seq_set_id)
                 latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as edit_exception:
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self._id,
+                                  edit_exception
+                                 )
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success
 
     def abundance_matrices(self):
@@ -795,11 +880,12 @@ class WgsAssembledSeqSet(Base):
         """
         self.logger.debug("In abundance_matrices().")
 
-        linkage_query = '"abundance_matrix"[node_type] && "{}"[linkage.computed_from]'.format(self.id)
+        linkage_query = '"abundance_matrix"[node_type] && ' + \
+                        '"{}"[linkage.computed_from]'.format(self.id)
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from AbundanceMatrix import AbundanceMatrix
+        from cutlass.AbundanceMatrix import AbundanceMatrix
 
         for page_no in count(1):
             res = query(WgsAssembledSeqSet.namespace, linkage_query,
@@ -825,7 +911,7 @@ class WgsAssembledSeqSet(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Annotation import Annotation
+        from cutlass.Annotation import Annotation
 
         for page_no in count(1):
             res = query(WgsAssembledSeqSet.namespace, linkage_query,

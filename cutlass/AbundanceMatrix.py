@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the abundance matrix object.
+"""
+
+# pylint: disable=W0703, C1801
 
 import json
 import logging
 import os
 import string
-from aspera import aspera
-from iHMPSession import iHMPSession
-from itertools import count
-from Base import Base
-from Util import *
+from cutlass.aspera import aspera
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class AbundanceMatrix(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the AbundanceMatrix class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -60,6 +63,8 @@ class AbundanceMatrix(Base):
         self._local_file = None
         self._private_files = None
         self._sop = None
+
+        super(AbundanceMatrix, self).__init__(*args, **kwargs)
 
     @property
     def checksums(self):
@@ -108,7 +113,6 @@ class AbundanceMatrix(Base):
         self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
-
 
     @property
     def format(self):
@@ -316,6 +320,16 @@ class AbundanceMatrix(Base):
 
         self._study = study
 
+    @property
+    def urls(self):
+        """
+        array: An array of string URLs from where the file can be obtained,
+               http, ftp, fasp, etc...
+        """
+        self.logger.debug("In 'urls' getter.")
+
+        return self._urls
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -356,7 +370,7 @@ class AbundanceMatrix(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -381,10 +395,10 @@ class AbundanceMatrix(Base):
         valid = True
 
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", str(len(problems)))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -404,8 +418,8 @@ class AbundanceMatrix(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ AbundanceMatrix.namespace ]
+                'read': ['all'],
+                'write': [AbundanceMatrix.namespace]
             },
             'linkage': self._links,
             'ns': AbundanceMatrix.namespace,
@@ -486,17 +500,17 @@ class AbundanceMatrix(Base):
         success = False
 
         try:
-            self.logger.info("Deleting AbunanceMatrix with ID %s." % matrix_id)
+            self.logger.info("Deleting AbunanceMatrix with ID %s.", matrix_id)
             session.get_osdf().delete_node(matrix_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"abundance_matrix\"[node_type]"):
+    def search(query="\"abundance_matrix\"[node_type]"):
         """
         Searches OSDF for AbundanceMatrix nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -524,7 +538,7 @@ class AbundanceMatrix(Base):
         if query != '"abundance_matrix"[node_type]':
             query = '({}) && "abundance_matrix"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         matrix_data = session.get_osdf().oql_query(AbundanceMatrix.namespace, query)
 
@@ -551,35 +565,37 @@ class AbundanceMatrix(Base):
         Returns:
             Returns an AbundanceMatrix instance.
         """
-        module_logger.info("Creating a template %s." % __name__)
+        module_logger.info("Creating a template %s.", __name__)
         matrix = AbundanceMatrix()
 
-        module_logger.debug("Filling in %s details." % __name__)
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         matrix._set_id(matrix_data['id'])
-        matrix._links = matrix_data['linkage']
-        matrix._version = matrix_data['ver']
+        matrix.links = matrix_data['linkage']
+        matrix.version = matrix_data['ver']
 
         # Required fields
-        matrix._checksums = matrix_data['meta']['checksums']
-        matrix._comment = matrix_data['meta']['comment']
-        matrix._format = matrix_data['meta']['format']
-        matrix._format_doc = matrix_data['meta']['format_doc']
-        matrix._matrix_type = matrix_data['meta']['matrix_type']
-        matrix._size = matrix_data['meta']['size']
-        matrix._study = matrix_data['meta']['study']
-        matrix._tags = matrix_data['meta']['tags']
+        matrix.checksums = matrix_data['meta']['checksums']
+        matrix.comment = matrix_data['meta']['comment']
+        matrix.format = matrix_data['meta']['format']
+        matrix.format_doc = matrix_data['meta']['format_doc']
+        matrix.matrix_type = matrix_data['meta']['matrix_type']
+        matrix.size = matrix_data['meta']['size']
+        matrix.study = matrix_data['meta']['study']
+        matrix.tags = matrix_data['meta']['tags']
+        # We need to use the private attribute here because there is no
+        # public setter.
         matrix._urls = matrix_data['meta']['urls']
 
         # Optional fields
         if 'sop' in matrix_data['meta']:
-            matrix._sop = matrix_data['meta']['sop']
+            matrix.sop = matrix_data['meta']['sop']
 
         if 'private_files' in matrix_data['meta']:
-            matrix._private_files = matrix_data['meta']['private_files']
+            matrix.private_files = matrix_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
         return matrix
 
     @staticmethod
@@ -596,14 +612,14 @@ class AbundanceMatrix(Base):
             An AbundanceMatrix object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % matrix_id)
+        module_logger.debug("In load. Specified ID: %s", matrix_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         matrix_data = session.get_osdf().get_node(matrix_id)
         matrix = AbundanceMatrix.load_abundance_matrix(matrix_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return matrix
 
@@ -613,36 +629,38 @@ class AbundanceMatrix(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_map = {
-            "16s_community": [ "genome", "microbiome", "16s", "analysis", "hmqcp" ],
-            "wgs_community": [ "genome", "microbiome", "wgs", "analysis", "hmscp" ],
-            "wgs_functional": [ "genome", "microbiome", "wgs", "analysis", "hmmrc" ],
-            "microb_proteomic": [ "proteome", "microbiome", "analysis" ],
-            "microb_lipidomic": [ "lipidome", "microbiome", "analysis" ],
-            "microb_cytokine": [ "cytokine", "microbiome", "analysis" ],
-            "microb_metabolome": [ "metabolome", "microbiome", "analysis" ],
-            "microb_metatranscriptome": [ "metatranscriptome", "microbiome", "analysis" ],
-            "host_proteomic": [ "proteome", "host", "analysis" ],
-            "host_lipidomic": [ "lipidome", "host", "analysis" ],
-            "host_cytokine": [ "cytokine", "host", "analysis" ],
-            "host_metabolome": [ "metabolome", "host", "analysis" ],
-            "host_transcriptome": [ "transcriptome", "host", "analysis" ] }
+            "16s_community": ["genome", "microbiome", "16s", "analysis", "hmqcp"],
+            "wgs_community": ["genome", "microbiome", "wgs", "analysis", "hmscp"],
+            "wgs_functional": ["genome", "microbiome", "wgs", "analysis", "hmmrc"],
+            "microb_proteomic": ["proteome", "microbiome", "analysis"],
+            "microb_lipidomic": ["lipidome", "microbiome", "analysis"],
+            "microb_cytokine": ["cytokine", "microbiome", "analysis"],
+            "microb_metabolome": ["metabolome", "microbiome", "analysis"],
+            "microb_metatranscriptome": ["metatranscriptome", "microbiome", "analysis"],
+            "host_proteomic": ["proteome", "host", "analysis"],
+            "host_lipidomic": ["lipidome", "host", "analysis"],
+            "host_cytokine": ["cytokine", "host", "analysis"],
+            "host_metabolome": ["metabolome", "host", "analysis"],
+            "host_transcriptome": ["transcriptome", "host", "analysis"]
+        }
 
         matrix_type = self._matrix_type
 
@@ -655,7 +673,9 @@ class AbundanceMatrix(Base):
         remote_elements.append(remote_base)
         remote_path = "/" + "/".join(remote_elements)
 
-        self.logger.debug("Remote path for this abundance matrix will be %s." % remote_path)
+        self.logger.debug("Remote path for this abundance matrix will be %s.",
+                          remote_path
+                         )
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(AbundanceMatrix.aspera_server,
@@ -669,7 +689,7 @@ class AbundanceMatrix(Base):
                               "Aborting save.")
             raise Exception("Unable to upload abundance matrix.")
         else:
-            self._urls = [ "fasp://" + AbundanceMatrix.aspera_server + remote_path ]
+            self._urls = ["fasp://" + AbundanceMatrix.aspera_server + remote_path]
 
     def save(self):
         """
@@ -702,23 +722,23 @@ class AbundanceMatrix(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
         osdf = session.get_osdf()
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 self.logger.info("Attempting to save a new node.")
@@ -731,30 +751,33 @@ class AbundanceMatrix(Base):
                 self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. Reason: %s",
+                                  __name__,
+                                  save_exception
+                                 )
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 matrix_data = self._get_raw_doc()
                 matrix_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % matrix_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, matrix_id)
                 osdf.edit_node(matrix_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % matrix_id)
+                self.logger.info("Update for %s %s successful.", __name__, matrix_id)
 
                 matrix_data = osdf.get_node(matrix_id)
                 latest_version = matrix_data['ver']
 
-                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now %s", __name__, str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
+                self.logger.error("An error occurred while updating %s %s. Reason: %s.",
+                                  __name__, self._id, update_exception
+                                 )
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success

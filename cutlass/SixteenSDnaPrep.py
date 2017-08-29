@@ -1,14 +1,16 @@
-#!/usr/bin/env python
+"""
+Models the 16S DNA prep object.
+"""
 
-from datetime import datetime
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from mimarks import MIMARKS, MimarksException
-from Base import Base
-from SixteenSRawSeqSet import SixteenSRawSeqSet
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.mimarks import MIMARKS, MimarksException
+from cutlass.Base import Base
+from cutlass.SixteenSRawSeqSet import SixteenSRawSeqSet
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -26,9 +28,7 @@ class SixteenSDnaPrep(Base):
     """
     namespace = "ihmp"
 
-    date_format = '%Y-%m-%d'
-
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the SixteenSDnaPrep class. This initializes the fields
         specific to the SixteenSDnaPrep class, and inherits from the Base class.
@@ -57,6 +57,8 @@ class SixteenSDnaPrep(Base):
         self._srs_id = None
         self._storage_duration = None
 
+        super(SixteenSDnaPrep, self).__init__(*args, **kwargs)
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current schema in
@@ -82,13 +84,13 @@ class SixteenSDnaPrep(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if 'prepared_from' not in self._links.keys():
             problems.append("Must add a 'prepared_from' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -112,13 +114,13 @@ class SixteenSDnaPrep(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'prepared_from' not in self._links.keys():
             self.logger.error("Must have of 'prepared_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -143,7 +145,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
+        self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
 
@@ -152,7 +154,7 @@ class SixteenSDnaPrep(Base):
         """
         int: Target library fragment size after shearing.
         """
-        self.logger.debug("In frag_size getter.")
+        self.logger.debug("In 'frag_size' getter.")
 
         return self._frag_size
 
@@ -169,7 +171,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In frag_size setter.")
+        self.logger.debug("In 'frag_size' setter.")
 
         if frag_size < 0:
             raise ValueError("Invalid frag_size. Must be non-negative.")
@@ -182,7 +184,7 @@ class SixteenSDnaPrep(Base):
         str: Specification of the layout: fragment/paired, and if paired,
              then nominal insert size and standard deviation.
         """
-        self.logger.debug("In lib_layout getter.")
+        self.logger.debug("In 'lib_layout' getter.")
 
         return self._lib_layout
 
@@ -198,7 +200,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In lib_layout setter.")
+        self.logger.debug("In 'lib_layout' setter.")
 
         self._lib_layout = lib_layout
 
@@ -209,7 +211,7 @@ class SixteenSDnaPrep(Base):
              method used in library construction. Terms used by TCGA include
              (random, hybrid selection)
         """
-        self.logger.debug("In lib_selection getter.")
+        self.logger.debug("In 'lib_selection' getter.")
 
         return self._lib_selection
 
@@ -225,14 +227,16 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In lib_selection setter.")
+        self.logger.debug("In 'lib_selection' setter.")
 
         self._lib_selection = lib_selection
 
     @property
     def mimarks(self):
-        """ mimarks: Genomic Standards Consortium MIMARKS fields. """
-        self.logger.debug("In mimarks getter.")
+        """
+        mimarks: Genomic Standards Consortium MIMARKS fields.
+        """
+        self.logger.debug("In 'mimarks' getter.")
 
         return self._mimarks
 
@@ -240,7 +244,7 @@ class SixteenSDnaPrep(Base):
     @enforce_dict
     def mimarks(self, mimarks):
         """
-        The setter for the SixteenSDnaPrep MIMARKS. The provided dictionary
+        The setter for the MIMARKS data. The provided dictionary
         must validate based on the MIMARKS class.
 
         Args:
@@ -249,7 +253,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In mimarks setter.")
+        self.logger.debug("In 'mimarks' setter.")
 
         valid_dictionary = MIMARKS.check_dict(mimarks)
 
@@ -265,7 +269,7 @@ class SixteenSDnaPrep(Base):
         """
         str: NCBI taxon id.
         """
-        self.logger.debug("In ncbi_taxon_id getter.")
+        self.logger.debug("In 'ncbi_taxon_id' getter.")
 
         return self._ncbi_taxon_id
 
@@ -273,7 +277,7 @@ class SixteenSDnaPrep(Base):
     @enforce_string
     def ncbi_taxon_id(self, ncbi_taxon_id):
         """
-        The setter for the SixteenSDnaPrep NCBI Taxon ID.
+        The setter for the NCBI Taxon ID.
 
         Args:
             ncbi_taxon_id (str): The new NCBI Taxon ID.
@@ -281,7 +285,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In ncbi_taxon_id setter.")
+        self.logger.debug("In 'ncbi_taxon_id' setter.")
 
         self._ncbi_taxon_id = ncbi_taxon_id
 
@@ -290,7 +294,7 @@ class SixteenSDnaPrep(Base):
         """
         str: Nucleic Acid Prep ID.
         """
-        self.logger.debug("In prep_id getter.")
+        self.logger.debug("In 'prep_id' getter.")
 
         return self._prep_id
 
@@ -298,15 +302,15 @@ class SixteenSDnaPrep(Base):
     @enforce_string
     def prep_id(self, prep_id):
         """
-        The setter for the SixteenSDnaPrep Prep ID.
+        The setter for the prep ID.
 
         Args:
-            prep_id (str): The new Prep ID.
+            prep_id (str): The new prep ID.
 
         Returns:
             None
         """
-        self.logger.debug("In prep_id setter.")
+        self.logger.debug("In 'prep_id' setter.")
 
         self._prep_id = prep_id
 
@@ -315,7 +319,7 @@ class SixteenSDnaPrep(Base):
         """
         str: NCBI Sequence Read Archive sample ID of the form SRS012345.
         """
-        self.logger.debug("In srs_id getter.")
+        self.logger.debug("In 'srs_id' getter.")
 
         return self._srs_id
 
@@ -332,7 +336,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In srs_id setter.")
+        self.logger.debug("In 'srs_id' setter.")
 
         if len(srs_id) < 3:
             raise Exception("SRS ID is too short, must be more than 3 characters.")
@@ -369,7 +373,7 @@ class SixteenSDnaPrep(Base):
         """
         str: Name and email of the primary contact at the sequencing center.
         """
-        self.logger.debug("In sequencing_contact getter.")
+        self.logger.debug("In 'sequencing_contact' getter.")
 
         return self._sequencing_contact
 
@@ -385,7 +389,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In sequencing_contact setter.")
+        self.logger.debug("In 'sequencing_contact' setter.")
 
         self._sequencing_contact = sequencing_contact
 
@@ -394,7 +398,7 @@ class SixteenSDnaPrep(Base):
         """
         int: Duration for which sample was stored in days.
         """
-        self.logger.debug("In storage_duration getter.")
+        self.logger.debug("In 'storage_duration' getter.")
 
         return self._storage_duration
 
@@ -402,7 +406,7 @@ class SixteenSDnaPrep(Base):
     @enforce_int
     def storage_duration(self, storage_duration):
         """
-        The setter for the SixteenSDnaPrep storage duration. The duration must
+        The setter for the storage duration. The duration must
         be an integer, and greater than 0.
 
         Args:
@@ -411,7 +415,7 @@ class SixteenSDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In storage_duration setter.")
+        self.logger.debug("In 'storage_duration' setter.")
 
         if storage_duration < 0:
             raise ValueError("Invalid storage_duration. Must be non-negative.")
@@ -429,9 +433,9 @@ class SixteenSDnaPrep(Base):
             None
         """
         module_logger.debug("In required fields.")
-        return ( "comment", "lib_layout", "lib_selection", "mimarks",
-                 "ncbi_taxon_id", "prep_id", "sequencing_center",
-                 "sequencing_contact", "storage_duration", "tags" )
+        return ("comment", "lib_layout", "lib_selection", "mimarks",
+                "ncbi_taxon_id", "prep_id", "sequencing_center",
+                "sequencing_contact", "storage_duration", "tags")
 
     def _get_raw_doc(self):
         """
@@ -451,8 +455,8 @@ class SixteenSDnaPrep(Base):
 
         sixteen_s_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ SixteenSDnaPrep.namespace ]
+                'read': ['all'],
+                'write': [SixteenSDnaPrep.namespace]
             },
             'linkage': self._links,
             'ns': SixteenSDnaPrep.namespace,
@@ -473,25 +477,25 @@ class SixteenSDnaPrep(Base):
         }
 
         if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           sixteen_s_doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            sixteen_s_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           sixteen_s_doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            sixteen_s_doc['ver'] = self._version
 
         if self._frag_size is not None:
-           self.logger.debug(__name__ + " object has the frag_size set.")
-           sixteen_s_doc['meta']['frag_size'] = self._frag_size
+            self.logger.debug("%s object has the frag_size set.", __name__)
+            sixteen_s_doc['meta']['frag_size'] = self._frag_size
 
         if self._srs_id is not None:
-           self.logger.debug(__name__ + " object has the srs_id set.")
-           sixteen_s_doc['meta']['srs_id'] = self._srs_id
+            self.logger.debug("%s object has the srs_id set.", __name__)
+            sixteen_s_doc['meta']['srs_id'] = self._srs_id
 
         return sixteen_s_doc
 
     @staticmethod
-    def search(query = "\"16s_dna_prep\"[node_type]"):
+    def search(query="\"16s_dna_prep\"[node_type]"):
         """
         Searches the OSDF database through all 16s DNA prep nodes. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -519,9 +523,12 @@ class SixteenSDnaPrep(Base):
         if query != '"16s_dna_prep"[node_type]':
             query = '({}) && "16s_dna_prep"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
-        sixteenSDnaPrep_data = session.get_osdf().oql_query(SixteenSDnaPrep.namespace, query)
+        sixteenSDnaPrep_data = session.get_osdf().oql_query(
+            SixteenSDnaPrep.namespace,
+            query
+        )
 
         all_results = sixteenSDnaPrep_data['results']
 
@@ -529,8 +536,8 @@ class SixteenSDnaPrep(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                sixteenSDnaPrep_result = SixteenSDnaPrep.load_sixteenSDnaPrep(result)
-                result_list.append(sixteenSDnaPrep_result)
+                sixteens_dna_prep_result = SixteenSDnaPrep.load_sixteenSDnaPrep(result)
+                result_list.append(sixteens_dna_prep_result)
 
         return result_list
 
@@ -545,37 +552,37 @@ class SixteenSDnaPrep(Base):
         Returns:
             Returns a Subject instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         prep = SixteenSDnaPrep()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         prep._set_id(prep_data['id'])
-        prep._version = prep_data['ver']
-        prep._links = prep_data['linkage']
+        prep.version = prep_data['ver']
+        prep.links = prep_data['linkage']
 
         # The attributes that are particular to SixteenSDnaPrep documents
-        prep._comment = prep_data['meta']['comment']
-        prep._lib_layout = prep_data['meta']['lib_layout']
-        prep._lib_selection = prep_data['meta']['lib_selection']
-        prep._mimarks = prep_data['meta']['mimarks']
-        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._sequencing_center = prep_data['meta']['sequencing_center']
-        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._tags = prep_data['meta']['tags']
+        prep.comment = prep_data['meta']['comment']
+        prep.lib_layout = prep_data['meta']['lib_layout']
+        prep.lib_selection = prep_data['meta']['lib_selection']
+        prep.mimarks = prep_data['meta']['mimarks']
+        prep.ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.sequencing_center = prep_data['meta']['sequencing_center']
+        prep.sequencing_contact = prep_data['meta']['sequencing_contact']
+        prep.storage_duration = prep_data['meta']['storage_duration']
+        prep.tags = prep_data['meta']['tags']
 
         if 'frag_size' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'frag_size' present.")
-            prep._frag_size = prep_data['meta']['frag_size']
+            module_logger.info("%s data has 'frag_size' present.", __name__)
+            prep.frag_size = prep_data['meta']['frag_size']
 
         if 'srs_id' in prep_data['meta']:
             module_logger.info(__name__ + " data has 'srs_id' present.")
-            prep._srs_id = prep_data['meta']['srs_id']
+            prep.srs_id = prep_data['meta']['srs_id']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return prep
 
@@ -596,8 +603,8 @@ class SixteenSDnaPrep(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a sixteensdnaprep with no ID.")
-            raise Exception("sixteensdnaprep does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID.", __name__)
 
         prep_id = self._id
 
@@ -608,7 +615,7 @@ class SixteenSDnaPrep(Base):
         success = False
 
         try:
-            self.logger.info("Deleting sixteensdnaprep with OSDF ID %s." % prep_id)
+            self.logger.info("Deleting %s with OSDF ID %s.", __name__, prep_id)
             session.get_osdf().delete_node(prep_id)
             success = True
         except Exception as e:
@@ -630,44 +637,44 @@ class SixteenSDnaPrep(Base):
         Returns:
             A SixteenSDnaPrep object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s.", prep_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         prep_data = session.get_osdf().get_node(prep_id)
 
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         prep = SixteenSDnaPrep()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         prep._set_id(prep_data['id'])
-        prep._version = prep_data['ver']
-        prep._links = prep_data['linkage']
+        prep.version = prep_data['ver']
+        prep.links = prep_data['linkage']
 
         # The attributes that are particular to SixteenSDnaPrep documents
-        prep._comment = prep_data['meta']['comment']
-        prep._lib_layout = prep_data['meta']['lib_layout']
-        prep._lib_selection = prep_data['meta']['lib_selection']
-        prep._mimarks = prep_data['meta']['mimarks']
-        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._sequencing_center = prep_data['meta']['sequencing_center']
-        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._tags = prep_data['meta']['tags']
+        prep.comment = prep_data['meta']['comment']
+        prep.lib_layout = prep_data['meta']['lib_layout']
+        prep.lib_selection = prep_data['meta']['lib_selection']
+        prep.mimarks = prep_data['meta']['mimarks']
+        prep.ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.sequencing_center = prep_data['meta']['sequencing_center']
+        prep.sequencing_contact = prep_data['meta']['sequencing_contact']
+        prep.storage_duration = prep_data['meta']['storage_duration']
+        prep.tags = prep_data['meta']['tags']
 
         if 'frag_size' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'frag_size' present.")
-            prep._frag_size = prep_data['meta']['frag_size']
+            module_logger.info("%s data has 'frag_size' present.", __name__)
+            prep.frag_size = prep_data['meta']['frag_size']
 
         if 'srs_id' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'srs_id' present.")
-            prep._srs_id = prep_data['meta']['srs_id']
+            module_logger.info("%s data has 'srs_id' present.", __name__)
+            prep.srs_id = prep_data['meta']['srs_id']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return prep
 
@@ -707,26 +714,26 @@ class SixteenSDnaPrep(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(prep_data)
-                self.logger.info("Save for sixteensdnaprep %s successful." % node_id)
-                self.logger.info("Setting ID for sixteensdnaprep %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when inserting %s.", self)
 
         else:
             prep_data = self._get_raw_doc()
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self._id)
                 session.get_osdf().edit_node(prep_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as edit_exception:
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self._id, edit_exception)
 
         return success
 
@@ -749,4 +756,3 @@ class SixteenSDnaPrep(Base):
 
             if res_count < 1:
                 break
-

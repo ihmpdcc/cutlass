@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the viral sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+#pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class ViralSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the ViralSeqSet class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -58,6 +61,8 @@ class ViralSeqSet(Base):
         self._local_file = None
         self._private_files = None
 
+        super(ViralSeqSet, self).__init__(*args, **kwargs)
+
     @property
     def checksums(self):
         """
@@ -79,8 +84,6 @@ class ViralSeqSet(Base):
             None
         """
         self.logger.debug("In 'checksums' setter.")
-        if type(checksums) is not dict:
-            raise ValueError("Invalid type for checksums.")
 
         self._checksums = checksums
 
@@ -287,7 +290,7 @@ class ViralSeqSet(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -311,10 +314,10 @@ class ViralSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -336,8 +339,8 @@ class ViralSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ ViralSeqSet.namespace ]
+                'read': ['all'],
+                'write': [ViralSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': ViralSeqSet.namespace,
@@ -409,7 +412,7 @@ class ViralSeqSet(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a ViralSeqSet with no ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
             raise Exception("ViralSeqSet does not have an ID.")
 
         viral_ss_id = self._id
@@ -421,17 +424,17 @@ class ViralSeqSet(Base):
         success = False
 
         try:
-            self.logger.info("Deleting ViralSeqSet with ID %s." % viral_ss_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, viral_ss_id)
             session.get_osdf().delete_node(viral_ss_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"viral_seq_set\"[node_type]"):
+    def search(query="\"viral_seq_set\"[node_type]"):
         """
         Searches OSDF for ViralSeqSet nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -459,7 +462,7 @@ class ViralSeqSet(Base):
         if query != '"viral_seq_set"[node_type]':
             query = '({}) && "viral_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         data = session.get_osdf().oql_query(ViralSeqSet.namespace, query)
 
@@ -491,30 +494,30 @@ class ViralSeqSet(Base):
 
         module_logger.debug("Filling in ViralSeqSet details.")
         node._set_id(data['id'])
-        node._links = data['linkage']
-        node._version = data['ver']
+        node.links = data['linkage']
+        node.version = data['ver']
 
         # Required fields
-        node._checksums = data['meta']['checksums']
+        node.checksums = data['meta']['checksums']
+        node.study = data['meta']['study']
+        node.tags = data['meta']['tags']
         node._subtype = data['meta']['subtype']
-        node._study = data['meta']['study']
-        node._tags = data['meta']['tags']
         node._urls = data['meta']['urls']
 
         # Optional fields
         if 'comment' in data['meta']:
-            node._comment = data['meta']['comment']
+            node.comment = data['meta']['comment']
 
         if 'format' in data['meta']:
-            node._format = data['meta']['format']
+            node.format = data['meta']['format']
 
         if 'format_doc' in data['meta']:
-            node._format_doc = data['meta']['format_doc']
+            node.format_doc = data['meta']['format_doc']
 
         if 'private_files' in data['meta']:
-            node._private_files = data['meta']['private_files']
+            node.private_files = data['meta']['private_files']
 
-        module_logger.debug("Returning loaded ViralSeqSet.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return node
 
     @staticmethod
@@ -531,35 +534,36 @@ class ViralSeqSet(Base):
             A ViralSeqSet object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % node_id)
+        module_logger.debug("In load. Specified ID: %s", node_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         node_data = session.get_osdf().get_node(node_id)
-        node = ViralSeqSet.load_viral_seq_set(node_data) 
+        node = ViralSeqSet.load_viral_seq_set(node_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return node
 
     def _upload_data(self):
         self.logger.debug("In _upload_data.")
 
-        session = iHMPSession.get_session() 
+        session = iHMPSession.get_session()
 
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
-            raise ValueError("Invalid study. No directory mapping for %s" % study)
+            raise ValueError("Invalid study. No directory mapping for %s", study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -567,9 +571,7 @@ class ViralSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
                                 "analysis", "hmvir", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
-
-        success = False
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(ViralSeqSet.aspera_server,
                                            session.username,
@@ -582,7 +584,7 @@ class ViralSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to upload viral sequence set.")
         else:
-            self._urls = [ "fasp://" + ViralSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + ViralSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -615,7 +617,7 @@ class ViralSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
@@ -627,11 +629,11 @@ class ViralSeqSet(Base):
         osdf = session.get_osdf()
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 self.logger.info("Attempting to save a new node.")
@@ -640,34 +642,38 @@ class ViralSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 node_data = self._get_raw_doc()
                 node_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % node_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, node_id)
                 osdf.edit_node(node_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % node_id)
+                self.logger.info("Update for %s %s successful.", __name__, node_id)
 
                 node_data = osdf.get_node(node_id)
                 latest_version = node_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as edit_exception:
+                self.logger.exception(edit_exception)
                 self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+                                  "%s %s. Reason: %s.", __name__, self._id,
+                                  edit_exception
+                                 )
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success

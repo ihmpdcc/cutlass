@@ -1,3 +1,7 @@
+"""
+Provide utility decorators and python version checking.
+"""
+
 from datetime import datetime
 
 import os
@@ -9,6 +13,9 @@ PYTHON_MIN_VERSION = (2, 7, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)
 
 def enforce_bool(func):
+    """
+    Decorator to enforce a boolean argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not bool:
             raise ValueError("Invalid type provided. Must be a bool.")
@@ -18,6 +25,9 @@ def enforce_bool(func):
     return wrapper
 
 def enforce_dict(func):
+    """
+    Decorator to enforce a dict argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not dict:
             raise ValueError("Invalid type provided. Must be a dict.")
@@ -27,6 +37,9 @@ def enforce_dict(func):
     return wrapper
 
 def enforce_float(func):
+    """
+    Decorator to enforce a float argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not float:
             raise ValueError("Invalid type provided. Must be a float.")
@@ -36,6 +49,9 @@ def enforce_float(func):
     return wrapper
 
 def enforce_int(func):
+    """
+    Decorator to enforce an int argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not int:
             raise ValueError("Invalid type provided. Must be an int.")
@@ -45,6 +61,9 @@ def enforce_int(func):
     return wrapper
 
 def enforce_list(func):
+    """
+    Decorator to enforce a list argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not list:
             raise ValueError("Invalid type provided. Must be a list.")
@@ -54,6 +73,9 @@ def enforce_list(func):
     return wrapper
 
 def enforce_string(func):
+    """
+    Decorator to enforce a string argument.
+    """
     def wrapper(self, *args):
         if type(args[0]) is not str:
             raise ValueError("Invalid type provided. Must be a string.")
@@ -62,7 +84,11 @@ def enforce_string(func):
 
     return wrapper
 
+
 def enforce_past_date(func):
+    """
+    Decorator to enforce date strings that are provided occur in the past.
+    """
     def wrapper(self, date):
         try:
             parsed = datetime.strptime(date, DATE_FORMAT)
@@ -148,9 +174,10 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
         }
 
         if raise_exception_on_fail:
-            raise UtilError(error_msg)
+            raise Exception(error_msg)
 
         if print_on_fail:
+            # pylint: disable=C0325
             print('ERROR: %s' % error_msg)
 
         if exit_on_fail:

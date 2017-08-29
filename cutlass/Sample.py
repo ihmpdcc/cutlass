@@ -1,18 +1,21 @@
-#!/usr/bin/env python
+"""
+Models the cytokine object.
+"""
 
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from mixs import MIXS, MixsException
-from Base import Base
-from WgsDnaPrep import WgsDnaPrep
-from SixteenSDnaPrep import SixteenSDnaPrep
-from HostSeqPrep import HostSeqPrep
-from MicrobiomeAssayPrep import MicrobiomeAssayPrep
-from HostAssayPrep import HostAssayPrep
-from SampleAttribute import SampleAttribute
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.mixs import MIXS, MixsException
+from cutlass.Base import Base
+from cutlass.WgsDnaPrep import WgsDnaPrep
+from cutlass.SixteenSDnaPrep import SixteenSDnaPrep
+from cutlass.HostSeqPrep import HostSeqPrep
+from cutlass.MicrobiomeAssayPrep import MicrobiomeAssayPrep
+from cutlass.HostAssayPrep import HostAssayPrep
+from cutlass.SampleAttribute import SampleAttribute
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -30,7 +33,7 @@ class Sample(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Sample class. This initializes the fields specific to the
         Sample class, and inherits from the Base class.
@@ -40,18 +43,21 @@ class Sample(Base):
         """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
         self.logger.addHandler(logging.NullHandler())
+
         # Common to all
         self._id = None
         self._version = None
         self._tags = []
         self._links = {}
 
-	# Unique to sample
+	    # Optional properties
         self._body_site = None
         self._fma_body_site = None
         self._mixs = None
         self._name = None
         self._supersite = None
+
+        super(Sample, self).__init__(*args, **kwargs)
 
     @property
     def body_site(self):
@@ -77,7 +83,8 @@ class Sample(Base):
 
         self.logger.debug("In 'body_site' setter.")
 
-        body_sites = ["anterior_nares", "attached_keratinized_gingiva",
+        body_sites = [
+            "anterior_nares", "attached_keratinized_gingiva",
             "buccal_mucosa", "hard_palate", "left_antecubital_fossa",
             "left_retroauricular_crease", "mid_vagina", "palatine_tonsils",
             "posterior_fornix", "right_antecubital_fossa",
@@ -99,7 +106,8 @@ class Sample(Base):
             "right_arm", "sigmoid_colon", "stomach", "subgingival",
             "synovial_fluid", "teeth", "terminal_ileum", "transverse_colon",
             "unknown", "upper_respiratory_tract", "urethra", "urinary_tract",
-            "vaginal", "wound" ]
+            "vaginal", "wound"
+        ]
 
         if body_site in body_sites:
             self._body_site = body_site
@@ -159,7 +167,7 @@ class Sample(Base):
                       "liver", "lymph_nodes", "oral", "other", "skin",
                       "spinal_cord", "unknown", "urogenital_tract", "wound"]
         if supersite in supersites:
-            self._supersite= supersite
+            self._supersite = supersite
         else:
             raise Exception("Supersite provided is not a valid supersite.")
 
@@ -253,14 +261,15 @@ class Sample(Base):
         (valid, error_message) = session.get_osdf().validate_node(document)
 
         problems = []
+
         if not valid:
-            self.logger.info("Validation did not succeed for Sample.")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if 'collected_during' not in self._links.keys():
             problems.append("Must add a 'collected_during' key-value pair in the links")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -284,12 +293,12 @@ class Sample(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'collected_during' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -329,24 +338,26 @@ class Sample(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(sample_data)
-                self.logger.info("Save for Sample %s successful." % node_id)
-                self.logger.info("Setting ID for Sample %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self.version = 1
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while saving Sample. " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
             sample_data = self._get_raw_doc()
             try:
-                self.logger.info("Attempting to update Sample with ID: %s." % self.id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self.id)
                 session.get_osdf().edit_node(sample_data)
-                self.logger.info("Update for Sample %s successful." % self.id)
+                self.logger.info("Update for %s %s successful.", __name__, self.id)
                 success = True
-            except Exception as e:
-                msg = "An error occurred while updating " + \
-                      "Sample %s. Reason: %s" % (self.id, e)
+            except Exception as edit_exception:
+                msg = "An error occurred while updating {} {}. Reason: {}".format(
+                    __name__, self.id, edit_exception
+                )
+
                 self.logger.error(msg)
 
         return success
@@ -364,37 +375,18 @@ class Sample(Base):
         Returns:
             A Sample object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % sample_id)
+        module_logger.debug("In load. Specified ID: %s", sample_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-
         sample_data = session.get_osdf().get_node(sample_id)
+        sample = Sample.load_sample(sample_data)
 
-        module_logger.info("Creating a template Sample.")
-        sample = Sample()
-
-        module_logger.debug("Filling in Sample details.")
-
-        sample._set_id(sample_data['id'])
-        # ver, not version for the key
-        sample._version = sample_data['ver']
-        sample._links = sample_data['linkage']
-        sample._tags = sample_data['meta']['tags']
-        sample._mixs = sample_data['meta']['mixs']
-        sample._fma_body_site = sample_data['meta']['fma_body_site']
-
-        if 'body_site' in sample_data['meta']:
-            sample._body_site = sample_data['meta']['body_site']
-
-        if 'supersite' in sample_data['meta']:
-            sample._supersite= sample_data['meta']['supersite']
-
-        module_logger.debug("Returning loaded Sample.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return sample
 
     @staticmethod
-    def search(query = "\"sample\"[node_type]"):
+    def search(query="\"sample\"[node_type]"):
         """
         Searches OSDF for Sample nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -422,7 +414,7 @@ class Sample(Base):
         if query != '"sample"[node_type]':
             query = '({}) && "sample"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         sample_data = session.get_osdf().oql_query(Sample.namespace, query)
 
@@ -431,35 +423,47 @@ class Sample(Base):
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                sample_result = Sample.load_sample(i)
+            for result in all_results:
+                sample_result = Sample.load_sample(result)
                 result_list.append(sample_result)
 
         return result_list
 
     @staticmethod
     def load_sample(sample_data):
-        module_logger.info("Creating a template Sample.")
+        """
+        Takes the provided JSON string and converts it to a
+        Sample object
+
+        Args:
+            sample_data (str): The JSON string to convert
+
+        Returns:
+            Returns a Sample instance.
+        """
+        module_logger.info("Creating a template %s.", __name__)
         sample = Sample()
 
-        module_logger.debug("Filling in Sample details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         sample._set_id(sample_data['id'])
         # ver, not version for the key
-        sample._version = sample_data['ver']
-        sample._name = sample_data['meta']['name']
-        sample._tags = sample_data['meta']['tags']
-        sample._mixs = sample_data['meta']['mixs']
-        sample._links = sample_data['linkage']
-        sample._fma_body_site = sample_data['meta']['fma_body_site']
+        sample.version = sample_data['ver']
+        sample.tags = sample_data['meta']['tags']
+        sample.mixs = sample_data['meta']['mixs']
+        sample.links = sample_data['linkage']
+        sample.fma_body_site = sample_data['meta']['fma_body_site']
 
         if 'body_site' in sample_data['meta']:
-            sample._body_site = sample_data['meta']['body_site']
+            sample.body_site = sample_data['meta']['body_site']
+
+        if 'name' in sample_data['meta']:
+            sample.name = sample_data['meta']['name']
 
         if 'supersite' in sample_data['meta']:
-            sample._supersite= sample_data['meta']['supersite']
+            sample.supersite = sample_data['meta']['supersite']
 
-        module_logger.debug("Returning loaded Sample.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return sample
 
     def _get_raw_doc(self):
@@ -480,8 +484,8 @@ class Sample(Base):
 
         sample_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Sample.namespace ]
+                'read': ['all'],
+                'write': [Sample.namespace]
             },
             'linkage': self._links,
             'ns': Sample.namespace,

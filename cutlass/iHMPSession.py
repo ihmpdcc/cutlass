@@ -1,12 +1,15 @@
-#!/usr/bin/env python
+"""
+The iHMPSession module allows users to easily establish a connection
+to an Open Science Data Framwork (OSDF) instance operated for the
+Integrative Human Microbiome Project (iHMP).
+"""
 
-from osdf import OSDF
-import logging
 import importlib
-from Util import *
+import logging
+from osdf import OSDF
+from cutlass.Util import *
 
 class iHMPSession(object):
-    check_python_version(name="Cutlass")
     """
     The iHMP Session class. This class allows you to connect with an OSDF
     instance and begin analysis of iHMP data. It produces skeletons of all
@@ -17,6 +20,8 @@ class iHMPSession(object):
         _single (iHMPSession): The iHMP Session that is currently live. None
         otherwise.
     """
+
+    check_python_version(name="Cutlass")
 
     _single = None
 
@@ -48,55 +53,56 @@ class iHMPSession(object):
         if iHMPSession._single is None:
             iHMPSession._single = self
 
-        self.logger.info("Using SSL encryption? %s" % str(self._ssl))
+        self.logger.info("Using SSL encryption? %s", str(self._ssl))
 
     def _get_cutlass_instance(self, name):
         self.logger.debug("In _get_cutlass_instance.")
 
         classes = {
-          "16s_dna_prep"                       : "SixteenSDnaPrep",
-          "16s_raw_seq_set"                    : "SixteenSRawSeqSet",
-          "16s_trimmed_seq_set"                : "SixteenSTrimmedSeqSet",
-          "abundance_matrix"                   : "AbundanceMatrix",
-          "annotation"                         : "Annotation",
-          "clustered_seq_set"                  : "ClusteredSeqSet",
-          "cytokine"                           : "Cytokine",
-          "host_assay_prep"                    : "HostAssayPrep",
-          "host_seq_prep"                      : "HostSeqPrep",
-          "host_transcriptomics_raw_seq_set"   : "HostTranscriptomicsRawSeqSet",
-          "host_wgs_raw_seq_set"               : "HostWgsRawSeqSet",
-          "lipidome"                           : "Lipidome",
-          "metabolome"                         : "Metabolome",
-          "microbiome_assay_prep"              : "MicrobiomeAssayPrep",
-          "microb_transcriptomics_raw_seq_set" : "MicrobTranscriptomicsRawSeqSet",
-          "project"                            : "Project",
-          "proteome"                           : "Proteome",
-          "sample"                             : "Sample",
-          "sample_attr"                        : "SampleAttribute",
-          "study"                              : "Study",
-          "subject"                            : "Subject",
-          "subject_attr"                       : "SubjectAttribute",
-          "viral_seq_set"                      : "ViralSeqSet",
-          "visit"                              : "Visit",
-          "visit_attr"                         : "VisitAttribute",
-          "wgs_assembled_seq_set"              : "WgsAssembledSeqSet",
-          "wgs_raw_seq_set"                    : "WgsRawSeqSet",
-          "wgs_dna_prep"                       : "WgsDnaPrep" }
+            "16s_dna_prep"                       : "SixteenSDnaPrep",
+            "16s_raw_seq_set"                    : "SixteenSRawSeqSet",
+            "16s_trimmed_seq_set"                : "SixteenSTrimmedSeqSet",
+            "abundance_matrix"                   : "AbundanceMatrix",
+            "annotation"                         : "Annotation",
+            "clustered_seq_set"                  : "ClusteredSeqSet",
+            "cytokine"                           : "Cytokine",
+            "host_assay_prep"                    : "HostAssayPrep",
+            "host_seq_prep"                      : "HostSeqPrep",
+            "host_transcriptomics_raw_seq_set"   : "HostTranscriptomicsRawSeqSet",
+            "host_wgs_raw_seq_set"               : "HostWgsRawSeqSet",
+            "lipidome"                           : "Lipidome",
+            "metabolome"                         : "Metabolome",
+            "microbiome_assay_prep"              : "MicrobiomeAssayPrep",
+            "microb_transcriptomics_raw_seq_set" : "MicrobTranscriptomicsRawSeqSet",
+            "project"                            : "Project",
+            "proteome"                           : "Proteome",
+            "sample"                             : "Sample",
+            "sample_attr"                        : "SampleAttribute",
+            "study"                              : "Study",
+            "subject"                            : "Subject",
+            "subject_attr"                       : "SubjectAttribute",
+            "viral_seq_set"                      : "ViralSeqSet",
+            "visit"                              : "Visit",
+            "visit_attr"                         : "VisitAttribute",
+            "wgs_assembled_seq_set"              : "WgsAssembledSeqSet",
+            "wgs_raw_seq_set"                    : "WgsRawSeqSet",
+            "wgs_dna_prep"                       : "WgsDnaPrep"
+        }
 
-        className = None
+        class_name = None
         valid = False
 
         if name in classes:
             valid = True
-            className = classes[name]
+            class_name = classes[name]
 
         instance = None
 
         if valid:
             module = importlib.import_module("cutlass", package="cutlass")
 
-            classVar = getattr(module, className)
-            instance = classVar()
+            class_var = getattr(module, class_name)
+            instance = class_var()
         else:
             raise TypeError("%s not defined in %s" % (name, self.__class__))
 
@@ -104,10 +110,10 @@ class iHMPSession(object):
 
     def __getattr__(self, name):
         if name.startswith("create_"):
-            classLc = name[7:]
+            class_lower = name[7:]
 
         try:
-            instance = self._get_cutlass_instance(classLc)
+            instance = self._get_cutlass_instance(class_lower)
         except TypeError:
             raise AttributeError("%s not defined in %s" % (name, self.__class__))
 
@@ -153,7 +159,7 @@ class iHMPSession(object):
         Returns:
             A object of the specified type.
         """
-        self.logger.debug("In create_object. Type: %s" % node_type)
+        self.logger.debug("In create_object. Type: %s", node_type)
 
         instance = None
 

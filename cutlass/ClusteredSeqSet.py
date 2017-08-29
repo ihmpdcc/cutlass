@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the clustered sequence set object.
+"""
+
+# pylint: disable=W0703, C1801
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -422,7 +425,7 @@ class ClusteredSeqSet(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must have a 'computed_from' link to an annotation.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -445,11 +448,12 @@ class ClusteredSeqSet(Base):
         problems = self.validate()
 
         valid = True
+
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", str(len(problems)))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -471,8 +475,8 @@ class ClusteredSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ ClusteredSeqSet.namespace ]
+                'read': ['all'],
+                'write': [ClusteredSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': ClusteredSeqSet.namespace,
@@ -492,29 +496,29 @@ class ClusteredSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._date is not None:
-           self.logger.debug("Object has the 'date' property set.")
-           doc['meta']['date'] = self._date
+            self.logger.debug("Object has the 'date' property set.")
+            doc['meta']['date'] = self._date
 
         if self._format_doc is not None:
-           self.logger.debug("Object has the 'format_doc' property set.")
-           doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
 
         if self._sop is not None:
-           self.logger.debug("Object has the 'sop' property set.")
-           doc['meta']['sop'] = self._sop
+            self.logger.debug("Object has the 'sop' property set.")
+            doc['meta']['sop'] = self._sop
 
         if self._private_files is not None:
-           self.logger.debug("Object has the 'private_files' property set.")
-           doc['meta']['private_files'] = self._private_files
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -561,17 +565,17 @@ class ClusteredSeqSet(Base):
         success = False
 
         try:
-            self.logger.info("Deleting ClusteredSeqSet with ID %s." % clustered_seq_set_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, clustered_seq_set_id)
             session.get_osdf().delete_node(clustered_seq_set_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"clustered_seq_set\"[node_type]"):
+    def search(query="\"clustered_seq_set\"[node_type]"):
         """
         Searches OSDF for ClusteredSeqSet nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -600,7 +604,7 @@ class ClusteredSeqSet(Base):
         if query != '"clustered_seq_set"[node_type]':
             query = '({}) && "clustered_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         # css = clustered seq set
         css_data = session.get_osdf().oql_query(ClusteredSeqSet.namespace, query)
@@ -635,30 +639,32 @@ class ClusteredSeqSet(Base):
 
         # The attributes commmon to all iHMP nodes
         css._set_id(css_data['id'])
-        css._links = css_data['linkage']
-        css._version = css_data['ver']
+        css.links = css_data['linkage']
+        css.version = css_data['ver']
 
         # Required fields
-        css._checksums = css_data['meta']['checksums']
-        css._comment = css_data['meta']['comment']
-        css._study = css_data['meta']['study']
-        css._tags = css_data['meta']['tags']
+        css.checksums = css_data['meta']['checksums']
+        css.comment = css_data['meta']['comment']
+        css.study = css_data['meta']['study']
+        css.tags = css_data['meta']['tags']
+        # We need to use the private attribute here because there is no
+        # public setter.
         css._urls = css_data['meta']['urls']
 
         # Optional fields
         if 'date' in css_data['meta']:
-            css._date = css_data['meta']['date']
+            css.date = css_data['meta']['date']
 
         if 'format_doc' in css_data['meta']:
-            css._format_doc = css_data['meta']['format_doc']
+            css.format_doc = css_data['meta']['format_doc']
 
         if 'sop' in css_data['meta']:
-            css._format = css_data['meta']['sop']
+            css.format = css_data['meta']['sop']
 
         if 'private_files' in css_data['meta']:
-            css._private_files = css_data['meta']['private_files']
+            css.private_files = css_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return css
 
@@ -676,7 +682,7 @@ class ClusteredSeqSet(Base):
             A ClusteredSeqSet object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
@@ -690,20 +696,21 @@ class ClusteredSeqSet(Base):
     def _upload_data(self):
         self.logger.debug("In _upload_data.")
 
-	session = iHMPSession.get_session()
+        session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -711,7 +718,7 @@ class ClusteredSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
                                 "analysis", "hmgc", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(ClusteredSeqSet.aspera_server,
                                            session.username,
@@ -723,8 +730,8 @@ class ClusteredSeqSet(Base):
             self.logger.error("Experienced an error uploading the data. " + \
                               "Aborting save.")
             raise Exception("Unable to load clustered sequence set.")
-	else:
-            self._urls = [ "fasp://" + ClusteredSeqSet.aspera_server + remote_path ]
+        else:
+            self._urls = ["fasp://" + ClusteredSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -754,12 +761,12 @@ class ClusteredSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logg.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
@@ -769,11 +776,11 @@ class ClusteredSeqSet(Base):
 
         if self._id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -783,34 +790,40 @@ class ClusteredSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as insert_exception:
+                self.logger.exception(insert_exception)
+                self.logger.error("An error occurred while saving %s. Reason: %s",
+                                  __name__, insert_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info(
+                "%s already has an ID, so we do an update (not an insert).",
+                __name__
+            )
 
             try:
                 css_data = self._get_raw_doc()
-                css_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % css_id)
+                css_id = self.id
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, css_id)
                 osdf.edit_node(css_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % css_id)
+                self.logger.info("Update for %s %s successful.", __name__, css_id)
 
                 css_data = osdf.get_node(css_id)
                 latest_version = css_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+                                  "%s %s. Reason: %s.", __name__,
+                                  self._id, update_exception)
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success

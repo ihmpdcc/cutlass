@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the cytokine object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class Cytokine(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Cytokine class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -57,6 +60,8 @@ class Cytokine(Base):
         self._local_file = None
         self._private_files = None
 
+        super(Cytokine, self).__init__(*args, **kwargs)
+
     @property
     def checksums(self):
         """
@@ -79,7 +84,7 @@ class Cytokine(Base):
             None
         """
         self.logger.debug("In 'checksums' setter.")
-        if type(checksums) is not dict:
+        if not isinstance(checksums, dict):
             raise ValueError("Invalid type for checksums.")
 
         self._checksums = checksums
@@ -285,7 +290,7 @@ class Cytokine(Base):
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", str(len(problems)))
 
         return problems
 
@@ -309,10 +314,10 @@ class Cytokine(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -334,8 +339,8 @@ class Cytokine(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Cytokine.namespace ]
+                'read': ['all'],
+                'write': [Cytokine.namespace]
             },
             'linkage': self._links,
             'ns': Cytokine.namespace,
@@ -422,17 +427,17 @@ class Cytokine(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Cytokine with ID %s." % cytokine_id)
+            self.logger.info("Deleting Cytokine with ID %s.", cytokine_id)
             session.get_osdf().delete_node(cytokine_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"cytokine\"[node_type]"):
+    def search(query="\"cytokine\"[node_type]"):
         """
         Searches OSDF for Cytokine nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -461,7 +466,7 @@ class Cytokine(Base):
         if query != '"cytokine"[node_type]':
             query = '({}) && "cytokine"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         cyto_data = session.get_osdf().oql_query(Cytokine.namespace, query)
 
@@ -493,27 +498,29 @@ class Cytokine(Base):
 
         module_logger.debug("Filling in Cytokine details.")
         cyto._set_id(cyto_data['id'])
-        cyto._links = cyto_data['linkage']
-        cyto._version = cyto_data['ver']
+        cyto.links = cyto_data['linkage']
+        cyto.version = cyto_data['ver']
 
         # Required fields
-        cyto._checksums = cyto_data['meta']['checksums']
-        cyto._study = cyto_data['meta']['study']
-        cyto._tags = cyto_data['meta']['tags']
+        cyto.checksums = cyto_data['meta']['checksums']
+        cyto.study = cyto_data['meta']['study']
+        cyto.tags = cyto_data['meta']['tags']
+        # We need to use the private attribute here because there is no
+        # public setter.
         cyto._urls = cyto_data['meta']['urls']
 
         # Optional fields
         if 'comment' in cyto_data['meta']:
-            cyto._comment = cyto_data['meta']['comment']
+            cyto.comment = cyto_data['meta']['comment']
 
         if 'format' in cyto_data['meta']:
-            cyto._format = cyto_data['meta']['format']
+            cyto.format = cyto_data['meta']['format']
 
         if 'format_doc' in cyto_data['meta']:
-            cyto._format_doc = cyto_data['meta']['format_doc']
+            cyto.format_doc = cyto_data['meta']['format_doc']
 
         if 'private_files' in cyto_data['meta']:
-            cyto._private_files = cyto_data['meta']['private_files']
+            cyto.private_files = cyto_data['meta']['private_files']
 
         module_logger.debug("Returning loaded Cytokine.")
         return cyto
@@ -532,14 +539,14 @@ class Cytokine(Base):
             A Cytokine object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % cyto_id)
+        module_logger.debug("In load. Specified ID: %s", cyto_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         cyto_data = session.get_osdf().get_node(cyto_id)
         cyto = Cytokine.load_cytokine(cyto_data)
 
-        module_logger.debug("Returning loaded Cytokine.")
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return cyto
 
@@ -549,24 +556,25 @@ class Cytokine(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "cytokine", "host", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(Cytokine.aspera_server,
                                            session.username,
@@ -579,7 +587,7 @@ class Cytokine(Base):
                               "Aborting save.")
             raise Exception("Unable to upload cytokine.")
         else:
-            self._urls = [ "fasp://" + Cytokine.aspera_server + remote_path ]
+            self._urls = ["fasp://" + Cytokine.aspera_server + remote_path]
 
     def save(self):
         """
@@ -610,12 +618,12 @@ class Cytokine(Base):
         self.logger.info("Got iHMP session.")
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logg.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
@@ -628,8 +636,8 @@ class Cytokine(Base):
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -639,34 +647,36 @@ class Cytokine(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 cyto_data = self._get_raw_doc()
                 cyto_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % cyto_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, cyto_id)
                 osdf.edit_node(cyto_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % cyto_id)
+                self.logger.info("Update for %s %s successful.", __name__, cyto_id)
 
                 cyto_data = osdf.get_node(cyto_id)
                 latest_version = cyto_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+                                  "%s %s. Reason: %s.",
+                                  (__name__, self._id, update_exception))
 
         self.logger.debug("Returning " + str(success))
         return success

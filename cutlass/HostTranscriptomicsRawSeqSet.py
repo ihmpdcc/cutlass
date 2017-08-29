@@ -1,24 +1,28 @@
-#!/usr/bin/env python
+"""
+This module models the host transcriptomics raw sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
+
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
 class HostTranscriptomicsRawSeqSet(Base):
     """
-    The class models host transcriptomics raw sequence set data for the
-    iHMP project. This class contains all the fields required to save a
+    The class models host transcriptomics raw sequence set data for the iHMP
+    project. This class contains all the fields required to save a
     HostTranscriptomicsRawSeqSet object to OSDF.
 
     Attributes:
@@ -28,7 +32,7 @@ class HostTranscriptomicsRawSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the HostTranscriptomicsRawSeqSet class. This initializes
         the fields specific to the class, and inherits from the Base class.
@@ -61,6 +65,8 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         # Optional properties
         self._private_files = None
+
+        super(HostTranscriptomicsRawSeqSet, self).__init__(*args, **kwargs)
 
     def validate(self):
         """
@@ -102,7 +108,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link to a host_seq_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -126,10 +132,10 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", str(len(problems)))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -474,8 +480,8 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ HostTranscriptomicsRawSeqSet.namespace ]
+                'read': ['all'],
+                'write': [HostTranscriptomicsRawSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': HostTranscriptomicsRawSeqSet.namespace,
@@ -515,7 +521,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"host_transcriptomics_raw_seq_set\"[node_type]"):
+    def search(query="\"host_transcriptomics_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all HostTranscriptomicsRawSeqSet
         nodes. Any criteria the user wishes to add is provided by the user
@@ -544,19 +550,19 @@ class HostTranscriptomicsRawSeqSet(Base):
         if query != '"host_transcriptomics_raw_seq_set"[node_type]':
             query = '({}) && "host_transcriptomics_raw_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
-        rawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
+        raw_seq_set_data = session.get_osdf().oql_query("ihmp", query)
 
-        all_results = rawSeqSet_data['results']
+        all_results = raw_seq_set_data['results']
 
         result_list = list()
 
         if len(all_results) > 0:
             for result in all_results:
-                rawSeqSet_result = HostTranscriptomicsRawSeqSet. \
+                raw_seq_set_result = HostTranscriptomicsRawSeqSet. \
                                       load_host_transcriptomics_raw_seq_set(result)
-                result_list.append(rawSeqSet_result)
+                result_list.append(raw_seq_set_result)
 
         return result_list
 
@@ -579,29 +585,31 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
 
         # The attributes that are required
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.exp_length = seq_set_data['meta']['exp_length']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.seq_model = seq_set_data['meta']['seq_model']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.tags = seq_set_data['meta']['tags']
+        seq_set.study = seq_set_data['meta']['study']
+        # We need to use the private attribute here because there is no
+        # public setter.
         seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
 
         # Optional fields.
         if 'sequence_type' in seq_set_data['meta']:
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+            seq_set.sequence_type = seq_set_data['meta']['sequence_type']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
         return seq_set
 
     @staticmethod
@@ -618,14 +626,14 @@ class HostTranscriptomicsRawSeqSet(Base):
             A HostTranscriptomicsRawSeqSet object with all the available OSDF
             data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         seq_set_data = session.get_osdf().get_node(seq_set_id)
-        seq_set = HostTranscriptomicsRawSeqSet.load_host_transcriptomics_raw_set_set(seq_set_data)
+        seq_set = HostTranscriptomicsRawSeqSet.load_host_transcriptomics_raw_seq_set(seq_set_data)
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return seq_set
 
@@ -636,17 +644,18 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -654,7 +663,7 @@ class HostTranscriptomicsRawSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "transcriptome", "host",
                                 "raw", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(HostTranscriptomicsRawSeqSet.aspera_server,
@@ -668,7 +677,7 @@ class HostTranscriptomicsRawSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to load host transcriptomics raw sequence set.")
         else:
-            self._urls = [ "fasp://" + HostTranscriptomicsRawSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + HostTranscriptomicsRawSeqSet.aspera_server + remote_path]
 
 
     def save(self):
@@ -699,23 +708,23 @@ class HostTranscriptomicsRawSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as uploadException:
+                self.logger.exception(uploadException)
                 # Don't bother continuing...
                 return False
 
         osdf = session.get_osdf()
 
         if self.id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.info("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.info("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 self.logger.info("Attempting to save a new node.")
@@ -724,34 +733,43 @@ class HostTranscriptomicsRawSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
-                                  "Reason: %s" % e)
+            except Exception as saveException:
+                self.logger.exception(saveException)
+                self.logger.error("An error occurred while saving %s. Reason: %s",
+                                  __name__,
+                                  saveException
+                                 )
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).",
+                             __name__
+                            )
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, seq_set_id)
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+                self.logger.info("Update for %s %s successful.", __name__, seq_set_id)
 
                 seq_set_data = osdf.get_node(seq_set_id)
                 latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now %s",
+                                  __name__, str(latest_version)
+                                 )
                 self._version = latest_version
+
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self._id,
+                                  update_exception
+                                 )
 
         self.logger.debug("Returning " + str(success))
         return success

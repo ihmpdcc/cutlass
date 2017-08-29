@@ -1,13 +1,18 @@
-#!/usr/bin/env python
+"""
+Models the 16S trimmed sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from itertools import count
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -27,7 +32,7 @@ class SixteenSTrimmedSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the SixteenSTrimmedSeqSet class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -58,6 +63,8 @@ class SixteenSTrimmedSeqSet(Base):
         self._local_file = None
         self._private_files = None
         self._sequence_type = None
+
+        super(SixteenSTrimmedSeqSet, self).__init__(*args, **kwargs)
 
     @property
     def checksums(self):
@@ -359,7 +366,7 @@ class SixteenSTrimmedSeqSet(Base):
         if 'computed_from' not in self._links.keys():
             problems.append("Must add a 'computed_from' link to a 16s_raw_seq_set.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -384,10 +391,10 @@ class SixteenSTrimmedSeqSet(Base):
         valid = True
 
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -423,8 +430,8 @@ class SixteenSTrimmedSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ SixteenSTrimmedSeqSet.namespace ]
+                'read': ['all'],
+                'write': [SixteenSTrimmedSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': SixteenSTrimmedSeqSet.namespace,
@@ -443,17 +450,17 @@ class SixteenSTrimmedSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._sequence_type is not None:
-           self.logger.debug("Object has the 'sequence_type' set.")
-           doc['meta']['sequence_type'] = self._sequence_type
+            self.logger.debug("Object has the 'sequence_type' set.")
+            doc['meta']['sequence_type'] = self._sequence_type
 
         if self._private_files is not None:
             self.logger.debug("Object has the 'private_files' property set.")
@@ -462,7 +469,7 @@ class SixteenSTrimmedSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"16s_trimmed_seq_set\"[node_type]"):
+    def search(query="\"16s_trimmed_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all SixteenSTrimmedSeqSet node
         types. Any criteria the user wishes to add is provided by the user in
@@ -491,9 +498,12 @@ class SixteenSTrimmedSeqSet(Base):
         if query != '"16s_trimmed_seq_set"[node_type]':
             query = '({}) && "16s_trimmed_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
-        sixteenSTrimmedSeqSet_data = session.get_osdf().oql_query("ihmp", query)
+        sixteenSTrimmedSeqSet_data = session.get_osdf().oql_query(
+            SixteenSTrimmedSeqSet.namespace,
+            query
+        )
 
         all_results = sixteenSTrimmedSeqSet_data['results']
 
@@ -501,8 +511,9 @@ class SixteenSTrimmedSeqSet(Base):
 
         if len(all_results) > 0:
             for result in all_results:
-                sixteenSTrimmedSeqSet_result = SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(result)
-                result_list.append(sixteenSTrimmedSeqSet_result)
+                sixteens_trimmed_seq_set_result = \
+                    SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(result)
+                result_list.append(sixteens_trimmed_seq_set_result)
 
         return result_list
 
@@ -518,34 +529,34 @@ class SixteenSTrimmedSeqSet(Base):
         Returns:
             Returns a SixteenSTrimmedSeqSet instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         seq_set = SixteenSTrimmedSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._links = seq_set_data['linkage']
-        seq_set._version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
 
         # Required fields
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._tags = seq_set_data['meta']['tags']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.tags = seq_set_data['meta']['tags']
         seq_set._urls = seq_set_data['meta']['urls']
 
         # Optional fields
         if 'sequence_type' in seq_set_data['meta']:
-            module_logger.info(__name__ + " data has 'sequence_type' present.")
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+            module_logger.info("%s data has 'sequence_type' present.", __name__)
+            seq_set.sequence_type = seq_set_data['meta']['sequence_type']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return seq_set
 
@@ -563,14 +574,14 @@ class SixteenSTrimmedSeqSet(Base):
             A SixteenSTrimmedSeqSet object with all the available OSDF data
             loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         seq_set_data = session.get_osdf().get_node(seq_set_id)
         seq_set = SixteenSTrimmedSeqSet.load_sixteenSTrimmedSeqSet(seq_set_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return seq_set
 
@@ -580,17 +591,18 @@ class SixteenSTrimmedSeqSet(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -598,7 +610,7 @@ class SixteenSTrimmedSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "16s",
                                 "hm16str", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(SixteenSTrimmedSeqSet.aspera_server,
                                            session.username,
@@ -611,7 +623,7 @@ class SixteenSTrimmedSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to 16S trimmed sequence set.")
         else:
-            self._urls = [ "fasp://" + SixteenSTrimmedSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + SixteenSTrimmedSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -643,7 +655,7 @@ class SixteenSTrimmedSeqSet(Base):
         self.logger.info("Got iHMP session.")
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
@@ -658,11 +670,11 @@ class SixteenSTrimmedSeqSet(Base):
 
         if self.id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -672,34 +684,39 @@ class SixteenSTrimmedSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s set already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s set already has an ID, so we do an update (not an insert).",
+                             __name__
+                            )
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, seq_set_id)
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
 
                 seq_set_data = osdf.get_node(seq_set_id)
-                latest_version = annot_data['ver']
+                latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " + \
-                                  "%s  %s. Reason: %s" % (__name__, self._id, e))
+            except Exception as edit_exception:
+                self.logger.exception(edit_exception)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self._id, edit_exception)
 
         self.logger.debug("Returning " + str(success))
         return success
@@ -715,7 +732,7 @@ class SixteenSTrimmedSeqSet(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from AbundanceMatrix import AbundanceMatrix
+        from cutlass.AbundanceMatrix import AbundanceMatrix
 
         for page_no in count(1):
             res = query(SixteenSTrimmedSeqSet.namespace, linkage_query,

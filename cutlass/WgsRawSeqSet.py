@@ -1,14 +1,18 @@
-#!/usr/bin/env python
+"""
+Models the WGS raw sequence set object.
+"""
 
 import json
 import logging
 import os
 import string
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +32,7 @@ class WgsRawSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the WgsRawSeqSet class. This initializes the fields
         specific to the WgsRawSeqSet class, and inherits from the Base class.
@@ -62,6 +66,8 @@ class WgsRawSeqSet(Base):
         # Optional properties
         self._private_files = None
 
+        super(WgsRawSeqSet, self).__init__(*args, **kwargs)
+
     def is_valid(self):
         """
         Validates the current object's data/JSON against the current schema
@@ -83,10 +89,10 @@ class WgsRawSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -227,7 +233,7 @@ class WgsRawSeqSet(Base):
         """
         str: URL to the local file to upload to the server.
         """
-        self.logger.debug("In local_file getter.")
+        self.logger.debug("In 'local_file' getter.")
 
         return self._local_file
 
@@ -255,6 +261,7 @@ class WgsRawSeqSet(Base):
         be uploaded to the DCC. Defaults to false.
         """
         self.logger.debug("In 'private_files' getter.")
+
         return self._private_files
 
     @private_files.setter
@@ -438,7 +445,7 @@ class WgsRawSeqSet(Base):
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -474,8 +481,8 @@ class WgsRawSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ WgsRawSeqSet.namespace ]
+                'read': ['all'],
+                'write': [WgsRawSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': WgsRawSeqSet.namespace,
@@ -515,7 +522,7 @@ class WgsRawSeqSet(Base):
         return doc
 
     @staticmethod
-    def search(query = "\"wgs_raw_seq_set\"[node_type]"):
+    def search(query="\"wgs_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all WgsRawSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query
@@ -543,7 +550,7 @@ class WgsRawSeqSet(Base):
         if query != '"wgs_raw_seq_set"[node_type]':
             query = '({}) && "wgs_raw_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         wgsRawSeqSet_data = session.get_osdf().oql_query("ihmp", query)
 
@@ -577,29 +584,29 @@ class WgsRawSeqSet(Base):
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
 
         # The attributes that are particular to WgsRawSeqSet documents
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.exp_length = seq_set_data['meta']['exp_length']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.seq_model = seq_set_data['meta']['seq_model']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.study = seq_set_data['meta']['study']
+        seq_set.tags = seq_set_data['meta']['tags']
         seq_set._urls = seq_set_data['meta']['urls']
-        seq_set._tags = seq_set_data['meta']['tags']
-        seq_set._study = seq_set_data['meta']['study']
 
         # Optional fields
         if 'sequence_type' in seq_set_data['meta']:
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+            seq_set.sequence_type = seq_set_data['meta']['sequence_type']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
         return seq_set
 
     @staticmethod
@@ -616,14 +623,14 @@ class WgsRawSeqSet(Base):
             A WgsRawSeqSet object with all the available OSDF data loaded into
             it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         seq_set_data = session.get_osdf().get_node(seq_set_id)
         seq_set = WgsRawSeqSet.load_wgsRawSeqSet(seq_set_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return seq_set
 
@@ -634,17 +641,18 @@ class WgsRawSeqSet(Base):
 
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -652,7 +660,7 @@ class WgsRawSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "microbiome", "wgs",
                                 "raw", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(WgsRawSeqSet.aspera_server,
@@ -666,7 +674,7 @@ class WgsRawSeqSet(Base):
                               "Aborting save.")
             raise Exception("Unable to upload WGS raw sequence set")
         else:
-            self._urls = [ "fasp://" + WgsRawSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + WgsRawSeqSet.aspera_server + remote_path]
 
 
     def save(self):
@@ -698,23 +706,23 @@ class WgsRawSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
         osdf = session.get_osdf()
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 self.logger.info("Attempting to save a new node.")
@@ -723,34 +731,36 @@ class WgsRawSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, seq_set_id)
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+                self.logger.info("Update for %s %s successful.", __name__, seq_set_id)
 
                 seq_set_data = osdf.get_node(seq_set_id)
                 latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now %s", __name__, str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as edit_exception:
+                self.logger.exception(edit_exception)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self._id,
+                                  edit_exception
+                                 )
 
         self.logger.debug("Returning " + str(success))
         return success
@@ -765,7 +775,7 @@ class WgsRawSeqSet(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from ViralSeqSet import ViralSeqSet
+        from cutlass.ViralSeqSet import ViralSeqSet
 
         for page_no in count(1):
             res = query(WgsRawSeqSet.namespace, linkage_query, page=page_no)

@@ -1,10 +1,15 @@
-#!/usr/bin/env python
+
+"""
+Models the sample attribute object.
+"""
 
 import json
 import logging
-from iHMPSession import iHMPSession
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -21,7 +26,7 @@ class SampleAttribute(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the SampleAttribute class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -41,6 +46,8 @@ class SampleAttribute(Base):
         # Required properties
         self._fecalcal = None
         self._study = None
+
+        super(SampleAttribute, self).__init__(*args, **kwargs)
 
     @property
     def fecalcal(self):
@@ -71,7 +78,7 @@ class SampleAttribute(Base):
         """
         str: One of the 3 studies that are part of the iHMP.
         """
-        self.logger.debug("In study getter.")
+        self.logger.debug("In 'study' getter.")
         return self._study
 
     @study.setter
@@ -86,7 +93,7 @@ class SampleAttribute(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         self._study = study
 
@@ -120,7 +127,8 @@ class SampleAttribute(Base):
         if 'associated_with' not in self._links.keys():
             problems.append("Must have a 'associated_with' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
+
         return problems
 
     def is_valid(self):
@@ -144,12 +152,12 @@ class SampleAttribute(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'associated_with' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -171,8 +179,8 @@ class SampleAttribute(Base):
 
         attrib_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ SampleAttribute.namespace ]
+                'read': ['all'],
+                'write': [SampleAttribute.namespace]
             },
             'linkage': self._links,
             'ns': SampleAttribute.namespace,
@@ -186,12 +194,12 @@ class SampleAttribute(Base):
         }
 
         if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           attrib_doc['id'] = self._id
+            self.logger.debug(__name__ + " object has the OSDF id set.")
+            attrib_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           attrib_doc['ver'] = self._version
+            self.logger.debug(__name__ + " object has the OSDF version set.")
+            attrib_doc['ver'] = self._version
 
         return attrib_doc
 
@@ -226,7 +234,7 @@ class SampleAttribute(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a " + __name__ + " with no ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
             raise Exception(__name__ + " does not have an ID.")
 
         attrib_id = self._id
@@ -238,16 +246,19 @@ class SampleAttribute(Base):
         success = False
 
         try:
-            self.logger.info("Deleting %s with ID %s." % (__name__, attrib_id))
+            self.logger.info("Deleting %s with ID %s.", __name__, attrib_id)
             session.get_osdf().delete_node(attrib_id)
             success = True
-        except Exception as e:
-            self.logger.error("An error occurred when deleting %s.", self)
+        except Exception as delete_exception:
+            self.logger.error("An error occurred when deleting %s: %s",
+                              self,
+                              delete_exception
+                             )
 
         return success
 
     @staticmethod
-    def search(query = "\"sample_attr\"[node_type]"):
+    def search(query="\"sample_attr\"[node_type]"):
         """
         Searches OSDF for SampleAttribute nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -276,7 +287,7 @@ class SampleAttribute(Base):
         if query != '"sample_attr"[node_type]':
             query = '({}) && "sample_attr"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         attrib_data = session.get_osdf().oql_query(SampleAttribute.namespace, query)
 
@@ -303,20 +314,21 @@ class SampleAttribute(Base):
         Returns:
             Returns a SampleAttribute instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         attrib = SampleAttribute()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
         attrib._set_id(attrib_data['id'])
-        attrib._links = attrib_data['linkage']
-        attrib._version = attrib_data['ver']
+        attrib.links = attrib_data['linkage']
+        attrib.version = attrib_data['ver']
 
         # Required fields
-        attrib._fecalcal = attrib_data['meta']['fecalcal']
-        attrib._study = attrib_data['meta']['study']
-        attrib._tags = attrib_data['meta']['tags']
+        attrib.fecalcal = attrib_data['meta']['fecalcal']
+        attrib.study = attrib_data['meta']['study']
+        attrib.tags = attrib_data['meta']['tags']
 
-        module_logger.debug("Returning loaded " + __name__ + ".")
+        module_logger.debug("Returning loaded %s.", __name__)
+
         return attrib
 
     @staticmethod
@@ -333,26 +345,26 @@ class SampleAttribute(Base):
             A SampleAttribute object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % attrib_id)
+        module_logger.debug("In load. Specified ID: %s", attrib_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         attrib_data = session.get_osdf().get_node(attrib_id)
 
-        module_logger.info("Creating a template SampleAttribute.")
+        module_logger.info("Creating a template %s.", __name__)
         attrib = SampleAttribute()
 
-        module_logger.debug("Filling in SampleAttribute details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # Node required fields
         attrib._set_id(attrib_data['id'])
-        attrib._links = attrib_data['linkage']
-        attrib._version = attrib_data['ver']
+        attrib.links = attrib_data['linkage']
+        attrib.version = attrib_data['ver']
 
         # Required fields
-        attrib._fecalcal = attrib_data['meta']['fecalcal']
-        attrib._study = attrib_data['meta']['study']
-        attrib._tags = attrib_data['meta']['tags']
+        attrib.fecalcal = attrib_data['meta']['fecalcal']
+        attrib.study = attrib_data['meta']['study']
+        attrib.tags = attrib_data['meta']['tags']
 
         return attrib
 
@@ -390,11 +402,11 @@ class SampleAttribute(Base):
         success = False
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -402,28 +414,28 @@ class SampleAttribute(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred when saving %s.", e)
+            except Exception as save_exception:
+                self.logger.error("An error occurred when saving %s.", save_exception)
         else:
-            self.logger.info("SampleAttribute already has an ID, so we " + \
-                             "do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we " + \
+                             "do an update (not an insert).", __name__)
 
             try:
                 attrib_data = self._get_raw_doc()
-                self.logger.info("SampleAttribute already has an ID, " + \
-                                 "so we do an update (not an insert).")
+                self.logger.info("%s already has an ID, " + \
+                                 "so we do an update (not an insert).", __name__)
                 attrib_id = self._id
-                self.logger.debug(__name__ + " OSDF ID to update: %s." % attrib_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, attrib_id)
                 osdf.edit_node(attrib_data)
 
                 attrib_data = osdf.get_node(attrib_id)
                 latest_version = attrib_data['ver']
 
-                self.logger.debug("The version of this " + __name__ + " is " + \
-                                  "now: %s" % str(latest_version))
+                self.logger.debug("The version of this %s is " + \
+                                  "now: %s", __name__, str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred when updating %s.", e)
+            except Exception as edit_exception:
+                self.logger.error("An error occurred when updating %s.", edit_exception)
 
         return success

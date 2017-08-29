@@ -1,12 +1,15 @@
-#!/usr/bin/env python
+"""
+This module models the study object.
+"""
 
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Subject import Subject
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Subject import Subject
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -24,7 +27,7 @@ class Study(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Study class. This initializes the fields specific to the
         Study class, and inherits from the Base class.
@@ -48,12 +51,15 @@ class Study(Base):
         self._subtype = None
         self._srp_id = None
 
+        super(Study, self).__init__(*args, **kwargs)
+
     @property
     def name(self):
         """
         The name of the study within which the sequencing was organized.
         """
         self.logger.debug("In 'name' getter.")
+
         return self._name
 
     @name.setter
@@ -254,8 +260,8 @@ class Study(Base):
 
         study_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Study.namespace ]
+                'read': ['all'],
+                'write': [Study.namespace]
             },
             'linkage': self._links,
             'ns': Study.namespace,
@@ -285,7 +291,7 @@ class Study(Base):
         return study_doc
 
     @staticmethod
-    def search(query = "\"study\"[node_type]"):
+    def search(query="\"study\"[node_type]"):
         """
         Searches the OSDF database through all Study node types. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -307,14 +313,13 @@ class Study(Base):
         """
         module_logger.debug("In search.")
 
-
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         if query != '"study"[node_type]':
             query = '({}) && "study"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         study_data = session.get_osdf().oql_query(Study.namespace, query)
 
@@ -340,27 +345,27 @@ class Study(Base):
         Returns:
             Returns a Study instance.
         """
-        module_logger.info("Creating a template Study.")
+        module_logger.info("Creating a template %s.", __name__)
 
         study = Study()
 
-        module_logger.debug("Filling in Study details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         study._set_id(study_data['id'])
         # For version, the key to use is simply 'ver'
-        study._version = study_data['ver']
-        study._links = study_data['linkage']
+        study.version = study_data['ver']
+        study.links = study_data['linkage']
 
         # The attributes that are particular to Study objects
-        study._name = study_data['meta']['name']
-        study._description = study_data['meta']['description']
-        study._center = study_data['meta']['center']
-        study._contact = study_data['meta']['contact']
-        study._tags = study_data['meta']['tags']
-        study._subtype = study_data['meta'].get('subtype', None)
+        study.name = study_data['meta']['name']
+        study.description = study_data['meta']['description']
+        study.center = study_data['meta']['center']
+        study.contact = study_data['meta']['contact']
+        study.tags = study_data['meta']['tags']
+        study.subtype = study_data['meta'].get('subtype', None)
 
         if 'srp_id' in study_data['meta']:
-            study._srp_id = study_data['meta']['srp_id']
+            study.srp_id = study_data['meta']['srp_id']
 
         module_logger.debug("Returning loaded Study.")
         return study
@@ -395,11 +400,11 @@ class Study(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Study with ID %s." % study_id)
+            self.logger.info("Deleting Study with ID %s.", study_id)
             session.get_osdf().delete_node(study_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
@@ -417,7 +422,7 @@ class Study(Base):
         Returns:
             A Study object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % study_id)
+        module_logger.debug("In load. Specified ID: %s", study_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
@@ -432,20 +437,20 @@ class Study(Base):
 
         study._set_id(study_data['id'])
         # For version, the key to use is simply 'ver'
-        study._version = study_data['ver']
-        study._links = study_data['linkage']
+        study.version = study_data['ver']
+        study.links = study_data['linkage']
 
         # The attributes that are particular to Study objects
-        study._name = study_data['meta']['name']
-        study._description = study_data['meta']['description']
-        study._center = study_data['meta']['center']
-        study._contact = study_data['meta']['contact']
-        study._tags = study_data['meta']['tags']
+        study.name = study_data['meta']['name']
+        study.description = study_data['meta']['description']
+        study.center = study_data['meta']['center']
+        study.contact = study_data['meta']['contact']
+        study.tags = study_data['meta']['tags']
 
         if 'srp_id' in study_data['meta']:
-            study._srp_id = study_data['meta']['srp_id']
+            study.srp_id = study_data['meta']['srp_id']
 
-        module_logger.debug("Returning loaded Study.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return study
 
     def save(self):
@@ -491,8 +496,8 @@ class Study(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(study_data)
-                self.logger.info("Save for Study %s successful." % node_id)
-                self.logger.debug("Setting ID for Study %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.debug("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self._version = 1
 
@@ -504,16 +509,14 @@ class Study(Base):
         else:
             study_data = self._get_raw_doc()
             try:
-                self.logger.info("Attempting to update Study with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self._id)
                 session.get_osdf().edit_node(study_data)
 
-                self.logger.info("Update for Study %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
                 success = True
-
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as edit_exception:
+                self.logger.exception(edit_exception)
                 self.logger.error("An error occurred while updating %s.", self)
-
 
         return success
 
@@ -538,13 +541,14 @@ class Study(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        # _error_message is intentionally unused
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'subset_of' not in self._links and 'part_of' not in self._links:
             self.logger.debug("Doesn't have the subset_of or the part_of linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -589,4 +593,3 @@ class Study(Base):
 
             if res_count < 1:
                 break
-

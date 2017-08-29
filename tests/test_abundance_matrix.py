@@ -123,9 +123,9 @@ class AbundanceMatrixTest(unittest.TestCase):
         success = False
 
         comment = "test_comment"
-        format_ = "fastq"
+        format_ = "tbl"
         format_doc = "test_format_doc"
-        matrix_type = "test_matrix_type"
+        matrix_type = "microb_lipidomic"
         size = 1000
         study = "prediabetes"
         sop = "test SOP"
@@ -374,9 +374,9 @@ class AbundanceMatrixTest(unittest.TestCase):
         matrix.links = {"computed_from": ["9bb18fe313e7fe94bf243da07e0032e4" ]}
 
         matrix.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
-        matrix.format = "fastq"
+        matrix.format = "tbl"
         matrix.format_doc = "Test format_doc"
-        matrix.matrix_type = "Test matrix type"
+        matrix.matrix_type = "microb_lipidomic"
         matrix.size = 1000
         matrix.study = "prediabetes"
         matrix.local_file = temp_file
