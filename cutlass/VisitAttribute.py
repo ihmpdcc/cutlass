@@ -306,6 +306,49 @@ class VisitAttribute(Base):
         attrib.survey_id = attrib_data['meta']['survey_id']
         attrib.tags = attrib_data['meta']['tags']
 
+        # Handle optional fields
+        for (propname, spec) in VisitAttribute.__dict.iteritems():
+            section = spec[1]
+
+            ## We need to handle any DiseaseMeta props separately here
+            if not section:
+                continue
+
+            module_logger.debug("In section " + section)
+
+            # Couple special cases to handle here.
+            if (section == "excercise" or
+               (propname.startswith('breakfast') or propname.startswith('lunch') or
+                propname.startswith('dinner'))):
+                (propbase, propkey) = propname.split('_', 1)
+
+                propval = attrib_data['meta'].get(section, {}).get(propbase, {}).get(propkey)
+            else:
+                if propname == "sixtym_gluc":
+                    propname = "60m_gluc"
+                elif propname == "thirtym_gluc":
+                    propname = "30m_gluc"
+
+                propval = attrib_data['meta'].get(section, {}).get(propname)
+
+            module_logger.debug("Prop: %s, value: %s" % (propname, propval))
+
+            if propval:
+                module_logger.debug("Setting prop %s to %s" % (propname, propval))
+                setattr(attrib, propname, propval)
+
+        # If any of the DiseaseMeta props exist we can handle them now
+        if attrib_data['meta'].get('disease'):
+            if attrib_data['meta']['disease'].get('study_disease_status'):
+                attrib.disease_study_status = attrib_data['meta']['disease'].get('study_disease_status')
+
+            disease_props = dict(('disease_%s' % k, v) for k,v in
+                                 attrib_data['meta']['disease']['study_disease'].iteritems())
+            # This will have a double "disease" on it so we need to correct it.
+            disease_props['disease_ontology_id'] = disease_props.pop('disease_disease_ontology_id')
+
+            map(lambda key: setattr(attrib, key, disease_props.get(key)), disease_props.keys())
+
         module_logger.debug("Returning loaded " + __name__ + ".")
         return attrib
 
