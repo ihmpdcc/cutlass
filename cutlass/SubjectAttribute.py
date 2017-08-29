@@ -1396,61 +1396,118 @@ class SubjectAttribute(Base):
         return result_list
 
     @staticmethod
-    def load_subject_attr(data):
+    def load_subject_attr(attrib_data):
         """
         Takes the provided JSON string and converts it to an object.
 
         Args:
-            data (str): The JSON string to convert
+           attib_data (str): The JSON string to convert
 
         Returns:
-            Returns an instance of this class.
+            Returns a SubjectAttribute instance.
         """
-        module_logger.info("Creating a template {}.".format(__name__))
-        attr = SubjectAttribute()
+        module_logger.info("Creating a template "  + __name__ + ".")
+        attrib = SubjectAttribute()
 
-        module_logger.debug("Filling in {} details.".format(__name__))
-        attr._set_id(data['id'])
-        attr._links = data['linkage']
-        attr._version = data['ver']
+        module_logger.debug("Filling in " + __name__ + " details.")
+        attrib._set_id(attrib_data['id'])
+        attrib._links = attrib_data['linkage']
+        attrib._version = attrib_data['ver']
 
         # Required fields
-        attr._study = data['meta']['study']
-        attr._tags = data['meta']['tags']
+        attrib._study = attrib_data['meta']['study']
+        attrib._tags = attrib_data['meta']['tags']
 
-        # Optional fields
-        if 'short_label' in data['meta']:
-            attr._short_label = data['meta']['short_label']
+        # Handle optional properties
+        if 'aerobics' in attrib_data['meta']:
+            attrib._aerobics = attrib_data['meta']['aerobics']
 
-        if 'url' in data['meta']:
-            attr._url = data['meta']['url']
+        if 'alcohol' in attrib_data['meta']:
+            attrib._alcohol = attrib_data['meta']['alcohol']
 
-        if 'species' in data['meta']:
-            attr._species = data['meta']['species']
+        if 'allergies' in attrib_data['meta']:
+            attrib._allergies = attrib_data['meta']['allergies']
 
-        if 'cell_type' in data['meta']:
-            attr._cell_type = data['meta']['cell_type']
+        if 'asthma' in attrib_data['meta']:
+            attrib._asthma = attrib_data['meta']['asthma']
 
-        if 'tissue' in data['meta']:
-            attr._tissue = data['meta']['tissue']
+        if 'cad' in attrib_data['meta']:
+            attrib._cad = attrib_data['meta']['cad']
 
-        if 'reference' in data['meta']:
-            attr._reference = data['meta']['reference']
+        if 'chf' in attrib_data['meta']:
+            attrib._chf = attrib_data['meta']['chf']
 
-        if 'protocol_name' in data['meta']:
-            attr._protocol_name = data['meta']['protocol_name']
+        if 'comment' in attrib_data['meta']:
+            attrib._comment = attrib_data['meta']['comment']            
 
-        if 'protocol_steps' in data['meta']:
-            attr._protocol_steps = data['meta']['protocol_steps']
+        if 'contact' in attrib_data['meta']:
+            attrib._contact = attrib_data['meta']['comment']
 
-        if 'exp_description' in data['meta']:
-            attr._exp_description = data['meta']['exp_description']
+        if 'diabetes' in attrib_data['meta']:
+            attrib._diabetes = attrib_data['meta']['diabetes']
 
-        if 'sample_description' in data['meta']:
-            attr._sample_description = data['meta']['sample_description']
+        if 'education' in attrib_data['meta']:
+            attrib._education = attrib_data['meta']['education']
+
+        if 'family_history' in attrib_data['meta']:
+            attrib._family_history = attrib_data['meta']['family_history']
+
+        if 'father' in attrib_data['meta']:
+            attrib._father = attrib_data['meta']['father']
+
+        if 'gallbladder' in attrib_data['meta']:
+            attrib._gallbladder = attrib_data['meta']['gallbladder']
+
+        if 'hyperlipidemia' in attrib_data['meta']:
+            attrib._hyperlipidemia = attrib_data['meta']['hyperlipidemia']            
+
+        if 'hypertension' in attrib_data['meta']:
+            attrib._hypertension = attrib_data['meta']['hypertension']
+
+        if 'illicit_drug' in attrib_data['meta']:
+            attrib._illicit_drug = attrib_data['meta']['illicit_drug']
+
+        if 'kidney' in attrib_data['meta']:
+            attrib._kidney = attrib_data['meta']['kidney']
+
+        if 'liver' in attrib_data['meta']:
+            attrib._liver = attrib_data['meta']['liver']
+
+        if 'lmp' in attrib_data['meta']:
+            attrib._lmp = attrib_data['meta']['lmp']
+
+        if 'mother' in attrib_data['meta']:
+            attrib._mother = attrib_data['meta']['mother']
+
+        if 'occupation' in attrib_data['meta']:
+            attrib._occupation = attrib_data['meta']['occupation']
+
+        if 'osa' in attrib_data['meta']:
+            attrib._osa = attrib_data['meta']['osa']
+
+        if 'pancreatitis' in attrib_data['meta']:
+            attrib._pancreatitis = attrib_data['meta']['pancreatitis']
+
+        if 'postmenopausal' in attrib_data['meta']:
+            attrib._postmenopausal = attrib_data['meta']['postmenopausal']
+
+        if 'pvd' in attrib_data['meta']:
+            attrib._pvd = attrib_data['meta']['pvd']
+
+        if 'rx' in attrib_data['meta']:
+            attrib._rx = attrib_data['meta']['rx']
+
+        if 'survey_id' in attrib_data['meta']:
+            attrib._survey_id = attrib_data['meta']['survey_id']
+
+        if 'siblings' in attrib_data['meta']:
+            attrib._siblings = attrib_data['meta']['siblings']
+
+        if 'tobacco' in attrib_data['meta']:
+            attrib._tobacco = attrib_data['meta']['tobacco']
 
         module_logger.debug("Returning loaded SubjectAttribute.")
-        return attr
+        return attrib
 
     @staticmethod
     def load(node_id):

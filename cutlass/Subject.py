@@ -515,7 +515,7 @@ class Subject(Base):
             res_count = res['result_count']
 
             for doc in res['results']:
-                yield SubjectAttribute.load_subject_attribute(doc)
+                yield SubjectAttribute.load_subject_attr(doc)
 
             res_count -= len(res['results'])
 
