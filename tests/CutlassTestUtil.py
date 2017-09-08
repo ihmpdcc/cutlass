@@ -6,7 +6,7 @@ class CutlassTestUtil(object):
         try:
             setattr(obj, prop, value1)
             success1 = True
-        except:
+        except Exception:
             pass
 
         test.assertTrue(success1, "Able to use the %s setter to True" % prop)
@@ -22,7 +22,7 @@ class CutlassTestUtil(object):
         try:
             setattr(obj, prop, value2)
             success2 = True
-        except:
+        except Exception:
             pass
 
         test.assertTrue(success2, "Able to use the %s setter to False" % prop)
@@ -40,7 +40,24 @@ class CutlassTestUtil(object):
         try:
             setattr(obj, prop, value)
             success = True
-        except:
+        except Exception:
+            pass
+
+        test.assertTrue(success, "Able to use the %s setter" % prop)
+
+        retrieved = getattr(obj, prop)
+
+        test.assertEqual(retrieved, value,
+                         "Property getter for '%s' works." % prop)
+
+    def floatPropertyTest(self, test, obj, prop):
+        value = 1313.1313
+        success = False
+
+        try:
+            setattr(obj, prop, value)
+            success = True
+        except Exception:
             pass
 
         test.assertTrue(success, "Able to use the %s setter" % prop)
@@ -57,7 +74,7 @@ class CutlassTestUtil(object):
         try:
             setattr(obj, prop, value)
             success = True
-        except:
+        except Exception:
             pass
 
         test.assertTrue(success, "Able to use the %s setter" % prop)
@@ -75,6 +92,23 @@ class CutlassTestUtil(object):
         # test an int
         with test.assertRaises(Exception):
             setattr(obj, prop, 1)
+
+        # test a list
+        with test.assertRaises(Exception):
+            setattr(obj, prop, ["test"])
+
+        # test a dictionary
+        with test.assertRaises(Exception):
+            setattr(obj, prop, {})
+
+    def floatTypeTest(self, test, obj, prop):
+        # test a string
+        with test.assertRaises(Exception):
+            setattr(obj, prop, "test")
+
+        # test an int
+        with test.assertRaises(Exception):
+            setattr(obj, prop, 3)
 
         # test a list
         with test.assertRaises(Exception):

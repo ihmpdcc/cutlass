@@ -2,13 +2,11 @@
 
 import unittest
 import json
-import os
-import sys
-import ConfigParser
 
-from cutlass import iHMPSession
 from cutlass import SubjectAttribute
 from CutlassTestConfig import CutlassTestConfig
+
+# pylint: disable=W0703, C1801
 
 class SubjectAttributeTest(unittest.TestCase):
     session = None
@@ -23,7 +21,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             from cutlass import SubjectAttribute
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
@@ -37,7 +35,7 @@ class SubjectAttributeTest(unittest.TestCase):
             subject_attr = self.session.create_subject_attr()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
@@ -53,7 +51,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr_json = subject_attr.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -64,7 +62,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr_data = json.loads(subj_attr_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -103,7 +101,7 @@ class SubjectAttributeTest(unittest.TestCase):
                         "SubjectAttribute tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template subject tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         subj_attr.tags = new_tags
         self.assertEqual(subj_attr.tags, new_tags,
@@ -121,12 +119,12 @@ class SubjectAttributeTest(unittest.TestCase):
         subj_attr = self.session.create_subject_attr()
 
         subj_attr.add_tag("test")
-        self.assertEqual(subj_attr.tags, [ "test" ], "Can add a tag to a subject.")
+        self.assertEqual(subj_attr.tags, ["test"], "Can add a tag to a subject.")
 
         json_str = subj_attr.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -136,7 +134,7 @@ class SubjectAttributeTest(unittest.TestCase):
         json_str = subj_attr.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
@@ -158,11 +156,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.alcohol = [ 'a', 'b', 'c' ]
+            subj_attr.alcohol = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.alcohol = { 'a': 1, 'b': 2 }
+            subj_attr.alcohol = {'a': 1, 'b': 2}
 
     def testLegalAlcohol(self):
         subj_attr = self.session.create_subject_attr()
@@ -172,7 +170,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.alcohol = alcohol
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'alcohol' setter.")
@@ -190,11 +188,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.aerobics = [ 'a', 'b', 'c' ]
+            subj_attr.aerobics = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.aerobics = { 'a': 1, 'b': 2 }
+            subj_attr.aerobics = {'a': 1, 'b': 2}
 
     def testLegalAerobics(self):
         subj_attr = self.session.create_subject_attr()
@@ -204,7 +202,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.aerobics = aerobics
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'aerobics' setter.")
@@ -226,11 +224,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.allergies = [ 'a', 'b', 'c' ]
+            subj_attr.allergies = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.allergies = { 'a': 1, 'b': 2 }
+            subj_attr.allergies = {'a': 1, 'b': 2}
 
     def testLegalAllergies(self):
         subj_attr = self.session.create_subject_attr()
@@ -240,7 +238,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.allergies = allergies
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'allergies' setter.")
@@ -258,11 +256,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.asthma = [ 'a', 'b', 'c' ]
+            subj_attr.asthma = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.asthma = { 'a': 1, 'b': 2 }
+            subj_attr.asthma = {'a': 1, 'b': 2}
 
     def testLegalAsthma(self):
         subj_attr = self.session.create_subject_attr()
@@ -272,7 +270,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.asthma = asthma
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'asthma' setter.")
@@ -290,11 +288,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.cad = [ 'a', 'b', 'c' ]
+            subj_attr.cad = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.cad = { 'a': 1, 'b': 2 }
+            subj_attr.cad = {'a': 1, 'b': 2}
 
     def testLegalCAD(self):
         subj_attr = self.session.create_subject_attr()
@@ -304,7 +302,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.cad = cad
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'cad' setter.")
@@ -322,11 +320,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.chf = [ 'a', 'b', 'c' ]
+            subj_attr.chf = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.chf = { 'a': 1, 'b': 2 }
+            subj_attr.chf = {'a': 1, 'b': 2}
 
     def testLegalCHF(self):
         subj_attr = self.session.create_subject_attr()
@@ -336,7 +334,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.chf = chf
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'chf' setter.")
@@ -354,11 +352,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.comment = [ 'a', 'b', 'c' ]
+            subj_attr.comment = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.comment = { 'a': 1, 'b': 2 }
+            subj_attr.comment = {'a': 1, 'b': 2}
 
     def testLegalComment(self):
         subj_attr = self.session.create_subject_attr()
@@ -368,7 +366,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.comment = comment
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'comment' setter.")
@@ -390,11 +388,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.contact = [ 'a', 'b', 'c' ]
+            subj_attr.contact = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.contact = { 'a': 1, 'b': 2 }
+            subj_attr.contact = {'a': 1, 'b': 2}
 
     def testLegalContact(self):
         subj_attr = self.session.create_subject_attr()
@@ -404,7 +402,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.contact = contact
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'contact' setter.")
@@ -422,11 +420,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.diabetes = [ 'a', 'b', 'c' ]
+            subj_attr.diabetes = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.diabetes = { 'a': 1, 'b': 2 }
+            subj_attr.diabetes = {'a': 1, 'b': 2}
 
     def testLegalDiabetes(self):
         subj_attr = self.session.create_subject_attr()
@@ -436,7 +434,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.diabetes = diabetes
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'diabetes' setter.")
@@ -454,11 +452,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.education = [ 'a', 'b', 'c' ]
+            subj_attr.education = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.education = { 'a': 1, 'b': 2 }
+            subj_attr.education = {'a': 1, 'b': 2}
 
     def testLegalEducation(self):
         subj_attr = self.session.create_subject_attr()
@@ -468,7 +466,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.education = education
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'education' setter.")
@@ -486,11 +484,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.family_history = [ 'a', 'b', 'c' ]
+            subj_attr.family_history = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.family_history = { 'a': 1, 'b': 2 }
+            subj_attr.family_history = {'a': 1, 'b': 2}
 
     def testLegalFamilyHistory(self):
         subj_attr = self.session.create_subject_attr()
@@ -500,7 +498,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.family_history = family_history
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'family_history' setter.")
@@ -518,11 +516,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.father = [ 'a', 'b', 'c' ]
+            subj_attr.father = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.father = { 'a': 1, 'b': 2 }
+            subj_attr.father = {'a': 1, 'b': 2}
 
     def testLegalFather(self):
         subj_attr = self.session.create_subject_attr()
@@ -532,7 +530,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.father = father
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'father' setter.")
@@ -550,11 +548,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.gallbladder = [ 'a', 'b', 'c' ]
+            subj_attr.gallbladder = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.gallbladder = { 'a': 1, 'b': 2 }
+            subj_attr.gallbladder = {'a': 1, 'b': 2}
 
     def testLegalGallbladder(self):
         subj_attr = self.session.create_subject_attr()
@@ -564,7 +562,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.gallbladder = gallbladder
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'gallbladder' setter.")
@@ -582,11 +580,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.hyperlipidemia = [ 'a', 'b', 'c' ]
+            subj_attr.hyperlipidemia = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.hyperlipidemia = { 'a': 1, 'b': 2 }
+            subj_attr.hyperlipidemia = {'a': 1, 'b': 2}
 
     def testLegalHyperlipidemia(self):
         subj_attr = self.session.create_subject_attr()
@@ -596,7 +594,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.hyperlipidemia = hyperlipidemia
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'hyperlipidemia' setter.")
@@ -614,11 +612,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.hypertension = [ 'a', 'b', 'c' ]
+            subj_attr.hypertension = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.hypertension = { 'a': 1, 'b': 2 }
+            subj_attr.hypertension = {'a': 1, 'b': 2}
 
     def testLegalHypertension(self):
         subj_attr = self.session.create_subject_attr()
@@ -628,7 +626,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.hypertension = hypertension
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'hypertension' setter.")
@@ -646,11 +644,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.illicit_drug = [ 'a', 'b', 'c' ]
+            subj_attr.illicit_drug = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.illicit_drug = { 'a': 1, 'b': 2 }
+            subj_attr.illicit_drug = {'a': 1, 'b': 2}
 
     def testLegalIllicitDrug(self):
         subj_attr = self.session.create_subject_attr()
@@ -660,7 +658,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.illicit_drug = illicit_drug
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'illicit_drug' setter.")
@@ -677,11 +675,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.kidney = [ 'a', 'b', 'c' ]
+            subj_attr.kidney = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.kidney = { 'a': 1, 'b': 2 }
+            subj_attr.kidney = {'a': 1, 'b': 2}
 
     def testLegalKidney(self):
         subj_attr = self.session.create_subject_attr()
@@ -691,7 +689,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.kidney = kidney
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'kidney' setter.")
@@ -708,11 +706,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.liver = [ 'a', 'b', 'c' ]
+            subj_attr.liver = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.liver = { 'a': 1, 'b': 2 }
+            subj_attr.liver = {'a': 1, 'b': 2}
 
     def testLegalLiver(self):
         subj_attr = self.session.create_subject_attr()
@@ -722,7 +720,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.liver = liver
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'liver' setter.")
@@ -740,11 +738,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.lmp = [ 'a', 'b', 'c' ]
+            subj_attr.lmp = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.lmp = { 'a': 1, 'b': 2 }
+            subj_attr.lmp = {'a': 1, 'b': 2}
 
     def testLegalLMP(self):
         subj_attr = self.session.create_subject_attr()
@@ -754,7 +752,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.lmp = lmp
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'lmp' setter.")
@@ -772,11 +770,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.mother = [ 'a', 'b', 'c' ]
+            subj_attr.mother = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.mother = { 'a': 1, 'b': 2 }
+            subj_attr.mother = {'a': 1, 'b': 2}
 
     def testLegalMother(self):
         subj_attr = self.session.create_subject_attr()
@@ -786,7 +784,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.mother = mother
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'mother' setter.")
@@ -804,11 +802,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.osa = [ 'a', 'b', 'c' ]
+            subj_attr.osa = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.osa = { 'a': 1, 'b': 2 }
+            subj_attr.osa = {'a': 1, 'b': 2}
 
     def testLegalOSA(self):
         subj_attr = self.session.create_subject_attr()
@@ -818,7 +816,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.osa = osa
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'osa' setter.")
@@ -836,11 +834,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.occupation = [ 'a', 'b', 'c' ]
+            subj_attr.occupation = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.occupation = { 'a': 1, 'b': 2 }
+            subj_attr.occupation = {'a': 1, 'b': 2}
 
     def testLegalOccupation(self):
         subj_attr = self.session.create_subject_attr()
@@ -850,7 +848,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.occupation = occupation
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'occupation' setter.")
@@ -868,11 +866,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.pancreatitis = [ 'a', 'b', 'c' ]
+            subj_attr.pancreatitis = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.pancreatitis = { 'a': 1, 'b': 2 }
+            subj_attr.pancreatitis = {'a': 1, 'b': 2}
 
     def testLegalPancreatitis(self):
         subj_attr = self.session.create_subject_attr()
@@ -882,7 +880,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.pancreatitis = pancreatitis
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'pancreatitis' setter.")
@@ -900,11 +898,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.postmenopausal = [ 'a', 'b', 'c' ]
+            subj_attr.postmenopausal = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.postmenopausal = { 'a': 1, 'b': 2 }
+            subj_attr.postmenopausal = {'a': 1, 'b': 2}
 
     def testLegalPostmenopausal(self):
         subj_attr = self.session.create_subject_attr()
@@ -914,7 +912,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.postmenopausal = postmenopausal
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'postmenopausal' setter.")
@@ -932,11 +930,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.pvd = [ 'a', 'b', 'c' ]
+            subj_attr.pvd = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.pvd = { 'a': 1, 'b': 2 }
+            subj_attr.pvd = {'a': 1, 'b': 2}
 
     def testLegalPVD(self):
         subj_attr = self.session.create_subject_attr()
@@ -946,7 +944,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.pvd = pvd
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'pvd' setter.")
@@ -964,11 +962,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.rx = [ 'a', 'b', 'c' ]
+            subj_attr.rx = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.rx = { 'a': 1, 'b': 2 }
+            subj_attr.rx = {'a': 1, 'b': 2}
 
     def testLegalRx(self):
         subj_attr = self.session.create_subject_attr()
@@ -978,7 +976,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.rx = rx
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'rx' setter.")
@@ -996,11 +994,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.siblings = [ 'a', 'b', 'c' ]
+            subj_attr.siblings = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.siblings = { 'a': 1, 'b': 2 }
+            subj_attr.siblings = {'a': 1, 'b': 2}
 
     def testLegalSiblings(self):
         subj_attr = self.session.create_subject_attr()
@@ -1010,7 +1008,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.siblings = siblings
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'siblings' setter.")
@@ -1028,11 +1026,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.survey_id = [ 'a', 'b', 'c' ]
+            subj_attr.survey_id = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.survey_id = { 'a': 1, 'b': 2 }
+            subj_attr.survey_id = {'a': 1, 'b': 2}
 
     def testLegalSurveyID(self):
         subj_attr = self.session.create_subject_attr()
@@ -1042,7 +1040,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.survey_id = survey_id
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'survey_id' setter.")
@@ -1060,11 +1058,11 @@ class SubjectAttributeTest(unittest.TestCase):
 
         # Test list argument
         with self.assertRaises(Exception):
-            subj_attr.tobacco = [ 'a', 'b', 'c' ]
+            subj_attr.tobacco = ['a', 'b', 'c']
 
         # Test dict argument
         with self.assertRaises(Exception):
-            subj_attr.tobacco = { 'a': 1, 'b': 2 }
+            subj_attr.tobacco = {'a': 1, 'b': 2}
 
     def testLegalTobacco(self):
         subj_attr = self.session.create_subject_attr()
@@ -1074,7 +1072,7 @@ class SubjectAttributeTest(unittest.TestCase):
         try:
             subj_attr.tobacco = tobacco
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'tobacco' setter.")
@@ -1088,7 +1086,7 @@ class SubjectAttributeTest(unittest.TestCase):
 
         subj_attr = self.session.create_subject_attr()
 
-        test_links = {"associated_with": [] }
+        test_links = {"associated_with": []}
         test_tag = "New tag added to subject"
 
         self.assertFalse(subj_attr.save(),
@@ -1137,7 +1135,7 @@ class SubjectAttributeTest(unittest.TestCase):
         with self.assertRaises(Exception):
             subj_attr.delete()
 
-        self.assertTrue(subj_attr.save() == True,
+        self.assertTrue(subj_attr.save(),
                         "SubjectAttribute was saved successfully")
 
         # Load the subject that was just saved from the OSDF instance

@@ -1,2059 +1,757 @@
 #!/usr/bin/env python
 
 import unittest
-from cutlass import iHMPSession
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class VisitAttributeTest(unittest.TestCase):
+    """ Unit tests for the VisitAttribute class """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
 
+        cls.util = CutlassTestUtil()
+
     def testImport(self):
+        """ Test the import of the VisitAttribute module. """
         success = False
         try:
             from cutlass import VisitAttribute
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(VisitAttribute is None)
 
     def testSessionCreate(self):
+        """ Test the import of a VisitAttribute module. """
         success = False
         attr = None
 
         try:
-            visit = self.session.create_visit_attr()
+            attr = self.session.create_visit_attr()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
-        self.failIf(visit is None)
+        self.failIf(attr is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a VisitAttribute instance. """
         attr = self.session.create_visit_attr()
         success = False
 
         attr.study = "prediabetes"
-        attr.tags = [ "test", "visit_attr" ]
+        attr.tags = ["test", "visit_attr"]
         attr_json = None
 
         try:
             attr_json = attr.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
         self.assertTrue(attr_json is not None, "to_json() returned data.")
 
     def testComment(self):
+        """ Test the comment property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.comment = 1
-
-        with self.assertRaises(ValueError):
-            attr.comment = {}
-
-        with self.assertRaises(ValueError):
-            attr.comment = []
-
-        with self.assertRaises(ValueError):
-            attr.comment = 3.5
-
-        comment = "test comment"
-        attr.comment = comment
-
-        self.assertEquals(comment, attr.comment, "comment property works.")
+        self.util.stringTypeTest(self, attr, "comment")
 
     def testClinicalPatientAge(self):
+        """ Test the age property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.age = "test age"
+        self.util.intTypeTest(self, attr, "age")
 
-        with self.assertRaises(ValueError):
-            attr.age = True
-
-        with self.assertRaises(ValueError):
-            attr.age = {}
-
-        with self.assertRaises(ValueError):
-            attr.age = []
-
-        with self.assertRaises(ValueError):
-            attr.age = 3.5
-
-        age = 30
-        attr.age = age
-
-        self.assertEquals(age, attr.age,
-                          "age property works.")
+        self.util.intPropertyTest(self, attr, "age")
 
     def testClinicalPatientHeight(self):
+        """ Test the height property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.height = "test height"
+        self.util.floatTypeTest(self, attr, "height")
 
-        with self.assertRaises(ValueError):
-            attr.height = True
-
-        with self.assertRaises(ValueError):
-            attr.height = {}
-
-        with self.assertRaises(ValueError):
-            attr.height = []
-
-        with self.assertRaises(ValueError):
-            attr.height = 60
-
-        height = 60.12
-        attr.height = height
-
-        self.assertEquals(height, attr.height,
-                          "height property works.")
+        self.util.floatPropertyTest(self, attr, "height")
 
     def testClinicalPatientWeight(self):
+        """ Test the weight property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.weight = "test weight"
+        self.util.floatTypeTest(self, attr, "weight")
 
-        with self.assertRaises(ValueError):
-            attr.weight = True
-
-        with self.assertRaises(ValueError):
-            attr.weight = {}
-
-        with self.assertRaises(ValueError):
-            attr.weight = []
-
-        with self.assertRaises(ValueError):
-            attr.weight = 3
-
-        weight = 80.32
-        attr.weight = weight
-
-        self.assertEquals(weight, attr.weight,
-                          "weight property works.")
+        self.util.floatPropertyTest(self, attr, "weight")
 
     def testClinicalPatientWeightDiff(self):
+        """ Test the weight_diff property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.weight_diff = 30.5
+        self.util.stringTypeTest(self, attr, "weight_diff")
 
-        with self.assertRaises(ValueError):
-            attr.weight_diff = True
-
-        with self.assertRaises(ValueError):
-            attr.weight_diff = {}
-
-        with self.assertRaises(ValueError):
-            attr.weight_diff = []
-
-        with self.assertRaises(ValueError):
-            attr.weight_diff = 3
-
-        weight_diff = "test weight_diff"
-        attr.weight_diff = weight_diff
-
-        self.assertEquals(weight_diff, attr.weight_diff,
-                          "weight_diff property works.")
+        self.util.stringPropertyTest(self, attr, "weight_diff")
 
     def testClinicalPatientBMI(self):
+        """ Test the bmi property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.bmi = "test bmi"
+        self.util.floatTypeTest(self, attr, "bmi")
 
-        with self.assertRaises(ValueError):
-            attr.bmi = True
-
-        with self.assertRaises(ValueError):
-            attr.bmi = {}
-
-        with self.assertRaises(ValueError):
-            attr.bmi = []
-
-        with self.assertRaises(ValueError):
-            attr.bmi = 3
-
-        bmi = 20.5
-        attr.bmi = bmi
-
-        self.assertEquals(bmi, attr.bmi,
-                          "bmi property works.")
+        self.util.floatPropertyTest(self, attr, "bmi")
 
     def testClinicalPatientHBI(self):
+        """ Test the hbi property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.hbi = "test hbi"
+        self.util.boolTypeTest(self, attr, "hbi")
 
-        with self.assertRaises(ValueError):
-            attr.hbi = 20.5
-
-        with self.assertRaises(ValueError):
-            attr.hbi = {}
-
-        with self.assertRaises(ValueError):
-            attr.hbi = []
-
-        with self.assertRaises(ValueError):
-            attr.hbi = 3
-
-        hbi = True
-        attr.hbi = hbi
-
-        self.assertEquals(hbi, attr.hbi,
-                          "hbi property works.")
+        self.util.boolPropertyTest(self, attr, "hbi")
 
     def testClinicalPatientHBITotal(self):
+        """ Test the hbi_total property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.hbi_total = "test hbi total"
+        self.util.floatTypeTest(self, attr, "hbi_total")
 
-        with self.assertRaises(ValueError):
-            attr.hbi_total = True
-
-        with self.assertRaises(ValueError):
-            attr.hbi_total = {}
-
-        with self.assertRaises(ValueError):
-            attr.hbi_total = []
-
-        with self.assertRaises(ValueError):
-            attr.hbi_total = 3
-
-        hbi_total = 3.56
-        attr.hbi_total = hbi_total
-
-        self.assertEquals(hbi_total, attr.hbi_total,
-                          "hbi_total property works.")
+        self.util.floatPropertyTest(self, attr, "hbi_total")
 
     def testClinicalPatientSCCAI(self):
+        """ Test the sccai property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.sccai = "test sccai"
+        self.util.boolTypeTest(self, attr, "sccai")
 
-        with self.assertRaises(ValueError):
-            attr.sccai = 3.5
-
-        with self.assertRaises(ValueError):
-            attr.sccai = {}
-
-        with self.assertRaises(ValueError):
-            attr.sccai = []
-
-        with self.assertRaises(ValueError):
-            attr.sccai = 3
-
-        sccai = True
-        attr.sccai = sccai
-
-        self.assertEquals(sccai, attr.sccai,
-                          "sccai property works.")
+        self.util.boolPropertyTest(self, attr, "sccai")
 
     def testClinicalPatientSCCAITotal(self):
+        """ Test the sccai_total property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.sccai_total = "test sccai total"
+        self.util.floatTypeTest(self, attr, "sccai_total")
 
-        with self.assertRaises(ValueError):
-            attr.sccai_total = True
-
-        with self.assertRaises(ValueError):
-            attr.sccai_total = {}
-
-        with self.assertRaises(ValueError):
-            attr.sccai_total = []
-
-        with self.assertRaises(ValueError):
-            attr.sccai_total = 3
-
-        sccai_total = 3.56
-        attr.sccai_total = sccai_total
-
-        self.assertEquals(sccai_total, attr.sccai_total,
-                          "sccai_total property works.")
+        self.util.floatPropertyTest(self, attr, "sccai_total")
 
     def testClinicalPatientFastGluc(self):
+        """ Test the fast_gluc property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.fast_gluc = "test fast_gluc"
+        self.util.intTypeTest(self, attr, "fast_gluc")
 
-        with self.assertRaises(ValueError):
-            attr.fast_gluc = True
-
-        with self.assertRaises(ValueError):
-            attr.fast_gluc = {}
-
-        with self.assertRaises(ValueError):
-            attr.fast_gluc = []
-
-        with self.assertRaises(ValueError):
-            attr.fast_gluc = 3.56
-
-        fast_gluc = 3
-        attr.fast_gluc = fast_gluc
-
-        self.assertEquals(fast_gluc, attr.fast_gluc,
-                          "fast_gluc property works.")
+        self.util.intPropertyTest(self, attr, "fast_gluc")
 
     def testClinicalPatient30mGluc(self):
+        """ Test the thirtym_gluc property. """
+        attr = self.session.create_visit_attr()
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.thirtym_gluc = "test thirtym_gluc"
+        self.util.intTypeTest(self, attr, "thirtym_gluc")
 
-        with self.assertRaises(ValueError):
-            attr.thirtym_gluc = True
-
-        with self.assertRaises(ValueError):
-            attr.thirtym_gluc = {}
-
-        with self.assertRaises(ValueError):
-            attr.thirtym_gluc = []
-
-        with self.assertRaises(ValueError):
-            attr.thirtym_gluc = 3.56
-
-        thirtym_gluc = 3
-        attr.thirtym_gluc = thirtym_gluc
-
-        self.assertEquals(thirtym_gluc, attr.thirtym_gluc,
-                          "thirtym_gluc property works.")
+        self.util.intPropertyTest(self, attr, "thirtym_gluc")
 
     def testClinicalPatient60mGluc(self):
+        """ Test the sixtym_gluc property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.sixtym_gluc = "test sixtym_gluc"
+        self.util.intTypeTest(self, attr, "sixtym_gluc")
 
-        with self.assertRaises(ValueError):
-            attr.sixtym_gluc = True
-
-        with self.assertRaises(ValueError):
-            attr.sixtym_gluc = {}
-
-        with self.assertRaises(ValueError):
-            attr.sixtym_gluc = []
-
-        with self.assertRaises(ValueError):
-            attr.sixtym_gluc = 3.56
-
-        sixtym_gluc = 3
-        attr.sixtym_gluc = sixtym_gluc
-
-        self.assertEquals(sixtym_gluc, attr.sixtym_gluc,
-                          "sixtym_gluc property works.")
+        self.util.intPropertyTest(self, attr, "sixtym_gluc")
 
     def testHrtPrior(self):
+        """ Test the prior property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.prior = "test prior"
+        self.util.boolTypeTest(self, attr, "prior")
 
-        with self.assertRaises(ValueError):
-            attr.prior = 1
-
-        with self.assertRaises(ValueError):
-            attr.prior = {}
-
-        with self.assertRaises(ValueError):
-            attr.prior = []
-
-        with self.assertRaises(ValueError):
-            attr.prior = 3.5
-
-        prior = True
-        attr.prior = prior
-
-        self.assertEquals(prior, attr.prior,
-                          "prior property works.")
+        self.util.boolPropertyTest(self, attr, "prior")
 
     def testHrtCurrent(self):
+        """ Test the current property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.current = "test current"
+        self.util.boolTypeTest(self, attr, "current")
 
-        with self.assertRaises(ValueError):
-            attr.current = 1
-
-        with self.assertRaises(ValueError):
-            attr.current = {}
-
-        with self.assertRaises(ValueError):
-            attr.current = []
-
-        with self.assertRaises(ValueError):
-            attr.current = 3.5
-
-        current = True
-        attr.current = current
-
-        self.assertEquals(current, attr.current,
-                          "current property works.")
+        self.util.boolPropertyTest(self, attr, "current")
 
     def testHrtDuration(self):
+        """ Test the duration property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.duration = True
+        self.util.stringTypeTest(self, attr, "duration")
 
-        with self.assertRaises(ValueError):
-            attr.duration = 1
-
-        with self.assertRaises(ValueError):
-            attr.duration = {}
-
-        with self.assertRaises(ValueError):
-            attr.duration = []
-
-        with self.assertRaises(ValueError):
-            attr.duration = 3.5
-
-        duration = "test duration"
-        attr.duration = duration
-
-        self.assertEquals(duration, attr.duration,
-                          "duration property works.")
-
+        self.util.stringPropertyTest(self, attr, "duration")
 
     def testHealthAssessSelfAssess(self):
+        """ Test the self_assess property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.self_assess = "test new meds"
+        self.util.boolTypeTest(self, attr, "self_assess")
 
-        with self.assertRaises(ValueError):
-            attr.self_assess = 1
-
-        with self.assertRaises(ValueError):
-            attr.self_assess = {}
-
-        with self.assertRaises(ValueError):
-            attr.self_assess = []
-
-        with self.assertRaises(ValueError):
-            attr.self_assess = 3.5
-
-        self_assess = True
-        attr.self_assess = self_assess
-
-        self.assertEquals(self_assess, attr.self_assess,
-                          "self_assess property works.")
+        self.util.boolPropertyTest(self, attr, "self_assess")
 
     def testHealthAssessSelfCondition(self):
+        """ Test the self_condition property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.self_condition = True
+        self.util.stringTypeTest(self, attr, "self_condition")
 
-        with self.assertRaises(ValueError):
-            attr.self_condition = 1
-
-        with self.assertRaises(ValueError):
-            attr.self_condition = {}
-
-        with self.assertRaises(ValueError):
-            attr.self_condition = []
-
-        with self.assertRaises(ValueError):
-            attr.self_condition = 3.5
-
-        self_condition = "test self condition"
-        attr.self_condition = self_condition
-
-        self.assertEquals(self_condition, attr.self_condition,
-                          "self_condition property works.")
+        self.util.stringPropertyTest(self, attr, "self_condition")
 
     def testHealthAssessAbdominalPain(self):
+        """ Test the abdominal_pain property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.abdominal_pain = "test abdominal pain"
+        self.util.boolTypeTest(self, attr, "abdominal_pain")
 
-        with self.assertRaises(ValueError):
-            attr.abdominal_pain = 1
-
-        with self.assertRaises(ValueError):
-            attr.abdominal_pain = {}
-
-        with self.assertRaises(ValueError):
-            attr.abdominal_pain = []
-
-        with self.assertRaises(ValueError):
-            attr.abdominal_pain = 3.5
-
-        abdominal_pain = True
-        attr.abdominal_pain = abdominal_pain
-
-        self.assertEquals(abdominal_pain, attr.abdominal_pain,
-                          "abdominal_pain property works.")
+        self.util.boolPropertyTest(self, attr, "abdominal_pain")
 
     def testHealthAssessAcuteDis(self):
+        """ Test the acute_dis property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.acute_dis = True
+        self.util.stringTypeTest(self, attr, "acute_dis")
 
-        with self.assertRaises(ValueError):
-            attr.acute_dis = 1
-
-        with self.assertRaises(ValueError):
-            attr.acute_dis = {}
-
-        with self.assertRaises(ValueError):
-            attr.acute_dis = []
-
-        with self.assertRaises(ValueError):
-            attr.acute_dis = 3.5
-
-        acute_dis = "test acute_dis"
-        attr.acute_dis = acute_dis
-
-        self.assertEquals(acute_dis, attr.acute_dis,
-                          "acute_dis property works.")
+        self.util.stringPropertyTest(self, attr, "acute_dis")
 
     def testHealthAssessArthralgia(self):
+        """ Test the arthralgia property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.arthralgia = "test arthralgia"
+        self.util.boolTypeTest(self, attr, "arthralgia")
 
-        with self.assertRaises(ValueError):
-            attr.arthralgia = 1
-
-        with self.assertRaises(ValueError):
-            attr.arthralgia = {}
-
-        with self.assertRaises(ValueError):
-            attr.arthralgia = []
-
-        with self.assertRaises(ValueError):
-            attr.arthralgia = 3.5
-
-        arthralgia = True
-        attr.arthralgia = arthralgia
-
-        self.assertEquals(arthralgia, attr.arthralgia,
-                          "arthralgia property works.")
+        self.util.boolPropertyTest(self, attr, "arthralgia")
 
     def testHealthAssessBowelDay(self):
+        """ Test the bowel_day property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.bowel_day = True
+        self.util.intTypeTest(self, attr, "bowel_day")
 
-        with self.assertRaises(ValueError):
-            attr.bowel_day = "test bowel day"
-
-        with self.assertRaises(ValueError):
-            attr.bowel_day = {}
-
-        with self.assertRaises(ValueError):
-            attr.bowel_day = []
-
-        with self.assertRaises(ValueError):
-            attr.bowel_day = 3.5
-
-        bowel_day = 3
-        attr.bowel_day = bowel_day
-
-        self.assertEquals(bowel_day, attr.bowel_day,
-                          "bowel_day property works.")
+        self.util.intPropertyTest(self, attr, "bowel_day")
 
     def testHealthAssessBowelNight(self):
+        """ Test the bowel_night property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.bowel_night = True
+        self.util.intTypeTest(self, attr, "bowel_night")
 
-        with self.assertRaises(ValueError):
-            attr.bowel_night = "test bowel night"
-
-        with self.assertRaises(ValueError):
-            attr.bowel_night = {}
-
-        with self.assertRaises(ValueError):
-            attr.bowel_night = []
-
-        with self.assertRaises(ValueError):
-            attr.bowel_night = 3.5
-
-        bowel_night = 2
-        attr.bowel_night = bowel_night
-
-        self.assertEquals(bowel_night, attr.bowel_night,
-                          "bowel_night property works.")
+        self.util.intPropertyTest(self, attr, "bowel_night")
 
     def testHealthAssessCancer(self):
+        """ Test the cancer property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.cancer = True
+        self.util.stringTypeTest(self, attr, "cancer")
 
-        with self.assertRaises(ValueError):
-            attr.cancer = 1
-
-        with self.assertRaises(ValueError):
-            attr.cancer = {}
-
-        with self.assertRaises(ValueError):
-            attr.cancer = []
-
-        with self.assertRaises(ValueError):
-            attr.cancer = 3.5
-
-        cancer = "test cancer"
-        attr.cancer = cancer
-
-        self.assertEquals(cancer, attr.cancer,
-                          "cancer property works.")
+        self.util.stringPropertyTest(self, attr, "cancer")
 
     def testHealthAssessCancerMtc(self):
+        """ Test the cancer_mtc property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.cancer_mtc = "test cancer mtc"
+        self.util.boolTypeTest(self, attr, "cancer_mtc")
 
-        with self.assertRaises(ValueError):
-            attr.cancer_mtc = 1
-
-        with self.assertRaises(ValueError):
-            attr.cancer_mtc = {}
-
-        with self.assertRaises(ValueError):
-            attr.cancer_mtc = []
-
-        with self.assertRaises(ValueError):
-            attr.cancer_mtc = 3.5
-
-        cancer_mtc = True
-        attr.cancer_mtc = cancer_mtc
-
-        self.assertEquals(cancer_mtc, attr.cancer_mtc,
-                          "cancer_mtc property works.")
+        self.util.boolPropertyTest(self, attr, "cancer_mtc")
 
     def testHealthAssessChestPain(self):
+        """ Test the chest_pain property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.chest_pain = "test chest_pain"
+        self.util.boolTypeTest(self, attr, "chest_pain")
 
-        with self.assertRaises(ValueError):
-            attr.chest_pain = 1
-
-        with self.assertRaises(ValueError):
-            attr.chest_pain = {}
-
-        with self.assertRaises(ValueError):
-            attr.chest_pain = []
-
-        with self.assertRaises(ValueError):
-            attr.chest_pain = 3.5
-
-        chest_pain = True
-        attr.chest_pain = chest_pain
-
-        self.assertEquals(chest_pain, attr.chest_pain,
-                          "chest_pain property works.")
+        self.util.boolPropertyTest(self, attr, "chest_pain")
 
     def testHealthAssessClaudication(self):
+        """ Test the claudication property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.claudication = "test claudication"
+        self.util.boolTypeTest(self, attr, "claudication")
 
-        with self.assertRaises(ValueError):
-            attr.claudication = 1
-
-        with self.assertRaises(ValueError):
-            attr.claudication = {}
-
-        with self.assertRaises(ValueError):
-            attr.claudication = []
-
-        with self.assertRaises(ValueError):
-            attr.claudication = 3.5
-
-        claudication = True
-        attr.claudication = claudication
-
-        self.assertEquals(claudication, attr.claudication,
-                          "claudication property works.")
+        self.util.boolPropertyTest(self, attr, "claudication")
 
     def testHealthAssessChronicDis(self):
+        """ Test the chronic_dis property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.chronic_dis = True
+        self.util.stringTypeTest(self, attr, "chronic_dis")
 
-        with self.assertRaises(ValueError):
-            attr.chronic_dis = 1
-
-        with self.assertRaises(ValueError):
-            attr.chronic_dis = {}
-
-        with self.assertRaises(ValueError):
-            attr.chronic_dis = []
-
-        with self.assertRaises(ValueError):
-            attr.chronic_dis = 3.5
-
-        chronic_dis = "test chronic_dis"
-        attr.chronic_dis = chronic_dis
-
-        self.assertEquals(chronic_dis, attr.chronic_dis,
-                          "chronic_dis property works.")
+        self.util.stringPropertyTest(self, attr, "chronic_dis")
 
     def testHealthAssessDiarrhea(self):
+        """ Test the diarrhea property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.diarrhea = "test diarrhea"
+        self.util.boolTypeTest(self, attr, "diarrhea")
 
-        with self.assertRaises(ValueError):
-            attr.diarrhea = 1
-
-        with self.assertRaises(ValueError):
-            attr.diarrhea = {}
-
-        with self.assertRaises(ValueError):
-            attr.diarrhea = []
-
-        with self.assertRaises(ValueError):
-            attr.diarrhea = 3.5
-
-        diarrhea = True
-        attr.diarrhea = diarrhea
-
-        self.assertEquals(diarrhea, attr.diarrhea,
-                          "diarrhea property works.")
+        self.util.boolPropertyTest(self, attr, "diarrhea")
 
     def testHealthAssessDyspnea(self):
+        """ Test the dyspnea property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.dyspnea = "test dyspnea"
+        self.util.boolTypeTest(self, attr, "dyspnea")
 
-        with self.assertRaises(ValueError):
-            attr.dyspnea = 1
-
-        with self.assertRaises(ValueError):
-            attr.dyspnea = {}
-
-        with self.assertRaises(ValueError):
-            attr.dyspnea = []
-
-        with self.assertRaises(ValueError):
-            attr.dyspnea = 3.5
-
-        dyspnea = True
-        attr.dyspnea = dyspnea
-
-        self.assertEquals(dyspnea, attr.dyspnea,
-                          "dyspnea property works.")
+        self.util.boolPropertyTest(self, attr, "dyspnea")
 
     def testHealthAssessEryNodosum(self):
+        """ Test the ery_nodosum property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.ery_nodosum = "test ery nodosum"
+        self.util.boolTypeTest(self, attr, "ery_nodosum")
 
-        with self.assertRaises(ValueError):
-            attr.ery_nodosum = 1
-
-        with self.assertRaises(ValueError):
-            attr.ery_nodosum = {}
-
-        with self.assertRaises(ValueError):
-            attr.ery_nodosum = []
-
-        with self.assertRaises(ValueError):
-            attr.ery_nodosum = 3.5
-
-        ery_nodosum = True
-        attr.ery_nodosum = ery_nodosum
-
-        self.assertEquals(ery_nodosum, attr.ery_nodosum,
-                          "ery_nodosum property works.")
+        self.util.boolPropertyTest(self, attr, "ery_nodosum")
 
     def testHealthAssessFever(self):
+        """ Test the fever property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.fever = True
+        self.util.stringTypeTest(self, attr, "fever")
 
-        with self.assertRaises(ValueError):
-            attr.fever = 1
-
-        with self.assertRaises(ValueError):
-            attr.fever = {}
-
-        with self.assertRaises(ValueError):
-            attr.fever = []
-
-        with self.assertRaises(ValueError):
-            attr.fever = 3.5
-
-        fever = "test fever"
-        attr.fever = fever
-
-        self.assertEquals(fever, attr.fever,
-                          "fever property works.")
+        self.util.stringPropertyTest(self, attr, "fever")
 
     def testHealthAssessLegEdema(self):
+        """ Test the leg_edema property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.leg_edema = "test leg_edema"
+        self.util.boolTypeTest(self, attr, "leg_edema")
 
-        with self.assertRaises(ValueError):
-            attr.leg_edema = 1
-
-        with self.assertRaises(ValueError):
-            attr.leg_edema = {}
-
-        with self.assertRaises(ValueError):
-            attr.leg_edema = []
-
-        with self.assertRaises(ValueError):
-            attr.leg_edema = 3.5
-
-        leg_edema = True
-        attr.leg_edema = leg_edema
-
-        self.assertEquals(leg_edema, attr.leg_edema,
-                          "leg_edema property works.")
+        self.util.boolPropertyTest(self, attr, "leg_edema")
 
     def testHealthAssessNeurologic(self):
+        """ Test the neurologic property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.neurologic = "test neurologic"
+        self.util.boolTypeTest(self, attr, "neurologic")
 
-        with self.assertRaises(ValueError):
-            attr.neurologic = 1
-
-        with self.assertRaises(ValueError):
-            attr.neurologic = {}
-
-        with self.assertRaises(ValueError):
-            attr.neurologic = []
-
-        with self.assertRaises(ValueError):
-            attr.neurologic = 3.5
-
-        neurologic = True
-        attr.neurologic = neurologic
-
-        self.assertEquals(neurologic, attr.neurologic,
-                          "neurologic property works.")
+        self.util.boolPropertyTest(self, attr, "neurologic")
 
     def testHealthAssessPregnant(self):
+        """ Test the pregnant property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.pregnant = "test pregnant"
+        self.util.boolTypeTest(self, attr, "pregnant")
 
-        with self.assertRaises(ValueError):
-            attr.pregnant = 1
-
-        with self.assertRaises(ValueError):
-            attr.pregnant = {}
-
-        with self.assertRaises(ValueError):
-            attr.pregnant = []
-
-        with self.assertRaises(ValueError):
-            attr.pregnant = 3.5
-
-        pregnant = True
-        attr.pregnant = pregnant
-
-        self.assertEquals(pregnant, attr.pregnant,
-                          "pregnant property works.")
+        self.util.boolPropertyTest(self, attr, "pregnant")
 
     def testHealthAssessPregPlans(self):
+        """ Test the preg_plans property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.preg_plans = "test preg_plans"
+        self.util.boolTypeTest(self, attr, "preg_plans")
 
-        with self.assertRaises(ValueError):
-            attr.preg_plans = 1
-
-        with self.assertRaises(ValueError):
-            attr.preg_plans = {}
-
-        with self.assertRaises(ValueError):
-            attr.preg_plans = []
-
-        with self.assertRaises(ValueError):
-            attr.preg_plans = 3.5
-
-        preg_plans = True
-        attr.preg_plans = preg_plans
-
-        self.assertEquals(preg_plans, attr.preg_plans,
-                          "preg_plans property works.")
+        self.util.boolPropertyTest(self, attr, "preg_plans")
 
     def testHealthAssessPyoGangrenosum(self):
+        """ Test the pyo_gangrenosum property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.pyo_gangrenosum = "test pyo_gangrenosum"
+        self.util.boolTypeTest(self, attr, "pyo_gangrenosum")
 
-        with self.assertRaises(ValueError):
-            attr.pyo_gangrenosum = 1
-
-        with self.assertRaises(ValueError):
-            attr.pyo_gangrenosum = {}
-
-        with self.assertRaises(ValueError):
-            attr.pyo_gangrenosum = []
-
-        with self.assertRaises(ValueError):
-            attr.pyo_gangrenosum = 3.5
-
-        pyo_gangrenosum = True
-        attr.pyo_gangrenosum = pyo_gangrenosum
-
-        self.assertEquals(pyo_gangrenosum, attr.pyo_gangrenosum,
-                          "pyo_gangrenosum property works.")
+        self.util.boolPropertyTest(self, attr, "pyo_gangrenosum")
 
     def testHealthAssessRash(self):
+        """ Test the rash property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.rash = "test rash"
+        self.util.boolTypeTest(self, attr, "rash")
 
-        with self.assertRaises(ValueError):
-            attr.rash = 1
-
-        with self.assertRaises(ValueError):
-            attr.rash = {}
-
-        with self.assertRaises(ValueError):
-            attr.rash = []
-
-        with self.assertRaises(ValueError):
-            attr.rash = 3.5
-
-        rash = True
-        attr.rash = rash
-
-        self.assertEquals(rash, attr.rash,
-                          "rash property works.")
+        self.util.boolPropertyTest(self, attr, "rash")
 
     def testHealthAssessStoolBlood(self):
+        """ Test the stool_blood property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.stool_blood = "test stool blood"
+        self.util.boolTypeTest(self, attr, "stool_blood")
 
-        with self.assertRaises(ValueError):
-            attr.stool_blood = 1
-
-        with self.assertRaises(ValueError):
-            attr.stool_blood = {}
-
-        with self.assertRaises(ValueError):
-            attr.stool_blood = []
-
-        with self.assertRaises(ValueError):
-            attr.stool_blood = 3.5
-
-        stool_blood = True
-        attr.stool_blood = stool_blood
-
-        self.assertEquals(stool_blood, attr.stool_blood,
-                          "stool_blood property works.")
+        self.util.boolPropertyTest(self, attr, "stool_blood")
 
     def testHealthAssessStoolSoft(self):
+        """ Test the stool_soft property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.stool_soft = "test stool soft"
+        self.util.intTypeTest(self, attr, "stool_soft")
 
-        with self.assertRaises(ValueError):
-            attr.stool_soft = True
-
-        with self.assertRaises(ValueError):
-            attr.stool_soft = {}
-
-        with self.assertRaises(ValueError):
-            attr.stool_soft = []
-
-        with self.assertRaises(ValueError):
-            attr.stool_soft = 3.5
-
-        stool_soft = 2
-        attr.stool_soft = stool_soft
-
-        self.assertEquals(stool_soft, attr.stool_soft,
-                          "stool_soft property works.")
+        self.util.intPropertyTest(self, attr, "stool_soft")
 
     def testHealthAssessSurgery(self):
+        """ Test the surgery property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.surgery = 3
+        self.util.stringTypeTest(self, attr, "surgery")
 
-        with self.assertRaises(ValueError):
-            attr.surgery = True
-
-        with self.assertRaises(ValueError):
-            attr.surgery = {}
-
-        with self.assertRaises(ValueError):
-            attr.surgery = []
-
-        with self.assertRaises(ValueError):
-            attr.surgery = 3.5
-
-        surgery = "test surgery"
-        attr.surgery = surgery
-
-        self.assertEquals(surgery, attr.surgery,
-                          "surgery property works.")
+        self.util.stringPropertyTest(self, attr, "surgery")
 
     def testHealthAssessUrgencyDef(self):
+        """ Test the urgency_def property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.urgency_def = 3
+        self.util.stringTypeTest(self, attr, "urgency_def")
 
-        with self.assertRaises(ValueError):
-            attr.urgency_def = True
-
-        with self.assertRaises(ValueError):
-            attr.urgency_def = {}
-
-        with self.assertRaises(ValueError):
-            attr.urgency_def = []
-
-        with self.assertRaises(ValueError):
-            attr.urgency_def = 3.5
-
-        urgency_def = "test urgency_def"
-        attr.urgency_def = urgency_def
-
-        self.assertEquals(urgency_def, attr.urgency_def,
-                          "urgency_def property works.")
+        self.util.stringPropertyTest(self, attr, "urgency_def")
 
     def testHealthAssessUveitis(self):
+        """ Test the uveitis property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.uveitis = 3
+        self.util.boolTypeTest(self, attr, "uveitis")
 
-        with self.assertRaises(ValueError):
-            attr.uveitis = "test uveitis"
-
-        with self.assertRaises(ValueError):
-            attr.uveitis = {}
-
-        with self.assertRaises(ValueError):
-            attr.uveitis = []
-
-        with self.assertRaises(ValueError):
-            attr.uveitis = 3.5
-
-        uveitis = True
-        attr.uveitis = uveitis
-
-        self.assertEquals(uveitis, attr.uveitis,
-                          "uveitis property works.")
+        self.util.boolPropertyTest(self, attr, "uveitis")
 
     def testHealthAssessWeightChange(self):
+        """ Test the weight_change property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.weight_change = 3
+        self.util.stringTypeTest(self, attr, "weight_change")
 
-        with self.assertRaises(ValueError):
-            attr.weight_change = True
-
-        with self.assertRaises(ValueError):
-            attr.weight_change = {}
-
-        with self.assertRaises(ValueError):
-            attr.weight_change = []
-
-        with self.assertRaises(ValueError):
-            attr.weight_change = 3.5
-
-        weight_change = "test uveitis"
-        attr.weight_change = weight_change
-
-        self.assertEquals(weight_change, attr.weight_change,
-                          "weight_change property works.")
+        self.util.stringPropertyTest(self, attr, "weight_change")
 
     def testHealthAssessDiagOther(self):
+        """ Test the diag_other property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.diag_other = 3
+        self.util.stringTypeTest(self, attr, "diag_other")
 
-        with self.assertRaises(ValueError):
-            attr.diag_other = True
-
-        with self.assertRaises(ValueError):
-            attr.diag_other = {}
-
-        with self.assertRaises(ValueError):
-            attr.diag_other = []
-
-        with self.assertRaises(ValueError):
-            attr.diag_other = 3.5
-
-        diag_other = "test diag_other"
-        attr.diag_other = diag_other
-
-        self.assertEquals(diag_other, attr.diag_other,
-                          "diag_other property works.")
+        self.util.stringPropertyTest(self, attr, "diag_other")
 
     def testHealthAssessHosp(self):
+        """ Test the hosp property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.hosp = 3
+        self.util.boolTypeTest(self, attr, "hosp")
 
-        with self.assertRaises(ValueError):
-            attr.hosp = "test hosp"
-
-        with self.assertRaises(ValueError):
-            attr.hosp = {}
-
-        with self.assertRaises(ValueError):
-            attr.hosp = []
-
-        with self.assertRaises(ValueError):
-            attr.hosp = 3.5
-
-        hosp = True
-        attr.hosp = hosp
-
-        self.assertEquals(hosp, attr.hosp,
-                          "hosp property works.")
+        self.util.boolPropertyTest(self, attr, "hosp")
 
     def testHealthAssessWorkMissed(self):
+        """ Test the work_missed property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.work_missed = True
+        self.util.intTypeTest(self, attr, "work_missed")
 
-        with self.assertRaises(ValueError):
-            attr.work_missed = "test hosp"
-
-        with self.assertRaises(ValueError):
-            attr.work_missed = {}
-
-        with self.assertRaises(ValueError):
-            attr.work_missed = []
-
-        with self.assertRaises(ValueError):
-            attr.work_missed = 3.5
-
-        work_missed = 8
-        attr.work_missed = work_missed
-
-        self.assertEquals(work_missed, attr.work_missed,
-                          "work_missed property works.")
+        self.util.intPropertyTest(self, attr, "work_missed")
 
     def testMedicationsNewMeds(self):
+        """ Test the new_meds property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.new_meds = "test new meds"
+        self.util.boolTypeTest(self, attr, "new_meds")
 
-        with self.assertRaises(ValueError):
-            attr.new_meds = 1
-
-        with self.assertRaises(ValueError):
-            attr.new_meds = {}
-
-        with self.assertRaises(ValueError):
-            attr.new_meds = []
-
-        with self.assertRaises(ValueError):
-            attr.new_meds = 3.5
-
-        new_meds = True
-        attr.new_meds = new_meds
-
-        self.assertEquals(new_meds, attr.new_meds,
-                          "new_meds property works.")
+        self.util.boolPropertyTest(self, attr, "new_meds")
 
     def testMedicationsStoppedMeds(self):
+        """ Test the stopped_meds property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.stopped_meds = "test stopped meds"
+        self.util.boolTypeTest(self, attr, "stopped_meds")
 
-        with self.assertRaises(ValueError):
-            attr.stopped_meds = 1
-
-        with self.assertRaises(ValueError):
-            attr.stopped_meds = {}
-
-        with self.assertRaises(ValueError):
-            attr.stopped_meds = []
-
-        with self.assertRaises(ValueError):
-            attr.stopped_meds = 3.5
-
-        stopped_meds = True
-        attr.stopped_meds = stopped_meds
-
-        self.assertEquals(stopped_meds, attr.stopped_meds,
-                          "stopped_meds property works.")
+        self.util.boolPropertyTest(self, attr, "stopped_meds")
 
     def testMedicationsAbx(self):
+        """ Test the abx property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.abx = "test abx"
+        self.util.boolTypeTest(self, attr, "abx")
 
-        with self.assertRaises(ValueError):
-            attr.abx = 1
-
-        with self.assertRaises(ValueError):
-            attr.abx = {}
-
-        with self.assertRaises(ValueError):
-            attr.abx = []
-
-        with self.assertRaises(ValueError):
-            attr.abx = 3.5
-
-        abx = True
-        attr.abx = abx
-
-        self.assertEquals(abx, attr.abx,
-                          "abx property works.")
+        self.util.boolPropertyTest(self, attr, "abx")
 
     def testMedicationsChemo(self):
+        """ Test the chemo property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.chemo = "test chemo"
+        self.util.boolTypeTest(self, attr, "chemo")
 
-        with self.assertRaises(ValueError):
-            attr.chemo = 1
-
-        with self.assertRaises(ValueError):
-            attr.chemo = {}
-
-        with self.assertRaises(ValueError):
-            attr.chemo = []
-
-        with self.assertRaises(ValueError):
-            attr.chemo = 3.5
-
-        chemo = True
-        attr.chemo = chemo
-
-        self.assertEquals(chemo, attr.chemo,
-                          "chemo property works.")
+        self.util.boolPropertyTest(self, attr, "chemo")
 
     def testMedicationsImmunosupp(self):
+        """ Test the immunosupp property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.immunosupp = "test immunosupp"
+        self.util.boolTypeTest(self, attr, "immunosupp")
 
-        with self.assertRaises(ValueError):
-            attr.immunosupp = 1
-
-        with self.assertRaises(ValueError):
-            attr.immunosupp = {}
-
-        with self.assertRaises(ValueError):
-            attr.immunosupp = []
-
-        with self.assertRaises(ValueError):
-            attr.immunosupp = 3.5
-
-        immunosupp = True
-        attr.immunosupp = immunosupp
-
-        self.assertEquals(immunosupp, attr.immunosupp,
-                          "immunosupp property works.")
+        self.util.boolPropertyTest(self, attr, "immunosupp")
 
     def testTestsColonoscopy(self):
+        """ Test the colonoscopy property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.colonoscopy = 1
+        self.util.boolTypeTest(self, attr, "colonoscopy")
 
-        with self.assertRaises(ValueError):
-            attr.colonoscopy = {}
-
-        with self.assertRaises(ValueError):
-            attr.colonoscopy = []
-
-        with self.assertRaises(ValueError):
-            attr.colonoscopy = 3.5
-
-        colonoscopy = True
-        attr.colonoscopy = colonoscopy
-
-        self.assertEquals(colonoscopy, attr.colonoscopy,
-                          "colonoscopy property works.")
+        self.util.boolPropertyTest(self, attr, "colonoscopy")
 
     def testTestsOralContrast(self):
+        """ Test the oral_contrast property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.oral_contrast = 1
+        self.util.boolTypeTest(self, attr, "oral_contrast")
 
-        with self.assertRaises(ValueError):
-            attr.oral_contrast = {}
-
-        with self.assertRaises(ValueError):
-            attr.oral_contrast = []
-
-        with self.assertRaises(ValueError):
-            attr.oral_contrast = 3.5
-
-        oral_contrast = True
-        attr.oral_contrast = oral_contrast
-
-        self.assertEquals(oral_contrast, attr.oral_contrast,
-                          "oral_contrast property works.")
+        self.util.boolPropertyTest(self, attr, "oral_contrast")
 
     def testDiseaseComment(self):
+        """ Test the disease_comment property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_comment = True
+        self.util.stringTypeTest(self, attr, "disease_comment")
 
-        with self.assertRaises(ValueError):
-            attr.disease_comment = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_comment = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_comment = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_comment = 3.5
-
-        disease_comment = "test disease comment"
-        attr.disease_comment = disease_comment
-
-        self.assertEquals(disease_comment, attr.disease_comment,
-                          "disease_comment property works.")
+        self.util.stringPropertyTest(self, attr, "disease_comment")
 
     def testDiseaseName(self):
+        """ Test the disease_name property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_name = True
+        self.util.stringTypeTest(self, attr, "disease_name")
 
-        with self.assertRaises(ValueError):
-            attr.disease_name = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_name = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_name = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_name = 3.5
-
-        disease_name = "test disease name"
-        attr.disease_name = disease_name
-
-        self.assertEquals(disease_name, attr.disease_name,
-                          "disease_name property works.")
+        self.util.stringPropertyTest(self, attr, "disease_name")
 
     def testDiseaseDescription(self):
+        """ Test the disease_description property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_description = True
+        self.util.stringTypeTest(self, attr, "disease_description")
 
-        with self.assertRaises(ValueError):
-            attr.disease_description = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_description = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_description = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_description = 3.5
-
-        disease_description = "test disease description"
-        attr.disease_description = disease_description
-
-        self.assertEquals(disease_description, attr.disease_description,
-                          "disease_description property works.")
+        self.util.stringPropertyTest(self, attr, "disease_description")
 
     def testDiseaseOntologyID(self):
+        """ Test the disease_ontology_id property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_ontology_id = True
+        self.util.stringTypeTest(self, attr, "disease_ontology_id")
 
-        with self.assertRaises(ValueError):
-            attr.disease_ontology_id = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_ontology_id = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_ontology_id = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_ontology_id = 3.5
-
-        disease_ontology_id = "test disease ontology id"
-        attr.disease_ontology_id = disease_ontology_id
-
-        self.assertEquals(disease_ontology_id, attr.disease_ontology_id,
-                          "disease_ontology_id property works.")
+        self.util.stringPropertyTest(self, attr, "disease_ontology_id")
 
     def testDiseaseMeshID(self):
+        """ Test the disease_mesh_id property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_mesh_id = True
+        self.util.stringTypeTest(self, attr, "disease_mesh_id")
 
-        with self.assertRaises(ValueError):
-            attr.disease_mesh_id = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_mesh_id = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_mesh_id = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_mesh_id = 3.5
-
-        mesh_id = "test mesh id"
-        attr.disease_mesh_id = mesh_id
-
-        self.assertEquals(mesh_id, attr.disease_mesh_id,
-                          "disease_mesh_id property works.")
+        self.util.stringPropertyTest(self, attr, "disease_mesh_id")
 
     def testDiseaseNciID(self):
+        """ Test the disease_nci_id property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_nci_id = True
+        self.util.stringTypeTest(self, attr, "disease_nci_id")
 
-        with self.assertRaises(ValueError):
-            attr.disease_nci_id = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_nci_id = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_nci_id = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_nci_id = 3.5
-
-        nci_id = "test nci id"
-        attr.disease_nci_id = nci_id
-
-        self.assertEquals(nci_id, attr.disease_nci_id,
-                          "disease_nci_id property works.")
+        self.util.stringPropertyTest(self, attr, "disease_nci_id")
 
     def testDiseaseUmlsConceptID(self):
+        """ Test the disease_umls_concept_id property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_umls_concept_id = True
+        self.util.stringTypeTest(self, attr, "disease_umls_concept_id")
 
-        with self.assertRaises(ValueError):
-            attr.disease_umls_concept_id = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_umls_concept_id = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_umls_concept_id = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_umls_concept_id = 3.5
-
-        umls_concept_id = "test umls concept id"
-        attr.disease_umls_concept_id = umls_concept_id
-
-        self.assertEquals(umls_concept_id, attr.disease_umls_concept_id,
-                          "disease_umls_concept_id property works.")
+        self.util.stringPropertyTest(self, attr, "disease_umls_concept_id")
 
     def testDiseaseStudyStatus(self):
+        """ Test the disease_study_status property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.disease_study_status = True
+        self.util.stringTypeTest(self, attr, "disease_study_status")
 
-        with self.assertRaises(ValueError):
-            attr.disease_study_status = 3
-
-        with self.assertRaises(ValueError):
-            attr.disease_study_status = {}
-
-        with self.assertRaises(ValueError):
-            attr.disease_study_status = []
-
-        with self.assertRaises(ValueError):
-            attr.disease_study_status = 3.5
-
-        disease_study_status = "test disease study status"
-        attr.disease_study_status = disease_study_status
-
-        self.assertEquals(disease_study_status, attr.disease_study_status,
-                          "disease_study_status property works.")
+        self.util.stringPropertyTest(self, attr, "disease_study_status")
 
     def testPsychPsychiatric(self):
+        """ Test the psychiatric property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.psychiatric = "test psychiatric"
+        self.util.boolTypeTest(self, attr, "psychiatric")
 
-        with self.assertRaises(ValueError):
-            attr.psychiatric = {}
-
-        with self.assertRaises(ValueError):
-            attr.psychiatric = []
-
-        with self.assertRaises(ValueError):
-            attr.psychiatric = 3.5
-
-        psychiatric = False
-        attr.psychiatric = psychiatric
-
-        self.assertEquals(psychiatric, attr.psychiatric,
-                          "psychiatric property works.")
+        self.util.boolPropertyTest(self, attr, "psychiatric")
 
     def testPsychUpset(self):
+        """ Test the upset property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.upset = "test upset"
+        self.util.intTypeTest(self, attr, "upset")
 
-        with self.assertRaises(ValueError):
-            attr.upset = {}
-
-        with self.assertRaises(ValueError):
-            attr.upset = []
-
-        with self.assertRaises(ValueError):
-            attr.upset = 3.5
-
-        upset = 3
-        attr.upset = upset
-
-        self.assertEquals(upset, attr.upset,
-                          "upset property works.")
+        self.util.intPropertyTest(self, attr, "upset")
 
     def testPsychControl(self):
+        """ Test the control property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.control = "test control"
+        self.util.intTypeTest(self, attr, "control")
 
-        with self.assertRaises(ValueError):
-            attr.control = {}
-
-        with self.assertRaises(ValueError):
-            attr.control = []
-
-        with self.assertRaises(ValueError):
-            attr.control = 3.5
-
-        control = 3
-        attr.control = control
-
-        self.assertEquals(control, attr.control,
-                          "control property works.")
+        self.util.intPropertyTest(self, attr, "control")
 
     def testPsychStress(self):
+        """ Test the stress property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.stress = "test stress"
+        self.util.intTypeTest(self, attr, "stress")
 
-        with self.assertRaises(ValueError):
-            attr.stress = {}
-
-        with self.assertRaises(ValueError):
-            attr.stress = []
-
-        with self.assertRaises(ValueError):
-            attr.stress = 3.5
-
-        stress = 3
-        attr.stress = stress
-
-        self.assertEquals(stress, attr.stress,
-                          "stress property works.")
+        self.util.intPropertyTest(self, attr, "stress")
 
     def testPsychStressDef(self):
+        """ Test the stress_def property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.stress_def = 3
+        self.util.stringTypeTest(self, attr, "stress_def")
 
-        with self.assertRaises(ValueError):
-            attr.stress_def = {}
-
-        with self.assertRaises(ValueError):
-            attr.stress_def = []
-
-        with self.assertRaises(ValueError):
-            attr.stress_def = 3.5
-
-        stress_def = "test stress def"
-        attr.stress_def = stress_def
-
-        self.assertEquals(stress_def, attr.stress_def,
-                          "stress_def property works.")
+        self.util.stringPropertyTest(self, attr, "stress_def")
 
     def testPsychConfident(self):
+        """ Test the confident property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.confident = "test confident"
+        self.util.intTypeTest(self, attr, "confident")
 
-        with self.assertRaises(ValueError):
-            attr.confident = {}
-
-        with self.assertRaises(ValueError):
-            attr.confident = []
-
-        with self.assertRaises(ValueError):
-            attr.confident = 3.5
-
-        confident = 3
-        attr.confident = confident
-
-        self.assertEquals(confident, attr.confident,
-                          "confident property works.")
+        self.util.intPropertyTest(self, attr, "confident")
 
     def testPsychGoingYourWay(self):
+        """ Test the going_your_way property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.going_your_way = "test going_your_way"
+        self.util.intTypeTest(self, attr, "going_your_way")
 
-        with self.assertRaises(ValueError):
-            attr.going_your_way = {}
-
-        with self.assertRaises(ValueError):
-            attr.going_your_way = []
-
-        with self.assertRaises(ValueError):
-            attr.going_your_way = 3.5
-
-        going_your_way = 3
-        attr.going_your_way = going_your_way
-
-        self.assertEquals(going_your_way, attr.going_your_way,
-                          "going_your_way property works.")
+        self.util.intPropertyTest(self, attr, "going_your_way")
 
     def testPsychCoping(self):
+        """ Test the coping property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.coping = "test coping"
+        self.util.intTypeTest(self, attr, "coping")
 
-        with self.assertRaises(ValueError):
-            attr.coping = {}
-
-        with self.assertRaises(ValueError):
-            attr.coping = []
-
-        with self.assertRaises(ValueError):
-            attr.coping = 3.5
-
-        coping = 3
-        attr.coping = coping
-
-        self.assertEquals(coping, attr.coping,
-                          "coping property works.")
+        self.util.intPropertyTest(self, attr, "coping")
 
     def testPsychIrritation(self):
+        """ Test the irritation property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.irritation = "test irritation"
+        self.util.intTypeTest(self, attr, "irritation")
 
-        with self.assertRaises(ValueError):
-            attr.irritation = {}
-
-        with self.assertRaises(ValueError):
-            attr.irritation = []
-
-        with self.assertRaises(ValueError):
-            attr.irritation = 3.5
-
-        irritation = 3
-        attr.irritation = irritation
-
-        self.assertEquals(irritation, attr.irritation,
-                          "irritation property works.")
+        self.util.intPropertyTest(self, attr, "irritation")
 
     def testPsychOnTop(self):
+        """ Test the on_top property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.on_top = "test on top"
+        self.util.intTypeTest(self, attr, "on_top")
 
-        with self.assertRaises(ValueError):
-            attr.on_top = {}
-
-        with self.assertRaises(ValueError):
-            attr.on_top = []
-
-        with self.assertRaises(ValueError):
-            attr.on_top = 3.5
-
-        on_top = 3
-        attr.on_top = on_top
-
-        self.assertEquals(on_top, attr.on_top,
-                          "on_top property works.")
+        self.util.intPropertyTest(self, attr, "on_top")
 
     def testPsychAnger(self):
+        """ Test the anger property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.anger = "test anger"
+        self.util.intTypeTest(self, attr, "anger")
 
-        with self.assertRaises(ValueError):
-            attr.anger = {}
-
-        with self.assertRaises(ValueError):
-            attr.anger = []
-
-        with self.assertRaises(ValueError):
-            attr.anger = 3.5
-
-        anger = 3
-        attr.anger = anger
-
-        self.assertEquals(anger, attr.anger,
-                          "anger property works.")
+        self.util.intPropertyTest(self, attr, "anger")
 
     def testPsychDifficulties(self):
+        """ Test the difficulties property. """
         attr = self.session.create_visit_attr()
 
-        with self.assertRaises(ValueError):
-            attr.difficulties = "test difficulties"
+        self.util.intTypeTest(self, attr, "difficulties")
 
-        with self.assertRaises(ValueError):
-            attr.difficulties = {}
-
-        with self.assertRaises(ValueError):
-            attr.difficulties = []
-
-        with self.assertRaises(ValueError):
-            attr.difficulties = 3.5
-
-        difficulties = 7
-        attr.difficulties = difficulties
-
-        self.assertEquals(difficulties, attr.difficulties,
-                          "difficulties property works.")
+        self.util.intPropertyTest(self, attr, "difficulties")
 
     def testExerciseVigActivity(self):
+        """
+        Test the vig_activity_days, vig_activity_hours and
+        vig_activity_minutes properties.
+        """
         attr = self.session.create_visit_attr()
 
         # vig_activity_days
-        with self.assertRaises(ValueError):
-            attr.vig_activity_days = "test"
+        self.util.intTypeTest(self, attr, "vig_activity_days")
 
-        with self.assertRaises(ValueError):
-            attr.vig_activity_days = {}
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_days = []
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_days = 3.5
-
-        vig_activity_days = 3
-        attr.vig_activity_days = vig_activity_days
-
-        self.assertEquals(vig_activity_days, attr.vig_activity_days,
-                          "vig_activity_days property works.")
+        self.util.intPropertyTest(self, attr, "vig_activity_days")
 
         # vig_activity_hours
-        with self.assertRaises(ValueError):
-            attr.vig_activity_hours = "test"
+        self.util.intTypeTest(self, attr, "vig_activity_hours")
 
-        with self.assertRaises(ValueError):
-            attr.vig_activity_hours = {}
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_hours = []
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_hours = 3.5
-
-        vig_activity_hours = 4
-        attr.vig_activity_hours = vig_activity_hours
-
-        self.assertEquals(vig_activity_hours, attr.vig_activity_hours,
-                          "vig_activity_hours property works.")
+        self.util.intPropertyTest(self, attr, "vig_activity_hours")
 
         # vig_activity_minutes
-        with self.assertRaises(ValueError):
-            attr.vig_activity_minutes = "test"
+        self.util.intTypeTest(self, attr, "vig_activity_minutes")
 
-        with self.assertRaises(ValueError):
-            attr.vig_activity_minutes = {}
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_minutes = []
-
-        with self.assertRaises(ValueError):
-            attr.vig_activity_minutes = 3.5
-
-        vig_activity_minutes = 5
-        attr.vig_activity_minutes = vig_activity_minutes
-
-        self.assertEquals(vig_activity_minutes, attr.vig_activity_minutes,
-                          "vig_activity_minutes property works.")
+        self.util.intPropertyTest(self, attr, "vig_activity_minutes")
 
     def testExerciseModActivity(self):
+        """
+        Test the mod_activity_days, mod_activity_hours and
+        mod_activity_minutes properties.
+        """
         attr = self.session.create_visit_attr()
 
         # mod_activity_days
-        with self.assertRaises(ValueError):
-            attr.mod_activity_days = "test"
+        self.util.intTypeTest(self, attr, "mod_activity_days")
 
-        with self.assertRaises(ValueError):
-            attr.mod_activity_days = {}
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_days = []
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_days = 3.5
-
-        mod_activity_days = 3
-        attr.mod_activity_days = mod_activity_days
-
-        self.assertEquals(mod_activity_days, attr.mod_activity_days,
-                          "mod_activity_days property works.")
+        self.util.intPropertyTest(self, attr, "mod_activity_days")
 
         # mod_activity_hours
-        with self.assertRaises(ValueError):
-            attr.mod_activity_hours = "test"
+        self.util.intTypeTest(self, attr, "mod_activity_hours")
 
-        with self.assertRaises(ValueError):
-            attr.mod_activity_hours = {}
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_hours = []
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_hours = 3.5
-
-        mod_activity_hours = 4
-        attr.mod_activity_hours = mod_activity_hours
-
-        self.assertEquals(mod_activity_hours, attr.mod_activity_hours,
-                          "mod_activity_hours property works.")
+        self.util.intPropertyTest(self, attr, "mod_activity_hours")
 
         # mod_activity_minutes
-        with self.assertRaises(ValueError):
-            attr.mod_activity_minutes = "test"
+        self.util.intTypeTest(self, attr, "mod_activity_minutes")
 
-        with self.assertRaises(ValueError):
-            attr.mod_activity_minutes = {}
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_minutes = []
-
-        with self.assertRaises(ValueError):
-            attr.mod_activity_minutes = 3.5
-
-        mod_activity_minutes = 5
-        attr.mod_activity_minutes = mod_activity_minutes
-
-        self.assertEquals(mod_activity_minutes, attr.mod_activity_minutes,
-                          "mod_activity_minutes property works.")
+        self.util.intPropertyTest(self, attr, "mod_activity_minutes")
 
     def testExerciseWalking(self):
+        """
+        Test the walking_days, walking_hours and walking_minutes properties.
+        """
         attr = self.session.create_visit_attr()
 
         # walking_days
-        with self.assertRaises(ValueError):
-            attr.walking_days = "test"
+        self.util.intTypeTest(self, attr, "walking_days")
 
-        with self.assertRaises(ValueError):
-            attr.walking_days = {}
-
-        with self.assertRaises(ValueError):
-            attr.walking_days = []
-
-        with self.assertRaises(ValueError):
-            attr.walking_days = 3.5
-
-        walking_days = 3
-        attr.walking_days = walking_days
-
-        self.assertEquals(walking_days, attr.walking_days,
-                          "walking_days property works.")
+        self.util.intPropertyTest(self, attr, "walking_days")
 
         # walking_hours
-        with self.assertRaises(ValueError):
-            attr.walking_hours = "test"
+        self.util.intTypeTest(self, attr, "walking_hours")
 
-        with self.assertRaises(ValueError):
-            attr.walking_hours = {}
-
-        with self.assertRaises(ValueError):
-            attr.walking_hours = []
-
-        with self.assertRaises(ValueError):
-            attr.walking_hours = 3.5
-
-        walking_hours = 4
-        attr.walking_hours = walking_hours
-
-        self.assertEquals(walking_hours, attr.walking_hours,
-                          "walking_hours property works.")
+        self.util.intPropertyTest(self, attr, "walking_hours")
 
         # walking_minutes
-        with self.assertRaises(ValueError):
-            attr.walking_minutes = "test"
+        self.util.intTypeTest(self, attr, "walking_minutes")
 
-        with self.assertRaises(ValueError):
-            attr.walking_minutes = {}
-
-        with self.assertRaises(ValueError):
-            attr.walking_minutes = []
-
-        with self.assertRaises(ValueError):
-            attr.walking_minutes = 3.5
-
-        walking_minutes = 5
-        attr.walking_minutes = walking_minutes
-
-        self.assertEquals(walking_minutes, attr.walking_minutes,
-                          "walking_minutes property works.")
+        self.util.intPropertyTest(self, attr, "walking_minutes")
 
     def testExerciseActivity30d(self):
+        """ Test the activity_30d property. """
         attr = self.session.create_visit_attr()
 
-        # activity level over the last 30 days. Must be a string.
-        with self.assertRaises(ValueError):
-            attr.activity_30d = 3
+        self.util.stringTypeTest(self, attr, "activity_30d")
 
-        with self.assertRaises(ValueError):
-            attr.activity_30d = {}
-
-        with self.assertRaises(ValueError):
-            attr.activity_30d = []
-
-        with self.assertRaises(ValueError):
-            attr.activity_30d = 3.5
-
-        activity_30d = "test 30d"
-        attr.activity_30d = activity_30d
-
-        self.assertEquals(activity_30d, attr.activity_30d,
-                          "activity_30d property works.")
+        self.util.stringPropertyTest(self, attr, "activity_30d")
 
     def testExerciseActivity3m(self):
+        """ Test the activity_3m property. """
         attr = self.session.create_visit_attr()
 
-        # activity level over the last 3 months. Must be a string.
-        with self.assertRaises(ValueError):
-            attr.activity_3m = 3
+        self.util.stringTypeTest(self, attr, "activity_3m")
 
-        with self.assertRaises(ValueError):
-            attr.activity_3m = {}
-
-        with self.assertRaises(ValueError):
-            attr.activity_3m = []
-
-        with self.assertRaises(ValueError):
-            attr.activity_3m = 3.5
-
-        activity_3m = "test 3m"
-        attr.activity_3m = activity_3m
-
-        self.assertEquals(activity_3m, attr.activity_3m,
-                          "activity_3m property works.")
+        self.util.stringPropertyTest(self, attr, "activity_3m")
 
     def testExerciseActivityChange30d(self):
+        """ Test the activity_change_30d property. """
         attr = self.session.create_visit_attr()
 
-        # activity level changed over the last 30 days. Must be a string.
-        with self.assertRaises(ValueError):
-            attr.activity_change_30d = 3
+        self.util.stringTypeTest(self, attr, "activity_change_30d")
 
-        with self.assertRaises(ValueError):
-            attr.activity_change_30d = {}
-
-        with self.assertRaises(ValueError):
-            attr.activity_change_30d = []
-
-        with self.assertRaises(ValueError):
-            attr.activity_change_30d = 3.5
-
-        activity_change_30d = "test activity change 30d"
-        attr.activity_change_30d = activity_change_30d
-
-        self.assertEquals(activity_change_30d, attr.activity_change_30d,
-                          "activity_change_30d property works.")
+        self.util.stringPropertyTest(self, attr, "activity_change_30d")
 
     def testExerciseActivityChange3m(self):
+        """ Test the activity_change_3m property. """
         attr = self.session.create_visit_attr()
 
-        # activity level changed over the last 3 months. Must be a string.
-        with self.assertRaises(ValueError):
-            attr.activity_change_3m = 3
+        self.util.stringTypeTest(self, attr, "activity_change_3m")
 
-        with self.assertRaises(ValueError):
-            attr.activity_change_3m = {}
-
-        with self.assertRaises(ValueError):
-            attr.activity_change_3m = []
-
-        with self.assertRaises(ValueError):
-            attr.activity_change_3m = 3.5
-
-        activity_change_3m = "test activity change 3m"
-        attr.activity_change_3m = activity_change_3m
-
-        self.assertEquals(activity_change_3m, attr.activity_change_3m,
-                          "activity_change_3m property works.")
+        self.util.stringPropertyTest(self, attr, "activity_change_3m")
 
 if __name__ == '__main__':
     unittest.main()

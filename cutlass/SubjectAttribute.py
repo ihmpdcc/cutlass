@@ -1,10 +1,14 @@
-#!/usr/bin/env python
+"""
+Models the subject attribute object.
+"""
 
 import json
 import logging
-from iHMPSession import iHMPSession
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801, C0302
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -21,7 +25,7 @@ class SubjectAttribute(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the SubjectAttribute class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -70,6 +74,8 @@ class SubjectAttribute(Base):
         self._siblings = None
         self._study = None
         self._tobacco = None
+
+        super(SubjectAttribute, self).__init__(*args, **kwargs)
 
     @property
     def aerobics(self):
@@ -259,7 +265,7 @@ class SubjectAttribute(Base):
     @property
     def contact(self):
         """
-        str: Does the subject wish to be contacted in the future?
+        bool: Does the subject wish to be contacted in the future?
         """
         self.logger.debug("In 'contact' getter.")
 
@@ -788,31 +794,6 @@ class SubjectAttribute(Base):
         self._siblings = siblings
 
     @property
-    def survey_id(self):
-        """
-        str: Center specific survey identifier.
-        """
-        self.logger.debug("In 'survey_id' getter.")
-        return self._survey_id
-
-    @survey_id.setter
-    @enforce_string
-    def survey_id(self, survey_id):
-        """
-        The setter for center specific survey identifier.
-
-        Args:
-            survey_id (str): The survey identifier.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'survey_id' setter.")
-
-        self._survey_id = survey_id
-
-    @property
     def study(self):
         """
         str: One of the 3 studies that are part of the iHMP.
@@ -838,171 +819,12 @@ class SubjectAttribute(Base):
         self._study = study
 
     @property
-    def hypertension(self):
-        """
-        str: Retrieve the subject attribute's hypertension data.
-        """
-        self.logger.debug("In 'hypertension' getter.")
-
-        return self._hypertension
-
-    @hypertension.setter
-    @enforce_string
-    def hypertension(self, hypertension):
-        """
-        The setter for the subject attribute's hypertension data.
-
-        Args:
-            hypertension (str): Yes/No, duration.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'hypertension' setter.")
-
-        self._hypertension = hypertension
-
-    @property
-    def mother(self):
-        """
-        str: Retrieve the subject's mother.
-        """
-        self.logger.debug("In 'mother' getter.")
-
-        return self._mother
-
-    @mother.setter
-    @enforce_string
-    def mother(self, mother):
-        """
-        The setter for the subject's mother.
-
-        Args:
-            mother (str): The subject's mother.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'mother' setter.")
-
-        self._mother = mother
-
-    @property
-    def occupation(self):
-        """
-        str: Retrieve the subject's occupation.
-        """
-        self.logger.debug("In 'occupation' getter.")
-
-        return self._occupation
-
-    @occupation.setter
-    @enforce_string
-    def occupation(self, occupation):
-        """
-        The setter for the subject attribute's occupation.
-
-        Args:
-            occupation (str): The subject attribute's occupation.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'occupation' setter.")
-
-        self._occupation = occupation
-
-    @property
-    def pvd(self):
-        """
-        str: Retrieve the subject attribute's data on whether the subject
-        has peripheral vascular disease.
-        """
-        self.logger.debug("In 'pvd' getter.")
-
-        return self._pvd
-
-    @pvd.setter
-    @enforce_string
-    def pvd(self, pvd):
-        """
-        The setter for the subject attribute's data on the subject's
-        peripheral vascular disease.
-
-        Args:
-            pvd (str): Yes/No, duration.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'pvd' setter.")
-
-        self._pvd = pvd
-
-    @property
-    def rx(self):
-        """
-        str: Retrieve the subject attribute's prescriptions and
-        over-the-counter medications.
-        """
-        self.logger.debug("In 'rx' getter.")
-
-        return self._rx
-
-    @rx.setter
-    @enforce_string
-    def rx(self, rx):
-        """
-        The setter for the subject attribute's prescriptions and
-        over-the-counter medications..
-
-        Args:
-            rx (str): The subject atttribute prescriptions/medications.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'rx' setter.")
-
-        self._rx = rx
-
-    @property
-    def siblings(self):
-        """
-        str: Retrieve the subject attribute's siblings.
-        """
-        self.logger.debug("In 'siblings' getter.")
-
-        return self._siblings
-
-    @siblings.setter
-    @enforce_string
-    def siblings(self, siblings):
-        """
-        The setter for the subject attribute's siblings.
-
-        Args:
-            siblings (str): The subject atttribute siblings.
-
-        Returns:
-            None
-        """
-
-        self.logger.debug("In 'siblings' setter.")
-
-        self._siblings = siblings
-
-    @property
     def survey_id(self):
         """
         str: Center specific survey identifier.
         """
         self.logger.debug("In 'survey_id' getter.")
+
         return self._survey_id
 
     @survey_id.setter
@@ -1021,30 +843,6 @@ class SubjectAttribute(Base):
         self.logger.debug("In 'survey_id' setter.")
 
         self._survey_id = survey_id
-
-    @property
-    def study(self):
-        """
-        str: One of the 3 studies that are part of the iHMP.
-        """
-        self.logger.debug("In 'study' getter.")
-        return self._study
-
-    @study.setter
-    @enforce_string
-    def study(self, study):
-        """
-        One of the 3 studies that are part of the iHMP.
-
-        Args:
-            study (str): One of the 3 studies that are part of the iHMP.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'study' setter.")
-
-        self._study = study
 
     @property
     def tobacco(self):
@@ -1105,7 +903,7 @@ class SubjectAttribute(Base):
         if 'associated_with' not in self._links.keys():
             problems.append("Must have a 'associated_with' link to a subject.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -1129,12 +927,12 @@ class SubjectAttribute(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'associated_with' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -1156,8 +954,8 @@ class SubjectAttribute(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ SubjectAttribute.namespace ]
+                'read': ['all'],
+                'write': [SubjectAttribute.namespace]
             },
             'linkage': self._links,
             'ns': SubjectAttribute.namespace,
@@ -1179,27 +977,27 @@ class SubjectAttribute(Base):
 
         # Handle optional properties
         if self._aerobics is not None:
-            self.logger.debug(__name__ + " object has aerobics set.")
+            self.logger.debug("%s object has aerobics set.", __name__)
             doc['meta']['aerobics'] = self._aerobics
 
         if self._alcohol is not None:
-            self.logger.debug(__name__ + " object has alcohol set.")
+            self.logger.debug("%s object has alcohol set.", __name__)
             doc['meta']['alcohol'] = self._alcohol
 
         if self._allergies is not None:
-            self.logger.debug(__name__ + " object has allergies set.")
+            self.logger.debug("%s object has allergies set.", __name__)
             doc['meta']['allergies'] = self._allergies
 
         if self._asthma is not None:
-            self.logger.debug(__name__ + " object has asthma set.")
+            self.logger.debug("%s object has asthma set.", __name__)
             doc['meta']['asthma'] = self._asthma
 
         if self._cad is not None:
-            self.logger.debug(__name__ + " object has cad set.")
+            self.logger.debug("%s object has cad set.", __name__)
             doc['meta']['cad'] = self._cad
 
         if self._chf is not None:
-            self.logger.debug(__name__ + " object has chf set.")
+            self.logger.debug("%s object has chf set.", __name__)
             doc['meta']['chf'] = self._chf
 
         if self._comment is not None:
@@ -1255,43 +1053,43 @@ class SubjectAttribute(Base):
             doc['meta']['lmp'] = self._lmp
 
         if self._mother is not None:
-            self.logger.debug(__name__ + " object has mother set.")
+            self.logger.debug("%s object has mother set.", __name__)
             doc['meta']['mother'] = self._mother
 
         if self._occupation is not None:
-            self.logger.debug(__name__ + " object has occupation set.")
+            self.logger.debug("%s object has occupation set.", __name__)
             doc['meta']['occupation'] = self._occupation
 
         if self._osa is not None:
-            self.logger.debug(__name__ + " object has osa set.")
+            self.logger.debug("%s object has osa set.", __name__)
             doc['meta']['osa'] = self._osa
 
         if self._pancreatitis is not None:
-            self.logger.debug(__name__ + " object has pancreatitis set.")
+            self.logger.debug("%s object has pancreatitis set.", __name__)
             doc['meta']['pancreatitis'] = self._pancreatitis
 
         if self._postmenopausal is not None:
-            self.logger.debug(__name__ + " object has postmenopausal set.")
+            self.logger.debug("%s object has postmenopausal set.", __name__)
             doc['meta']['postmenopausal'] = self._postmenopausal
 
         if self._pvd is not None:
-            self.logger.debug(__name__ + " object has pvd set.")
+            self.logger.debug("%s object has pvd set.", __name__)
             doc['meta']['pvd'] = self._pvd
 
         if self._rx is not None:
-            self.logger.debug(__name__ + " object has rx set.")
+            self.logger.debug("%s object has rx set.", __name__)
             doc['meta']['rx'] = self._rx
 
         if self._survey_id is not None:
-            self.logger.debug(__name__ + " object has survey_id set.")
+            self.logger.debug("%s object has survey_id set.", __name__)
             doc['meta']['survey_id'] = self._survey_id
 
         if self._siblings is not None:
-            self.logger.debug(__name__ + " object has siblings set.")
+            self.logger.debug("%s object has siblings set.", __name__)
             doc['meta']['siblings'] = self._siblings
 
         if self._tobacco is not None:
-            self.logger.debug(__name__ + " object has tobacco set.")
+            self.logger.debug("%s object has tobacco set.", __name__)
             doc['meta']['tobacco'] = self._tobacco
 
         return doc
@@ -1328,8 +1126,8 @@ class SubjectAttribute(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a SubjectAttribute with no ID.")
-            raise Exception("SubjectAttribute does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("{} does not have an ID.".format(__name__))
 
         id = self._id
 
@@ -1340,17 +1138,17 @@ class SubjectAttribute(Base):
         success = False
 
         try:
-            self.logger.info("Deleting SubjectAttribute with ID %s." % id)
+            self.logger.info("Deleting %s with ID %s.", __name__, id)
             session.get_osdf().delete_node(id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"subject_attr\"[node_type]"):
+    def search(query="\"subject_attr\"[node_type]"):
         """
         Searches OSDF for SubjectAttribute nodes. Any criteria the user
         wishes to add is provided by the user in the query language
@@ -1378,7 +1176,7 @@ class SubjectAttribute(Base):
         if query != '"subject_attr"[node_type]':
             query = '({}) && "subject_attr"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         data = session.get_osdf().oql_query(
             SubjectAttribute.namespace, query
@@ -1396,61 +1194,118 @@ class SubjectAttribute(Base):
         return result_list
 
     @staticmethod
-    def load_subject_attr(data):
+    def load_subject_attr(attrib_data):
         """
         Takes the provided JSON string and converts it to an object.
 
         Args:
-            data (str): The JSON string to convert
+           attib_data (str): The JSON string to convert
 
         Returns:
-            Returns an instance of this class.
+            Returns a SubjectAttribute instance.
         """
-        module_logger.info("Creating a template {}.".format(__name__))
-        attr = SubjectAttribute()
+        module_logger.info("Creating a template %s.", __name__)
+        attrib = SubjectAttribute()
 
-        module_logger.debug("Filling in {} details.".format(__name__))
-        attr._set_id(data['id'])
-        attr._links = data['linkage']
-        attr._version = data['ver']
+        module_logger.debug("Filling in %s details.", __name__)
+        attrib._set_id(attrib_data['id'])
+        attrib.links = attrib_data['linkage']
+        attrib.version = attrib_data['ver']
 
         # Required fields
-        attr._study = data['meta']['study']
-        attr._tags = data['meta']['tags']
+        attrib.study = attrib_data['meta']['study']
+        attrib.tags = attrib_data['meta']['tags']
 
-        # Optional fields
-        if 'short_label' in data['meta']:
-            attr._short_label = data['meta']['short_label']
+        # Handle optional properties
+        if 'aerobics' in attrib_data['meta']:
+            attrib.aerobics = attrib_data['meta']['aerobics']
 
-        if 'url' in data['meta']:
-            attr._url = data['meta']['url']
+        if 'alcohol' in attrib_data['meta']:
+            attrib.alcohol = attrib_data['meta']['alcohol']
 
-        if 'species' in data['meta']:
-            attr._species = data['meta']['species']
+        if 'allergies' in attrib_data['meta']:
+            attrib.allergies = attrib_data['meta']['allergies']
 
-        if 'cell_type' in data['meta']:
-            attr._cell_type = data['meta']['cell_type']
+        if 'asthma' in attrib_data['meta']:
+            attrib.asthma = attrib_data['meta']['asthma']
 
-        if 'tissue' in data['meta']:
-            attr._tissue = data['meta']['tissue']
+        if 'cad' in attrib_data['meta']:
+            attrib.cad = attrib_data['meta']['cad']
 
-        if 'reference' in data['meta']:
-            attr._reference = data['meta']['reference']
+        if 'chf' in attrib_data['meta']:
+            attrib.chf = attrib_data['meta']['chf']
 
-        if 'protocol_name' in data['meta']:
-            attr._protocol_name = data['meta']['protocol_name']
+        if 'comment' in attrib_data['meta']:
+            attrib.comment = attrib_data['meta']['comment']
 
-        if 'protocol_steps' in data['meta']:
-            attr._protocol_steps = data['meta']['protocol_steps']
+        if 'contact' in attrib_data['meta']:
+            attrib.contact = attrib_data['meta']['contact']
 
-        if 'exp_description' in data['meta']:
-            attr._exp_description = data['meta']['exp_description']
+        if 'diabetes' in attrib_data['meta']:
+            attrib.diabetes = attrib_data['meta']['diabetes']
 
-        if 'sample_description' in data['meta']:
-            attr._sample_description = data['meta']['sample_description']
+        if 'education' in attrib_data['meta']:
+            attrib.education = attrib_data['meta']['education']
 
-        module_logger.debug("Returning loaded SubjectAttribute.")
-        return attr
+        if 'family_history' in attrib_data['meta']:
+            attrib.family_history = attrib_data['meta']['family_history']
+
+        if 'father' in attrib_data['meta']:
+            attrib.father = attrib_data['meta']['father']
+
+        if 'gallbladder' in attrib_data['meta']:
+            attrib.gallbladder = attrib_data['meta']['gallbladder']
+
+        if 'hyperlipidemia' in attrib_data['meta']:
+            attrib.hyperlipidemia = attrib_data['meta']['hyperlipidemia']
+
+        if 'hypertension' in attrib_data['meta']:
+            attrib.hypertension = attrib_data['meta']['hypertension']
+
+        if 'illicit_drug' in attrib_data['meta']:
+            attrib.illicit_drug = attrib_data['meta']['illicit_drug']
+
+        if 'kidney' in attrib_data['meta']:
+            attrib.kidney = attrib_data['meta']['kidney']
+
+        if 'liver' in attrib_data['meta']:
+            attrib.liver = attrib_data['meta']['liver']
+
+        if 'lmp' in attrib_data['meta']:
+            attrib.lmp = attrib_data['meta']['lmp']
+
+        if 'mother' in attrib_data['meta']:
+            attrib.mother = attrib_data['meta']['mother']
+
+        if 'occupation' in attrib_data['meta']:
+            attrib.occupation = attrib_data['meta']['occupation']
+
+        if 'osa' in attrib_data['meta']:
+            attrib.osa = attrib_data['meta']['osa']
+
+        if 'pancreatitis' in attrib_data['meta']:
+            attrib.pancreatitis = attrib_data['meta']['pancreatitis']
+
+        if 'postmenopausal' in attrib_data['meta']:
+            attrib.postmenopausal = attrib_data['meta']['postmenopausal']
+
+        if 'pvd' in attrib_data['meta']:
+            attrib.pvd = attrib_data['meta']['pvd']
+
+        if 'rx' in attrib_data['meta']:
+            attrib.rx = attrib_data['meta']['rx']
+
+        if 'survey_id' in attrib_data['meta']:
+            attrib.survey_id = attrib_data['meta']['survey_id']
+
+        if 'siblings' in attrib_data['meta']:
+            attrib.siblings = attrib_data['meta']['siblings']
+
+        if 'tobacco' in attrib_data['meta']:
+            attrib.tobacco = attrib_data['meta']['tobacco']
+
+        module_logger.debug("Returning loaded %s.", __name__)
+        return attrib
 
     @staticmethod
     def load(node_id):
@@ -1465,16 +1320,16 @@ class SubjectAttribute(Base):
         Returns:
             An object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % node_id)
+        module_logger.debug("In load. Specified ID: %s", node_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
 
         node_data = session.get_osdf().get_node(node_id)
 
-        node = SubjectAttribute.load_subject_attr(node_data);
+        node = SubjectAttribute.load_subject_attr(node_data)
 
-        module_logger.debug("Returning loaded {}.".format(__name__))
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return node
 
@@ -1511,11 +1366,11 @@ class SubjectAttribute(Base):
         success = False
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting {} to parsed JSON form.".format(__name__))
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -1523,29 +1378,31 @@ class SubjectAttribute(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("{} already has an ID, so we " + \
-                             "do an update (not an insert).".format(__name__))
+            self.logger.info("%s already has an ID, so we " + \
+                             "do an update (not an insert).", __name__)
 
             try:
                 node_data = self._get_raw_doc()
-                self.logger.info("{} already has an ID, so we do an " + \
-                                 "update (not an insert).".format(__name__))
+                self.logger.info("%s already has an ID, so we do an " + \
+                                 "update (not an insert).", __name__)
                 node_id = self._id
-                self.logger.debug("{} OSDF ID to update: {}.".format(__name__, node_id))
-                osdf.edit_node(prep_data)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, node_id)
+                osdf.edit_node(node_data)
 
                 node_data = osdf.get_node(node_id)
                 latest_version = node_data['ver']
 
-                self.logger.debug("The version of this {} is now: {}".format(__name__,  latest_version))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, latest_version
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success

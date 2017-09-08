@@ -13,6 +13,7 @@ from .MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet
 from .MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from .Project import Project
 from .Proteome import Proteome
+from .ProteomeNonPride import ProteomeNonPride
 from .Sample import Sample
 from .SampleAttribute import SampleAttribute
 from .SixteenSDnaPrep import SixteenSDnaPrep

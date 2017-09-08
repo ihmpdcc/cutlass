@@ -1,10 +1,14 @@
-import json
-import logging
-from iHMPSession import iHMPSession
+"""
+Models the visit attribute object.
+"""
 
-from DiseaseMeta import DiseaseMeta
-from Base import Base
-from Util import *
+import logging
+from cutlass.iHMPSession import iHMPSession
+from cutlass.DiseaseMeta import DiseaseMeta
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -15,171 +19,173 @@ class VisitAttribute(Base):
     namespace = "ihmp"
 
     __dict = {
-              'comment': [ str, None ],
-              'survey_id': [ str, None ],
-              'study': [ str, None ],
+        'comment': [str, None],
+        'survey_id': [str, None],
+        'study': [str, None],
 
-              # These are the disease metadata fields
-              'disease_comment': [ "DiseaseMeta.comment", None ],
-              'disease_name': [ "DiseaseMeta.name", None ],
-              'disease_description': [ "DiseaseMeta.description", None ],
-              'disease_ontology_id': [ "DiseaseMeta.disease_ontology_id", None ],
-              'disease_mesh_id': [ "DiseaseMeta.mesh_id", None ],
-              'disease_nci_id': [ "DiseaseMeta.nci_id", None ],
-              'disease_umls_concept_id': [ "DiseaseMeta.umls_concept_id", None ],
-              'disease_study_status': [ "DiseaseMeta.study_disease_status", None ],
+        # These are the disease metadata fields
+        'disease_comment': ["DiseaseMeta.comment", None],
+        'disease_name': ["DiseaseMeta.name", None],
+        'disease_description': ["DiseaseMeta.description", None],
+        'disease_ontology_id': ["DiseaseMeta.disease_ontology_id", None],
+        'disease_mesh_id': ["DiseaseMeta.mesh_id", None],
+        'disease_nci_id': ["DiseaseMeta.nci_id", None],
+        'disease_umls_concept_id': ["DiseaseMeta.umls_concept_id", None],
+        'disease_study_status': ["DiseaseMeta.study_disease_status", None],
 
-              # These are the clinical patient fields
-              'age'          : [ int   , "clinical_patient" ],
-              'height'       : [ float , "clinical_patient" ],
-              'weight'       : [ float , "clinical_patient" ],
-              'weight_diff'  : [ str   , "clinical_patient" ],
-              'bmi'          : [ float , "clinical_patient" ],
-              'hbi'          : [ bool  , "clinical_patient" ],
-              'hbi_total'    : [ float , "clinical_patient" ],
-              'sccai'        : [ bool  , "clinical_patient" ],
-              'sccai_total'  : [ float , "clinical_patient" ],
-              'fast_gluc'    : [ int   , "clinical_patient" ],
-              'thirtym_gluc' : [ int   , "clinical_patient" ],
-              'sixtym_gluc'  : [ int   , "clinical_patient" ],
+        # pylint: disable=C0326
+        # These are the clinical patient fields
+        'age'          : [int   , "clinical_patient"],
+        'height'       : [float , "clinical_patient"],
+        'weight'       : [float , "clinical_patient"],
+        'weight_diff'  : [str   , "clinical_patient"],
+        'bmi'          : [float , "clinical_patient"],
+        'hbi'          : [bool  , "clinical_patient"],
+        'hbi_total'    : [float , "clinical_patient"],
+        'sccai'        : [bool  , "clinical_patient"],
+        'sccai_total'  : [float , "clinical_patient"],
+        'fast_gluc'    : [int   , "clinical_patient"],
+        'thirtym_gluc' : [int   , "clinical_patient"],
+        'sixtym_gluc'  : [int   , "clinical_patient"],
 
-              # These are the hrt fields
-              'prior': [ bool, "hrt" ],
-              'current': [ bool, "hrt" ],
-              'duration': [ str, "hrt" ],
+        # These are the hrt fields
+        'prior'        : [bool  , "hrt"],
+        'current'      : [bool  , "hrt"],
+        'duration'     : [str   , "hrt"],
 
-              # These are the health assessment fields
-              'self_assess'     : [ bool , "health_assessment" ],
-              'self_condition'  : [ str  , "health_assessment" ],
-              'abdominal_pain'  : [ bool , "health_assessment" ],
-              'acute_dis'       : [ str  , "health_assessment" ],
-              'arthralgia'      : [ bool , "health_assessment" ],
-              'bowel_day'       : [ int  , "health_assessment" ],
-              'bowel_night'     : [ int  , "health_assessment" ],
-              'cancer'          : [ str  , "health_assessment" ],
-              'cancer_mtc'      : [ bool , "health_assessment" ],
-              'chest_pain'      : [ bool , "health_assessment" ],
-              'claudication'    : [ bool , "health_assessment" ],
-              'chronic_dis'     : [ str  , "health_assessment" ],
-              'diarrhea'        : [ bool , "health_assessment" ],
-              'dyspnea'         : [ bool , "health_assessment" ],
-              'ery_nodosum'     : [ bool , "health_assessment" ],
-              'fever'           : [ str  , "health_assessment" ],
-              'leg_edema'       : [ bool , "health_assessment" ],
-              'neurologic'      : [ bool , "health_assessment" ],
-              'pregnant'        : [ bool , "health_assessment" ],
-              'preg_plans'      : [ bool , "health_assessment" ],
-              'pyo_gangrenosum' : [ bool , "health_assessment" ],
-              'rash'            : [ bool , "health_assessment" ],
-              'stool_blood'     : [ bool , "health_assessment" ],
-              'stool_soft'      : [ int  , "health_assessment" ],
-              'surgery'         : [ str  , "health_assessment" ],
-              'urgency_def'     : [ str  , "health_assessment" ],
-              'uveitis'         : [ bool , "health_assessment" ],
-              'weight_change'   : [ str  , "health_assessment" ],
-              'diag_other'      : [ str  , "health_assessment" ],
-              'hosp'            : [ bool , "health_assessment" ],
-              'work_missed'     : [ int  , "health_assessment" ],
+        # These are the health assessment fields
+        'self_assess'     : [bool , "health_assessment"],
+        'self_condition'  : [str  , "health_assessment"],
+        'abdominal_pain'  : [bool , "health_assessment"],
+        'acute_dis'       : [str  , "health_assessment"],
+        'arthralgia'      : [bool , "health_assessment"],
+        'bowel_day'       : [int  , "health_assessment"],
+        'bowel_night'     : [int  , "health_assessment"],
+        'cancer'          : [str  , "health_assessment"],
+        'cancer_mtc'      : [bool , "health_assessment"],
+        'chest_pain'      : [bool , "health_assessment"],
+        'claudication'    : [bool , "health_assessment"],
+        'chronic_dis'     : [str  , "health_assessment"],
+        'diarrhea'        : [bool , "health_assessment"],
+        'dyspnea'         : [bool , "health_assessment"],
+        'ery_nodosum'     : [bool , "health_assessment"],
+        'fever'           : [str  , "health_assessment"],
+        'leg_edema'       : [bool , "health_assessment"],
+        'neurologic'      : [bool , "health_assessment"],
+        'pregnant'        : [bool , "health_assessment"],
+        'preg_plans'      : [bool , "health_assessment"],
+        'pyo_gangrenosum' : [bool , "health_assessment"],
+        'rash'            : [bool , "health_assessment"],
+        'stool_blood'     : [bool , "health_assessment"],
+        'stool_soft'      : [int  , "health_assessment"],
+        'surgery'         : [str  , "health_assessment"],
+        'urgency_def'     : [str  , "health_assessment"],
+        'uveitis'         : [bool , "health_assessment"],
+        'weight_change'   : [str  , "health_assessment"],
+        'diag_other'      : [str  , "health_assessment"],
+        'hosp'            : [bool , "health_assessment"],
+        'work_missed'     : [int  , "health_assessment"],
 
-              # These are the medications fields
-              'new_meds'     : [ bool, "medications" ],
-              'stopped_meds' : [ bool, "medications" ],
-              'abx'          : [ bool, "medications" ],
-              'chemo'        : [ bool, "medications" ],
-              'immunosupp'   : [ bool, "medications" ],
+        # These are the medications fields
+        'new_meds'     : [bool, "medications"],
+        'stopped_meds' : [bool, "medications"],
+        'abx'          : [bool, "medications"],
+        'chemo'        : [bool, "medications"],
+        'immunosupp'   : [bool, "medications"],
 
-              # These are the tests fields
-              'colonoscopy': [ bool, "tests" ],
-              'oral_contrast': [ bool, "tests" ],
+        # These are the tests fields
+        'colonoscopy':   [bool, "tests"],
+        'oral_contrast': [bool, "tests"],
 
-              # These are the psych fields
-              'psychiatric'    : [ bool, "psych" ],
-              'upset'          : [ int , "psych" ],
-              'control'        : [ int , "psych" ],
-              'stress'         : [ int , "psych" ],
-              'stress_def'     : [ str , "psych" ],
-              'confident'      : [ int , "psych" ],
-              'going_your_way' : [ int , "psych" ],
-              'coping'         : [ int , "psych" ],
-              'irritation'     : [ int , "psych" ],
-              'on_top'         : [ int , "psych" ],
-              'anger'          : [ int , "psych" ],
-              'difficulties'   : [ int , "psych" ],
+        # These are the psych fields
+        'psychiatric'    : [bool, "psych"],
+        'upset'          : [int , "psych"],
+        'control'        : [int , "psych"],
+        'stress'         : [int , "psych"],
+        'stress_def'     : [str , "psych"],
+        'confident'      : [int , "psych"],
+        'going_your_way' : [int , "psych"],
+        'coping'         : [int , "psych"],
+        'irritation'     : [int , "psych"],
+        'on_top'         : [int , "psych"],
+        'anger'          : [int , "psych"],
+        'difficulties'   : [int , "psych"],
 
-              # These are the exercise fields
-              'vig_activity_days'    : [ int, "exercise" ],
-              'vig_activity_hours'   : [ int, "exercise" ],
-              'vig_activity_minutes' : [ int, "exercise" ],
-              'mod_activity_days'    : [ int, "exercise" ],
-              'mod_activity_hours'   : [ int, "exercise" ],
-              'mod_activity_minutes' : [ int, "exercise" ],
-              'walking_days'         : [ int, "exercise" ],
-              'walking_hours'        : [ int, "exercise" ],
-              'walking_minutes'      : [ int, "exercise" ],
-              'activity_30d'         : [ str, "exercise" ],
-              'activity_3m'          : [ str, "exercise" ],
-              'activity_change_30d'  : [ str, "exercise" ],
-              'activity_change_3m'   : [ str, "exercise" ],
+        # These are the exercise fields
+        'vig_activity_days'    : [int, "exercise"],
+        'vig_activity_hours'   : [int, "exercise"],
+        'vig_activity_minutes' : [int, "exercise"],
+        'mod_activity_days'    : [int, "exercise"],
+        'mod_activity_hours'   : [int, "exercise"],
+        'mod_activity_minutes' : [int, "exercise"],
+        'walking_days'         : [int, "exercise"],
+        'walking_hours'        : [int, "exercise"],
+        'walking_minutes'      : [int, "exercise"],
+        'activity_30d'         : [str, "exercise"],
+        'activity_3m'          : [str, "exercise"],
+        'activity_change_30d'  : [str, "exercise"],
+        'activity_change_3m'   : [str, "exercise"],
 
-              # These are the dietary log fields
-              'alcohol'      : [ bool , "dietary_log" ],
-              'beans'        : [ bool , "dietary_log" ],
-              'biscuit'      : [ bool , "dietary_log" ],
-              'bread'        : [ str  , "dietary_log" ],
-              'bread_spread' : [ str  , "dietary_log" ],
-              'breadrolls'   : [ bool , "dietary_log" ],
-              'cheese'       : [ bool , "dietary_log" ],
-              'cereal'       : [ bool , "dietary_log" ],
-              'cereal_type'  : [ str  , "dietary_log" ],
-              'chips_crisps' : [ bool , "dietary_log" ],
-              'dairy'        : [ bool , "dietary_log" ],
-              'diet_drinks'  : [ bool , "dietary_log" ],
-              'eggs'         : [ bool , "dietary_log" ],
-              'fish'         : [ bool , "dietary_log" ],
-              'fish_white'   : [ bool , "dietary_log" ],
-              'fish_oil'     : [ bool , "dietary_log" ],
-              'fish_count'   : [ int  , "dietary_log" ],
-              'fruit'        : [ bool , "dietary_log" ],
-              'fruit_count'  : [ int  , "dietary_log" ],
-              'grains'       : [ bool , "dietary_log" ],
-              'ice_cream'    : [ bool , "dietary_log" ],
-              'juice'        : [ bool , "dietary_log" ],
-              'meat'         : [ bool , "dietary_log" ],
-              'meat_red'     : [ bool , "dietary_log" ],
-              'meat_white'   : [ bool , "dietary_log" ],
-              'meat_product' : [ bool , "dietary_log" ],
-              'milk'         : [ str  , "dietary_log" ],
-              'pastry'       : [ bool , "dietary_log" ],
-              'poultry'      : [ bool , "dietary_log" ],
-              'probiotic'    : [ bool , "dietary_log" ],
-              'salt'         : [ str  , "dietary_log" ],
-              'shellfish'    : [ bool , "dietary_log" ],
-              'soda'         : [ bool , "dietary_log" ],
-              'starch'       : [ bool , "dietary_log" ],
-              'starch_type'  : [ bool , "dietary_log" ],
-              'sugar'        : [ str  , "dietary_log" ],
-              'sugar_drinks' : [ bool , "dietary_log" ],
-              'sweets'       : [ bool , "dietary_log" ],
-              'sweets_count' : [ int  , "dietary_log" ],
-              'veg'          : [ bool , "dietary_log" ],
-              'veg_green'    : [ bool , "dietary_log" ],
-              'veg_root'     : [ bool , "dietary_log" ],
-              'veg_raw'      : [ bool , "dietary_log" ],
-              'water'        : [ bool , "dietary_log" ],
-              'yogurt'       : [ bool , "dietary_log" ],
+        # These are the dietary log fields
+        'alcohol'      : [bool , "dietary_log"],
+        'beans'        : [bool , "dietary_log"],
+        'biscuit'      : [bool , "dietary_log"],
+        'bread'        : [str  , "dietary_log"],
+        'bread_spread' : [str  , "dietary_log"],
+        'breadrolls'   : [bool , "dietary_log"],
+        'cheese'       : [bool , "dietary_log"],
+        'cereal'       : [bool , "dietary_log"],
+        'cereal_type'  : [str  , "dietary_log"],
+        'chips_crisps' : [bool , "dietary_log"],
+        'dairy'        : [bool , "dietary_log"],
+        'diet_drinks'  : [bool , "dietary_log"],
+        'eggs'         : [bool , "dietary_log"],
+        'fish'         : [bool , "dietary_log"],
+        'fish_white'   : [bool , "dietary_log"],
+        'fish_oil'     : [bool , "dietary_log"],
+        'fish_count'   : [int  , "dietary_log"],
+        'fruit'        : [bool , "dietary_log"],
+        'fruit_count'  : [int  , "dietary_log"],
+        'grains'       : [bool , "dietary_log"],
+        'ice_cream'    : [bool , "dietary_log"],
+        'juice'        : [bool , "dietary_log"],
+        'meat'         : [bool , "dietary_log"],
+        'meat_red'     : [bool , "dietary_log"],
+        'meat_white'   : [bool , "dietary_log"],
+        'meat_product' : [bool , "dietary_log"],
+        'milk'         : [str  , "dietary_log"],
+        'pastry'       : [bool , "dietary_log"],
+        'poultry'      : [bool , "dietary_log"],
+        'probiotic'    : [bool , "dietary_log"],
+        'salt'         : [str  , "dietary_log"],
+        'shellfish'    : [bool , "dietary_log"],
+        'soda'         : [bool , "dietary_log"],
+        'starch'       : [bool , "dietary_log"],
+        'starch_type'  : [bool , "dietary_log"],
+        'sugar'        : [str  , "dietary_log"],
+        'sugar_drinks' : [bool , "dietary_log"],
+        'sweets'       : [bool , "dietary_log"],
+        'sweets_count' : [int  , "dietary_log"],
+        'veg'          : [bool , "dietary_log"],
+        'veg_green'    : [bool , "dietary_log"],
+        'veg_root'     : [bool , "dietary_log"],
+        'veg_raw'      : [bool , "dietary_log"],
+        'water'        : [bool , "dietary_log"],
+        'yogurt'       : [bool , "dietary_log"],
 
-              # These are the dietary log "today" fields
-              'breakfast_tod':     [ str, "dietary_log_today" ],
-              'breakfast_food':    [ str, "dietary_log_today" ],
-              'breakfast_amt':     [ str, "dietary_log_today" ],
-              'lunch_tod':         [ str, "dietary_log_today" ],
-              'lunch_food':        [ str, "dietary_log_today" ],
-              'lunch_amt':         [ str, "dietary_log_today" ],
-              'dinner_tod':        [ str, "dietary_log_today" ],
-              'dinner_food':       [ str, "dietary_log_today" ],
-              'dinner_amt':        [ str, "dietary_log_today" ],
-              'other_food_intake': [ str, "dietary_log_today" ]
-              }
+        # These are the dietary log "today" fields
+        'breakfast_tod':     [str, "dietary_log_today"],
+        'breakfast_food':    [str, "dietary_log_today"],
+        'breakfast_amt':     [str, "dietary_log_today"],
+        'lunch_tod':         [str, "dietary_log_today"],
+        'lunch_food':        [str, "dietary_log_today"],
+        'lunch_amt':         [str, "dietary_log_today"],
+        'dinner_tod':        [str, "dietary_log_today"],
+        'dinner_food':       [str, "dietary_log_today"],
+        'dinner_amt':        [str, "dietary_log_today"],
+        'other_food_intake': [str, "dietary_log_today"]
+        # pylint: enable=C0326
+    }
 
     @staticmethod
     def _getx(self, propname, *args):
@@ -248,8 +254,10 @@ class VisitAttribute(Base):
         self._links = {}
         self._version = None
 
-        self._d = { "study": None,
-                    "tags": [] }
+        self._d = {
+            "study": None,
+            "tags": []
+        }
 
         for propname, spec in VisitAttribute.__dict.iteritems():
             t = spec[0]
@@ -263,12 +271,11 @@ class VisitAttribute(Base):
 
         if name not in VisitAttribute.__dict:
             super(VisitAttribute, self).__setattr__(name, value)
-            #raise AttributeError("Tsk tsk")
         else:
             nameType = self.__dict[name][0]
             if type(nameType) == str and nameType.startswith("DiseaseMeta."):
                 dm_name = nameType.replace("DiseaseMeta.", "", 1)
-                self.logger.debug("Setting DiseaseMeta {} property.".format(dm_name))
+                self.logger.debug("Setting %s %s property.", __name__, dm_name)
                 setattr(self._disease_meta, dm_name, value)
                 self.logger.debug("Setting flag that DiseaseMeta is dirty.")
                 self._dm_dirty = True
@@ -292,13 +299,13 @@ class VisitAttribute(Base):
         Returns:
             Returns a VisitAttribute instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         attrib = VisitAttribute()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
         attrib._set_id(attrib_data['id'])
-        attrib._links = attrib_data['linkage']
-        attrib._version = attrib_data['ver']
+        attrib.links = attrib_data['linkage']
+        attrib.version = attrib_data['ver']
 
         # Required fields
         attrib.comment = attrib_data['meta']['comment']
@@ -306,7 +313,7 @@ class VisitAttribute(Base):
         attrib.survey_id = attrib_data['meta']['survey_id']
         attrib.tags = attrib_data['meta']['tags']
 
-        module_logger.debug("Returning loaded " + __name__ + ".")
+        module_logger.debug("Returning loaded %s.", __name__)
         return attrib
 
     @staticmethod
@@ -322,7 +329,7 @@ class VisitAttribute(Base):
             A VisitAttribute object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % attrib_id)
+        module_logger.debug("In load. Specified ID: %s", attrib_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
@@ -355,13 +362,13 @@ class VisitAttribute(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if 'associated_with' not in self._links.keys():
             problems.append("Must add an 'associated_with' link to a visit.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -386,13 +393,13 @@ class VisitAttribute(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'associated_with' not in self._links.keys():
             self.logger.error("Must have an 'associated_with' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -401,8 +408,8 @@ class VisitAttribute(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ VisitAttribute.namespace ]
+                'read': ['all'],
+                'write': [VisitAttribute.namespace]
             },
             'linkage': self.links,
             'ns': VisitAttribute.namespace,
@@ -427,7 +434,7 @@ class VisitAttribute(Base):
             value = getattr(self, propname)
 
             if value is not None:
-                self.logger.debug("Value found for {} property.".format(propname))
+                self.logger.debug("Value found for %s property.", propname)
                 section = spec[1]
                 # Set the section to a dictionary if it doesn't exist yet
                 if section not in doc['meta']:
@@ -525,17 +532,17 @@ class VisitAttribute(Base):
             doc['meta']['disease_meta'] = self._disease_meta._get_raw_doc()
 
         if self._id is not None:
-            self.logger.debug(__name__ + " object has the OSDF id set.")
+            self.logger.debug("%s object has the OSDF id set.", __name__)
             doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug(__name__ + " object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             doc['ver'] = self._version
 
         return doc
 
     @staticmethod
-    def search(query = "\"visit_attr\"[node_type]"):
+    def search(query="\"visit_attr\"[node_type]"):
         """
         Searches OSDF for VisitAttribute nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -563,7 +570,7 @@ class VisitAttribute(Base):
         if query != '"visit_attr"[node_type]':
             query = '({}) && "visit_attr"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         attrib_data = session.get_osdf().oql_query(VisitAttribute.namespace, query)
 
@@ -612,26 +619,26 @@ class VisitAttribute(Base):
             self.logger.info("Got the raw JSON document.")
 
             try:
-                self.logger.info("Attempting to save a new node.")
+                self.logger.info("Attempting to save a new %snode.", __name__)
                 node_id = session.get_osdf().insert_node(data)
-                self.logger.info("Save for VisitAttribute %s successful." % node_id)
-                self.logger.info("Setting ID for VisitAttribute %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while saving. " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.error("An error occurred while saving %s." + \
+                                  "Reason: %s", __name__, save_exception)
         else:
             data = self._get_raw_doc()
             try:
-                self.logger.info("Attempting to update ID: %s." % self.id)
+                self.logger.info("Attempting to update ID: %s.", self.id)
                 session.get_osdf().edit_node(data)
-                self.logger.info("Update for %s successful." % self.id)
+                self.logger.info("Update for %s successful.", self.id)
                 success = True
-            except Exception as e:
-                msg = "An error occurred while updating " + \
-                      "VisitAttribute %s. Reason: %s" % (self.id, e)
+            except Exception as edit_exception:
+                msg = "An error occurred while updating %s %s. Reason: %s" \
+                       % (__name__, self.id, edit_exception)
                 self.logger.error(msg)
 
         return success
