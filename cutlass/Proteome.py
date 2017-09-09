@@ -1,15 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the proteome object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Visit import Visit
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=C0302, W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -926,7 +928,7 @@ class Proteome(Base):
         if 'derived_from' not in self._links.keys():
             problems.append("Must have a 'derived_from' link to an assay prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -945,17 +947,14 @@ class Proteome(Base):
         """
         self.logger.debug("In is_valid.")
 
-        document = self._get_raw_doc()
+        problems = self.validate()
 
-        session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
-
-        (valid, error_message) = session.get_osdf().validate_node(document)
-
-        if 'derived_from' not in self._links.keys():
+        valid = True
+        if len(problems):
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -977,8 +976,8 @@ class Proteome(Base):
 
         proteome_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Proteome.namespace ]
+                'read': ['all'],
+                'write': [Proteome.namespace]
             },
             'linkage': self._links,
             'ns': Proteome.namespace,
@@ -1013,37 +1012,37 @@ class Proteome(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Proteome object has the OSDF id set.")
-           proteome_doc['id'] = self._id
+            self.logger.debug("Proteome object has the OSDF id set.")
+            proteome_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Proteome object has the OSDF version set.")
-           proteome_doc['ver'] = self._version
+            self.logger.debug("Proteome object has the OSDF version set.")
+            proteome_doc['ver'] = self._version
 
         # Handle Proteome optional properties
         if self._date is not None:
-           self.logger.debug("Proteome object has the 'date' property set.")
-           proteome_doc['meta']['date'] = self._date
+            self.logger.debug("Proteome object has the 'date' property set.")
+            proteome_doc['meta']['date'] = self._date
 
         if self._reference is not None:
-           self.logger.debug("Proteome object has the 'reference' property set.")
-           proteome_doc['meta']['reference'] = self._reference
+            self.logger.debug("Proteome object has the 'reference' property set.")
+            proteome_doc['meta']['reference'] = self._reference
 
         if self._protocol_steps is not None:
-           self.logger.debug("Proteome object has the 'protocol_steps' property set.")
-           proteome_doc['meta']['protocol_steps'] = self._protocol_steps
+            self.logger.debug("Proteome object has the 'protocol_steps' property set.")
+            proteome_doc['meta']['protocol_steps'] = self._protocol_steps
 
         if self._exp_description is not None:
-           self.logger.debug("Proteome object has the 'exp_description' property set.")
-           proteome_doc['meta']['exp_description'] = self._exp_description
+            self.logger.debug("Proteome object has the 'exp_description' property set.")
+            proteome_doc['meta']['exp_description'] = self._exp_description
 
         if self._sample_description is not None:
-           self.logger.debug("Proteome object has the 'sample_description' property set.")
-           proteome_doc['meta']['sample_description'] = self._sample_description
+            self.logger.debug("Proteome object has the 'sample_description' property set.")
+            proteome_doc['meta']['sample_description'] = self._sample_description
 
         if self._xml_generation is not None:
-           self.logger.debug("Proteome object has the 'xml_generation' property set.")
-           proteome_doc['meta']['xml_generation'] = self._xml_generation
+            self.logger.debug("Proteome object has the 'xml_generation' property set.")
+            proteome_doc['meta']['xml_generation'] = self._xml_generation
 
         return proteome_doc
 
@@ -1083,7 +1082,7 @@ class Proteome(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Proteome with no ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
             raise Exception("Proteome does not have an ID.")
 
         proteome_id = self._id
@@ -1095,17 +1094,17 @@ class Proteome(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Proteome with ID %s." % proteome_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, proteome_id)
             session.get_osdf().delete_node(proteome_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"proteome\"[node_type]"):
+    def search(query="\"proteome\"[node_type]"):
         """
         Searches OSDF for Proteome nodes. Any criteria the user wishes to add
         is provided by the user in the query language specifications provided
@@ -1133,7 +1132,7 @@ class Proteome(Base):
         if query != '"proteome"[node_type]':
             query = '({}) && "proteome"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         proteome_data = session.get_osdf().oql_query(Proteome.namespace, query)
 
@@ -1159,10 +1158,10 @@ class Proteome(Base):
         Returns:
             Returns a Proteome instance.
         """
-        module_logger.info("Creating a template Proteome.")
+        module_logger.info("Creating a template %s.", __name__)
         proteome = Proteome()
 
-        module_logger.debug("Filling in Proteome details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # Node required fields
         proteome._set_id(proteome_data['id'])
@@ -1197,7 +1196,7 @@ class Proteome(Base):
 
         # Handle Proteome optional properties
         if 'date' in proteome_data['meta']:
-            proteome._race = proteome_data['meta']['date']
+            proteome._date = proteome_data['meta']['date']
 
         if 'reference' in proteome_data['meta']:
             proteome._reference = proteome_data['meta']['reference']
@@ -1230,24 +1229,25 @@ class Proteome(Base):
         Returns:
             A Proteome object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % proteome_id)
+        module_logger.debug("In load. Specified ID: %s", proteome_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         proteome_data = session.get_osdf().get_node(proteome_id)
 
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         proteome = Proteome.load_proteome(proteome_data)
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return proteome
 
     def _upload_files(self, study, file_map):
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
@@ -1264,10 +1264,9 @@ class Proteome(Base):
         # to the Aspera server and return a dictionary with the computed remote
         # paths...
         for file_type, local_file in file_map.iteritems():
-            self.logger.debug("Uploading %s of Proteome type %s" %
-                              (local_file, file_type))
+            self.logger.debug("Uploading %s of %s type %s", local_file, __name__, file_type)
 
-            remote_base = os.path.basename(local_file);
+            remote_base = os.path.basename(local_file)
 
             valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
             remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -1275,7 +1274,7 @@ class Proteome(Base):
 
             remote_path = "/".join(["/" + study_dir, "proteome",
                                     file_type, remote_base])
-            self.logger.debug("Remote path for this file will be %s." % remote_path)
+            self.logger.debug("Remote path for this file will be %s.", remote_path)
 
             # Upload the file to the iHMP aspera server
             upload_success = aspera.upload_file(Proteome.aspera_server,
@@ -1284,8 +1283,7 @@ class Proteome(Base):
                                                 local_file,
                                                 remote_path)
             if not upload_success:
-                self.logger.error(
-                    "Experienced an error uploading file %s. " % local_file)
+                self.logger.error("Experienced an error uploading file %s. ", local_file)
                 raise Exception("Unable to upload " + local_file)
             else:
                 remote_paths[file_type] = "fasp://" + Proteome.aspera_server + remote_path
@@ -1327,32 +1325,35 @@ class Proteome(Base):
 
         study = self._study
 
-        files = { "spectra": self._local_spectra_file,
-                  "pepid": self._local_pepid_file,
-                  "protmod": self._local_protmod_file,
-                  "protid": self._local_protid_file }
+        files = {
+            "spectra": self._local_spectra_file,
+            "pepid": self._local_pepid_file,
+            "protmod": self._local_protmod_file,
+            "protid": self._local_protid_file
+        }
 
         remote_files = {}
         try:
             remote_files = self._upload_files(study, files)
-        except Exception as e:
-            self.logger.exception("Unable to transmit data via Aspera.")
+        except Exception as upload_exception:
+            self.logger.exception("Unable to transmit data via Aspera: %s",
+                                  upload_exception)
             return False
 
-        self.logger.info("Aspera transmission of Proteome files successful.");
+        self.logger.info("Aspera transmission of Proteome files successful.")
 
         self.logger.debug("Setting url properties with remote paths.")
-        self._protid_url = [ remote_files['protid'] ]
-        self._pepid_url = [ remote_files['pepid'] ]
-        self._protmod_url = [ remote_files['protmod'] ]
-        self._spectra_url = [ remote_files['spectra_url'] ]
+        self._protid_url = [remote_files['protid']]
+        self._pepid_url = [remote_files['pepid']]
+        self._protmod_url = [remote_files['protmod']]
+        self._spectra_url = [remote_files['spectra_url']]
 
         if self._id is None:
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
             self.logger.debug("Converting Proteome to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -1360,27 +1361,33 @@ class Proteome(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("Proteome already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 proteome_data = self._get_raw_doc()
-                self.logger.info("Proteome already has an ID, so we do an update (not an insert).")
+                self.logger.info(
+                    "%s already has an ID, so we do an update (not an insert).",
+                    __name__
+                )
+
                 proteome_id = self._id
-                self.logger.debug("Proteome OSDF ID to update: %s." % proteome_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, proteome_id)
                 osdf.edit_node(proteome_data)
 
                 proteome_data = osdf.get_node(proteome_id)
                 latest_version = proteome_data['ver']
 
-                self.logger.debug("The version of this Proteome is now: %s" % str(latest_version))
+                self.logger.debug(
+                    "The version of this %s is now: %s", __name__, str(latest_version)
+                )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success

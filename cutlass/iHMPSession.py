@@ -76,6 +76,7 @@ class iHMPSession(object):
             "microb_transcriptomics_raw_seq_set" : "MicrobTranscriptomicsRawSeqSet",
             "project"                            : "Project",
             "proteome"                           : "Proteome",
+            "proteome_nonpride"                  : "ProteomeNonPride",
             "sample"                             : "Sample",
             "sample_attr"                        : "SampleAttribute",
             "study"                              : "Study",

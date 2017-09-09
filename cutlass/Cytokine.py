@@ -290,7 +290,7 @@ class Cytokine(Base):
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
 
-        self.logger.debug("Number of validation problems: %s.", str(len(problems)))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -415,7 +415,7 @@ class Cytokine(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Cytokine with no ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
             raise Exception("Cytokine does not have an ID.")
 
         cytokine_id = self._id
@@ -427,7 +427,7 @@ class Cytokine(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Cytokine with ID %s.", cytokine_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, cytokine_id)
             session.get_osdf().delete_node(cytokine_id)
             success = True
         except Exception as delete_exception:
@@ -496,7 +496,7 @@ class Cytokine(Base):
         module_logger.info("Creating a template Cytokine.")
         cyto = Cytokine()
 
-        module_logger.debug("Filling in Cytokine details.")
+        module_logger.debug("Filling in %s details.", __name__)
         cyto._set_id(cyto_data['id'])
         cyto.links = cyto_data['linkage']
         cyto.version = cyto_data['ver']
@@ -522,7 +522,7 @@ class Cytokine(Base):
         if 'private_files' in cyto_data['meta']:
             cyto.private_files = cyto_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded Cytokine.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return cyto
 
     @staticmethod

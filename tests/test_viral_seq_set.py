@@ -307,7 +307,7 @@ class ViralSeqSetTest(unittest.TestCase):
                         "required_fields() did not return empty value.")
 
     def testLoadSaveDeleteViralSeqSet(self):
-        """ Extensive test for the load, edit, save and delete fuctions. """
+        """ Extensive test for the load, edit, save and delete functions. """
 
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 

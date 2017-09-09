@@ -133,7 +133,7 @@ class ProteomeTest(unittest.TestCase):
         try:
             proteome.checksums = {"md5": "60b725f10c9c85c70d97880dfe8191b3"}
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Checksum setter accepts dictionary.")
@@ -170,17 +170,17 @@ class ProteomeTest(unittest.TestCase):
         """ Test the date property and whether it works with legal dates. """
         proteome = self.session.create_proteome()
         success = False
-        date = "2015-07-27"
+        past_date = "2015-07-27"
 
         try:
-            proteome.date = date
+            proteome.date = past_date
             success = True
         except Exception:
             pass
 
         self.assertTrue(success, "Able to use the date setter")
 
-        self.assertEqual(proteome.date, date,
+        self.assertEqual(proteome.date, past_date,
                          "Property getter for 'date' works.")
 
     def testPrideId(self):
@@ -391,14 +391,14 @@ class ProteomeTest(unittest.TestCase):
                         "required_fields() did not return empty value.")
 
     def testLoadSaveDeleteProteome(self):
-        """ Extensive test for the load, edit, save and delete fuctions. """
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the proteome at all points before and after adding
         # the required fields
 
         proteome = self.session.create_proteome()
 
         test_date = "2015-07-27"
-        test_links = {"by":[]}
+        test_links = {"derived_from": ["419d64483ec86c1fb9a94025f3b92d21"]}
         test_comment = "comment"
         test_checksums = {"md5": "60b725f10c9c85c70d97880dfe8191b3"}
 
