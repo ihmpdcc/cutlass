@@ -301,6 +301,8 @@ class VisitAttribute(Base):
         Returns:
             Tuple of strings of required properties.
         """
+        module_logger.debug("In required_fields.")
+
         return ("comment", "study", "tags")
 
     @staticmethod

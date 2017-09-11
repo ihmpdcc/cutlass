@@ -455,9 +455,10 @@ class SixteenSRawSeqSet(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties. 
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
+
         return ("checksums", "comment", "exp_length", "format", "format_doc",
                 "seq_model", "size", "study", "tags")
 
@@ -643,7 +644,7 @@ class SixteenSRawSeqSet(Base):
         if 'private_files' in seq_set_data['meta']:
             seq_set.private_files = seq_set_data['meta']['private_files']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
         return seq_set
 
     @staticmethod
@@ -667,7 +668,7 @@ class SixteenSRawSeqSet(Base):
         seq_set_data = session.get_osdf().get_node(seq_set_id)
         seq_set = SixteenSRawSeqSet.load_16s_raw_seq_set(seq_set_data)
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return seq_set
 
@@ -808,13 +809,15 @@ class SixteenSRawSeqSet(Base):
         Return iterator of all trimmed sequence sets that were computed from
         this sequence set.
         """
+        self.logger.debug("In trimmed_seq_sets().")
+
         linkage_query = '"{}"[linkage.computed_from]'.format(self.id)
         query = iHMPSession.get_session().get_osdf().oql_query
 
         from cutlass.SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet
 
         for page_no in count(1):
-            res = query("ihmp", linkage_query, page=page_no)
+            res = query(SixteenSRawSeqSet.namespace, linkage_query, page=page_no)
             res_count = res['result_count']
 
             for doc in res['results']:
