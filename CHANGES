@@ -1,7 +1,16 @@
+cutlass 0.30
+
+  * Support for the ProteomeNonPride node type. 
+  * Numerous formatting and other changes identified by pylint corrected.
+  * Some pyunit test scripts improved to reduce code duplication with use of
+    testing utilities.
+
+ - Victor <victor73@github.com>  Mon, 11 Sep 2017 10:00:00 -0400
+
 cutlass 0.29
 
-  * Added missing support for private data in several classes
-    and added associated changes to examples and test scripts.
+  * Added missing support for private data in several classes and added
+    associated changes to examples and test scripts.
   * Negative size check for AbundanceMatrix.
 
  - Victor <victor73@github.com>  Thu, 02 Mar 2017 10:30:00 -0400
