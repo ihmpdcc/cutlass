@@ -2,6 +2,8 @@ cutlass 0.30
 
   * Support for the ProteomeNonPride node type. 
   * Numerous formatting and other changes identified by pylint corrected.
+  * Merged PR #29 from @carze fixing the handling of optional properties
+    in the VisitAttribute class.
   * Some pyunit test scripts improved to reduce code duplication with use of
     testing utilities.
 
