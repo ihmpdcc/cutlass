@@ -8,7 +8,7 @@ from cutlass.DiseaseMeta import DiseaseMeta
 from cutlass.Base import Base
 from cutlass.Util import *
 
-# pylint: disable=W0703, C1801
+# pylint: disable=W0703, C1801, R0912
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -16,6 +16,14 @@ module_logger = logging.getLogger(__name__)
 module_logger.addHandler(logging.NullHandler())
 
 class VisitAttribute(Base):
+    """
+    The class encapsulating the data for an iHMP visit attribute.
+    This class contains all the fields required to save a visit attribute in
+    OSDF.
+
+    Attributes:
+        namespace (str): The namespace this class will use in OSDF.
+    """
     namespace = "ihmp"
 
     __dict = {
@@ -285,7 +293,15 @@ class VisitAttribute(Base):
 
     @staticmethod
     def required_fields():
-        return ("study", "tags")
+        """
+        A static method. The required fields for the class.
+
+        Args:
+            None
+        Returns:
+            Tuple of strings of required properties.
+        """
+        return ("comment", "study", "tags")
 
     @staticmethod
     def load_visit_attr(attrib_data):
@@ -312,6 +328,50 @@ class VisitAttribute(Base):
         attrib.study = attrib_data['meta']['study']
         attrib.survey_id = attrib_data['meta']['survey_id']
         attrib.tags = attrib_data['meta']['tags']
+
+        # Handle optional fields
+        for (propname, spec) in VisitAttribute.__dict.iteritems():
+            section = spec[1]
+
+            ## We need to handle any DiseaseMeta props separately here
+            if not section:
+                continue
+
+            module_logger.debug("In section %s", section)
+
+            # Couple special cases to handle here.
+            if (section == "excercise" or
+               (propname.startswith('breakfast') or propname.startswith('lunch') or
+                propname.startswith('dinner'))):
+                (propbase, propkey) = propname.split('_', 1)
+
+                propval = attrib_data['meta'].get(section, {}).get(propbase, {}).get(propkey)
+            else:
+                if propname == "sixtym_gluc":
+                    propname = "60m_gluc"
+                elif propname == "thirtym_gluc":
+                    propname = "30m_gluc"
+
+                propval = attrib_data['meta'].get(section, {}).get(propname)
+
+            module_logger.debug("Prop: %s, value: %s", propname, propval)
+
+            if propval:
+                module_logger.debug("Setting prop %s to %s", propname, propval)
+                setattr(attrib, propname, propval)
+
+        # If any of the DiseaseMeta props exist we can handle them now
+        if attrib_data['meta'].get('disease'):
+            if attrib_data['meta']['disease'].get('study_disease_status'):
+                attrib.disease_study_status = \
+                    attrib_data['meta']['disease'].get('study_disease_status')
+
+            disease_props = dict(('disease_%s' % key, value) for key, value in
+                                 attrib_data['meta']['disease']['study_disease'].iteritems())
+            # This will have a double "disease" on it so we need to correct it.
+            disease_props['disease_ontology_id'] = disease_props.pop('disease_disease_ontology_id')
+
+            map(lambda key: setattr(attrib, key, disease_props.get(key)), disease_props.keys())
 
         module_logger.debug("Returning loaded %s.", __name__)
         return attrib

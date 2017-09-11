@@ -138,7 +138,7 @@ class Project(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
         fields = ('name', 'description', 'mixs', 'tags')
         return fields
