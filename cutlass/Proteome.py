@@ -1303,7 +1303,7 @@ class Proteome(Base):
 
         remote_files = {}
         try:
-            remote_files = self._upload_files(study, files)
+            remote_files = self._upload_files(study, subtype, files)
         except Exception as upload_exception:
             self.logger.exception("Unable to transmit data via Aspera: %s",
                                   upload_exception)
