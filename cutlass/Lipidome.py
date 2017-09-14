@@ -69,6 +69,7 @@ class Lipidome(Base):
         dict: The lipidome's checksum data.
         """
         self.logger.debug("In 'checksums' getter.")
+
         return self._checksums
 
     @checksums.setter
@@ -123,19 +124,19 @@ class Lipidome(Base):
 
     @format.setter
     @enforce_string
-    def format(self, format):
+    def format(self, format_arg):
         """
         The setter for the file format of the lipidome file.
 
         Args:
-            format (str): The file format of the lipidome file.
+            format_arg (str): The file format of the lipidome file.
 
         Returns:
             None
         """
         self.logger.debug("In 'format' setter.")
 
-        self._format = format
+        self._format = format_arg
 
     @property
     def format_doc(self):
@@ -143,6 +144,7 @@ class Lipidome(Base):
         str: URL for documentation of file format.
         """
         self.logger.debug("In 'format_doc' getter.")
+
         return self._format_doc
 
     @format_doc.setter
@@ -434,8 +436,8 @@ class Lipidome(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Lipidome with no ID.")
-            raise Exception("Lipidome does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID." % __name__)
 
         lipidome_id = self._id
 
@@ -446,7 +448,7 @@ class Lipidome(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Lipidome with ID %s.", lipidome_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, lipidome_id)
             session.get_osdf().delete_node(lipidome_id)
             success = True
         except Exception as delete_exception:
@@ -512,10 +514,10 @@ class Lipidome(Base):
         Returns:
             Returns a Lipidome instance.
         """
-        module_logger.info("Creating a template Lipidome.")
+        module_logger.info("Creating a template %s.", __name__)
         lip = Lipidome()
 
-        module_logger.debug("Filling in Lipidome details.")
+        module_logger.debug("Filling in %s details.", __name__)
         lip._set_id(lip_data['id'])
         lip.links = lip_data['linkage']
         lip.version = lip_data['ver']
@@ -642,8 +644,8 @@ class Lipidome(Base):
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
@@ -700,5 +702,5 @@ class Lipidome(Base):
                                   edit_exception
                                  )
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success
