@@ -9,7 +9,7 @@ from cutlass.iHMPSession import iHMPSession
 from cutlass.Base import Base
 from cutlass.Util import *
 
-# pylint: disable=C0302, W0703
+# pylint: disable=C0302, W0703, R0192
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
