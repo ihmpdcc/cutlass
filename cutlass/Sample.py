@@ -1,5 +1,5 @@
 """
-Models the cytokine object.
+Models the sample object.
 """
 
 import logging
