@@ -1,11 +1,15 @@
-#!/usr/bin/env python
+"""
+Models the host assay prep object.
+"""
 
 import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=C0302, W0703
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -22,7 +26,7 @@ class HostAssayPrep(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the HostAssayPrep class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -39,28 +43,31 @@ class HostAssayPrep(Base):
         self._links = {}
         self._tags = []
 
+        # Required properties
+        self._center = None
         self._comment = None
+        self._contact = None
+        self._experiment_type = None
+        self._prep_id = None
         self._pride_id = None
         self._sample_name = None
-        self._title = None
-        self._center = None
-        self._contact = None
-        self._prep_id = None
         self._storage_duration = None
-        self._experiment_type = None
         self._study = None
+        self._title = None
 
         # Optional properties
-        self._short_label = None
-        self._urls = None
-        self._species = None
         self._cell_type = None
-        self._tissue = None
-        self._reference = None
+        self._exp_description = None
         self._protocol_name = None
         self._protocol_steps = None
-        self._exp_description = None
+        self._reference = None
         self._sample_description = None
+        self._short_label = None
+        self._species = None
+        self._tissue = None
+        self._urls = None
+
+        super(HostAssayPrep, self).__init__(*args, **kwargs)
 
     @property
     def comment(self):
@@ -406,7 +413,7 @@ class HostAssayPrep(Base):
         return self._urls
 
     @urls.setter
-    def url(self, urls):
+    def urls(self, urls):
         """
         URLs of relevant electronic resources.
 
@@ -608,7 +615,7 @@ class HostAssayPrep(Base):
         if 'prepared_from' not in self._links.keys():
             problems.append("Must have a 'prepared_from' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -632,12 +639,12 @@ class HostAssayPrep(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'prepared_from' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -659,8 +666,8 @@ class HostAssayPrep(Base):
 
         prep_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ HostAssayPrep.namespace ]
+                'read': ['all'],
+                'write': [HostAssayPrep.namespace]
             },
             'linkage': self._links,
             'ns': HostAssayPrep.namespace,
@@ -680,61 +687,61 @@ class HostAssayPrep(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("HostAssayPrep object has the OSDF id set.")
-           prep_doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            prep_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("HostAssayPrep object has the OSDF version set.")
-           prep_doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            prep_doc['ver'] = self._version
 
         # Handle HostAssayPrep optional properties
         if self._short_label is not None:
-           self.logger.debug("HostAssayPrep object has the 'short_label' property set.")
-           prep_doc['meta']['short_label'] = self._short_label
+            self.logger.debug("%s object has the 'short_label' property set.", __name__)
+            prep_doc['meta']['short_label'] = self._short_label
 
         if self._urls is not None:
-           self.logger.debug("HostAssayPrep object has the 'url' property set.")
-           prep_doc['meta']['urls'] = self._urls
+            self.logger.debug("%s object has the 'url' property set.", __name__)
+            prep_doc['meta']['urls'] = self._urls
 
         if self._pride_id is not None:
-           self.logger.debug("HostAssayPrep object has the 'pride_id' property set.")
-           prep_doc['meta']['pride_id'] = self._pride_id
+            self.logger.debug("%s object has the 'pride_id' property set.", __name__)
+            prep_doc['meta']['pride_id'] = self._pride_id
 
         if self._species is not None:
-           self.logger.debug("HostAssayPrep object has the 'species' property set.")
-           prep_doc['meta']['species'] = self._species
+            self.logger.debug("%s object has the 'species' property set.", __name__)
+            prep_doc['meta']['species'] = self._species
 
         if self._cell_type is not None:
-           self.logger.debug("HostAssayPrep object has the 'cell_type' property set.")
-           prep_doc['meta']['cell_type'] = self._cell_type
+            self.logger.debug("%s object has the 'cell_type' property set.", __name__)
+            prep_doc['meta']['cell_type'] = self._cell_type
 
         if self._tissue is not None:
-           self.logger.debug("HostAssayPrep object has the 'tissue' property set.")
-           prep_doc['meta']['tissue'] = self._tissue
+            self.logger.debug("%s object has the 'tissue' property set.", __name__)
+            prep_doc['meta']['tissue'] = self._tissue
 
         if self._protocol_name is not None:
-           self.logger.debug("HostAssayPrep object has the 'protocol_name' property set.")
-           prep_doc['meta']['protocol_name'] = self._protocol_name
+            self.logger.debug("%s object has the 'protocol_name' property set.", __name__)
+            prep_doc['meta']['protocol_name'] = self._protocol_name
 
         if self._protocol_steps is not None:
-           self.logger.debug("HostAssayPrep object has the 'protocol_steps' property set.")
-           prep_doc['meta']['protocol_steps'] = self._protocol_steps
+            self.logger.debug("%s object has the 'protocol_steps' property set.", __name__)
+            prep_doc['meta']['protocol_steps'] = self._protocol_steps
 
         if self._reference is not None:
-           self.logger.debug("HostAssayPrep object has the 'reference' property set.")
-           prep_doc['meta']['reference'] = self._reference
+            self.logger.debug("%s object has the 'reference' property set.", __name__)
+            prep_doc['meta']['reference'] = self._reference
 
         if self._exp_description is not None:
-           self.logger.debug("HostAssayPrep object has the 'exp_description' property set.")
-           prep_doc['meta']['exp_description'] = self._exp_description
+            self.logger.debug("%s object has the 'exp_description' property set.", __name__)
+            prep_doc['meta']['exp_description'] = self._exp_description
 
         if self._sample_description is not None:
-           self.logger.debug("HostAssayPrep object has the 'sample_description' property set.")
-           prep_doc['meta']['sample_description'] = self._sample_description
+            self.logger.debug("%s object has the 'sample_description' property set.", __name__)
+            prep_doc['meta']['sample_description'] = self._sample_description
 
         if self._storage_duration is not None:
-           self.logger.debug("HostAssayPrep object has the 'storage_duration' property set.")
-           prep_doc['meta']['storage_duration'] = self._storage_duration
+            self.logger.debug("%s object has the 'storage_duration' property set.", __name__)
+            prep_doc['meta']['storage_duration'] = self._storage_duration
 
         return prep_doc
 
@@ -769,8 +776,8 @@ class HostAssayPrep(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a HostAssayPrep with no ID.")
-            raise Exception("HostAssayPrep does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID." % __name__)
 
         host_prep_id = self._id
 
@@ -781,17 +788,17 @@ class HostAssayPrep(Base):
         success = False
 
         try:
-            self.logger.info("Deleting HostAssayPrep with ID %s." % host_prep_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, host_prep_id)
             session.get_osdf().delete_node(host_prep_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"host_assay_prep\"[node_type]"):
+    def search(query="\"host_assay_prep\"[node_type]"):
         """
         Searches OSDF for HostAssayPrep nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -819,7 +826,7 @@ class HostAssayPrep(Base):
         if query != '"host_assay_prep"[node_type]':
             query = '({}) && "host_assay_prep"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         prep_data = session.get_osdf().oql_query(HostAssayPrep.namespace, query)
 
@@ -846,63 +853,63 @@ class HostAssayPrep(Base):
         Returns:
             Returns a HostAssayPrep instance.
         """
-        module_logger.info("Creating a template HostAssayPrep.")
+        module_logger.info("Creating a template %s.", __name__)
         prep = HostAssayPrep()
 
-        module_logger.debug("Filling in HostAssayPrep details.")
+        module_logger.debug("Filling in %s details.", __name__)
         prep._set_id(prep_data['id'])
-        prep._links = prep_data['linkage']
-        prep._version = prep_data['ver']
+        prep.links = prep_data['linkage']
+        prep.version = prep_data['ver']
 
         # Required fields
-        prep._gender = prep_data['meta']['comment']
-        prep._sample_name = prep_data['meta']['sample_name']
-        prep._title = prep_data['meta']['title']
-        prep._center = prep_data['meta']['center']
-        prep._contact = prep_data['meta']['contact']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._experiment_type = prep_data['meta']['experiment_type']
-        prep._study = prep_data['meta']['study']
-        prep._tags = prep_data['meta']['tags']
+        prep.comment = prep_data['meta']['comment']
+        prep.contact = prep_data['meta']['contact']
+        prep.center = prep_data['meta']['center']
+        prep.experiment_type = prep_data['meta']['experiment_type']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.sample_name = prep_data['meta']['sample_name']
+        prep.study = prep_data['meta']['study']
+        prep.tags = prep_data['meta']['tags']
+        prep.title = prep_data['meta']['title']
 
         # Optional fields
         if 'short_label' in prep_data['meta']:
-            prep._short_label = prep_data['meta']['short_label']
+            prep.short_label = prep_data['meta']['short_label']
 
         if 'urls' in prep_data['meta']:
-            prep._urls = prep_data['meta']['urls']
+            prep.urls = prep_data['meta']['urls']
 
         if 'pride_id' in prep_data['meta']:
-            prep._pride_id = prep_data['meta']['pride_id']
+            prep.pride_id = prep_data['meta']['pride_id']
 
         if 'species' in prep_data['meta']:
-            prep._species = prep_data['meta']['species']
+            prep.species = prep_data['meta']['species']
 
         if 'cell_type' in prep_data['meta']:
-            prep._cell_type = prep_data['meta']['cell_type']
+            prep.cell_type = prep_data['meta']['cell_type']
 
         if 'tissue' in prep_data['meta']:
-            prep._tissue = prep_data['meta']['tissue']
+            prep.tissue = prep_data['meta']['tissue']
 
         if 'reference' in prep_data['meta']:
-            prep._reference = prep_data['meta']['reference']
+            prep.reference = prep_data['meta']['reference']
 
         if 'protocol_name' in prep_data['meta']:
-            prep._protocol_name = prep_data['meta']['protocol_name']
+            prep.protocol_name = prep_data['meta']['protocol_name']
 
         if 'protocol_steps' in prep_data['meta']:
-            prep._protocol_steps = prep_data['meta']['protocol_steps']
+            prep.protocol_steps = prep_data['meta']['protocol_steps']
 
         if 'exp_description' in prep_data['meta']:
-            prep._exp_description = prep_data['meta']['exp_description']
+            prep.exp_description = prep_data['meta']['exp_description']
 
         if 'sample_description' in prep_data['meta']:
-            prep._sample_description = prep_data['meta']['sample_description']
+            prep.sample_description = prep_data['meta']['sample_description']
 
         if 'storage_duration' in prep_data['meta']:
-            prep._storage_duration = prep_data['meta']['storage_duration']
+            prep.storage_duration = prep_data['meta']['storage_duration']
 
-        module_logger.debug("Returning loaded HostAssayPrep.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return prep
 
     @staticmethod
@@ -919,69 +926,15 @@ class HostAssayPrep(Base):
             A HostAssayPrep object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s", prep_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         prep_data = session.get_osdf().get_node(prep_id)
+        prep = HostAssayPrep.load_host_assay_prep(prep_data)
 
-        module_logger.info("Creating a template HostAssayPrep.")
-        prep = HostAssayPrep()
+        module_logger.debug("Returning loaded %s.", __name__)
 
-        module_logger.debug("Filling in HostAssayPrep details.")
-
-        # Node required fields
-        prep._set_id(prep_data['id'])
-        prep._links = prep_data['linkage']
-        prep._version = prep_data['ver']
-
-        # Required fields
-        prep._comment = prep_data['meta']['comment']
-        prep._pride_id = prep_data['meta']['pride_id']
-        prep._sample_name = prep_data['meta']['sample_name']
-        prep._title = prep_data['meta']['title']
-        prep._center = prep_data['meta']['center']
-        prep._contact = prep_data['meta']['contact']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._experiment_type = prep_data['meta']['experiment_type']
-        prep._short_label = prep_data['meta']['short_label']
-        prep._protocol_name = prep_data['meta']['protocol_name']
-        prep._study = prep_data['meta']['study']
-        prep._tags = prep_data['meta']['tags']
-
-        # Handle HostAssayPrep optional properties
-        if 'short_label' in prep_data['meta']:
-            prep._short_label = prep_data['meta']['short_label']
-
-        if 'url' in prep_data['meta']:
-            prep._urls = prep_data['meta']['urls']
-
-        if 'species' in prep_data['meta']:
-            prep._species = prep_data['meta']['species']
-
-        if 'cell_type' in prep_data['meta']:
-            prep._cell_type = prep_data['meta']['cell_type']
-
-        if 'tissue' in prep_data['meta']:
-            prep._tissue = prep_data['meta']['tissue']
-
-        if 'reference' in prep_data['meta']:
-            prep._reference = prep_data['meta']['reference']
-
-        if 'protocol_name' in prep_data['meta']:
-            prep._protocol_name = prep_data['meta']['protocol_name']
-
-        if 'protocol_steps' in prep_data['meta']:
-            prep._protocol_steps = prep_data['meta']['protocol_steps']
-
-        if 'exp_description' in prep_data['meta']:
-            prep._exp_description = prep_data['meta']['exp_description']
-
-        if 'sample_description' in prep_data['meta']:
-            prep._sample_description = prep_data['meta']['sample_description']
-
-        module_logger.debug("Returning loaded HostAssayPrep.")
         return prep
 
     def save(self):
@@ -1018,11 +971,11 @@ class HostAssayPrep(Base):
         success = False
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting HostAssayPrep to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -1030,28 +983,33 @@ class HostAssayPrep(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("HostAssayPrep already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert).",
+                             __name__)
 
             try:
                 prep_data = self._get_raw_doc()
-                self.logger.info("HostAssayPrep already has an ID, " + \
-                                 "so we do an update (not an insert).")
+                self.logger.info("%s already has an ID, so we do an update (not an insert).",
+                                 __name__
+                                )
                 prep_id = self._id
-                self.logger.debug("HostAssayPrep OSDF ID to update: %s." % prep_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, prep_id)
                 osdf.edit_node(prep_data)
 
                 prep_data = osdf.get_node(prep_id)
                 latest_version = prep_data['ver']
 
-                self.logger.debug("The version of this HostAssayPrep is now: %s" % str(latest_version))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success
@@ -1066,7 +1024,7 @@ class HostAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Cytokine import Cytokine
+        from cutlass.Cytokine import Cytokine
 
         for page_no in count(1):
             res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
@@ -1090,7 +1048,7 @@ class HostAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Lipidome import Lipidome
+        from cutlass.Lipidome import Lipidome
 
         for page_no in count(1):
             res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
@@ -1114,7 +1072,7 @@ class HostAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Metabolome import Metabolome
+        from cutlass.Metabolome import Metabolome
 
         for page_no in count(1):
             res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
@@ -1138,7 +1096,7 @@ class HostAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Proteome import Proteome
+        from cutlass.Proteome import Proteome
 
         for page_no in count(1):
             res = query(HostAssayPrep.namespace, linkage_query, page=page_no)
@@ -1176,10 +1134,10 @@ class HostAssayPrep(Base):
         """
         self.logger.debug("In derivations().")
 
-        from Cytokine import Cytokine
-        from Lipidome import Lipidome
-        from Metabolome import Metabolome
-        from Proteome import Proteome
+        from cutlass.Cytokine import Cytokine
+        from cutlass.Lipidome import Lipidome
+        from cutlass.Metabolome import Metabolome
+        from cutlass.Proteome import Proteome
 
         for doc in self._derived_docs():
             if doc['node_type'] == "lipidome":
