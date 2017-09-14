@@ -1,17 +1,15 @@
-"""
-Models the proteome object.
-"""
+#!/usr/bin/env python
 
 import json
 import logging
 import os
 import string
-from cutlass.iHMPSession import iHMPSession
-from cutlass.Base import Base
-from cutlass.aspera import aspera
-from cutlass.Util import *
-
-# pylint: disable=C0302, W0703, C1801
+from itertools import count
+from iHMPSession import iHMPSession
+from Base import Base
+from Visit import Visit
+from aspera import aspera
+from Util import *
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -57,33 +55,34 @@ class Proteome(Base):
         self._analyzer = None
         self._checksums = {}
         self._comment = None
+        self._data_processing_protocol = None
         self._detector = None
+        self._exp_description = None
         self._instrument_name = None
-        self._pepid_format = None
-        self._pepid_url = ['']
+        self._modification = ['']
+        self._result_url = ['']
         self._pride_id = None
         self._processing_method = None
-        self._protid_format = None
         self._protocol_name = None
-        self._protmod_format = None
-        self._protid_url = ['']
-        self._protmod_url = ['']
-        self._local_protmod_file = None
+        self._peak_url = ['']
         self._sample_name = None
         self._search_engine = None
         self._short_label = None
         self._software = None
         self._source = None
-        self._spectra_format = None
-        self._spectra_url = ['']
-        self._local_spectra_file = None
         self._study = None
         self._subtype = None
+        self._raw_url = ['']
+        self._other_url = ['']
+        self._result_url = ['']
+        self._local_raw_file = None
+        self._local_other_file = None
+        self._local_result_file = None
+        self._local_peak_file = None
         self._title = None
 
         # Optional properties
         self._date = None
-        self._exp_description = None
         self._protocol_steps = None
         self._reference = None
         self._sample_description = None
@@ -365,6 +364,32 @@ class Proteome(Base):
         self._exp_description = exp_description
 
     @property
+    def data_processing_protocol(self):
+        """
+		str: Description of the data processing protocol.
+		"""
+        self.logger.debug("In 'data_processing_protocol' getter.")
+        return self._data_processing_protocol
+
+    @data_processing_protocol.setter
+    @enforce_string
+    def data_processing_protocol(self, data_processing_protocol):
+        """
+		A short description of the data processing protocol followed to
+		generate associated data sets, optimally 2-3 sentences.
+
+		Args:
+			data_processing_protocol (str): Description of the goals/objectives
+			of the study.
+
+		Returns:
+			None
+		"""
+        self.logger.debug("In 'data_processing_protocol' setter.")
+
+        self._data_processing_protocol = data_processing_protocol
+
+    @property
     def sample_description(self):
         """
         str: Expansible description of the sample used to generate the
@@ -604,244 +629,198 @@ class Proteome(Base):
         self._xml_generation = xml_generation
 
     @property
-    def spectra_format(self):
+    def modification(self):
         """
-        str: File format of the file(s) containing data.
+        list: An array of ontology strings describing protein modifications.
+        PSI-MOD and Unimod CV terms are allowed.
         """
-        self.logger.debug("In 'spectra_format' getter.")
-        return self._spectra_format
+        self.logger.debug("In 'modification' getter.")
 
-    @spectra_format.setter
+        return self._modification
+
+    @modification.setter
     @enforce_string
-    def spectra_format(self, spectra_format):
+    def modification(self, modification):
         """
-        File format of the file(s) containing data.
+        list: An array of ontology strings describing protein modifications.
+        PSI-MOD and Unimod CV terms are allowed.
 
         Args:
-            spectra_format (str): File format of the file(s) containing data.
+            modification (list): An array of ontology strings describing protein modifications.
 
         Returns:
             None
         """
-        self.logger.debug("In 'spectra_format' setter.")
+        self.logger.debug("In 'modification' setter.")
 
-        self._spectra_format = spectra_format
+        self._modification = modification
 
     @property
-    def protid_format(self):
+    def raw_url(self):
         """
-        str: File format of the file(s) containing data.
+        list: URLs from where raw files can be obtained.
         """
-        self.logger.debug("In 'protid_format' getter.")
+        self.logger.debug("In raw_url getter.")
 
-        return self._protid_format
+        return self._raw_url
 
-    @protid_format.setter
+    @property
+    def other_url(self):
+        """
+        list: URLs from where other files can be obtained.
+        """
+        self.logger.debug("In other_url getter.")
+
+        return self._other_url
+
+    @property
+    def local_raw_file(self):
+        """
+        str: Local path where the raw file is located.
+        """
+        self.logger.debug("In 'local_raw_file' getter.")
+
+        return self._local_raw_file
+
+    @local_raw_file.setter
     @enforce_string
-    def protid_format(self, protid_format):
+    def local_raw_file(self, local_raw_file):
         """
-        File format of the file(s) containing data.
-
-        Args:
-            protid_format (str): File format of the file(s) containing data.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'protid_format' setter.")
-
-        self._protid_format = protid_format
-
-    @property
-    def pepid_format(self):
-        """
-        str: File format of the file(s) containing data.
-        """
-        self.logger.debug("In 'pepid_format' getter.")
-
-        return self._pepid_format
-
-    @pepid_format.setter
-    @enforce_string
-    def pepid_format(self, pepid_format):
-        """
-        File format of the file(s) containing data.
-
-        Args:
-            pepid_format (str): File format of the file(s) containing data.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'pepid_format' setter.")
-
-        self._pepid_format = pepid_format
-
-    @property
-    def protmod_format(self):
-        """
-        str: File format of the file(s) containing data.
-        """
-        self.logger.debug("In 'protmod_format' getter.")
-
-        return self._protmod_format
-
-    @protmod_format.setter
-    @enforce_string
-    def protmod_format(self, protmod_format):
-        """
-        File format of the file(s) containing data.
-
-        Args:
-            protmod_format (str): File format of the file(s) containing data.
-
-        Returns:
-            None
-        """
-        self.logger.debug("In 'protmod_format' setter.")
-
-        self._protmod_format = protmod_format
-
-    @property
-    def protmod_url(self):
-        """
-        list: URLs for protein modifications files using the PSI-MOD ontology.
-        """
-        self.logger.debug("In 'protmod_url' getter.")
-
-        return self._protmod_url
-
-    @property
-    def local_protmod_file(self):
-        """
-        str: Local path where the PSI-MOD data is located.
-        """
-        self.logger.debug("In 'local_protmod_file' getter.")
-
-        return self._local_protmod_file
-
-    @local_protmod_file.setter
-    @enforce_string
-    def local_protmod_file(self, local_protmod_file):
-        """
-        Local file where PSI-MOD data is located. This data will be
+        Local file where raw data is located. This data will be
         uploaded via Aspera when the node is saved.
 
         Args:
-            local_protmod_file (str): Local file containing the PSI-MOD data
+            local_raw_file (str):  Local file containing the raw data.
 
         Returns:
             None
         """
-        self.logger.debug("In 'local_protmod_file' setter.")
+        self.logger.debug("In 'local_raw_file' setter.")
 
-        self._local_protmod_file = local_protmod_file
-
-    @property
-    def spectra_url(self):
-        """
-        list: URLs from where spectra files can be obtained.
-        """
-        self.logger.debug("In spectra_url getter.")
-
-        return self._spectra_url
+        self._local_raw_file = local_raw_file
 
     @property
-    def local_spectra_file(self):
+    def local_result_file(self):
         """
-        str: Local path where the spectra file is located.
+        str: Local path where the result file is located.
         """
-        self.logger.debug("In 'local_spectra_file' getter.")
+        self.logger.debug("In 'local_result_file' getter.")
 
-        return self._local_spectra_file
+        return self._local_result_file
 
-    @local_spectra_file.setter
+    @local_result_file.setter
     @enforce_string
-    def local_spectra_file(self, local_spectra_file):
+    def local_result_file(self, local_result_file):
         """
-        Local file where spectra data is located. This data will be
+        Local file where result data is located. This data will be
         uploaded via Aspera when the node is saved.
 
         Args:
-            local_spectra_file (str):  Local file containing the spectra data.
+            local_result_file (str):  Local file containing the result data.
 
         Returns:
             None
         """
-        self.logger.debug("In 'local_spectra_file' setter.")
+        self.logger.debug("In 'local_result_file' setter.")
 
-        self._local_spectra_file = local_spectra_file
-
-    @property
-    def protid_url(self):
-        """
-        list: URLs from where protein identification file can be obtained.
-        """
-        self.logger.debug("In 'protid_url' getter.")
-
-        return self._protid_url
+        self._local_result_file = local_result_file
 
     @property
-    def local_protid_file(self):
+    def local_other_file(self):
         """
-        str: Local path where the protein identification file is located.
+        str: Local path where the other file is located.
         """
-        self.logger.debug("In 'local_protid_file' getter.")
+        self.logger.debug("In 'local_other_file' getter.")
 
-        return self._local_protid_file
+        return self._local_other_file
 
-    @local_protid_file.setter
+    @local_other_file.setter
     @enforce_string
-    def local_protid_file(self, local_protid_file):
+    def local_other_file(self, local_other_file):
         """
-        Local file where protein identification data is located. This data will
+        Local file where other data is located. This data will be
+        uploaded via Aspera when the node is saved.
+
+        Args:
+            local_other_file (str):  Local file containing the other data.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'local_other_file' setter.")
+
+        self._local_other_file = local_other_file
+
+    @property
+    def peak_url(self):
+        """
+        list: URLs from where peak file can be obtained.
+        """
+        self.logger.debug("In 'peak_url' getter.")
+
+        return self._peak_url
+
+    @property
+    def local_peak_file(self):
+        """
+        str: Local path where the peak file is located.
+        """
+        self.logger.debug("In 'local_peak_file' getter.")
+
+        return self._local_peak_file
+
+    @local_peak_file.setter
+    @enforce_string
+    def local_peak_file(self, local_peak_file):
+        """
+        Local file where peak data is located. This data will
         be uploaded via Aspera when the node is saved.
 
         Args:
-            local_protid_file (str):  Local file containing the protein
+            local_peak_file (str):  Local file containing the protein
             identification data.
 
         Returns:
             None
         """
-        self.logger.debug("In 'local_protid_file' setter.")
+        self.logger.debug("In 'local_peak_file' setter.")
 
-        self._local_protid_file = local_protid_file
+        self._local_peak_file = local_peak_file
 
     @property
-    def pepid_url(self):
+    def result_url(self):
         """
         list: URLs from where peptide identification file can be obtained.
         """
-        self.logger.debug("In pepid_url getter.")
-        return self._pepid_url
+        self.logger.debug("In result_url getter.")
+        return self._result_url
 
     @property
-    def local_pepid_file(self):
+    def local_result_file(self):
         """
-        str: Local path where the peptide identification file is located.
+        str: Local path where the result identification file is located.
         """
-        self.logger.debug("In 'local_pepid_file' getter.")
+        self.logger.debug("In 'local_result_file' getter.")
 
-        return self._local_pepid_file
+        return self._local_result_file
 
-    @local_pepid_file.setter
+    @local_result_file.setter
     @enforce_string
-    def local_pepid_file(self, local_pepid_file):
+    def local_result_file(self, local_result_file):
         """
         Local file where peptide identification data is located. This data will
         be uploaded via Aspera when the node is saved.
 
         Args:
-            local_pepid_file (str):  Local file containing the peptide
+            local_result_file (str):  Local file containing the peptide
             identification data.
 
         Returns:
             None
         """
-        self.logger.debug("In 'local_pepid_file' setter.")
+        self.logger.debug("In 'local_result_file' setter.")
 
-        self._local_pepid_file = local_pepid_file
+        self._local_result_file = local_result_file
 
     @property
     def study(self):
@@ -876,7 +855,7 @@ class Proteome(Base):
     @property
     def subtype(self):
         """
-        str: Retrieves the subtype of the Proteome (host or microbiome).
+        str: The subtype of the proteome.
         """
         self.logger.debug("In 'subtype' getter.")
 
@@ -886,17 +865,22 @@ class Proteome(Base):
     @enforce_string
     def subtype(self, subtype):
         """
-        Sets the subtype of the proteome. Must be either 'host' or 'microbiome'.
+        One of the 3 studies that are part of the iHMP.
 
         Args:
-            subtype (str): host or microbiome.
+            subtype (str): The subtype of the proteome.
 
         Returns:
             None
         """
-        self.logger.debug("In 'subtype' setter.")
+        self.logger.debug("In subtype setter.")
 
-        self._subtype = subtype
+        subtypes = ["host", "microbiome"]
+
+        if subtype in subtypes:
+            self._subtype = subtype
+        else:
+            raise Exception("Invalid subtype.")
 
     def validate(self):
         """
@@ -928,7 +912,7 @@ class Proteome(Base):
         if 'derived_from' not in self._links.keys():
             problems.append("Must have a 'derived_from' link to an assay prep.")
 
-        self.logger.debug("Number of validation problems: %s.", len(problems))
+        self.logger.debug("Number of validation problems: %s." % len(problems))
         return problems
 
     def is_valid(self):
@@ -947,14 +931,17 @@ class Proteome(Base):
         """
         self.logger.debug("In is_valid.")
 
-        problems = self.validate()
+        document = self._get_raw_doc()
 
-        valid = True
-        if len(problems):
-            self.logger.error("There were %s problems.", len(problems))
+        session = iHMPSession.get_session()
+        self.logger.info("Got iHMP session.")
+
+        (valid, error_message) = session.get_osdf().validate_node(document)
+
+        if 'derived_from' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s", str(valid))
+        self.logger.debug("Valid? %s" % str(valid))
 
         return valid
 
@@ -976,8 +963,8 @@ class Proteome(Base):
 
         proteome_doc = {
             'acl': {
-                'read': ['all'],
-                'write': [Proteome.namespace]
+                'read': [ 'all' ],
+                'write': [ Proteome.namespace ]
             },
             'linkage': self._links,
             'ns': Proteome.namespace,
@@ -997,52 +984,63 @@ class Proteome(Base):
                 'software': self._software,
                 'processing_method': self._processing_method,
                 'search_engine': self._search_engine,
-                'protid_format': self._protid_format,
-                'protid_url': self._protid_url,
-                'pepid_format': self._pepid_format,
-                'pepid_url': self._pepid_url,
-                'protmod_format': self._protmod_format,
-                'protmod_url': self._protmod_url,
-                'spectra_format': self._spectra_format,
-                'spectra_url': self._spectra_url,
+                'peak_url': self._peak_url,
+                'result_url': self._result_url,
+                'raw_url': self._raw_url,
+                'other_url': self._other_url,
+                'result_url': self._result_url,
                 'study': self._study,
                 'subtype': self._subtype,
-                'tags': self._tags
+                'tags': self._tags,
+                'exp_description': self._exp_description,
+                'data_processing_protocol': self._data_processing_protocol
             }
         }
 
         if self._id is not None:
-            self.logger.debug("Proteome object has the OSDF id set.")
-            proteome_doc['id'] = self._id
+           self.logger.debug("Proteome object has the OSDF id set.")
+           proteome_doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug("Proteome object has the OSDF version set.")
-            proteome_doc['ver'] = self._version
+           self.logger.debug("Proteome object has the OSDF version set.")
+           proteome_doc['ver'] = self._version
 
         # Handle Proteome optional properties
         if self._date is not None:
-            self.logger.debug("Proteome object has the 'date' property set.")
-            proteome_doc['meta']['date'] = self._date
+           self.logger.debug("Proteome object has the 'date' property set.")
+           proteome_doc['meta']['date'] = self._date
+
+        if self._modification is not None:
+           self.logger.debug("Proteome object has the 'modification' property set.")
+           proteome_doc['meta']['modification'] = self._modification
+
+        if self._other_url is not None:
+           self.logger.debug("Proteome object has the 'other_url' property set.")
+           proteome_doc['meta']['other_url'] = self._other_url
 
         if self._reference is not None:
-            self.logger.debug("Proteome object has the 'reference' property set.")
-            proteome_doc['meta']['reference'] = self._reference
+           self.logger.debug("Proteome object has the 'reference' property set.")
+           proteome_doc['meta']['reference'] = self._reference
 
         if self._protocol_steps is not None:
-            self.logger.debug("Proteome object has the 'protocol_steps' property set.")
-            proteome_doc['meta']['protocol_steps'] = self._protocol_steps
+           self.logger.debug("Proteome object has the 'protocol_steps' property set.")
+           proteome_doc['meta']['protocol_steps'] = self._protocol_steps
 
-        if self._exp_description is not None:
-            self.logger.debug("Proteome object has the 'exp_description' property set.")
-            proteome_doc['meta']['exp_description'] = self._exp_description
+        # if self._protmod_format is not None:
+        #    self.logger.debug("Proteome object has the 'protmod_format' property set.")
+        #    proteome_doc['meta']['protmod_format'] = self._protmod_format
+        #
+        # if self._protmod_url is not None:
+        #    self.logger.debug("Proteome object has the 'protmod_url' property set.")
+        #    proteome_doc['meta']['protmod_url'] = self._protmod_url
 
         if self._sample_description is not None:
-            self.logger.debug("Proteome object has the 'sample_description' property set.")
-            proteome_doc['meta']['sample_description'] = self._sample_description
+           self.logger.debug("Proteome object has the 'sample_description' property set.")
+           proteome_doc['meta']['sample_description'] = self._sample_description
 
         if self._xml_generation is not None:
-            self.logger.debug("Proteome object has the 'xml_generation' property set.")
-            proteome_doc['meta']['xml_generation'] = self._xml_generation
+           self.logger.debug("Proteome object has the 'xml_generation' property set.")
+           proteome_doc['meta']['xml_generation'] = self._xml_generation
 
         return proteome_doc
 
@@ -1060,10 +1058,9 @@ class Proteome(Base):
         return ("checksums", "comment", "pride_id", "sample_name", "title",
                 "short_label", "protocol_name", "instrument_name", "source",
                 "analyzer", "detector", "software", "processing_method",
-                "search_engine", "protid_format", "pepid_format",
-                "protmod_format", "spectra_format",
-                "local_spectra_file", "local_protmod_file", "local_protid_file",
-                "local_pepid_file", "study", "subtype")
+                "search_engine", "exp_description", "data_processing_protocol"
+                "local_raw_file", "local_other_file", "local_peak_file",
+                "local_result_file", "study", "subtype")
 
     def delete(self):
         """
@@ -1082,7 +1079,7 @@ class Proteome(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            self.logger.warn("Attempt to delete a Proteome with no ID.")
             raise Exception("Proteome does not have an ID.")
 
         proteome_id = self._id
@@ -1094,17 +1091,17 @@ class Proteome(Base):
         success = False
 
         try:
-            self.logger.info("Deleting %s with ID %s.", __name__, proteome_id)
+            self.logger.info("Deleting Proteome with ID %s." % proteome_id)
             session.get_osdf().delete_node(proteome_id)
             success = True
-        except Exception as delete_exception:
-            self.logger.exception(delete_exception)
+        except Exception as e:
+            self.logger.exception(e)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query="\"proteome\"[node_type]"):
+    def search(query = "\"proteome\"[node_type]"):
         """
         Searches OSDF for Proteome nodes. Any criteria the user wishes to add
         is provided by the user in the query language specifications provided
@@ -1132,7 +1129,7 @@ class Proteome(Base):
         if query != '"proteome"[node_type]':
             query = '({}) && "proteome"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: %s", query)
+        module_logger.debug("Submitting OQL query: {}".format(query))
 
         proteome_data = session.get_osdf().oql_query(Proteome.namespace, query)
 
@@ -1158,10 +1155,11 @@ class Proteome(Base):
         Returns:
             Returns a Proteome instance.
         """
-        module_logger.info("Creating a template %s.", __name__)
+        module_logger.info("Creating a template Proteome.")
         proteome = Proteome()
 
-        module_logger.debug("Filling in %s details.", __name__)
+        module_logger.debug("Filling in Proteome details.")
+
 
         # Node required fields
         proteome._set_id(proteome_data['id'])
@@ -1183,29 +1181,30 @@ class Proteome(Base):
         proteome._software = proteome_data['meta']['software']
         proteome._processing_method = proteome_data['meta']['processing_method']
         proteome._search_engine = proteome_data['meta']['search_engine']
-        proteome._protid_format = proteome_data['meta']['protid_format']
-        proteome._protid_url = proteome_data['meta']['protid_url']
-        proteome._pepid_format = proteome_data['meta']['pepid_format']
-        proteome._pepid_url = proteome_data['meta']['pepid_url']
-        proteome._protmod_format = proteome_data['meta']['protmod_format']
-        proteome._protmod_url = proteome_data['meta']['protmod_url']
-        proteome._spectra_format = proteome_data['meta']['spectra_format']
-        proteome._spectra_url = proteome_data['meta']['spectra_url']
+        proteome._peak_url = proteome_data['meta']['peak_url']
+        proteome._result_url = proteome_data['meta']['result_url']
+        proteome._raw_url = proteome_data['meta']['raw_url']
+        proteome._other_url = proteome_data['meta']['other_url']
         proteome._study = proteome_data['meta']['study']
+        proteome._subtype = proteome_data['meta']['subtype']
         proteome._tags = proteome_data['meta']['tags']
-
+        proteome._exp_description = proteome_data['meta']['exp_description']
+        proteome._data_processing_protocol = proteome_data['meta']['data_processing_protocol']
         # Handle Proteome optional properties
         if 'date' in proteome_data['meta']:
             proteome._date = proteome_data['meta']['date']
+
+        if 'modification' in proteome_data['meta']:
+            proteome._modification = proteome_data['meta']['modification']
+
+        if 'other_url' in proteome_data['meta']:
+            proteome._other_url = proteome_data['meta']['other_url']
 
         if 'reference' in proteome_data['meta']:
             proteome._reference = proteome_data['meta']['reference']
 
         if 'protocol_steps' in proteome_data['meta']:
             proteome._protocol_steps = proteome_data['meta']['protocol_steps']
-
-        if 'exp_description' in proteome_data['meta']:
-            proteome._exp_description = proteome_data['meta']['exp_description']
 
         if 'sample_description' in proteome_data['meta']:
             proteome._sample_description = proteome_data['meta']['sample_description']
@@ -1229,25 +1228,24 @@ class Proteome(Base):
         Returns:
             A Proteome object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s", proteome_id)
+        module_logger.debug("In load. Specified ID: %s" % proteome_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         proteome_data = session.get_osdf().get_node(proteome_id)
 
-        module_logger.info("Creating a template %s.", __name__)
+        module_logger.info("Creating a template " + __name__ + ".")
         proteome = Proteome.load_proteome(proteome_data)
 
-        module_logger.debug("Returning loaded %s", __name__)
+        module_logger.debug("Returning loaded " + __name__)
 
         return proteome
 
-    def _upload_files(self, study, file_map):
-        study2dir = {
-            "ibd": "ibd",
-            "preg_preterm": "ptb",
-            "prediabetes": "t2d"
-        }
+    def _upload_files(self, study, subtype, file_map):
+        study2dir = { "ibd": "ibd",
+                      "preg_preterm": "ptb",
+                      "prediabetes": "t2d"
+                    }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
@@ -1264,17 +1262,18 @@ class Proteome(Base):
         # to the Aspera server and return a dictionary with the computed remote
         # paths...
         for file_type, local_file in file_map.iteritems():
-            self.logger.debug("Uploading %s of %s type %s", local_file, __name__, file_type)
+            self.logger.debug("Uploading %s of Proteome type %s" %
+                              (local_file, file_type))
 
-            remote_base = os.path.basename(local_file)
+            remote_base = os.path.basename(local_file);
 
             valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
             remote_base = ''.join(c for c in remote_base if c in valid_chars)
             remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
-            remote_path = "/".join(["/" + study_dir, "proteome",
+            remote_path = "/".join(["/" + study_dir, "proteome", subtype,
                                     file_type, remote_base])
-            self.logger.debug("Remote path for this file will be %s.", remote_path)
+            self.logger.debug("Remote path for this file will be %s." % remote_path)
 
             # Upload the file to the iHMP aspera server
             upload_success = aspera.upload_file(Proteome.aspera_server,
@@ -1283,7 +1282,8 @@ class Proteome(Base):
                                                 local_file,
                                                 remote_path)
             if not upload_success:
-                self.logger.error("Experienced an error uploading file %s. ", local_file)
+                self.logger.error(
+                    "Experienced an error uploading file %s. " % local_file)
                 raise Exception("Unable to upload " + local_file)
             else:
                 remote_paths[file_type] = "fasp://" + Proteome.aspera_server + remote_path
@@ -1325,35 +1325,35 @@ class Proteome(Base):
 
         study = self._study
 
-        files = {
-            "spectra": self._local_spectra_file,
-            "pepid": self._local_pepid_file,
-            "protmod": self._local_protmod_file,
-            "protid": self._local_protid_file
-        }
+        subtype = self._subtype
+
+        files = { "raw": self._local_raw_file,
+                  "other": self._local_other_file,
+                  "result": self._local_result_file,
+                  "peak": self._local_peak_file }
 
         remote_files = {}
         try:
-            remote_files = self._upload_files(study, files)
-        except Exception as upload_exception:
-            self.logger.exception("Unable to transmit data via Aspera: %s",
-                                  upload_exception)
+            remote_files = self._upload_files(study, subtype, files)
+        except Exception as e:
+            self.logger.exception("Unable to transmit data via Aspera.")
             return False
 
-        self.logger.info("Aspera transmission of Proteome files successful.")
+        self.logger.info("Aspera transmission of Proteome files successful.");
 
         self.logger.debug("Setting url properties with remote paths.")
-        self._protid_url = [remote_files['protid']]
-        self._pepid_url = [remote_files['pepid']]
-        self._protmod_url = [remote_files['protmod']]
-        self._spectra_url = [remote_files['spectra_url']]
+        self._peak_url = [ remote_files['peak'] ]
+        self._result_url = [ remote_files['result'] ]
+        self._raw_url = [ remote_files['raw'] ]
+        self._result_url = [ remote_files['result'] ]
+        self._other_url = [remote_files['other']]
 
         if self._id is None:
             self.logger.info("About to insert a new " + __name__ + " OSDF node.")
 
             # Get the JSON form of the data and load it
             self.logger.debug("Converting Proteome to parsed JSON form.")
-            data = json.loads(self.to_json())
+            data = json.loads( self.to_json() )
 
             try:
                 node_id = osdf.insert_node(data)
@@ -1361,33 +1361,27 @@ class Proteome(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as save_exception:
-                self.logger.exception(save_exception)
+            except Exception as e:
+                self.logger.exception(e)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
+            self.logger.info("Proteome already has an ID, so we do an update (not an insert).")
 
             try:
                 proteome_data = self._get_raw_doc()
-                self.logger.info(
-                    "%s already has an ID, so we do an update (not an insert).",
-                    __name__
-                )
-
+                self.logger.info("Proteome already has an ID, so we do an update (not an insert).")
                 proteome_id = self._id
-                self.logger.debug("%s OSDF ID to update: %s.", __name__, proteome_id)
+                self.logger.debug("Proteome OSDF ID to update: %s." % proteome_id)
                 osdf.edit_node(proteome_data)
 
                 proteome_data = osdf.get_node(proteome_id)
                 latest_version = proteome_data['ver']
 
-                self.logger.debug(
-                    "The version of this %s is now: %s", __name__, str(latest_version)
-                )
+                self.logger.debug("The version of this Proteome is now: %s" % str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as update_exception:
-                self.logger.exception(update_exception)
+            except Exception as e:
+                self.logger.exception(e)
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success
