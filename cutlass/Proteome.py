@@ -988,31 +988,23 @@ class Proteome(Base):
            proteome_doc['meta']['modification'] = self._modification
 
         if self._other_url is not None:
-           self.logger.debug("Proteome object has the 'other_url' property set.")
+           self.logger.debug("%s object has the 'other_url' property set.", __name__)
            proteome_doc['meta']['other_url'] = self._other_url
 
         if self._reference is not None:
-           self.logger.debug("Proteome object has the 'reference' property set.")
+           self.logger.debug("%s object has the 'reference' property set.", __name__)
            proteome_doc['meta']['reference'] = self._reference
 
         if self._protocol_steps is not None:
-           self.logger.debug("Proteome object has the 'protocol_steps' property set.")
+           self.logger.debug("%s object has the 'protocol_steps' property set.", __name__)
            proteome_doc['meta']['protocol_steps'] = self._protocol_steps
 
-        # if self._protmod_format is not None:
-        #    self.logger.debug("Proteome object has the 'protmod_format' property set.")
-        #    proteome_doc['meta']['protmod_format'] = self._protmod_format
-        #
-        # if self._protmod_url is not None:
-        #    self.logger.debug("Proteome object has the 'protmod_url' property set.")
-        #    proteome_doc['meta']['protmod_url'] = self._protmod_url
-
         if self._sample_description is not None:
-           self.logger.debug("Proteome object has the 'sample_description' property set.")
+           self.logger.debug("%s object has the 'sample_description' property set.", __name__)
            proteome_doc['meta']['sample_description'] = self._sample_description
 
         if self._xml_generation is not None:
-           self.logger.debug("Proteome object has the 'xml_generation' property set.")
+           self.logger.debug("%s object has the 'xml_generation' property set.", __name__)
            proteome_doc['meta']['xml_generation'] = self._xml_generation
 
         return proteome_doc
@@ -1051,7 +1043,7 @@ class Proteome(Base):
 
         if self._id is None:
             self.logger.warn("Attempt to delete a %s with no ID.", __name__)
-            raise Exception("Proteome does not have an ID.")
+            raise Exception("%s does not have an ID." % __name__)
 
         proteome_id = self._id
 
@@ -1161,6 +1153,7 @@ class Proteome(Base):
         proteome._tags = proteome_data['meta']['tags']
         proteome._exp_description = proteome_data['meta']['exp_description']
         proteome._data_processing_protocol = proteome_data['meta']['data_processing_protocol']
+
         # Handle Proteome optional properties
         if 'date' in proteome_data['meta']:
             proteome._date = proteome_data['meta']['date']
@@ -1183,7 +1176,7 @@ class Proteome(Base):
         if 'xml_generation' in proteome_data['meta']:
             proteome._xml_generation = proteome_data['meta']['xml_generation']
 
-        module_logger.debug("Returning loaded Proteome.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return proteome
 
     @staticmethod
@@ -1213,10 +1206,11 @@ class Proteome(Base):
         return proteome
 
     def _upload_files(self, study, subtype, file_map):
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
@@ -1309,7 +1303,7 @@ class Proteome(Base):
                                   upload_exception)
             return False
 
-        self.logger.info("Aspera transmission of Proteome files successful.")
+        self.logger.info("Aspera transmission of %s files successful.", __name__)
 
         self.logger.debug("Setting url properties with remote paths.")
         self._peak_url = [ remote_files['peak'] ]
@@ -1319,10 +1313,10 @@ class Proteome(Base):
         self._other_url = [remote_files['other']]
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting Proteome to parsed JSON form.")
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
             data = json.loads( self.to_json() )
 
             try:
@@ -1335,7 +1329,7 @@ class Proteome(Base):
                 self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("Proteome already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 proteome_data = self._get_raw_doc()
