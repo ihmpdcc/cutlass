@@ -37,7 +37,7 @@ class Proteome(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Proteome class. This initializes the fields specific to the
         class, and inherits from the Base class.
@@ -89,6 +89,8 @@ class Proteome(Base):
         self._reference = None
         self._sample_description = None
         self._xml_generation = None
+
+        super(Proteome, self).__init__(*args, **kwargs)
 
     @property
     def checksums(self):
@@ -909,12 +911,12 @@ class Proteome(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'derived_from' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -943,69 +945,68 @@ class Proteome(Base):
             'ns': Proteome.namespace,
             'node_type': 'proteome',
             'meta': {
+                'analyzer': self._analyzer,
                 'checksums': self._checksums,
                 'comment': self._comment,
-                'pride_id': self._pride_id,
-                'sample_name': self._sample_name,
-                'title': self._title,
-                'short_label': self._short_label,
-                'protocol_name': self._protocol_name,
-                'instrument_name': self._instrument_name,
-                'source': self._source,
-                'analyzer': self._analyzer,
                 'detector': self._detector,
-                'software': self._software,
-                'processing_method': self._processing_method,
-                'search_engine': self._search_engine,
-                'peak_url': self._peak_url,
-                'result_url': self._result_url,
-                'raw_url': self._raw_url,
+                'instrument_name': self._instrument_name,
                 'other_url': self._other_url,
+                'peak_url': self._peak_url,
+                'pride_id': self._pride_id,
+                'processing_method': self._processing_method,
+                'protocol_name': self._protocol_name,
+                'raw_url': self._raw_url,
                 'result_url': self._result_url,
+                'sample_name': self._sample_name,
+                'search_engine': self._search_engine,
+                'short_label': self._short_label,
+                'software': self._software,
+                'source': self._source,
                 'study': self._study,
                 'subtype': self._subtype,
                 'tags': self._tags,
+                'title': self._title,
                 'exp_description': self._exp_description,
                 'data_processing_protocol': self._data_processing_protocol
             }
         }
 
         if self._id is not None:
-           self.logger.debug("Proteome object has the OSDF id set.")
-           proteome_doc['id'] = self._id
+            self.logger.debug("Proteome object has the OSDF id set.")
+            proteome_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Proteome object has the OSDF version set.")
-           proteome_doc['ver'] = self._version
+            self.logger.debug("Proteome object has the OSDF version set.")
+            proteome_doc['ver'] = self._version
 
         # Handle Proteome optional properties
         if self._date is not None:
-           self.logger.debug("Proteome object has the 'date' property set.")
-           proteome_doc['meta']['date'] = self._date
+            self.logger.debug("Proteome object has the 'date' property set.")
+            proteome_doc['meta']['date'] = self._date
 
         if self._modification is not None:
-           self.logger.debug("Proteome object has the 'modification' property set.")
-           proteome_doc['meta']['modification'] = self._modification
+            self.logger.debug("Proteome object has the 'modification' property set.")
+            proteome_doc['meta']['modification'] = self._modification
 
         if self._other_url is not None:
-           self.logger.debug("%s object has the 'other_url' property set.", __name__)
-           proteome_doc['meta']['other_url'] = self._other_url
+            self.logger.debug("%s object has the 'other_url' property set.", __name__)
+            proteome_doc['meta']['other_url'] = self._other_url
 
         if self._reference is not None:
-           self.logger.debug("%s object has the 'reference' property set.", __name__)
-           proteome_doc['meta']['reference'] = self._reference
+            self.logger.debug("%s object has the 'reference' property set.", __name__)
+            proteome_doc['meta']['reference'] = self._reference
 
         if self._protocol_steps is not None:
-           self.logger.debug("%s object has the 'protocol_steps' property set.", __name__)
-           proteome_doc['meta']['protocol_steps'] = self._protocol_steps
+            self.logger.debug("%s object has the 'protocol_steps' property set.", __name__)
+            proteome_doc['meta']['protocol_steps'] = self._protocol_steps
 
         if self._sample_description is not None:
-           self.logger.debug("%s object has the 'sample_description' property set.", __name__)
-           proteome_doc['meta']['sample_description'] = self._sample_description
+            self.logger.debug("%s object has the 'sample_description' property set.", __name__)
+            proteome_doc['meta']['sample_description'] = self._sample_description
 
         if self._xml_generation is not None:
-           self.logger.debug("%s object has the 'xml_generation' property set.", __name__)
-           proteome_doc['meta']['xml_generation'] = self._xml_generation
+            self.logger.debug("%s object has the 'xml_generation' property set.", __name__)
+            proteome_doc['meta']['xml_generation'] = self._xml_generation
 
         return proteome_doc
 
@@ -1020,6 +1021,7 @@ class Proteome(Base):
             None
         """
         module_logger.debug("In required fields.")
+
         return ("checksums", "comment", "pride_id", "sample_name", "title",
                 "short_label", "protocol_name", "instrument_name", "source",
                 "analyzer", "detector", "software", "processing_method",
@@ -1092,7 +1094,7 @@ class Proteome(Base):
         if query != '"proteome"[node_type]':
             query = '({}) && "proteome"[node_type]'.format(query)
 
-	module_logger.debug("Submitting OQL query: %s", query)
+        module_logger.debug("Submitting OQL query: %s", query)
 
         proteome_data = session.get_osdf().oql_query(Proteome.namespace, query)
 
@@ -1118,63 +1120,62 @@ class Proteome(Base):
         Returns:
             Returns a Proteome instance.
         """
-	module_logger.info("Creating a template %s.", __name__)
+        module_logger.info("Creating a template %s.", __name__)
         proteome = Proteome()
 
-	module_logger.debug("Filling in %s details.", __name__)
-
+        module_logger.debug("Filling in %s details.", __name__)
 
         # Node required fields
         proteome._set_id(proteome_data['id'])
-        proteome._links = proteome_data['linkage']
-        proteome._version = proteome_data['ver']
+        proteome.links = proteome_data['linkage']
+        proteome.version = proteome_data['ver']
 
         # Proteome required fields
-        proteome._checksums = proteome_data['meta']['checksums']
-        proteome._comment = proteome_data['meta']['comment']
-        proteome._pride_id = proteome_data['meta']['pride_id']
-        proteome._sample_name = proteome_data['meta']['sample_name']
-        proteome._title = proteome_data['meta']['title']
-        proteome._short_label = proteome_data['meta']['short_label']
-        proteome._protocol_name = proteome_data['meta']['protocol_name']
-        proteome._instrument_name = proteome_data['meta']['instrument_name']
-        proteome._source = proteome_data['meta']['source']
-        proteome._analyzer = proteome_data['meta']['analyzer']
-        proteome._detector = proteome_data['meta']['detector']
-        proteome._software = proteome_data['meta']['software']
-        proteome._processing_method = proteome_data['meta']['processing_method']
-        proteome._search_engine = proteome_data['meta']['search_engine']
+        proteome.analyzer = proteome_data['meta']['analyzer']
+        proteome.checksums = proteome_data['meta']['checksums']
+        proteome.comment = proteome_data['meta']['comment']
+        proteome.data_processing_protocol = proteome_data['meta']['data_processing_protocol']
+        proteome.detector = proteome_data['meta']['detector']
+        proteome.exp_description = proteome_data['meta']['exp_description']
+        proteome.instrument_name = proteome_data['meta']['instrument_name']
+        proteome.processing_method = proteome_data['meta']['processing_method']
+        proteome.pride_id = proteome_data['meta']['pride_id']
+        proteome.protocol_name = proteome_data['meta']['protocol_name']
+        proteome.sample_name = proteome_data['meta']['sample_name']
+        proteome.search_engine = proteome_data['meta']['search_engine']
+        proteome.short_label = proteome_data['meta']['short_label']
+        proteome.software = proteome_data['meta']['software']
+        proteome.source = proteome_data['meta']['source']
+        proteome.study = proteome_data['meta']['study']
+        proteome.subtype = proteome_data['meta']['subtype']
+        proteome.tags = proteome_data['meta']['tags']
+        proteome.title = proteome_data['meta']['title']
         proteome._peak_url = proteome_data['meta']['peak_url']
         proteome._result_url = proteome_data['meta']['result_url']
         proteome._raw_url = proteome_data['meta']['raw_url']
         proteome._other_url = proteome_data['meta']['other_url']
-        proteome._study = proteome_data['meta']['study']
-        proteome._subtype = proteome_data['meta']['subtype']
-        proteome._tags = proteome_data['meta']['tags']
-        proteome._exp_description = proteome_data['meta']['exp_description']
-        proteome._data_processing_protocol = proteome_data['meta']['data_processing_protocol']
 
         # Handle Proteome optional properties
         if 'date' in proteome_data['meta']:
-            proteome._date = proteome_data['meta']['date']
+            proteome.date = proteome_data['meta']['date']
 
         if 'modification' in proteome_data['meta']:
-            proteome._modification = proteome_data['meta']['modification']
+            proteome.modification = proteome_data['meta']['modification']
 
         if 'other_url' in proteome_data['meta']:
             proteome._other_url = proteome_data['meta']['other_url']
 
         if 'reference' in proteome_data['meta']:
-            proteome._reference = proteome_data['meta']['reference']
+            proteome.reference = proteome_data['meta']['reference']
 
         if 'protocol_steps' in proteome_data['meta']:
-            proteome._protocol_steps = proteome_data['meta']['protocol_steps']
+            proteome.protocol_steps = proteome_data['meta']['protocol_steps']
 
         if 'sample_description' in proteome_data['meta']:
-            proteome._sample_description = proteome_data['meta']['sample_description']
+            proteome.sample_description = proteome_data['meta']['sample_description']
 
         if 'xml_generation' in proteome_data['meta']:
-            proteome._xml_generation = proteome_data['meta']['xml_generation']
+            proteome.xml_generation = proteome_data['meta']['xml_generation']
 
         module_logger.debug("Returning loaded %s.", __name__)
         return proteome
@@ -1192,20 +1193,22 @@ class Proteome(Base):
         Returns:
             A Proteome object with all the available OSDF data loaded into it.
         """
-	module_logger.debug("In load. Specified ID: %s", proteome_id)
+        module_logger.debug("In load. Specified ID: %s", proteome_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         proteome_data = session.get_osdf().get_node(proteome_id)
 
-	module_logger.info("Creating a template %s.", __name__)
+        module_logger.info("Creating a template %s.", __name__)
         proteome = Proteome.load_proteome(proteome_data)
 
-	module_logger.debug("Returning loaded %s", __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return proteome
 
     def _upload_files(self, study, subtype, file_map):
+        self.logger.debug("In _upload_files.")
+
         study2dir = {
             "ibd": "ibd",
             "preg_preterm": "ptb",
@@ -1229,7 +1232,7 @@ class Proteome(Base):
         for file_type, local_file in file_map.iteritems():
             self.logger.debug("Uploading %s of %s type %s", local_file, __name__, file_type)
 
-            remote_base = os.path.basename(local_file);
+            remote_base = os.path.basename(local_file)
 
             valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
             remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -1290,10 +1293,12 @@ class Proteome(Base):
 
         subtype = self._subtype
 
-        files = { "raw": self._local_raw_file,
-                  "other": self._local_other_file,
-                  "result": self._local_result_file,
-                  "peak": self._local_peak_file }
+        files = {
+            "other": self._local_other_file,
+            "peak": self._local_peak_file,
+            "raw": self._local_raw_file,
+            "result": self._local_result_file
+        }
 
         remote_files = {}
         try:
@@ -1306,18 +1311,17 @@ class Proteome(Base):
         self.logger.info("Aspera transmission of %s files successful.", __name__)
 
         self.logger.debug("Setting url properties with remote paths.")
-        self._peak_url = [ remote_files['peak'] ]
-        self._result_url = [ remote_files['result'] ]
-        self._raw_url = [ remote_files['raw'] ]
-        self._result_url = [ remote_files['result'] ]
         self._other_url = [remote_files['other']]
+        self._peak_url = [remote_files['peak']]
+        self._raw_url = [remote_files['raw']]
+        self._result_url = [remote_files['result']]
 
         if self._id is None:
             self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
             self.logger.debug("Converting %s to parsed JSON form.", __name__)
-            data = json.loads( self.to_json() )
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -1333,9 +1337,11 @@ class Proteome(Base):
 
             try:
                 proteome_data = self._get_raw_doc()
-		self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
+                self.logger.info("%s already has an ID, so we do an update (not an insert).",
+                                 __name__
+                                )
                 proteome_id = self._id
-		self.logger.debug("%s OSDF ID to update: %s.", __name__, proteome_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, proteome_id)
                 osdf.edit_node(proteome_data)
 
                 proteome_data = osdf.get_node(proteome_id)
