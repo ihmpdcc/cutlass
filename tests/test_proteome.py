@@ -3,6 +3,7 @@
 import unittest
 import json
 from datetime import date
+import tempfile
 
 from cutlass import Proteome
 
@@ -106,11 +107,29 @@ class ProteomeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             proteome.version = "test"
 
+    def testAnalyzer(self):
+        """ Test the analyzer property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "analyzer")
+
+        self.util.stringPropertyTest(self, proteome, "analyzer")
+
+    def testDetector(self):
+        """ Test the detector property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "detector")
+
+        self.util.stringPropertyTest(self, proteome, "detector")
+
     def testComment(self):
         """ Test the comment property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "comment")
+
+        self.util.stringPropertyTest(self, proteome, "comment")
 
     def testIllegalChecksums(self):
         """ Test the checksums property with illegal values. """
@@ -189,29 +208,7 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "pride_id")
 
-    def testSampleName(self):
-        """ Test the sample name property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "sample_name")
-
-    def testTitle(self):
-        """ Test the title property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "title")
-
-    def testShortLabel(self):
-        """ Test the short label property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "short_label")
-
-    def testReference(self):
-        """ Test the reference property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "reference")
+        self.util.stringPropertyTest(self, proteome, "pride_id")
 
     def testProtocolName(self):
         """ Test the protocol name property. """
@@ -219,11 +216,47 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "protocol_name")
 
+        self.util.stringPropertyTest(self, proteome, "protocol_name")
+
     def testProtocolSteps(self):
         """ Test the protocol steps property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "protocol_steps")
+
+        self.util.stringPropertyTest(self, proteome, "protocol_steps")
+
+    def testReference(self):
+        """ Test the reference property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "reference")
+
+        self.util.stringPropertyTest(self, proteome, "reference")
+
+    def testSampleName(self):
+        """ Test the sample name property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "sample_name")
+
+        self.util.stringPropertyTest(self, proteome, "sample_name")
+
+    def testShortLabel(self):
+        """ Test the short label property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "short_label")
+
+        self.util.stringPropertyTest(self, proteome, "short_label")
+
+    def testTitle(self):
+        """ Test the title property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "title")
+
+        self.util.stringPropertyTest(self, proteome, "title")
 
     def testExpDescription(self):
         """ Test the exp description property. """
@@ -231,11 +264,15 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "exp_description")
 
+        self.util.stringPropertyTest(self, proteome, "exp_description")
+
     def testSampleDescription(self):
         """ Test the sample description property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "sample_description")
+
+        self.util.stringPropertyTest(self, proteome, "sample_description")
 
     def testInstrumentName(self):
         """ Test the instrument name property. """
@@ -243,23 +280,15 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "instrument_name")
 
+        self.util.stringPropertyTest(self, proteome, "instrument_name")
+
     def testSource(self):
         """ Test the source property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "source")
 
-    def testAnalyzer(self):
-        """ Test the analyzer property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "analyzer")
-
-    def testDetector(self):
-        """ Test the detector property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "detector")
+        self.util.stringPropertyTest(self, proteome, "source")
 
     def testSoftware(self):
         """ Test the software property. """
@@ -267,11 +296,15 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "software")
 
+        self.util.stringPropertyTest(self, proteome, "software")
+
     def testProcessingMethod(self):
         """ Test the processing method property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "processing_method")
+
+        self.util.stringPropertyTest(self, proteome, "processing_method")
 
     def testSearchEngine(self):
         """ Test the search engine property. """
@@ -279,51 +312,21 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, proteome, "search_engine")
 
+        self.util.stringPropertyTest(self, proteome, "search_engine")
+
     def testXMLGeneration(self):
         """ Test the XML generation property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "xml_generation")
 
-    def testSpectraFormat(self):
-        """ Test the spectra format property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "spectra_format")
-
-    def testProtIDFormat(self):
-        """ Test the prot ID format property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "protid_format")
-
-    def testPepIDFormat(self):
-        """ Test the pep ID format property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "pepid_format")
-
-    def testProtModFormat(self):
-        """ Test the prot mod format property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "protmod_format")
+        self.util.stringPropertyTest(self, proteome, "xml_generation")
 
     def testStudy(self):
         """ Test the study property. """
         proteome = self.session.create_proteome()
 
-        # Try an int
-        with self.assertRaises(ValueError):
-            proteome.study = 3
-
-        # Try an list
-        with self.assertRaises(ValueError):
-            proteome.study = ['a', 'b', 'c']
-
-        # Try a dict
-        with self.assertRaises(ValueError):
-            proteome.study = {'a': 1, 'b': 2, 'c': 3}
+        self.util.stringTypeTest(self, proteome, "study")
 
         value = "random"
         with self.assertRaises(Exception):
@@ -334,6 +337,21 @@ class ProteomeTest(unittest.TestCase):
 
         self.assertEqual(proteome.study, value,
                          "No exception when a valid study provided.")
+    def testSubtype(self):
+        """ Test the subtype property. """
+        proteome = self.session.create_proteome_nonpride()
+
+        self.util.stringTypeTest(self, proteome, "subtype")
+
+        subtype = "random"
+        with self.assertRaises(Exception):
+            proteome.subtype = subtype
+
+        subtype = "microbiome"
+        proteome.subtype = subtype
+
+        self.assertEqual(proteome.subtype, subtype,
+                         "No exception when a valid subtype provided.")
 
     def testTags(self):
         """ Test the tags property. """
@@ -397,10 +415,17 @@ class ProteomeTest(unittest.TestCase):
 
         proteome = self.session.create_proteome()
 
-        test_date = "2015-07-27"
-        test_links = {"derived_from": ["419d64483ec86c1fb9a94025f3b92d21"]}
-        test_comment = "comment"
+        temp_file = tempfile.NamedTemporaryFile(delete=False).name
+        test_analyzer = "test analyzer"
         test_checksums = {"md5": "60b725f10c9c85c70d97880dfe8191b3"}
+        test_comment = "comment"
+        test_data_processing_protocol = "test data processing protocol"
+        test_date = "2015-07-27"
+        test_detector = "test_detector"
+        test_links = {"derived_from": ["419d64483ec86c1fb9a94025f3b92d21"]}
+        test_processing_method = "test processing method"
+        test_study = "prediabetes"
+        test_subtype = "microbiome"
 
         self.assertFalse(proteome.save(),
                          "Proteome not saved successfully, no required fields")
@@ -418,9 +443,24 @@ class ProteomeTest(unittest.TestCase):
 
         self.assertFalse(proteome.save(), "Proteome not saved successfully")
 
-        # Make sure visit does not delete if it does not exist
+        # Make sure node does not delete if it does not exist
         with self.assertRaises(Exception):
             proteome.delete()
+
+        # Optional parameters
+        proteome.analyzer = test_analyzer
+        proteome.data_processing_protocol = test_data_processing_protocol
+        proteome.detector = test_detector
+        proteome.processing_method = test_processing_method
+        proteome.study = test_study
+        proteome.subtype = test_subtype
+        proteome.add_tag("test")
+
+        # Required file data (just use the same temp file for all)
+        proteome.local_other_file = temp_file
+        proteome.local_peak_file = temp_file
+        proteome.local_protmod_file = temp_file
+        proteome.local_raw_file = temp_file
 
         self.assertTrue(proteome.save() == True,
                         "Proteome was not saved successfully")

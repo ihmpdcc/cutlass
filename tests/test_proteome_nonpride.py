@@ -429,6 +429,7 @@ class ProteomeNonPrideTest(unittest.TestCase):
         test_exp_description = "test exp description"
         test_instrument_name = "test instrument name"
         test_private_files = False
+        test_processing_method = "test processing method"
         test_protmod_format = "test protmod format"
         test_protocol_name = "test protocol name"
         test_protocol_steps = "test protocol steps"
@@ -440,7 +441,6 @@ class ProteomeNonPrideTest(unittest.TestCase):
         test_study = "prediabetes"
         test_subtype = "microbiome"
         test_title = "test title"
-        test_processing_method = "test processing method"
 
         self.assertFalse(proteome.save(),
                          "ProteomeNonPride not saved successfully, no required fields")
@@ -497,6 +497,8 @@ class ProteomeNonPrideTest(unittest.TestCase):
                          "ProteomeNonPride date not saved & loaded successfully")
         self.assertEqual(proteome.comment, proteome_loaded.comment,
                          "ProteomeNonPride comment not saved & loaded successfully")
+        self.assertEqual(proteome.checksums, proteome_loaded.checksums,
+                         "Proteome checksums not saved & loaded successfully")
 
         # ProteomeNonPride is deleted successfully
         self.assertTrue(proteome.delete(),
