@@ -1107,6 +1107,8 @@ class ProteomeNonPride(Base):
         return prot
 
     def _upload_files(self, file_map):
+        self.logger.debug("In _upload_files.")
+
         study2dir = {
             "ibd": "ibd",
             "preg_preterm": "ptb",
