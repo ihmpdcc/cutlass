@@ -97,16 +97,6 @@ class ProteomeTest(unittest.TestCase):
         with self.assertRaises(AttributeError):
             proteome.id = "test"
 
-    def testVersion(self):
-        """ Test the version property. """
-        proteome = self.session.create_proteome()
-
-        self.assertTrue(proteome.version is None,
-                        "New template proteome has no version.")
-
-        with self.assertRaises(ValueError):
-            proteome.version = "test"
-
     def testAnalyzer(self):
         """ Test the analyzer property. """
         proteome = self.session.create_proteome()
@@ -115,14 +105,6 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, proteome, "analyzer")
 
-    def testDetector(self):
-        """ Test the detector property. """
-        proteome = self.session.create_proteome()
-
-        self.util.stringTypeTest(self, proteome, "detector")
-
-        self.util.stringPropertyTest(self, proteome, "detector")
-
     def testComment(self):
         """ Test the comment property. """
         proteome = self.session.create_proteome()
@@ -130,6 +112,14 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringTypeTest(self, proteome, "comment")
 
         self.util.stringPropertyTest(self, proteome, "comment")
+
+    def testDetector(self):
+        """ Test the detector property. """
+        proteome = self.session.create_proteome()
+
+        self.util.stringTypeTest(self, proteome, "detector")
+
+        self.util.stringPropertyTest(self, proteome, "detector")
 
     def testIllegalChecksums(self):
         """ Test the checksums property with illegal values. """
@@ -298,6 +288,14 @@ class ProteomeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, proteome, "software")
 
+    def testPrivateFiles(self):
+        """ Test the private files property. """
+        proteome = self.session.create_proteome()
+
+        self.util.boolTypeTest(self, proteome, "private_files")
+
+        self.util.boolPropertyTest(self, proteome, "private_files")
+
     def testProcessingMethod(self):
         """ Test the processing method property. """
         proteome = self.session.create_proteome()
@@ -407,6 +405,16 @@ class ProteomeTest(unittest.TestCase):
 
         self.assertTrue(len(required) > 0,
                         "required_fields() did not return empty value.")
+
+    def testVersion(self):
+        """ Test the version property. """
+        proteome = self.session.create_proteome()
+
+        self.assertTrue(proteome.version is None,
+                        "New template proteome has no version.")
+
+        with self.assertRaises(ValueError):
+            proteome.version = "test"
 
     def testLoadSaveDeleteProteome(self):
         """ Extensive test for the load, edit, save and delete functions. """
