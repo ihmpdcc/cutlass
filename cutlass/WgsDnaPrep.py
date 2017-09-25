@@ -714,7 +714,7 @@ class WgsDnaPrep(Base):
                 elif doc['node_type'] == "viral_seq_set":
                     yield ViralSeqSet.load_viral_seq_set(doc)
                 elif doc['node_type'] == "microb_transcriptomics_raw_seq_set":
-                    yield MicrobTranscriptomicsRawSeqSet.load_microb_transcriptomics_raw_set_set(doc)
+                    yield MicrobTranscriptomicsRawSeqSet.load_microb_transcriptomics_raw_seq_set(doc)
 
             res_count -= len(res['results'])
 
