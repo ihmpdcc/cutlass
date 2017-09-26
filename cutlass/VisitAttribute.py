@@ -591,7 +591,7 @@ class VisitAttribute(Base):
         # If we've configured fields in the DiseaseMeta class, fill the disease
         # portion of the document, which is delegated to the DiseaseMeta class.
         if self._dm_dirty:
-            doc['meta']['disease_meta'] = self._disease_meta._get_raw_doc()
+            doc['meta']['disease'] = self._disease_meta._get_raw_doc()
 
         if self._id is not None:
             self.logger.debug("%s object has the OSDF id set.", __name__)
