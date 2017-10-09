@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the metabolome object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=C0302, W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class Metabolome(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Metabolome class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -57,6 +60,8 @@ class Metabolome(Base):
         self._format_doc = None
         self._local_file = None
         self._private_files = None
+
+        super(Metabolome, self).__init__(*args, **kwargs)
 
     @property
     def checksums(self):
@@ -141,6 +146,7 @@ class Metabolome(Base):
         str: URL for documentation of file format.
         """
         self.logger.debug("In 'format_doc' getter.")
+
         return self._format_doc
 
     @format_doc.setter
@@ -303,7 +309,7 @@ class Metabolome(Base):
             problems.append("Must have a 'derived_from' link to a " + \
                             "microb_assay_prep or a host_assay_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -327,12 +333,12 @@ class Metabolome(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'derived_from' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -354,8 +360,8 @@ class Metabolome(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Metabolome.namespace ]
+                'read': ['all'],
+                'write': [Metabolome.namespace]
             },
             'linkage': self._links,
             'ns': Metabolome.namespace,
@@ -370,29 +376,29 @@ class Metabolome(Base):
         }
 
         if self._id is not None:
-           self.logger.debug("Object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("Object has the OSDF id set.")
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("Object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("Object has the OSDF version set.")
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("Object has the 'comment' property set.")
-           doc['meta']['comment'] = self._comment
+            self.logger.debug("Object has the 'comment' property set.")
+            doc['meta']['comment'] = self._comment
 
         if self._format is not None:
-           self.logger.debug("Object has the 'format' property set.")
-           doc['meta']['format'] = self._format
+            self.logger.debug("Object has the 'format' property set.")
+            doc['meta']['format'] = self._format
 
         if self._format_doc is not None:
-           self.logger.debug("Object has the 'format_doc' property set.")
-           doc['meta']['format_doc'] = self._format_doc
+            self.logger.debug("Object has the 'format_doc' property set.")
+            doc['meta']['format_doc'] = self._format_doc
 
         if self._private_files is not None:
-           self.logger.debug("Object has the 'private_files' property set.")
-           doc['meta']['private_files'] = self._private_files
+            self.logger.debug("Object has the 'private_files' property set.")
+            doc['meta']['private_files'] = self._private_files
 
         return doc
 
@@ -406,7 +412,8 @@ class Metabolome(Base):
         Returns:
             Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
+
         return ("checksums", "subtype", "study", "tags")
 
     def delete(self):
@@ -426,8 +433,8 @@ class Metabolome(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a Metabolome with no ID.")
-            raise Exception("Metabolome does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID." % __name__)
 
         metabolome_id = self._id
 
@@ -438,17 +445,17 @@ class Metabolome(Base):
         success = False
 
         try:
-            self.logger.info("Deleting Metabolome with ID %s." % metabolome_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, metabolome_id)
             session.get_osdf().delete_node(metabolome_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"metabolome\"[node_type]"):
+    def search(query="\"metabolome\"[node_type]"):
         """
         Searches OSDF for Metabolome nodes. Any criteria the user wishes to
         add is provided by the user in the query language specifications
@@ -476,7 +483,7 @@ class Metabolome(Base):
         if query != '"metabolome"[node_type]':
             query = '({}) && "metabolome"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         data = session.get_osdf().oql_query(Metabolome.namespace, query)
 
@@ -508,28 +515,28 @@ class Metabolome(Base):
 
         module_logger.debug("Filling in Metabolome details.")
         node._set_id(data['id'])
-        node._links = data['linkage']
-        node._version = data['ver']
+        node.links = data['linkage']
+        node.version = data['ver']
 
         # Required fields
-        node._checksums = data['meta']['checksums']
-        node._subtype = data['meta']['subtype']
-        node._study = data['meta']['study']
-        node._tags = data['meta']['tags']
+        node.checksums = data['meta']['checksums']
+        node.subtype = data['meta']['subtype']
+        node.study = data['meta']['study']
+        node.tags = data['meta']['tags']
         node._urls = data['meta']['urls']
 
         # Optional fields
         if 'comment' in data['meta']:
-            node._comment = data['meta']['comment']
+            node.comment = data['meta']['comment']
 
         if 'format' in data['meta']:
-            node._format = data['meta']['format']
+            node.format = data['meta']['format']
 
         if 'format_doc' in data['meta']:
-            node._format_doc = data['meta']['format_doc']
+            node.format_doc = data['meta']['format_doc']
 
         if 'private_files' in data['meta']:
-            node._private_files = data['meta']['private_files']
+            node.private_files = data['meta']['private_files']
 
         module_logger.debug("Returning loaded Metabolome.")
         return node
@@ -548,15 +555,15 @@ class Metabolome(Base):
             A Metabolome object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % node_id)
+        module_logger.debug("In load. Specified ID: %s", node_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         node_data = session.get_osdf().get_node(node_id)
 
-        node = Metabolome.load_metabolome(node_data);
+        node = Metabolome.load_metabolome(node_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return node
 
@@ -567,24 +574,25 @@ class Metabolome(Base):
 
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
         remote_base = remote_base.replace(' ', '_') # No spaces in filenames
 
         remote_path = "/".join(["/" + study_dir, "metabolome", self._subtype, remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         upload_result = aspera.upload_file(Metabolome.aspera_server,
                                            session.username,
@@ -595,9 +603,9 @@ class Metabolome(Base):
         if not upload_result:
             self.logger.error("Experienced an error uploading the data. " + \
                               "Aborting save.")
-            raise Exception("Unable to upload metabolome.")
-	else:
-	    self._urls = [ "fasp://" + Metabolome.aspera_server + remote_path ]
+            raise Exception("Unable to upload " + __name__)
+        else:
+            self._urls = ["fasp://" + Metabolome.aspera_server + remote_path]
 
     def save(self):
         """
@@ -628,12 +636,12 @@ class Metabolome(Base):
         self.logger.info("Got iHMP session.")
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
             except Exception as e:
-                self.logg.exception(e)
+                self.logger.exception(e)
                 # Don't bother continuing...
                 return False
 
@@ -643,11 +651,11 @@ class Metabolome(Base):
 
         if self._id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -657,34 +665,37 @@ class Metabolome(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " + \
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. " + \
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
 
             try:
                 node_data = self._get_raw_doc()
                 node_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % node_id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, node_id)
                 osdf.edit_node(node_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % node_id)
+                self.logger.info("Update for %s %s successful.", __name__, node_id)
 
                 node_data = session.get_osdf().get_node(node_id)
                 latest_version = node_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while updating " + \
-                                  "%s %s. Reason: %s.", (__name__, self._id, e))
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s.", __name__, self._id, update_exception)
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success

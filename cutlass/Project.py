@@ -1,14 +1,16 @@
-#!/usr/bin/env python
+"""
+Models the project object.
+"""
 
-import re
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from mixs import MIXS, MixsException
-from Base import Base
-from Study import Study
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.mixs import MIXS, MixsException
+from cutlass.Base import Base
+from cutlass.Study import Study
+from cutlass.Util import *
+
+# pylint: disable=C0302, W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -26,7 +28,7 @@ class Project(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Project class. This initializes the fields specific to the
         Project class, and inherits from the Base class.
@@ -45,6 +47,8 @@ class Project(Base):
         self._name = None
         self._description = None
         self._mixs = None
+
+        super(Project, self).__init__(*args, **kwargs)
 
     @property
     def name(self):
@@ -187,75 +191,38 @@ class Project(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = osdf.insert_node(project_data)
-                self.logger.info("Save for Project %s successful." % node_id)
-                self.logger.debug("Setting ID for Project %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.debug("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self.version = 1
 
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while inserting Project %s." +
-                                  "Reason: %s" % self._name, e)
+            except Exception as insert_exception:
+                self.logger.error("An error occurred while inserting %s %s. " + \
+                                  "Reason: %s", __name__, self._name, insert_exception)
         else:
             project_data = self._get_raw_doc()
 
             try:
-                self.logger.info("Attempting to update Project with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.", __name__, self._id)
                 osdf.edit_node(project_data)
-                self.logger.info("Update for Project %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.", __name__, self._id)
 
                 updated_data = osdf.get_node(self._id)
                 latest_version = updated_data['ver']
 
-                self.logger.debug("The new version of this Project is now: %s" % str(latest_version))
+                self.logger.debug("The new version of this %s is now: %s",
+                                  __name__,
+                                  str(latest_version)
+                                 )
                 self.version = latest_version
 
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while updating Project %s. " +
-                                  "Reason: %s" % (self.id, e))
+            except Exception as update_exception:
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s", __name__, self.id, update_exception)
 
         return success
-
-    @staticmethod
-    def load(project_id):
-        """
-        Loads the data for the specified input ID from the OSDF instance to
-        this object. If the provided ID does not exist, then an error message
-        is provided stating the project does not exist.
-
-        Args:
-            project_id (str): The OSDF ID for the document to load.
-
-        Returns:
-            A Project object with all the available OSDF data loaded into it.
-        """
-        module_logger.debug("In load. Specified ID: %s" % project_id)
-
-        # use OSDF get_node() to load the data
-        session = iHMPSession.get_session()
-        module_logger.info("Got iHMP session.")
-
-        project_data = session.get_osdf().get_node(project_id)
-
-        module_logger.info("Creating a template project.")
-
-        project = Project()
-
-        module_logger.debug("Filling in project details.")
-
-        project._set_id(project_data['id'])
-
-        # For version, the key to use is simply 'ver'
-        project._links = project_data['linkage']
-        project._version = project_data['ver']
-        project._tags = project_data['meta']['tags']
-        project._mixs = project_data['meta']['mixs']
-        project._description = project_data['meta']['description']
-        project._name = project_data['meta']['name']
-
-        module_logger.debug("Returning loaded project.")
-        return project
 
     def delete(self):
         """
@@ -275,8 +242,8 @@ class Project(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a project with no ID.")
-            raise Exception("project does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID." % __name__)
 
         project_id = self._id
 
@@ -287,16 +254,16 @@ class Project(Base):
         success = False
 
         try:
-            self.logger.info("Deleting project with ID %s." % project_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, project_id)
             session.get_osdf().delete_node(project_id)
             success = True
-        except Exception as e:
-            self.logger.error("An error occurred when deleting project %s. " +
-                              "Reason: %s" % project_id, e)
+        except Exception as delete_exception:
+            self.logger.error("An error occurred when deleting %s %s. " + \
+                              "Reason: %s", __name__, project_id, delete_exception)
         return success
 
     @staticmethod
-    def search(query = "\"project\"[node_type]"):
+    def search(query="\"project\"[node_type]"):
         """
         Searches the OSDF database through all Project node types. Any criteria
         the user wishes to add is provided by the user in the query language
@@ -324,7 +291,7 @@ class Project(Base):
         if query != '"project"[node_type]':
             query = '({}) && "project"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         project_data = session.get_osdf().oql_query(Project.namespace, query)
 
@@ -340,6 +307,34 @@ class Project(Base):
         return result_list
 
     @staticmethod
+    def load(project_id):
+        """
+        Loads the data for the specified input ID from the OSDF instance to
+        this object. If the provided ID does not exist, then an error message
+        is provided stating the project does not exist.
+
+        Args:
+            project_id (str): The OSDF ID for the document to load.
+
+        Returns:
+            A Project object with all the available OSDF data loaded into it.
+        """
+        module_logger.debug("In load. Specified ID: %s", project_id)
+
+        # use OSDF get_node() to load the data
+        session = iHMPSession.get_session()
+        module_logger.info("Got iHMP session.")
+
+        project_data = session.get_osdf().get_node(project_id)
+
+        module_logger.info("Creating a template %s.", __name__)
+        project = Project.load_project(project_data)
+
+        module_logger.debug("Returning loaded %s.", __name__)
+
+        return project
+
+    @staticmethod
     def load_project(project_data):
         """
         Takes the provided JSON string and converts it to a Project object
@@ -350,23 +345,24 @@ class Project(Base):
         Returns:
             Returns a Project instance.
         """
-        module_logger.info("Creating a template project.")
+        module_logger.info("Creating a template %s.", __name__)
 
         project = Project()
 
-        module_logger.debug("Filling in project details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         project._set_id(project_data['id'])
 
         # For version, the key to use is simply 'ver'
-        project._links = project_data['linkage']
-        project._version = project_data['ver']
-        project._tags = project_data['meta']['tags']
-        project._mixs = project_data['meta']['mixs']
-        project._description = project_data['meta']['description']
-        project._name = project_data['meta']['name']
+        project.links = project_data['linkage']
+        project.version = project_data['ver']
+        project.tags = project_data['meta']['tags']
+        project.mixs = project_data['meta']['mixs']
+        project.description = project_data['meta']['description']
+        project.name = project_data['meta']['name']
 
-        module_logger.debug("Returning loaded project.")
+        module_logger.debug("Returning loaded %s.", __name__)
+
         return project
 
     def _get_raw_doc(self):
@@ -387,8 +383,8 @@ class Project(Base):
 
         project_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ Project.namespace ]
+                'read': ['all'],
+                'write': [Project.namespace]
             },
             'linkage': self._links,
             'ns': Project.namespace,
@@ -403,11 +399,11 @@ class Project(Base):
         }
 
         if self._id is not None:
-            self.logger.debug("Project object has the OSDF id set.")
+            self.logger.debug("%s object has the OSDF id set.", __name__)
             project_doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug("Project object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             project_doc['ver'] = self._version
 
         return project_doc
@@ -431,4 +427,3 @@ class Project(Base):
 
             if res_count < 1:
                 break
-

@@ -64,6 +64,7 @@ class Proteome(Base):
         self._modification = ['']
         self._result_url = ['']
         self._pride_id = None
+        self._private_files = None
         self._processing_method = None
         self._protocol_name = None
         self._peak_url = ['']
@@ -188,6 +189,33 @@ class Proteome(Base):
         self.logger.debug("In 'pride_id' setter.")
 
         self._pride_id = pride_id
+
+    @property
+    def private_files(self):
+        """
+        bool: Whether this object describes private data that should not
+        be uploaded to the DCC. Defaults to false.
+        """
+        self.logger.debug("In 'private_files' getter.")
+
+        return self._private_files
+
+    @private_files.setter
+    @enforce_bool
+    def private_files(self, private_files):
+        """
+        The setter for the private files flag to denote this object
+        describes data that should not be uploaded to the DCC.
+
+        Args:
+            private_files (bool):
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'private_files' setter.")
+
+        self._private_files = private_files
 
     @property
     def sample_name(self):
@@ -643,7 +671,7 @@ class Proteome(Base):
         return self._modification
 
     @modification.setter
-    @enforce_string
+    @enforce_list
     def modification(self, modification):
         """
         list: An array of ontology strings describing protein modifications.
@@ -796,7 +824,7 @@ class Proteome(Base):
         """
         list: URLs from where peptide identification file can be obtained.
         """
-        self.logger.debug("In result_url getter.")
+        self.logger.debug("In 'result_url' getter.")
         return self._result_url
 
     @property
@@ -820,7 +848,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In study setter.")
+        self.logger.debug("In 'study' setter.")
 
         studies = ["preg_preterm", "ibd", "prediabetes"]
 
@@ -850,7 +878,7 @@ class Proteome(Base):
         Returns:
             None
         """
-        self.logger.debug("In subtype setter.")
+        self.logger.debug("In 'subtype' setter.")
 
         subtypes = ["host", "microbiome"]
 
@@ -948,7 +976,9 @@ class Proteome(Base):
                 'analyzer': self._analyzer,
                 'checksums': self._checksums,
                 'comment': self._comment,
+                'data_processing_protocol': self._data_processing_protocol,
                 'detector': self._detector,
+                'exp_description': self._exp_description,
                 'instrument_name': self._instrument_name,
                 'other_url': self._other_url,
                 'peak_url': self._peak_url,
@@ -965,9 +995,7 @@ class Proteome(Base):
                 'study': self._study,
                 'subtype': self._subtype,
                 'tags': self._tags,
-                'title': self._title,
-                'exp_description': self._exp_description,
-                'data_processing_protocol': self._data_processing_protocol
+                'title': self._title
             }
         }
 
@@ -976,7 +1004,7 @@ class Proteome(Base):
             proteome_doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug("Proteome object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             proteome_doc['ver'] = self._version
 
         # Handle Proteome optional properties
@@ -1022,12 +1050,11 @@ class Proteome(Base):
         """
         module_logger.debug("In required fields.")
 
-        return ("checksums", "comment", "pride_id", "sample_name", "title",
-                "short_label", "protocol_name", "instrument_name", "source",
-                "analyzer", "detector", "software", "processing_method",
-                "search_engine", "exp_description", "data_processing_protocol"
-                "local_raw_file", "local_other_file", "local_peak_file",
-                "local_result_file", "study", "subtype")
+        return ("analyzer", "checksums", "comment", "data_processing_protocol", "detector",
+                "exp_description", "instrument_name", "local_raw_file", "local_other_file",
+                "local_peak_file", "local_result_file", "pride_id", "processing_method",
+                "protocol_name", "sample_name", "search_engine", "short_label", "software",
+                "source", "study", "subtype", "title")
 
     def delete(self):
         """
@@ -1110,75 +1137,79 @@ class Proteome(Base):
         return result_list
 
     @staticmethod
-    def load_proteome(proteome_data):
+    def load_proteome(prot_data):
         """
         Takes the provided JSON string and converts it to a Proteome object
 
         Args:
-            proteome_data (str): The JSON string to convert
+            prot_data (str): The JSON string to convert
 
         Returns:
             Returns a Proteome instance.
         """
         module_logger.info("Creating a template %s.", __name__)
-        proteome = Proteome()
+        prot = Proteome()
 
         module_logger.debug("Filling in %s details.", __name__)
 
         # Node required fields
-        proteome._set_id(proteome_data['id'])
-        proteome.links = proteome_data['linkage']
-        proteome.version = proteome_data['ver']
+        prot._set_id(prot_data['id'])
+        prot.links = prot_data['linkage']
+        prot.version = prot_data['ver']
 
         # Proteome required fields
-        proteome.analyzer = proteome_data['meta']['analyzer']
-        proteome.checksums = proteome_data['meta']['checksums']
-        proteome.comment = proteome_data['meta']['comment']
-        proteome.data_processing_protocol = proteome_data['meta']['data_processing_protocol']
-        proteome.detector = proteome_data['meta']['detector']
-        proteome.exp_description = proteome_data['meta']['exp_description']
-        proteome.instrument_name = proteome_data['meta']['instrument_name']
-        proteome.processing_method = proteome_data['meta']['processing_method']
-        proteome.pride_id = proteome_data['meta']['pride_id']
-        proteome.protocol_name = proteome_data['meta']['protocol_name']
-        proteome.sample_name = proteome_data['meta']['sample_name']
-        proteome.search_engine = proteome_data['meta']['search_engine']
-        proteome.short_label = proteome_data['meta']['short_label']
-        proteome.software = proteome_data['meta']['software']
-        proteome.source = proteome_data['meta']['source']
-        proteome.study = proteome_data['meta']['study']
-        proteome.subtype = proteome_data['meta']['subtype']
-        proteome.tags = proteome_data['meta']['tags']
-        proteome.title = proteome_data['meta']['title']
-        proteome._peak_url = proteome_data['meta']['peak_url']
-        proteome._result_url = proteome_data['meta']['result_url']
-        proteome._raw_url = proteome_data['meta']['raw_url']
-        proteome._other_url = proteome_data['meta']['other_url']
+        prot.analyzer = prot_data['meta']['analyzer']
+        prot.checksums = prot_data['meta']['checksums']
+        prot.comment = prot_data['meta']['comment']
+        prot.data_processing_protocol = prot_data['meta']['data_processing_protocol']
+        prot.detector = prot_data['meta']['detector']
+        prot.exp_description = prot_data['meta']['exp_description']
+        prot.instrument_name = prot_data['meta']['instrument_name']
+        prot.processing_method = prot_data['meta']['processing_method']
+        prot.pride_id = prot_data['meta']['pride_id']
+        prot.protocol_name = prot_data['meta']['protocol_name']
+        prot.sample_name = prot_data['meta']['sample_name']
+        prot.search_engine = prot_data['meta']['search_engine']
+        prot.short_label = prot_data['meta']['short_label']
+        prot.software = prot_data['meta']['software']
+        prot.source = prot_data['meta']['source']
+        prot.study = prot_data['meta']['study']
+        prot.subtype = prot_data['meta']['subtype']
+        prot.tags = prot_data['meta']['tags']
+        prot.title = prot_data['meta']['title']
+        prot._other_url = prot_data['meta']['other_url']
+        prot._peak_url = prot_data['meta']['peak_url']
+        prot._raw_url = prot_data['meta']['raw_url']
+        prot._result_url = prot_data['meta']['result_url']
 
         # Handle Proteome optional properties
-        if 'date' in proteome_data['meta']:
-            proteome.date = proteome_data['meta']['date']
+        if 'date' in prot_data['meta']:
+            prot.date = prot_data['meta']['date']
 
-        if 'modification' in proteome_data['meta']:
-            proteome.modification = proteome_data['meta']['modification']
+        if 'modification' in prot_data['meta']:
+            prot.modification = prot_data['meta']['modification']
 
-        if 'other_url' in proteome_data['meta']:
-            proteome._other_url = proteome_data['meta']['other_url']
+        if 'other_url' in prot_data['meta']:
+            prot._other_url = prot_data['meta']['other_url']
 
-        if 'reference' in proteome_data['meta']:
-            proteome.reference = proteome_data['meta']['reference']
+        if 'reference' in prot_data['meta']:
+            prot.reference = prot_data['meta']['reference']
 
-        if 'protocol_steps' in proteome_data['meta']:
-            proteome.protocol_steps = proteome_data['meta']['protocol_steps']
+        if 'private_files' in prot_data['meta']:
+            prot.private_files = prot_data['meta']['private_files']
 
-        if 'sample_description' in proteome_data['meta']:
-            proteome.sample_description = proteome_data['meta']['sample_description']
+        if 'protocol_steps' in prot_data['meta']:
+            prot.protocol_steps = prot_data['meta']['protocol_steps']
 
-        if 'xml_generation' in proteome_data['meta']:
-            proteome.xml_generation = proteome_data['meta']['xml_generation']
+        if 'sample_description' in prot_data['meta']:
+            prot.sample_description = prot_data['meta']['sample_description']
+
+        if 'xml_generation' in prot_data['meta']:
+            prot.xml_generation = prot_data['meta']['xml_generation']
 
         module_logger.debug("Returning loaded %s.", __name__)
-        return proteome
+
+        return prot
 
     @staticmethod
     def load(proteome_id):
@@ -1202,11 +1233,11 @@ class Proteome(Base):
         module_logger.info("Creating a template %s.", __name__)
         proteome = Proteome.load_proteome(proteome_data)
 
-        module_logger.debug("Returning loaded %s", __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return proteome
 
-    def _upload_files(self, study, subtype, file_map):
+    def _upload_files(self, file_map):
         self.logger.debug("In _upload_files.")
 
         study2dir = {
@@ -1214,6 +1245,9 @@ class Proteome(Base):
             "preg_preterm": "ptb",
             "prediabetes": "t2d"
         }
+
+        study = self.study
+        subtype = self.subtype
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
@@ -1283,38 +1317,41 @@ class Proteome(Base):
             return False
 
         session = iHMPSession.get_session()
-        self.logger.info("Got iHMP session.")
 
-        osdf = session.get_osdf()
+        self.logger.info("Got iHMP session.")
 
         success = False
 
-        study = self._study
+        if self._private_files:
+            self._other_url = ["<private>"]
+            self._peak_url = ["<private>"]
+            self._raw_url = ["<private>"]
+            self._result_url = ["<private>"]
+        else:
+            files = {
+                "other": self._local_other_file,
+                "peak": self._local_peak_file,
+                "raw": self._local_raw_file,
+                "result": self._local_result_file
+            }
 
-        subtype = self._subtype
+            remote_files = {}
+            try:
+                remote_files = self._upload_files(files)
+            except Exception as upload_exception:
+                self.logger.exception("Unable to transmit data via Aspera. Reason: %s",
+                                    upload_exception)
+                return False
 
-        files = {
-            "other": self._local_other_file,
-            "peak": self._local_peak_file,
-            "raw": self._local_raw_file,
-            "result": self._local_result_file
-        }
+            self.logger.info("Aspera transmission of %s files successful.", __name__)
 
-        remote_files = {}
-        try:
-            remote_files = self._upload_files(study, subtype, files)
-        except Exception as upload_exception:
-            self.logger.exception("Unable to transmit data via Aspera: %s",
-                                  upload_exception)
-            return False
+            self.logger.debug("Setting url properties with remote paths.")
+            self._other_url = [remote_files['other']]
+            self._peak_url = [remote_files['peak']]
+            self._raw_url = [remote_files['raw']]
+            self._result_url = [remote_files['result']]
 
-        self.logger.info("Aspera transmission of %s files successful.", __name__)
-
-        self.logger.debug("Setting url properties with remote paths.")
-        self._other_url = [remote_files['other']]
-        self._peak_url = [remote_files['peak']]
-        self._raw_url = [remote_files['raw']]
-        self._result_url = [remote_files['result']]
+        osdf = session.get_osdf()
 
         if self._id is None:
             self.logger.info("About to insert a new %s OSDF node.", __name__)
@@ -1333,27 +1370,30 @@ class Proteome(Base):
                 self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("%s already has an ID, so we do an update (not an insert).", __name__)
+            self.logger.info("%s already has an ID, so we do an update " + \
+                             "(not an insert).", __name__)
 
             try:
-                proteome_data = self._get_raw_doc()
-                self.logger.info("%s already has an ID, so we do an update (not an insert).",
-                                 __name__
-                                )
-                proteome_id = self._id
-                self.logger.debug("%s OSDF ID to update: %s.", __name__, proteome_id)
-                osdf.edit_node(proteome_data)
+                prot_data = self._get_raw_doc()
+                prot_id = self._id
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, prot_id)
+                osdf.edit_node(prot_data)
+                self.logger.info("Update for %s %s successful.", __name__, prot_id)
 
-                proteome_data = osdf.get_node(proteome_id)
-                latest_version = proteome_data['ver']
+                prot_data = osdf.get_node(prot_id)
+                latest_version = prot_data['ver']
 
-                self.logger.debug(
-                    "The version of this %s is now: %s", __name__, str(latest_version)
-                )
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
             except Exception as update_exception:
                 self.logger.exception(update_exception)
-                self.logger.error("An error occurred when updating %s.", self)
+                self.logger.error("An error occurred while updating %s %s. " + \
+                                  "Reason: %s.", __name__,
+                                  self._id,
+                                  update_exception
+                                 )
 
         return success

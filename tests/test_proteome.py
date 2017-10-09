@@ -430,10 +430,20 @@ class ProteomeTest(unittest.TestCase):
         test_data_processing_protocol = "test data processing protocol"
         test_date = "2015-07-27"
         test_detector = "test_detector"
+        test_exp_description = "test exp description"
+        test_instrument_name = "test instrument"
         test_links = {"derived_from": ["419d64483ec86c1fb9a94025f3b92d21"]}
+        test_pride_id = "test pride id"
         test_processing_method = "test processing method"
+        test_protocol_name = "test protocol name"
+        test_sample_name = "test sample name"
+        test_short_label = "test short label"
+        test_software = "test software"
+        test_source = "test source"
         test_study = "prediabetes"
         test_subtype = "microbiome"
+        test_search_engine = "test search engine"
+        test_title = "test title"
 
         self.assertFalse(proteome.save(),
                          "Proteome not saved successfully, no required fields")
@@ -448,6 +458,16 @@ class ProteomeTest(unittest.TestCase):
 
         proteome.links = test_links
         proteome.checksums = test_checksums
+        proteome.exp_description = test_exp_description
+        proteome.instrument_name = test_instrument_name
+        proteome.pride_id = test_pride_id
+        proteome.protocol_name = test_protocol_name
+        proteome.sample_name = test_sample_name
+        proteome.search_engine = test_search_engine
+        proteome.short_label = test_short_label
+        proteome.software = test_software
+        proteome.source = test_source
+        proteome.title = test_title
 
         self.assertFalse(proteome.save(), "Proteome not saved successfully")
 
@@ -460,6 +480,7 @@ class ProteomeTest(unittest.TestCase):
         proteome.data_processing_protocol = test_data_processing_protocol
         proteome.detector = test_detector
         proteome.processing_method = test_processing_method
+        proteome.source = test_source
         proteome.study = test_study
         proteome.subtype = test_subtype
         proteome.add_tag("test")
@@ -467,8 +488,8 @@ class ProteomeTest(unittest.TestCase):
         # Required file data (just use the same temp file for all)
         proteome.local_other_file = temp_file
         proteome.local_peak_file = temp_file
-        proteome.local_protmod_file = temp_file
         proteome.local_raw_file = temp_file
+        proteome.local_result_file = temp_file
 
         self.assertTrue(proteome.save() == True,
                         "Proteome was not saved successfully")
@@ -483,6 +504,26 @@ class ProteomeTest(unittest.TestCase):
                          "Proteome comment not saved & loaded successfully")
         self.assertEqual(proteome.checksums, proteome_loaded.checksums,
                          "Proteome checksums not saved & loaded successfully")
+        self.assertEqual(proteome.exp_description, proteome_loaded.exp_description,
+                         "Proteome exp_description not saved & loaded successfully")
+        self.assertEqual(proteome.instrument_name, proteome_loaded.instrument_name,
+                         "Proteome instrument_name not saved & loaded successfully")
+        self.assertEqual(proteome.search_engine, proteome_loaded.search_engine,
+                         "Proteome search_engine not saved & loaded successfully")
+        self.assertEqual(proteome.short_label, proteome_loaded.short_label,
+                         "Proteome short_label not saved & loaded successfully")
+        self.assertEqual(proteome.source, proteome_loaded.source,
+                         "Proteome source not saved & loaded successfully")
+        self.assertEqual(proteome.pride_id, proteome_loaded.pride_id,
+                         "Proteome pride_id not saved & loaded successfully")
+        self.assertEqual(proteome.protocol_name, proteome_loaded.protocol_name,
+                         "Proteome protocol_name not saved & loaded successfully")
+        self.assertEqual(proteome.sample_name, proteome_loaded.sample_name,
+                         "Proteome sample_name not saved & loaded successfully")
+        self.assertEqual(proteome.software, proteome_loaded.software,
+                         "Proteome software not saved & loaded successfully")
+        self.assertEqual(proteome.title, proteome_loaded.title,
+                         "Proteome title not saved & loaded successfully")
 
         # Proteome is deleted successfully
         self.assertTrue(proteome.delete(),

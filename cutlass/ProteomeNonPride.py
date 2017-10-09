@@ -1212,7 +1212,7 @@ class ProteomeNonPride(Base):
             try:
                 remote_files = self._upload_files(files)
             except Exception as upload_exception:
-                self.logger.exception("Unable to transmit data via Aspera. Reason %s.",
+                self.logger.exception("Unable to transmit data via Aspera. Reason: %s.",
                                       upload_exception
                                      )
                 return False
@@ -1266,7 +1266,8 @@ class ProteomeNonPride(Base):
                 latest_version = prot_data['ver']
 
                 self.logger.debug("The version of this %s is now: %s",
-                                  __name__, str(latest_version))
+                                  __name__, str(latest_version)
+                                 )
                 self._version = latest_version
                 success = True
             except Exception as update_exception:
