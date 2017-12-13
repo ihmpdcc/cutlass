@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import Metabolome
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(Metabolome.required_fields())
 
 metabolome = Metabolome()
 
-metabolome.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+metabolome.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 metabolome.study = "prediabetes"
 metabolome.subtype = "host"
 
@@ -45,9 +47,9 @@ metabolome.local_file = temp_file
 metabolome.private_files = False
 
 # Metabolome are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps
-metabolome.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b93c50" ] }
+metabolome.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b93c50"]}
 
-metabolome.tags = [ "metabolome", "ihmp" ]
+metabolome.tags = ["metabolome", "ihmp"]
 metabolome.add_tag("another")
 metabolome.add_tag("and_another")
 

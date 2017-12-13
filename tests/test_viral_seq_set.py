@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the ViralSeqSet module. """
+
 import unittest
 import json
 import tempfile
@@ -12,19 +14,20 @@ from CutlassTestUtil import CutlassTestUtil
 # pylint: disable=W0703, C1801
 
 class ViralSeqSetTest(unittest.TestCase):
-    """ Unit tests for the cutlass ViralSeqSet class """
+    """ A unit test class for the ViralSeqSet class """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
-        """ Test the import of the ViralSeqSet module. """
+        """ Test the importation of the ViralSeqSet module. """
         success = False
         try:
             from cutlass import ViralSeqSet
@@ -206,7 +209,7 @@ class ViralSeqSetTest(unittest.TestCase):
         self.assertTrue(vss_data is not None,
                         "to_json() returned parsable JSON.")
 
-        self.assertTrue('meta' in vss_data, "JSON has 'vss' key in it.")
+        self.assertTrue('meta' in vss_data, "JSON has 'meta' key in it.")
 
         self.assertEqual(vss_data['meta']['comment'],
                          comment,
@@ -341,7 +344,7 @@ class ViralSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             vss.delete()
 
-        self.assertTrue(vss.save() == True, "ViralSeqSet was saved successfully")
+        self.assertTrue(vss.save() is True, "ViralSeqSet was saved successfully")
 
         # Load the viral_seq_set that was just saved from the OSDF instance
         vss_loaded = self.session.create_viral_seq_set()

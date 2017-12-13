@@ -1,44 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the WgsRawSeqSet module. """
+
 import unittest
 import json
-import random
-import string
-import sys
 import tempfile
 
-from cutlass import iHMPSession
 from cutlass import WgsRawSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
-def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+# pylint: disable=W0703, C1801
 
 class WgsRawSeqSetTest(unittest.TestCase):
+    """ A unit test class for the WgsRawSeqSet class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the WgsRawSeqSet module. """
         success = False
         try:
             from cutlass import WgsRawSeqSet
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(WgsRawSeqSet is None)
 
     def testSessionCreate(self):
+        """ Test creation of a WgsRawSeqSet from the session. """
         success = False
         wgsRawSeqSet = None
 
@@ -46,13 +47,14 @@ class WgsRawSeqSetTest(unittest.TestCase):
             wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(wgsRawSeqSet is None)
 
     def testToJson(self):
+        """ Test the to_json() method. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
         comment = "Test comment"
@@ -66,7 +68,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         try:
             wgsRawSeqSet_json = wgsRawSeqSet.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -78,7 +80,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         try:
             wgsRawSeqSet_data = json.loads(wgsRawSeqSet_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -96,6 +98,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
                          private_files, "'private_files' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.assertTrue(wgsRawSeqSet.id is None,
@@ -105,6 +108,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
             wgsRawSeqSet.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.assertTrue(wgsRawSeqSet.version is None,
@@ -114,6 +118,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
             wgsRawSeqSet.version = "test"
 
     def testComment(self):
+        """ Test the comment property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.stringTypeTest(self, wgsRawSeqSet, "comment")
@@ -121,6 +126,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, wgsRawSeqSet, "comment")
 
     def testExpLength(self):
+        """ Test the exp_length property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.intTypeTest(self, wgsRawSeqSet, "exp_length")
@@ -128,20 +134,22 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, wgsRawSeqSet, "exp_length")
 
     def testExpLengthNegative(self):
+        """ Test the exp_length property with a negative value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.exp_length = -1
 
     def testChecksumsLegal(self):
+        """ Test the checksums property with a legal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
-        checksums = { "md5": "asdf32qrfrae" }
+        checksums = {"md5": "asdf32qrfrae"}
 
         try:
-            wgsRawSeqSet.checksums= checksums
+            wgsRawSeqSet.checksums = checksums
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the checksums setter")
@@ -150,6 +158,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormatLegal(self):
+        """ Test the checksums property with an illegal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
         test_format = "fasta"
@@ -157,7 +166,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         try:
             wgsRawSeqSet.format = test_format
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'format' setter")
@@ -166,20 +175,22 @@ class WgsRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'format' works.")
 
     def testFormatIllegal(self):
+        """ Test the format property with an illegal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.format = "asbdasidsa"
 
     def testFormatDoc(self):
+        """ Test the format_doc property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
-        success = False
 
         self.util.stringTypeTest(self, wgsRawSeqSet, "format_doc")
 
         self.util.stringPropertyTest(self, wgsRawSeqSet, "format_doc")
 
     def testPrivateFiles(self):
+        """ Test the private_files property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.boolTypeTest(self, wgsRawSeqSet, "private_files")
@@ -187,6 +198,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.util.boolPropertyTest(self, wgsRawSeqSet, "private_files")
 
     def testSequenceTypeLegal(self):
+        """ Test the sequence_type property with a legal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
         sequence_type = "peptide"
@@ -194,7 +206,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         try:
             wgsRawSeqSet.sequence_type = sequence_type
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the sequence_type setter")
@@ -203,12 +215,14 @@ class WgsRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'sequence_type' works.")
 
     def testSequenceTypeIllegal(self):
+        """ Test the sequence_type property with an illegal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.sequence_type = "asbdasidsa"
 
     def testSeqModel(self):
+        """ Test the seq_model property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.stringTypeTest(self, wgsRawSeqSet, "seq_model")
@@ -216,6 +230,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, wgsRawSeqSet, "seq_model")
 
     def testSize(self):
+        """ Test the size property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         self.util.intTypeTest(self, wgsRawSeqSet, "size")
@@ -223,12 +238,14 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, wgsRawSeqSet, "size")
 
     def testSizeNegative(self):
+        """ Test the size property with an illegal negative value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.size = -1
 
     def testStudyLegal(self):
+        """ Test the study property with a legal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
         success = False
         study = "ibd"
@@ -236,7 +253,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         try:
             wgsRawSeqSet.study = study
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the study setter")
@@ -244,19 +261,21 @@ class WgsRawSeqSetTest(unittest.TestCase):
         self.assertEqual(wgsRawSeqSet.study, study, "Property getter for 'study' works.")
 
     def testStudyIllegal(self):
+        """ Test the study property with an illegal value. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         with self.assertRaises(Exception):
             wgsRawSeqSet.study = "adfadsf"
 
     def testTags(self):
+        """ Test the tags property. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         tags = wgsRawSeqSet.tags
-        self.assertTrue(type(tags) == list, "WgsRawSeqSet tags() method returns a list.")
+        self.assertTrue(type(tags) == list, "WgsRawSeqSet tags() property returns a list.")
         self.assertEqual(len(tags), 0, "Template wgsRawSeqSet tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         wgsRawSeqSet.tags = new_tags
         self.assertEqual(wgsRawSeqSet.tags, new_tags, "Can set tags on a wgsRawSeqSet.")
@@ -270,15 +289,16 @@ class WgsRawSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         wgsRawSeqSet.add_tag("test")
-        self.assertEqual(wgsRawSeqSet.tags, [ "test" ], "Can add a tag to a wgsRawSeqSet.")
+        self.assertEqual(wgsRawSeqSet.tags, ["test"], "Can add a tag to a wgsRawSeqSet.")
 
         json_str = wgsRawSeqSet.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -288,10 +308,11 @@ class WgsRawSeqSetTest(unittest.TestCase):
         json_str = wgsRawSeqSet.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the static required_fields() method. """
         required = WgsRawSeqSet.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -301,6 +322,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteWgsRawSeqSet(self):
+        """ Test the saving, loading and deleting functionality. """
         # Attempt to save the wgsRawSeqSet at all points before and after
         # adding the required fields
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
@@ -308,7 +330,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         wgsRawSeqSet = self.session.create_object("wgs_raw_seq_set")
 
         test_comment = "Test comment"
-        checksums = { "md5":"abdbcbfbdbababdbcbfbdbabdbfbcbdb" }
+        checksums = {"md5": "abdbcbfbdbababdbcbfbdbabdbfbcbdb"}
         exp_length = 100
         test_format = "fasta"
         format_doc = "http://www.google.com"
@@ -350,7 +372,7 @@ class WgsRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             wgsRawSeqSet.delete()
 
-        self.assertTrue(wgsRawSeqSet.save() == True,
+        self.assertTrue(wgsRawSeqSet.save() is True,
                         "WgsRawSeqSet was not saved successfully")
 
         # load the wgsRawSeqSet that was just saved from the OSDF instance

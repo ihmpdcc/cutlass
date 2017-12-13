@@ -1,41 +1,47 @@
 #!/usr/bin/env python
 
+""" A unittest script for the SixteenSDnaPrep module. """
+
 import unittest
 import json
 import random
 import string
-import sys
 
-from cutlass import iHMPSession
 from cutlass import SixteenSDnaPrep
 from cutlass import MIMARKS, MimarksException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
-def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+# pylint: disable=W0703, C1801
 
 class SixteenSDnaPrepTest(unittest.TestCase):
+    """ A unit test class for the SixteenSDnaPrep module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the SixteenSDnaPrep module. """
         success = False
         try:
             from cutlass import SixteenSDnaPrep
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(SixteenSDnaPrep is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a SixteenSDnaPrep via the session. """
         success = False
         sixteenSDnaPrep = None
 
@@ -43,13 +49,14 @@ class SixteenSDnaPrepTest(unittest.TestCase):
             sixteenSDnaPrep = self.session.create_16s_dna_prep()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(sixteenSDnaPrep is None)
 
     def testToJson(self):
+        """ Test the to_json() method. """
         sixteenSDnaPrep = self.session.create_16s_dna_prep()
         success = False
         comment = "Test comment"
@@ -60,7 +67,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         try:
             sixteenSDnaPrep_json = sixteenSDnaPrep.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -72,7 +79,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         try:
             sixteenSDnaPrep_data = json.loads(sixteenSDnaPrep_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -88,222 +95,122 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+        """ Test the id property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(sixteenSDnaPrep.id is None,
+        self.assertTrue(prep.id is None,
                         "New template sixteenSDnaPrep has no ID.")
 
         with self.assertRaises(AttributeError):
-            sixteenSDnaPrep.id = "test"
+            prep.id = "test"
 
     def testVersion(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+        """ Test the version property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(sixteenSDnaPrep.version is None,
+        self.assertTrue(prep.version is None,
                         "New template sixteenSDnaPrep has no version.")
 
         with self.assertRaises(ValueError):
-            sixteenSDnaPrep.version = "test"
+            prep.version = "test"
 
-    def testIllegalComment(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+    def testComment(self):
+        """ Test the comment property. """
+        prep = self.session.create_16s_dna_prep()
 
-        with self.assertRaises(Exception):
-            sixteenSDnaPrep.comment = 1
+        self.util.stringTypeTest(self, prep, "comment")
 
-    def testLegalComment(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        comment = "This is a test comment"
+        self.util.stringPropertyTest(self, prep, "comment")
 
-        try:
-            sixteenSDnaPrep.comment = comment
-            success = True
-        except:
-            pass
+    def testFragSize(self):
+        """ Test the frag_size property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(success, "Able to use the comment setter")
+        self.util.intTypeTest(self, prep, "frag_size")
 
-        self.assertEqual(sixteenSDnaPrep.comment, comment,
-                         "Property getter for 'comment' works.")
+        self.util.intPropertyTest(self, prep, "frag_size")
 
-    def testIllegalFragSize(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+    def testLibLayout(self):
+        """ Test the lib_layout property. """
+        prep = self.session.create_16s_dna_prep()
 
-        with self.assertRaises(Exception):
-            sixteenSDnaPrep.frag_size = "wrong frag size variable type"
+        self.util.stringTypeTest(self, prep, "lib_layout")
 
-    def testLegalFragSize(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        frag_size = 1020
+        self.util.stringPropertyTest(self, prep, "lib_layout")
 
-        try:
-            sixteenSDnaPrep.frag_size = frag_size
-            success = True
-        except:
-            pass
+    def testLibSelection(self):
+        """ Test the lib_selection property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(success, "Able to use the frag_size setter")
+        self.util.stringTypeTest(self, prep, "lib_selection")
 
-        self.assertEqual(sixteenSDnaPrep.frag_size, frag_size,
-                         "Property getter for 'frag_size' works.")
+        self.util.stringPropertyTest(self, prep, "lib_selection")
 
-    def testLegalLibLayout(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        lib_layout = "A test Lib Layout for the test class"
+    def testNCBITaxonID(self):
+        """ Test the ncbi_taxon_id property. """
+        prep = self.session.create_16s_dna_prep()
 
-        try:
-            sixteenSDnaPrep.lib_layout = lib_layout
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, prep, "ncbi_taxon_id")
 
-        self.assertTrue(success, "Able to use the lib_layout setter")
+        self.util.stringPropertyTest(self, prep, "ncbi_taxon_id")
 
-        self.assertEqual(sixteenSDnaPrep.lib_layout, lib_layout,
-                         "Property getter for 'lib_layout' works.")
+    def testPrepID(self):
+        """ Test the prep_id property. """
+        prep = self.session.create_16s_dna_prep()
 
-    def testLegalLibSelection(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        lib_selection = "A test Lib selection for the test class"
+        self.util.stringTypeTest(self, prep, "prep_id")
 
-        try:
-            sixteenSDnaPrep.lib_selection = lib_selection
-            success = True
-        except:
-            pass
+        self.util.stringPropertyTest(self, prep, "prep_id")
 
-        self.assertTrue(success, "Able to use the lib_selection setter")
+    def testSequencingCenter(self):
+        """ Test the sequencing_center property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertEqual(sixteenSDnaPrep.lib_selection, lib_selection,
-                         "Property getter for 'lib_selection' works.")
+        self.util.stringTypeTest(self, prep, "sequencing_center")
 
-    def testLegalNCBITaxonID(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
+        self.util.stringPropertyTest(self, prep, "sequencing_center")
 
-        try:
-            sixteenSDnaPrep.ncbi_taxon_id = ncbi_taxon_id
-            success = True
-        except:
-            pass
+    def testSequencingContact(self):
+        """ Test the sequencing_contact property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(success, "Able to use the ncbi_taxon_id setter")
+        self.util.stringTypeTest(self, prep, "sequencing_contact")
 
-        self.assertEqual(sixteenSDnaPrep.ncbi_taxon_id, ncbi_taxon_id,
-                         "Property getter for 'ncbi_taxon_id' works.")
+        self.util.stringPropertyTest(self, prep, "sequencing_contact")
 
-    def testLegalPrepID(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        prep_id = "A test prep id for the test class"
+    def testSRSID(self):
+        """ Test the srs_id property. """
+        prep = self.session.create_16s_dna_prep()
 
-        try:
-            sixteenSDnaPrep.prep_id = prep_id
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, prep, "srs_id")
 
-        self.assertTrue(success, "Able to use the prep_id setter")
+        self.util.stringPropertyTest(self, prep, "srs_id")
 
-        self.assertEqual(sixteenSDnaPrep.prep_id, prep_id,
-                         "Property getter for 'prep_id' works.")
+    def testStorageDuration(self):
+        """ Test the storage_duration property. """
+        prep = self.session.create_16s_dna_prep()
 
-    def testLegalSequencingCenter(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        sequencing_center = "A test seq center for the test class"
+        self.util.intTypeTest(self, prep, "storage_duration")
 
-        try:
-            sixteenSDnaPrep.sequencing_center = sequencing_center
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the sequencing_center setter")
-
-        self.assertEqual(sixteenSDnaPrep.sequencing_center, sequencing_center,
-                         "Property getter for 'sequencing_center' works.")
-
-    def testLegalSequencingContact(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        sequencing_contact = "A test seq contact for the test class"
-
-        try:
-            sixteenSDnaPrep.sequencing_contact = sequencing_contact
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the sequencing_contact setter")
-
-        self.assertEqual(sixteenSDnaPrep.sequencing_contact, sequencing_contact,
-                         "Property getter for 'sequencing_contact' works.")
-
-    def testLegalSRSID(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        srs_id = "A test prep id for the test class"
-
-        try:
-            sixteenSDnaPrep.srs_id = srs_id
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the srs_id setter")
-
-        self.assertEqual(sixteenSDnaPrep.srs_id, srs_id, "Property getter for 'srs_id' works.")
-
-    def testIllegalSRSID(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-
-        with self.assertRaises(Exception):
-            sixteenSDnaPrep.srs_id = 1
-
-    def testLegalStorageDuration(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-        success = False
-        storage_duration = 12
-
-        try:
-            sixteenSDnaPrep.storage_duration = storage_duration
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the storage_duration setter")
-
-        self.assertEqual(sixteenSDnaPrep.storage_duration, storage_duration,
-                         "Property getter for 'storage_duration' works.")
-
-    def testIllegalStorageDuration(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
-
-        with self.assertRaises(Exception):
-            sixteenSDnaPrep.storage_duration = "ASDASDSAD"
+        self.util.intPropertyTest(self, prep, "storage_duration")
 
     def testTags(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+        """ Test the tags property. """
+        prep = self.session.create_16s_dna_prep()
 
-        tags = sixteenSDnaPrep.tags
+        tags = prep.tags
         self.assertTrue(type(tags) == list,
                         "SixteenSDnaPrep tags() method returns a list.")
 
         self.assertEqual(len(tags), 0,
                          "Template sixteenSDnaPrep tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
-        sixteenSDnaPrep.tags = new_tags
-        self.assertEqual(sixteenSDnaPrep.tags, new_tags, "Can set tags on a sixteenSDnaPrep.")
+        prep.tags = new_tags
+        self.assertEqual(prep.tags, new_tags, "Can set tags on a sixteenSDnaPrep.")
 
-        json_str = sixteenSDnaPrep.to_json()
+        json_str = prep.to_json()
         doc = json.loads(json_str)
         self.assertTrue('tags' in doc['meta'],
                         "JSON representation has 'tags' field in 'meta'.")
@@ -312,97 +219,100 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+        """ Test the add_tag() method. """
+        prep = self.session.create_16s_dna_prep()
 
-        sixteenSDnaPrep.add_tag("test")
-        self.assertEqual(sixteenSDnaPrep.tags, [ "test" ],
+        prep.add_tag("test")
+        self.assertEqual(prep.tags, ["test"],
                          "Can add a tag to a sixteenSDnaPrep.")
 
-        json_str = sixteenSDnaPrep.to_json()
+        json_str = prep.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
         with self.assertRaises(ValueError):
-            sixteenSDnaPrep.add_tag("test")
+            prep.add_tag("test")
 
-        json_str = sixteenSDnaPrep.to_json()
+        json_str = prep.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testMimarks(self):
-        sixteenSDnaPrep = self.session.create_16s_dna_prep()
+        """ Test the mimarks property. """
+        prep = self.session.create_16s_dna_prep()
 
-        self.assertTrue(sixteenSDnaPrep.mimarks is None,
+        self.assertTrue(prep.mimarks is None,
                         "New template sixteenSDnaPrep has no MIMARKS data.")
 
-        invalid_test_mimarks = { "a": 1,
-                              "b": 2 }
+        invalid_test_mimarks = {"a": 1,
+                                "b": 2}
 
         with self.assertRaises(MimarksException):
-            sixteenSDnaPrep.mimarks = invalid_test_mimarks
+            prep.mimarks = invalid_test_mimarks
 
-        self.assertTrue(sixteenSDnaPrep.mimarks is None,
-             "Template sixteenSDnaPrep has no MIMARKS after invalid set attempt.")
+        self.assertTrue(prep.mimarks is None,
+                        "Template sixteenSDnaPrep has no MIMARKS after invalid set attempt.")
 
         valid_mimarks = {
-              "adapters": "blah",
-              "biome": "blah",
-              "collection_date": "blah",
-              "experimental_factor": "blah",
-              "feature": "blah",
-              "findex": "blah",
-              "geo_loc_name": "blah",
-              "investigation_type": "blah",
-              "isol_growth_condt": "blah",
-              "lat_lon": "blah",
-              "lib_const_meth": "blah",
-              "lib_reads_seqd": "blah",
-              "lib_size": 500,
-              "lib_vector": "blah",
-              "material": "blah",
-              "nucl_acid_amp": "blah",
-              "nucl_acid_ext": "blah",
-              "pcr_primers": "blah",
-              "pcr_cond": "blah",
-              "project_name": "blah",
-              "rel_to_oxygen": "blah",
-              "rindex": "blah",
-              "samp_collect_device": "blah",
-              "samp_mat_process": "blah",
-              "samp_size": "blah",
-              "seq_meth": "blah",
-              "sop": ["a", "b", "c"],
-              "source_mat_id": ["a", "b", "c"],
-              "submitted_to_insdc": True,
-              "target_gene": "blah",
-              "target_subfragment": "blah",
-              "url": ["a", "b", "c"]
+            "adapters": "blah",
+            "biome": "blah",
+            "collection_date": "blah",
+            "experimental_factor": "blah",
+            "feature": "blah",
+            "findex": "blah",
+            "geo_loc_name": "blah",
+            "investigation_type": "blah",
+            "isol_growth_condt": "blah",
+            "lat_lon": "blah",
+            "lib_const_meth": "blah",
+            "lib_reads_seqd": "blah",
+            "lib_size": 500,
+            "lib_vector": "blah",
+            "material": "blah",
+            "nucl_acid_amp": "blah",
+            "nucl_acid_ext": "blah",
+            "pcr_primers": "blah",
+            "pcr_cond": "blah",
+            "project_name": "blah",
+            "rel_to_oxygen": "blah",
+            "rindex": "blah",
+            "samp_collect_device": "blah",
+            "samp_mat_process": "blah",
+            "samp_size": "blah",
+            "seq_meth": "blah",
+            "sop": ["a", "b", "c"],
+            "source_mat_id": ["a", "b", "c"],
+            "submitted_to_insdc": True,
+            "target_gene": "blah",
+            "target_subfragment": "blah",
+            "url": ["a", "b", "c"]
         }
 
         # Assume failure
         success = False
 
         try:
-            sixteenSDnaPrep.mimarks = valid_mimarks
+            prep.mimarks = valid_mimarks
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Valid MIMARKS data does not raise exception.")
 
-        self.assertTrue(sixteenSDnaPrep.mimarks is not None,
+        self.assertTrue(prep.mimarks is not None,
                         "mimarks getter retrieves data.")
 
-        biome = sixteenSDnaPrep.mimarks['biome']
+        biome = prep.mimarks['biome']
         self.assertEqual(biome, valid_mimarks["biome"],
                          "Retrieved MIMARKS data appears to be okay.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = SixteenSDnaPrep.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -412,6 +322,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSixteenSDnaPrep(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the sixteenSDnaPrep at all points before and after
         # adding the required fields
 
@@ -422,38 +333,38 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         lib_layout = "asdfads"
         lib_selection = "asdfhewofue"
         mimarks = {
-              "adapters": "blah",
-              "biome": "blah",
-              "collection_date": "blah",
-              "experimental_factor": "blah",
-              "feature": "blah",
-              "findex": "blah",
-              "geo_loc_name": "blah",
-              "investigation_type": "blah",
-              "isol_growth_condt": "blah",
-              "lat_lon": "blah",
-              "lib_const_meth": "blah",
-              "lib_reads_seqd": "blah",
-              "lib_size": 500,
-              "lib_vector": "blah",
-              "material": "blah",
-              "nucl_acid_amp": "blah",
-              "nucl_acid_ext": "blah",
-              "pcr_primers": "blah",
-              "pcr_cond": "blah",
-              "project_name": "blah",
-              "rel_to_oxygen": "blah",
-              "rindex": "blah",
-              "samp_collect_device": "blah",
-              "samp_mat_process": "blah",
-              "samp_size": "blah",
-              "seq_meth": "blah",
-              "sop": ["a", "b", "c"],
-              "source_mat_id": ["a", "b", "c"],
-              "submitted_to_insdc": True,
-              "target_gene": "blah",
-              "target_subfragment": "blah",
-              "url": ["a", "b", "c"]
+            "adapters": "blah",
+            "biome": "blah",
+            "collection_date": "blah",
+            "experimental_factor": "blah",
+            "feature": "blah",
+            "findex": "blah",
+            "geo_loc_name": "blah",
+            "investigation_type": "blah",
+            "isol_growth_condt": "blah",
+            "lat_lon": "blah",
+            "lib_const_meth": "blah",
+            "lib_reads_seqd": "blah",
+            "lib_size": 500,
+            "lib_vector": "blah",
+            "material": "blah",
+            "nucl_acid_amp": "blah",
+            "nucl_acid_ext": "blah",
+            "pcr_primers": "blah",
+            "pcr_cond": "blah",
+            "project_name": "blah",
+            "rel_to_oxygen": "blah",
+            "rindex": "blah",
+            "samp_collect_device": "blah",
+            "samp_mat_process": "blah",
+            "samp_size": "blah",
+            "seq_meth": "blah",
+            "sop": ["a", "b", "c"],
+            "source_mat_id": ["a", "b", "c"],
+            "submitted_to_insdc": True,
+            "target_gene": "blah",
+            "target_subfragment": "blah",
+            "url": ["a", "b", "c"]
         }
         ncbi_taxon_id = "sadfadsfawefw"
         prep_id = "asdsadewqrewq"
@@ -464,7 +375,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         test_links = {"prepared_from":[]}
 
         self.assertFalse(sixteenSDnaPrep.save(),
-                "SixteenSDnaPrep not saved successfully, no required fields")
+                         "SixteenSDnaPrep not saved successfully, no required fields")
 
         sixteenSDnaPrep.comment = test_comment
 
@@ -494,7 +405,7 @@ class SixteenSDnaPrepTest(unittest.TestCase):
         with self.assertRaises(Exception):
             sixteenSDnaPrep.delete()
 
-        self.assertTrue(sixteenSDnaPrep.save() == True,
+        self.assertTrue(sixteenSDnaPrep.save() is True,
                         "SixteenSDnaPrep was not saved successfully")
 
         # Load the sixteenSDnaPrep that was just saved from the OSDF instance

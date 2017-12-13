@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import ViralSeqSet
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
@@ -29,7 +30,7 @@ print(ViralSeqSet.required_fields())
 
 vss = ViralSeqSet()
 
-vss.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+vss.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 vss.study = "prediabetes"
 
 print("Creating a temp file for example/testing purposes.")
@@ -44,9 +45,9 @@ vss.local_file = temp_file
 vss.private_files = False
 
 # ViralSeqSets are 'computed_from' WgsRawSeqSet nodes
-vss.links = { "computed_from": [ "b9af32d3ab623bcfbdce2ea3a502c015" ] }
+vss.links = {"computed_from": ["b9af32d3ab623bcfbdce2ea3a502c015"]}
 
-vss.tags = [ "viral_seq_set", "ihmp" ]
+vss.tags = ["viral_seq_set", "ihmp"]
 vss.add_tag("another")
 vss.add_tag("and_another")
 

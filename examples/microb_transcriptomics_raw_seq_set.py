@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import MicrobTranscriptomicsRawSeqSet
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(MicrobTranscriptomicsRawSeqSet.required_fields())
 
 mtrss = MicrobTranscriptomicsRawSeqSet()
 
-mtrss.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+mtrss.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 mtrss.study = "prediabetes"
 
 print("Creating a temp file for example/testing purposes.")
@@ -48,9 +50,9 @@ mtrss.format_doc = "the format url"
 mtrss.private_files = False
 
 # MicrobTranscriptomicsRawSeqSets are 'sequenced_from' WgsDnaPrep nodes
-mtrss.links = { "sequenced_from": [ "b9af32d3ab623bcfbdce2ea3a5016b61" ] }
+mtrss.links = {"sequenced_from": ["b9af32d3ab623bcfbdce2ea3a5016b61"]}
 
-mtrss.tags = [ "microb_transcriptomics_raw_seq_set", "ihmp" ]
+mtrss.tags = ["microb_transcriptomics_raw_seq_set", "ihmp"]
 mtrss.add_tag("another")
 mtrss.add_tag("and_another")
 

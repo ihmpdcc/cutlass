@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import SixteenSRawSeqSet
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(SixteenSRawSeqSet.required_fields())
 
 seq_set = SixteenSRawSeqSet()
 
-seq_set.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+seq_set.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 seq_set.comment = "test comment. Hello world!"
 seq_set.exp_length = 2000
 seq_set.format = "fasta"
@@ -48,9 +50,9 @@ seq_set.local_file = temp_file
 seq_set.private_files = False
 
 # SixteenSRawSeqSets are 'sequenced_from' other nodes
-seq_set.links = { "sequenced_from": [ "610a4911a5ca67de12cdc1e4b4014133" ] }
+seq_set.links = {"sequenced_from": ["610a4911a5ca67de12cdc1e4b4014133"]}
 
-seq_set.tags = [ "16s_raw_seq_set", "ihmp" ]
+seq_set.tags = ["16s_raw_seq_set", "ihmp"]
 seq_set.add_tag("another")
 seq_set.add_tag("and_another")
 

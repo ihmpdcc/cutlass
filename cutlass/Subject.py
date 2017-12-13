@@ -34,7 +34,7 @@ class Subject(Base):
     valid_genders = ("male", "female", "unknown")
 
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the Subject class. This initializes the fields specific to the
         Subject class, and inherits from the Base class.
@@ -54,6 +54,8 @@ class Subject(Base):
         self._rand_subject_id = None
         self._gender = None
         self._race = None
+
+        super(Subject, self).__init__(*args, **kwargs)
 
     @property
     def gender(self):
@@ -259,7 +261,7 @@ class Subject(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
         module_logger.debug("In required_fields.")
         return ("rand_subject_id", "gender", "tags")

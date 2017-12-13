@@ -1,15 +1,28 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import HostAssayPrep
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
+
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -29,7 +42,7 @@ prep.title = "the title"
 
 # Optional properties
 prep.short_label = "the short label"
-prep.urls = [ "http://prep.url" ]
+prep.urls = ["http://prep.url"]
 prep.species = "the species"
 prep.cell_type = "the cell type"
 prep.tissue = "test tissue"
@@ -46,9 +59,9 @@ temp_file = tempfile.NamedTemporaryFile(delete=False).name
 print("Local file: %s" % temp_file)
 
 # HostAssayPreps are 'prepared_from' a Sample
-prep.links = { "prepared_from": [ "610a4911a5ca67de12cdc1e4b4011876" ] }
+prep.links = {"prepared_from": ["610a4911a5ca67de12cdc1e4b4011876"]}
 
-prep.tags = [ "prep", "ihmp" ]
+prep.tags = ["prep", "ihmp"]
 prep.add_tag("another")
 prep.add_tag("and_another")
 

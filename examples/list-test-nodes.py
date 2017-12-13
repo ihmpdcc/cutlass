@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
+# pylint: disable=C0111, C0325
+
 import argparse
 import logging
-import pprint
 from cutlass import iHMPSession
 
-## globals
+# globals
 NAMESPACE = 'ihmp'
 
 ## input
@@ -16,7 +17,7 @@ parser.add_argument('--server', help='OSDF server address')
 parser.add_argument('--tag', help='Unique tag for uploaded test nodes.')
 args = parser.parse_args()
 
-## main program
+# main program
 logging.basicConfig(level=logging.INFO)
 s = iHMPSession(args.username, args.password, args.server)
 o = s.get_osdf()
@@ -28,13 +29,13 @@ print("OQL query=" + qstring + " result_count=" + str(res['result_count']))
 results = res['results']
 
 n_listed = 0
-for r in results:
-    id = r['id']
-    print("id=" + id + " node type=" + r["node_type"])
-    tags = r['meta']['tags']
-    for t in tags:
+for result in results:
+    ident = result['id']
+    print("id=" + ident + " node type=" + result["node_type"])
+    tags = result['meta']['tags']
+    for tag in tags:
         # double-check that args.tag is present - should be superfluous
-        if (t == args.tag):
+        if (tag == args.tag):
             n_listed = n_listed + 1
 
 print("num_listed= " + str(n_listed))

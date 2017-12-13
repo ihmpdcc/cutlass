@@ -1,10 +1,30 @@
 #!/usr/bin/env python
 
+""" A unittest script for the DiseaseMeta module. """
+
 import unittest
 from cutlass.DiseaseMeta import DiseaseMeta
 
+from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
+
 class DiseaseMetaTest(unittest.TestCase):
+    """ A unit test class for the DiseaseMeta class. """
+
+    session = None
+    util = None
+
+    @classmethod
+    def setUpClass(cls):
+        """ Setup for the unittest. """
+        # Establish the session for each test method
+        cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
+
     def testImport(self):
+        """ Test the importation of the DiseaseMeta module. """
         success = False
         try:
             from cutlass import DiseaseMeta
@@ -16,72 +36,28 @@ class DiseaseMetaTest(unittest.TestCase):
         self.failIf(DiseaseMeta is None)
 
     def testComment(self):
+        """ Test the comment property. """
         dis_meta = DiseaseMeta()
 
-        with self.assertRaises(ValueError):
-            dis_meta.comment = 1
+        self.util.stringTypeTest(self, dis_meta, "comment")
 
-        with self.assertRaises(ValueError):
-            dis_meta.comment = {}
-
-        with self.assertRaises(ValueError):
-            dis_meta.comment = []
-
-        with self.assertRaises(ValueError):
-            dis_meta.comment = 3.5
-
-        comment = "test comment"
-        dis_meta.comment = comment
-
-        self.assertEquals(comment, dis_meta.comment, "comment property works.")
+        self.util.stringPropertyTest(self, dis_meta, "comment")
 
     def testName(self):
+        """ Test the name property. """
         dis_meta = DiseaseMeta()
 
-        with self.assertRaises(ValueError):
-            dis_meta.name = 30
+        self.util.stringTypeTest(self, dis_meta, "name")
 
-        with self.assertRaises(ValueError):
-            dis_meta.name = True
-
-        with self.assertRaises(ValueError):
-            dis_meta.name = {}
-
-        with self.assertRaises(ValueError):
-            dis_meta.name = []
-
-        with self.assertRaises(ValueError):
-            dis_meta.name = 3.5
-
-        name = "test name"
-        dis_meta.name = name
-
-        self.assertEquals(name, dis_meta.name,
-                          "name property works.")
+        self.util.stringPropertyTest(self, dis_meta, "name")
 
     def testDescription(self):
+        """ Test the description property. """
         dis_meta = DiseaseMeta()
 
-        with self.assertRaises(ValueError):
-            dis_meta.description = True
+        self.util.stringTypeTest(self, dis_meta, "description")
 
-        with self.assertRaises(ValueError):
-            dis_meta.description = 1
-
-        with self.assertRaises(ValueError):
-            dis_meta.description = {}
-
-        with self.assertRaises(ValueError):
-            dis_meta.description = []
-
-        with self.assertRaises(ValueError):
-            dis_meta.description = 3.5
-
-        description = "test self condition"
-        dis_meta.description = description
-
-        self.assertEquals(description, dis_meta.description,
-                          "description property works.")
+        self.util.stringPropertyTest(self, dis_meta, "description")
 
     def testDiseaseOntologyID(self):
         dis_meta = DiseaseMeta()
@@ -108,54 +84,23 @@ class DiseaseMetaTest(unittest.TestCase):
                           "disease_ontology_id property works.")
 
     def testMeshID(self):
+        """ test the mesh_id method. """
         dis_meta = DiseaseMeta()
 
-        with self.assertRaises(ValueError):
-            dis_meta.mesh_id = True
+        self.util.stringTypeTest(self, dis_meta, "mesh_id")
 
-        with self.assertRaises(ValueError):
-            dis_meta.mesh_id = 1
-
-        with self.assertRaises(ValueError):
-            dis_meta.mesh_id = {}
-
-        with self.assertRaises(ValueError):
-            dis_meta.mesh_id = []
-
-        with self.assertRaises(ValueError):
-            dis_meta.mesh_id = 3.5
-
-        mesh_id = "test mesh ID"
-        dis_meta.mesh_id = mesh_id
-
-        self.assertEquals(mesh_id, dis_meta.mesh_id,
-                          "mesh_id property works.")
+        self.util.stringPropertyTest(self, dis_meta, "mesh_id")
 
     def testNciID(self):
+        """ Test the nci_id property. """
         dis_meta = DiseaseMeta()
 
-        with self.assertRaises(ValueError):
-            dis_meta.nci_id = True
+        self.util.stringTypeTest(self, dis_meta, "nci_id")
 
-        with self.assertRaises(ValueError):
-            dis_meta.nci_id = 1
-
-        with self.assertRaises(ValueError):
-            dis_meta.nci_id = {}
-
-        with self.assertRaises(ValueError):
-            dis_meta.nci_id = []
-
-        with self.assertRaises(ValueError):
-            dis_meta.nci_id = 3.5
-
-        nci_id = "test NCI ID"
-        dis_meta.nci_id = nci_id
-
-        self.assertEquals(nci_id, dis_meta.nci_id,
-                          "nci_id property works.")
+        self.util.stringPropertyTest(self, dis_meta, "nci_id")
 
     def testToJson(self):
+        """ Test the generation of JSON from a DiseaseMeta instance. """
         dis_meta = DiseaseMeta()
         success = False
 
@@ -167,13 +112,11 @@ class DiseaseMetaTest(unittest.TestCase):
         try:
             dis_meta_json = dis_meta.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
         self.assertTrue(dis_meta_json is not None, "to_json() returned data.")
 
-
 if __name__ == '__main__':
     unittest.main()
-

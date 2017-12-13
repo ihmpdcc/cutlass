@@ -1,11 +1,15 @@
-#!/usr/bin/env python
+"""
+Models the MicrobiomeAssayPrep object.
+"""
 
 import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C0302, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -22,7 +26,7 @@ class MicrobiomeAssayPrep(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the MicrobiomeAssayPrep class. This initializes the
         fields specific to the class, and inherits from the Base class.
@@ -39,6 +43,7 @@ class MicrobiomeAssayPrep(Base):
         self._links = {}
         self._tags = []
 
+        # Required properties
         self._comment = None
         self._pride_id = None
         self._sample_name = None
@@ -61,6 +66,8 @@ class MicrobiomeAssayPrep(Base):
         self._protocol_steps = None
         self._exp_description = None
         self._sample_description = None
+
+        super(MicrobiomeAssayPrep, self).__init__(*args, **kwargs)
 
     @property
     def comment(self):
@@ -585,7 +592,7 @@ class MicrobiomeAssayPrep(Base):
         if 'prepared_from' not in self._links.keys():
             problems.append("Must have a 'prepared_from' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -609,12 +616,12 @@ class MicrobiomeAssayPrep(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'prepared_from' not in self._links.keys():
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -636,76 +643,76 @@ class MicrobiomeAssayPrep(Base):
 
         prep_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ MicrobiomeAssayPrep.namespace ]
+                'read': ['all'],
+                'write': [MicrobiomeAssayPrep.namespace]
             },
             'linkage': self._links,
             'ns': MicrobiomeAssayPrep.namespace,
             'node_type': 'microb_assay_prep',
             'meta': {
+                'center': self._center,
                 'comment': self._comment,
+                'contact': self._contact,
+                'experiment_type': self._experiment_type,
+                'prep_id': self._prep_id,
                 'pride_id': self._pride_id,
                 'sample_name': self._sample_name,
-                'title': self._title,
-                'center': self._center,
-                'contact': self._contact,
-                'prep_id': self._prep_id,
                 'storage_duration': self._storage_duration,
-                'experiment_type': self._experiment_type,
-                'subtype': self._study,
                 'study': self._study,
-                'tags': self._tags
+                'subtype': self._study,
+                'tags': self._tags,
+                'title': self._title
             }
         }
 
         if self._id is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the OSDF id set.")
-           prep_doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            prep_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the OSDF version set.")
-           prep_doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            prep_doc['ver'] = self._version
 
-        # Handle MicrobiomeAssayPrep optional properties
+        # Handle optional properties
         if self._short_label is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'short_label' property set.")
-           prep_doc['meta']['short_label'] = self._short_label
+            self.logger.debug("%s object has the 'short_label' property set.", __name__)
+            prep_doc['meta']['short_label'] = self._short_label
 
         if self._url is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'url' property set.")
-           prep_doc['meta']['url'] = self._url
+            self.logger.debug("%s object has the 'url' property set.", __name__)
+            prep_doc['meta']['url'] = self._url
 
         if self._species is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'species' property set.")
-           prep_doc['meta']['species'] = self._species
+            self.logger.debug("%s object has the 'species' property set.", __name__)
+            prep_doc['meta']['species'] = self._species
 
         if self._cell_type is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'cell_type' property set.")
-           prep_doc['meta']['cell_type'] = self._cell_type
+            self.logger.debug("%s object has the 'cell_type' property set.", __name__)
+            prep_doc['meta']['cell_type'] = self._cell_type
 
         if self._tissue is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'tissue' property set.")
-           prep_doc['meta']['tissue'] = self._tissue
+            self.logger.debug("%s object has the 'tissue' property set.", __name__)
+            prep_doc['meta']['tissue'] = self._tissue
 
         if self._reference is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'reference' property set.")
-           prep_doc['meta']['reference'] = self._reference
+            self.logger.debug("%s object has the 'reference' property set.", __name__)
+            prep_doc['meta']['reference'] = self._reference
 
         if self._protocol_name is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'protocol_name' property set.")
-           prep_doc['meta']['protocol_name'] = self._protocol_name
+            self.logger.debug("%s object has the 'protocol_name' property set.", __name__)
+            prep_doc['meta']['protocol_name'] = self._protocol_name
 
         if self._protocol_steps is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'protocol_steps' property set.")
-           prep_doc['meta']['protocol_steps'] = self._protocol_steps
+            self.logger.debug("%s object has the 'protocol_steps' property set.", __name__)
+            prep_doc['meta']['protocol_steps'] = self._protocol_steps
 
         if self._exp_description is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'exp_description' property set.")
-           prep_doc['meta']['exp_description'] = self._exp_description
+            self.logger.debug("%s object has the 'exp_description' property set.", __name__)
+            prep_doc['meta']['exp_description'] = self._exp_description
 
         if self._sample_description is not None:
-           self.logger.debug("MicrobiomeAssayPrep object has the 'sample_description' property set.")
-           prep_doc['meta']['sample_description'] = self._sample_description
+            self.logger.debug("%s object has the 'sample_description' property set.", __name__)
+            prep_doc['meta']['sample_description'] = self._sample_description
 
         return prep_doc
 
@@ -741,8 +748,8 @@ class MicrobiomeAssayPrep(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a MicrobiomeAssayPrep with no ID.")
-            raise Exception("MicrobiomeAssayPrep does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("{} does not have an ID.".format(__name__))
 
         prep_id = self._id
 
@@ -753,17 +760,17 @@ class MicrobiomeAssayPrep(Base):
         success = False
 
         try:
-            self.logger.info("Deleting MicrobiomeAssayPrep with ID %s." % prep_id)
+            self.logger.info("Deleting %s with ID %s.", __name__, prep_id)
             session.get_osdf().delete_node(prep_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     @staticmethod
-    def search(query = "\"microb_assay_prep\"[node_type]"):
+    def search(query="\"microb_assay_prep\"[node_type]"):
         """
         Searches OSDF for MicrobiomeAssayPrep nodes. Any criteria the user
         wishes to add is provided by the user in the query language
@@ -791,7 +798,7 @@ class MicrobiomeAssayPrep(Base):
         if query != '"microb_assay_prep"[node_type]':
             query = '({}) && "microb_assay_prep"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         prep_data = session.get_osdf().oql_query(
             MicrobiomeAssayPrep.namespace, query
@@ -820,138 +827,84 @@ class MicrobiomeAssayPrep(Base):
         Returns:
             Returns a MicrobiomeAssayPrep instance.
         """
-        module_logger.info("Creating a template MicrobiomeAssayPrep.")
+        module_logger.info("Creating a template %s.", __name__)
         prep = MicrobiomeAssayPrep()
 
-        module_logger.debug("Filling in MicrobiomeAssayPrep details.")
+        module_logger.debug("Filling in %s details.", __name__)
         prep._set_id(prep_data['id'])
-        prep._links = prep_data['linkage']
-        prep._version = prep_data['ver']
+        prep.links = prep_data['linkage']
+        prep.version = prep_data['ver']
 
         # Required fields
-        prep._gender = prep_data['meta']['comment']
-        prep._pride_id = prep_data['meta']['pride_id']
-        prep._sample_name = prep_data['meta']['sample_name']
-        prep._title = prep_data['meta']['title']
-        prep._center = prep_data['meta']['center']
-        prep._contact = prep_data['meta']['contact']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._experiment_type = prep_data['meta']['experiment_type']
-        prep._study = prep_data['meta']['study']
-        prep._tags = prep_data['meta']['tags']
+        prep.comment = prep_data['meta']['comment']
+        prep.contact = prep_data['meta']['contact']
+        prep.pride_id = prep_data['meta']['pride_id']
+        prep.sample_name = prep_data['meta']['sample_name']
+        prep.title = prep_data['meta']['title']
+        prep.center = prep_data['meta']['center']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.storage_duration = prep_data['meta']['storage_duration']
+        prep.experiment_type = prep_data['meta']['experiment_type']
+        prep.study = prep_data['meta']['study']
+        prep.tags = prep_data['meta']['tags']
 
         # Optional fields
         if 'short_label' in prep_data['meta']:
-            prep._short_label = prep_data['meta']['short_label']
+            prep.short_label = prep_data['meta']['short_label']
 
         if 'url' in prep_data['meta']:
             prep._url = prep_data['meta']['url']
 
         if 'species' in prep_data['meta']:
-            prep._species = prep_data['meta']['species']
+            prep.species = prep_data['meta']['species']
 
         if 'cell_type' in prep_data['meta']:
-            prep._cell_type = prep_data['meta']['cell_type']
+            prep.cell_type = prep_data['meta']['cell_type']
 
         if 'tissue' in prep_data['meta']:
-            prep._tissue = prep_data['meta']['tissue']
+            prep.tissue = prep_data['meta']['tissue']
 
         if 'reference' in prep_data['meta']:
-            prep._reference = prep_data['meta']['reference']
+            prep.reference = prep_data['meta']['reference']
 
         if 'protocol_name' in prep_data['meta']:
-            prep._protocol_name = prep_data['meta']['protocol_name']
+            prep.protocol_name = prep_data['meta']['protocol_name']
 
         if 'protocol_steps' in prep_data['meta']:
-            prep._protocol_steps = prep_data['meta']['protocol_steps']
+            prep.protocol_steps = prep_data['meta']['protocol_steps']
 
         if 'exp_description' in prep_data['meta']:
-            prep._exp_description = prep_data['meta']['exp_description']
+            prep.exp_description = prep_data['meta']['exp_description']
 
         if 'sample_description' in prep_data['meta']:
-            prep._sample_description = prep_data['meta']['sample_description']
+            prep.sample_description = prep_data['meta']['sample_description']
 
-        module_logger.debug("Returning loaded MicrobiomeAssayPrep.")
+        module_logger.debug("Returning loaded %s.", __name__)
         return prep
 
     @staticmethod
-    def load(prep_id):
+    def load(node_id):
         """
         Loads the data for the specified input ID from the OSDF instance to this object.
         If the provided ID does not exist, then an error message is provided stating the
         project does not exist.
 
         Args:
-            prep_id (str): The OSDF ID for the document to load.
+            node_id (str): The OSDF ID for the document to load.
 
         Returns:
             A MicrobiomeAssayPrep object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s", node_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-        prep_data = session.get_osdf().get_node(prep_id)
+        node_data = session.get_osdf().get_node(node_id)
+        node = MicrobiomeAssayPrep.load_microassayprep(node_data)
 
-        module_logger.info("Creating a template MicrobiomeAssayPrep.")
-        prep = MicrobiomeAssayPrep()
+        module_logger.debug("Returning loaded %s.", __name__)
 
-        module_logger.debug("Filling in MicrobiomeAssayPrep details.")
-
-        # Node required fields
-        prep._set_id(prep_data['id'])
-        prep._links = prep_data['linkage']
-        prep._version = prep_data['ver']
-
-        # Required fields
-        prep._comment = prep_data['meta']['comment']
-        prep._pride_id = prep_data['meta']['pride_id']
-        prep._sample_name = prep_data['meta']['sample_name']
-        prep._title = prep_data['meta']['title']
-        prep._center = prep_data['meta']['center']
-        prep._contact = prep_data['meta']['contact']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._experiment_type = prep_data['meta']['experiment_type']
-        prep._short_label = prep_data['meta']['short_label']
-        prep._protocol_name = prep_data['meta']['protocol_name']
-        prep._study = prep_data['meta']['study']
-        prep._tags = prep_data['meta']['tags']
-
-        # Handle MicrobiomeAssayPrep optional properties
-        if 'short_label' in prep_data['meta']:
-            prep._short_label = prep_data['meta']['short_label']
-
-        if 'url' in prep_data['meta']:
-            prep._url = prep_data['meta']['url']
-
-        if 'species' in prep_data['meta']:
-            prep._species = prep_data['meta']['species']
-
-        if 'cell_type' in prep_data['meta']:
-            prep._cell_type = prep_data['meta']['cell_type']
-
-        if 'tissue' in prep_data['meta']:
-            prep._tissue = prep_data['meta']['tissue']
-
-        if 'reference' in prep_data['meta']:
-            prep._reference = prep_data['meta']['reference']
-
-        if 'protocol_name' in prep_data['meta']:
-            prep._protocol_name = prep_data['meta']['protocol_name']
-
-        if 'protocol_steps' in prep_data['meta']:
-            prep._protocol_steps = prep_data['meta']['protocol_steps']
-
-        if 'exp_description' in prep_data['meta']:
-            prep._exp_description = prep_data['meta']['exp_description']
-
-        if 'sample_description' in prep_data['meta']:
-            prep._sample_description = prep_data['meta']['sample_description']
-
-        module_logger.debug("Returning loaded MicrobiomeAssayPrep.")
-        return prep
+        return node
 
     def save(self):
         """
@@ -987,11 +940,11 @@ class MicrobiomeAssayPrep(Base):
         success = False
 
         if self._id is None:
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting MicrobiomeAssayPrep to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
 
             try:
                 node_id = osdf.insert_node(data)
@@ -999,28 +952,30 @@ class MicrobiomeAssayPrep(Base):
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("MicrobiomeAssayPrep already has an ID, so we do an update (not an insert).")
+            self.logger.info("%s already has an ID, so we do an update "
+                             "(not an insert).", __name__)
 
             try:
                 prep_data = self._get_raw_doc()
-                self.logger.info("MicrobiomeAssayPrep already has an ID, " + \
-                                 "so we do an update (not an insert).")
+                self.logger.info("%s already has an ID, "
+                                 "so we do an update (not an insert).", __name__)
                 prep_id = self._id
-                self.logger.debug("MicrobiomeAssayPrep OSDF ID to update: %s." % prep_id)
+                self.logger.debug("%s OSDF ID to update: %s.", __name__, prep_id)
                 osdf.edit_node(prep_data)
 
                 prep_data = osdf.get_node(prep_id)
                 latest_version = prep_data['ver']
 
-                self.logger.debug("The version of this MicrobiomeAssayPrep is now: %s" % str(latest_version))
+                self.logger.debug("The version of this %s is now: %s",
+                                  __name__, str(latest_version))
                 self._version = latest_version
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as update_exception:
+                self.logger.exception(update_exception)
                 self.logger.error("An error occurred when updating %s.", self)
 
         return success
@@ -1035,7 +990,7 @@ class MicrobiomeAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Cytokine import Cytokine
+        from cutlass.Cytokine import Cytokine
 
         for page_no in count(1):
             res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
@@ -1060,7 +1015,7 @@ class MicrobiomeAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Lipidome import Lipidome
+        from cutlass.Lipidome import Lipidome
 
         for page_no in count(1):
             res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
@@ -1085,7 +1040,7 @@ class MicrobiomeAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Metabolome import Metabolome
+        from cutlass.Metabolome import Metabolome
 
         for page_no in count(1):
             res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
@@ -1110,7 +1065,7 @@ class MicrobiomeAssayPrep(Base):
 
         query = iHMPSession.get_session().get_osdf().oql_query
 
-        from Proteome import Proteome
+        from cutlass.Proteome import Proteome
 
         for page_no in count(1):
             res = query(MicrobiomeAssayPrep.namespace, linkage_query, page=page_no)
@@ -1148,10 +1103,10 @@ class MicrobiomeAssayPrep(Base):
         """
         self.logger.debug("In _derived_docs.")
 
-        from Cytokine import Cytokine
-        from Lipidome import Lipidome
-        from Metabolome import Metabolome
-        from Proteome import Proteome
+        from cutlass.Cytokine import Cytokine
+        from cutlass.Lipidome import Lipidome
+        from cutlass.Metabolome import Metabolome
+        from cutlass.Proteome import Proteome
 
         for doc in self._derived_docs():
             if doc['node_type'] == "cytokine":

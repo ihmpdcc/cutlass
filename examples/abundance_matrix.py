@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import AbundanceMatrix
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -34,7 +36,7 @@ print(AbundanceMatrix.required_fields())
 matrix = AbundanceMatrix()
 
 matrix.comment = "test comment"
-matrix.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+matrix.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 matrix.format = "csv"
 matrix.format_doc = "http://format.url"
 matrix.matrix_type = "host_cytokine"
@@ -47,9 +49,9 @@ matrix.private_files = False
 matrix.sop = "the SOP"
 
 # Annotations are 'computed_from' a 16S trimmed sequence set
-matrix.links = { "computed_from": [ "9bb18fe313e7fe94bf243da07e0032e4" ] }
+matrix.links = {"computed_from": ["9bb18fe313e7fe94bf243da07e0032e4"]}
 
-matrix.tags = [ "test", "abundance", "ihmp" ]
+matrix.tags = ["test", "abundance", "ihmp"]
 matrix.add_tag("matrix")
 
 print(matrix.to_json(indent=2))

@@ -406,11 +406,11 @@ class SixteenSTrimmedSeqSet(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("checksums", "comment", "format", "format_doc",
-                "size", "study", "tags")
+                "local_file", "size", "study", "tags")
 
     def _get_raw_doc(self):
         """

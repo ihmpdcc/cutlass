@@ -244,32 +244,32 @@ class DiseaseMeta(object):
         self.logger.debug("In _get_raw_doc.")
 
         doc = {
-                'study_disease': {
-                    'name': self._name,
-                    'description': self._description
-                },
-                'study_disease_status': self._study_disease_status
+            'study_disease': {
+                'name': self._name,
+                'description': self._description
+            },
+            'study_disease_status': self._study_disease_status
         }
 
         # Handle optional properties
         if self._comment is not None:
-           self.logger.debug("Object has the comment property attribute set.")
-           doc['study_disease']['comment'] = self._comment
+            self.logger.debug("Object has the comment property attribute set.")
+            doc['study_disease']['comment'] = self._comment
 
         if self._disease_ontology_id is not None:
-           self.logger.debug("Object has the disease_ontology_id property set.")
-           doc['study_disease']['disease_ontology_id'] = self._disease_ontology_id
+            self.logger.debug("Object has the disease_ontology_id property set.")
+            doc['study_disease']['disease_ontology_id'] = self._disease_ontology_id
 
         if self._mesh_id is not None:
-           self.logger.debug("Object has the mesh_id property set.")
-           doc['study_disease']['mesh_id'] = self._mesh_id
+            self.logger.debug("Object has the mesh_id property set.")
+            doc['study_disease']['mesh_id'] = self._mesh_id
 
         if self._nci_id is not None:
-           self.logger.debug("Object has the nci_id property set.")
-           doc['study_disease']['nci_id'] = self._nci_id
+            self.logger.debug("Object has the nci_id property set.")
+            doc['study_disease']['nci_id'] = self._nci_id
 
         if self._umls_concept_id is not None:
-           self.logger.debug("Object has the umls_concept_id property set.")
-           doc['study_disease']['umls_concept_id'] = self._umls_concept_id
+            self.logger.debug("Object has the umls_concept_id property set.")
+            doc['study_disease']['umls_concept_id'] = self._umls_concept_id
 
         return doc

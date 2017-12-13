@@ -1,41 +1,53 @@
 #!/usr/bin/env python
 
+""" A unittest script for the WgsAssembledSeqSet module. """
+
 import unittest
 import json
 import random
 import string
 import tempfile
-from cutlass import iHMPSession
+
 from cutlass import WgsAssembledSeqSet
+
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
+# pylint: disable=W0703, C1801
+
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    """
+    Generate a random string using alphanumeric characters. Default size is 6.
+    """
     return ''.join(random.choice(chars) for _ in range(size))
 
 class WgsAssembledSeqSetTest(unittest.TestCase):
+    """ A unit test class for the WgsAssembledSeqSet class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the WgsAssembledSeqSet module. """
         success = False
         try:
             from cutlass import WgsAssembledSeqSet
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(WgsAssembledSeqSet is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a WgsAssembledSeqSet via the session. """
         success = False
         seq_set = None
 
@@ -43,13 +55,14 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
             seq_set = self.session.create_object("wgs_assembled_seq_set")
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(seq_set is None)
 
     def testPrivateFiles(self):
+        """ Test the private_files property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.boolTypeTest(self, seq_set, "private_files")
@@ -57,6 +70,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.boolPropertyTest(self, seq_set, "private_files")
 
     def testToJson(self):
+        """ Test the generation of JSON from a WgsAssembledSeqSet instance. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
         success = False
 
@@ -71,7 +85,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         try:
             seqset_json = seq_set.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -82,7 +96,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         try:
             seqset_data = json.loads(seqset_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -99,6 +113,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                         )
 
     def testId(self):
+        """ Test the id property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.assertTrue(seq_set.id is None,
@@ -108,6 +123,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
             seq_set.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.assertTrue(seq_set.version is None,
@@ -117,6 +133,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
             seq_set.version = "test"
 
     def testAssembler(self):
+        """ Test the assembler property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.stringTypeTest(self, seq_set, "assembler")
@@ -124,6 +141,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "assembler")
 
     def testAssemblyName(self):
+        """ Test the assembly_name property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.stringTypeTest(self, seq_set, "assembly_name")
@@ -131,14 +149,15 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "assembly_name")
 
     def testChecksumsLegal(self):
+        """ Test the checksums property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
         success = False
-        checksums = {"md5":"asdf32qrfrae"}
+        checksums = {"md5": "asdf32qrfrae"}
 
         try:
             seq_set.checksums = checksums
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'checksums' setter.")
@@ -148,6 +167,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testComment(self):
+        """ Test the comment property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.stringTypeTest(self, seq_set, "comment")
@@ -155,12 +175,15 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "comment")
 
     def testIllegalFormat(self):
+        """ Test the format property with an illegal value. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         with self.assertRaises(Exception):
             seq_set.format = 1
 
     def testLegalFormat(self):
+        """ Test the format property with a legal value. """
+        seq_set = self.session.create_object("wgs_assembled_seq_set")
         seq_set = self.session.create_object("wgs_assembled_seq_set")
         success = False
         format_ = "fasta"
@@ -168,7 +191,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         try:
             seq_set.format = format_
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'format' setter")
@@ -177,6 +200,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          "Property getter for 'format' works.")
 
     def testFormatDoc(self):
+        """ Test the format_doc property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.stringTypeTest(self, seq_set, "format_doc")
@@ -184,6 +208,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "format_doc")
 
     def testIllegalSequenceType(self):
+        """ Test the sequence_type property with an illegal value. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         # Test int argument
@@ -199,6 +224,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
             seq_set.sequence_type = {'a': 1, 'b': 2}
 
     def testLegalSequenceType(self):
+        """ Test the sequence_type property with a legal value. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
         success = False
         sequence_type = "nucleotide"
@@ -206,7 +232,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         try:
             seq_set.sequence_type = sequence_type
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'sequence_type' setter.")
@@ -215,6 +241,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          "Property getter for 'sequence_type' works.")
 
     def testSize(self):
+        """ Test the size property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         self.util.intTypeTest(self, seq_set, "size")
@@ -222,6 +249,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, seq_set, "size")
 
     def testTags(self):
+        """ Test the tags property. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         tags = seq_set.tags
@@ -243,6 +271,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         seq_set = self.session.create_object("wgs_assembled_seq_set")
 
         seq_set.add_tag("test")
@@ -266,6 +295,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = WgsAssembledSeqSet.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -275,6 +305,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteWgsAssembledSeqSet(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
         # attempt to save the WgsAssembledSeqSet at all points before and
@@ -321,7 +352,7 @@ class WgsAssembledSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             seq_set.delete()
 
-        self.assertTrue(seq_set.save() == True,
+        self.assertTrue(seq_set.save() is True,
                         "WgsAssembledSeqSet was not saved successfully.")
 
         # load the WgsAssembledSeqSet that was just saved from the OSDF instance

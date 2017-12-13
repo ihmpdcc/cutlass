@@ -1046,9 +1046,9 @@ class Proteome(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
 
         return ("analyzer", "checksums", "comment", "data_processing_protocol", "detector",
                 "exp_description", "instrument_name", "local_raw_file", "local_other_file",
@@ -1340,7 +1340,7 @@ class Proteome(Base):
                 remote_files = self._upload_files(files)
             except Exception as upload_exception:
                 self.logger.exception("Unable to transmit data via Aspera. Reason: %s",
-                                    upload_exception)
+                                      upload_exception)
                 return False
 
             self.logger.info("Aspera transmission of %s files successful.", __name__)
@@ -1370,7 +1370,7 @@ class Proteome(Base):
                 self.logger.exception(save_exception)
                 self.logger.error("An error occurred when saving %s.", self)
         else:
-            self.logger.info("%s already has an ID, so we do an update " + \
+            self.logger.info("%s already has an ID, so we do an update "
                              "(not an insert).", __name__)
 
             try:

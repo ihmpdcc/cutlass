@@ -1,39 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the ClusteredSeqSet module. """
+
 import unittest
 import json
-import sys
 import tempfile
 
-from cutlass import iHMPSession
 from cutlass import ClusteredSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
+# pylint: disable=W0703, C1801
+
 class ClusteredSeqSetTest(unittest.TestCase):
+    """ A unit test class for the ClusteredSeqSet module. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the ClusteredSeqSet module. """
         success = False
         try:
             from cutlass import ClusteredSeqSet
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(ClusteredSeqSet is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a ClusteredSeqSet via the session. """
         success = False
         css = None
 
@@ -41,13 +47,14 @@ class ClusteredSeqSetTest(unittest.TestCase):
             css = self.session.create_clustered_seq_set()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(css is None)
 
     def testComment(self):
+        """ Test the comment property. """
         css = self.session.create_clustered_seq_set()
 
         self.util.stringTypeTest(self, css, "comment")
@@ -55,14 +62,15 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, css, "comment")
 
     def testChecksums(self):
+        """ Test the checksums property. """
         css = self.session.create_clustered_seq_set()
         success = False
         checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
         try:
-            css.checksums= checksums
+            css.checksums = checksums
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the checksums setter")
@@ -71,6 +79,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testClusteringProcess(self):
+        """ Test the clustering_process property. """
         css = self.session.create_clustered_seq_set()
 
         self.util.stringTypeTest(self, css, "clustering_process")
@@ -78,6 +87,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, css, "clustering_process")
 
     def testSize(self):
+        """ Test the size property. """
         css = self.session.create_clustered_seq_set()
 
         self.util.intTypeTest(self, css, "size")
@@ -85,12 +95,14 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, css, "size")
 
     def testSizeNegative(self):
+        """ Test the size property with an illegal negative value. """
         css = self.session.create_clustered_seq_set()
 
         with self.assertRaises(Exception):
             css.size = -1
 
     def testToJson(self):
+        """ Test the to_json() method. """
         css = self.session.create_clustered_seq_set()
         success = False
 
@@ -115,7 +127,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         try:
             css_json = css.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -126,7 +138,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         try:
             css_data = json.loads(css_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -140,39 +152,40 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.assertEqual(css_data['meta']['comment'],
                          comment,
                          "'comment' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['format'],
                          format_,
                          "'format' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['study'],
                          study,
                          "'study' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['clustering_process'],
                          clustering_process,
                          "'clustering_process' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['size'],
                          size,
                          "'size' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['private_files'],
                          private_files,
                          "'private_files' in JSON had expected value."
-                         )
+                        )
 
     def testDataInJson(self):
+        """ Test the data resulting from the to_json() method. """
         css = self.session.create_clustered_seq_set()
         success = False
         comment = "test_comment"
@@ -188,7 +201,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         try:
             css_json = css.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -199,7 +212,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         try:
             css_data = json.loads(css_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -212,19 +225,20 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.assertEqual(css_data['meta']['comment'],
                          comment,
                          "'comment' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['format'],
                          format_,
                          "'format' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(css_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
-                         )
+                        )
 
     def testId(self):
+        """ Test the id property. """
         css = self.session.create_clustered_seq_set()
 
         self.assertTrue(css.id is None,
@@ -234,6 +248,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
             css.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         css = self.session.create_clustered_seq_set()
 
         self.assertTrue(css.version is None,
@@ -243,6 +258,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
             css.version = "test"
 
     def testTags(self):
+        """ Test the tags property. """
         css = self.session.create_clustered_seq_set()
 
         tags = css.tags
@@ -251,7 +267,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         self.assertEqual(len(tags), 0,
                          "Template clustered_seq_set tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         css.tags = new_tags
         self.assertEqual(css.tags, new_tags,
@@ -266,16 +282,17 @@ class ClusteredSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         css = self.session.create_clustered_seq_set()
 
         css.add_tag("test")
-        self.assertEqual(css.tags, [ "test" ],
+        self.assertEqual(css.tags, ["test"],
                          "Can add a tag to a clustered_seq_set.")
 
         json_str = css.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -285,10 +302,11 @@ class ClusteredSeqSetTest(unittest.TestCase):
         json_str = css.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() method. """
         required = ClusteredSeqSet.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -298,15 +316,17 @@ class ClusteredSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteClusteredSeqSet(self):
+        """ Extensive test for the load, edit, save and delete functions. """
+
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
         # Attempt to save the clustered seq set at all points before and after
         # adding the required fields
         css = self.session.create_clustered_seq_set()
         self.assertFalse(
-                css.save(),
-                "ClusteredSeqSet not saved successfully, no required fields"
-                )
+            css.save(),
+            "ClusteredSeqSet not saved successfully, no required fields"
+        )
 
         css.comment = "Test clustered_seq_set comment"
 
@@ -318,7 +338,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         # ClusteredSeqSet nodes are "computed_from" Annotation nodes
         css.links = {"computed_from": ["88af6472fb03642dd5eaf8cddc2f3405"]}
 
-        css.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
+        css.checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
         css.format = "nucleotide_fsa"
         css.sequence_type = "nucleotide"
         css.size = 1313
@@ -333,7 +353,7 @@ class ClusteredSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             css.delete()
 
-        self.assertTrue(css.save() == True, "ClusteredSeqSet was saved successfully")
+        self.assertTrue(css.save() is True, "ClusteredSeqSet was saved successfully")
 
         # Load the clustered seq set that was just saved from the OSDF instance
         css_loaded = self.session.create_clustered_seq_set()

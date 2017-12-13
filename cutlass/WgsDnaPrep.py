@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+"""
+Models the WGS DNA prep object.
+"""
 
-from datetime import datetime
-import json
 import logging
 from itertools import count
-from iHMPSession import iHMPSession
-from mims import MIMS, MimsException
-from Base import Base
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.mims import MIMS, MimsException
+from cutlass.Base import Base
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ class WgsDnaPrep(Base):
     """
     namespace = "ihmp"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the WgsDnaPrep class. This initializes the fields specific
         to the WgsDnaPrep class, and inherits from the Base class.
@@ -54,6 +56,8 @@ class WgsDnaPrep(Base):
         self._srs_id = None
         self._storage_duration = None
 
+        super(WgsDnaPrep, self).__init__(*args, **kwargs)
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -79,13 +83,13 @@ class WgsDnaPrep(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if 'prepared_from' not in self._links.keys():
             problems.append("Must add a 'prepared_from' link to a sample.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
         return problems
 
     def is_valid(self):
@@ -109,13 +113,13 @@ class WgsDnaPrep(Base):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         if 'prepared_from' not in self._links.keys():
             self.logger.error("Must have of 'prepared_from' linkage.")
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -140,7 +144,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In comment setter.")
+        self.logger.debug("In 'comment' setter.")
 
         self._comment = comment
 
@@ -149,7 +153,7 @@ class WgsDnaPrep(Base):
         """
         int: Target library fragment size after shearing.
         """
-        self.logger.debug("In frag_size getter.")
+        self.logger.debug("In 'frag_size' getter.")
 
         return self._frag_size
 
@@ -166,7 +170,7 @@ class WgsDnaPrep(Base):
         Returns:
             None
         """
-        self.logger.debug("In frag_size setter.")
+        self.logger.debug("In 'frag_size' setter.")
 
         if frag_size < 0:
             raise ValueError("Invalid frag_size. Must be non-negative.")
@@ -425,12 +429,12 @@ class WgsDnaPrep(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
-        return ( "comment", "lib_layout", "lib_selection", "mims",
-                 "ncbi_taxon_id", "prep_id", "sequencing_center",
-                 "sequencing_contact", "storage_duration", "tags" )
+        module_logger.debug("In required_fields.")
+        return ("comment", "lib_layout", "lib_selection", "mims",
+                "ncbi_taxon_id", "prep_id", "sequencing_center",
+                "sequencing_contact", "storage_duration", "tags")
 
     def _get_raw_doc(self):
         """
@@ -450,8 +454,8 @@ class WgsDnaPrep(Base):
 
         wgs_doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ WgsDnaPrep.namespace ]
+                'read': ['all'],
+                'write': [WgsDnaPrep.namespace]
             },
             'linkage': self._links,
             'ns': WgsDnaPrep.namespace,
@@ -472,25 +476,25 @@ class WgsDnaPrep(Base):
         }
 
         if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           wgs_doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            wgs_doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           wgs_doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            wgs_doc['ver'] = self._version
 
         if self._frag_size is not None:
-           self.logger.debug(__name__ + " object has the frag_size set.")
-           wgs_doc['meta']['frag_size'] = self._frag_size
+            self.logger.debug("%s object has the frag_size set.", __name__)
+            wgs_doc['meta']['frag_size'] = self._frag_size
 
         if self._srs_id is not None:
-           self.logger.debug(__name__ + " object has the srs_id set.")
-           wgs_doc['meta']['srs_id'] = self._srs_id
+            self.logger.debug("%s object has the srs_id set.", __name__)
+            wgs_doc['meta']['srs_id'] = self._srs_id
 
         return wgs_doc
 
     @staticmethod
-    def search(query = "\"wgs_dna_prep\"[node_type]"):
+    def search(query="\"wgs_dna_prep\"[node_type]"):
         """
         Searches the OSDF database through all WgsDnaPrep node types. Any
         criteria the user wishes to add is provided by the user in the query
@@ -518,7 +522,7 @@ class WgsDnaPrep(Base):
         if query != '"wgs_dna_prep"[node_type]':
             query = '({}) && "wgs_dna_prep"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         wgsDnaPrep_data = session.get_osdf().oql_query(WgsDnaPrep.namespace, query)
 
@@ -527,9 +531,9 @@ class WgsDnaPrep(Base):
         result_list = list()
 
         if len(all_results) > 0:
-            for i in all_results:
-                wgsDnaPrep_result = WgsDnaPrep.load_wgsDnaPrep(i)
-                result_list.append(wgsDnaPrep_result)
+            for result in all_results:
+                prep_result = WgsDnaPrep.load_wgsDnaPrep(result)
+                result_list.append(prep_result)
 
         return result_list
 
@@ -544,37 +548,37 @@ class WgsDnaPrep(Base):
         Returns:
             Returns a WgsDnaPrep instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         prep = WgsDnaPrep()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         prep._set_id(prep_data['id'])
-        prep._version = prep_data['ver']
-        prep._links = prep_data['linkage']
+        prep.version = prep_data['ver']
+        prep.links = prep_data['linkage']
 
         # The attributes that are particular to WgsDnaPrep documents
-        prep._comment = prep_data['meta']['comment']
-        prep._lib_layout = prep_data['meta']['lib_layout']
-        prep._lib_selection = prep_data['meta']['lib_selection']
-        prep._mims = prep_data['meta']['mims']
-        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._sequencing_center = prep_data['meta']['sequencing_center']
-        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._tags = prep_data['meta']['tags']
+        prep.comment = prep_data['meta']['comment']
+        prep.lib_layout = prep_data['meta']['lib_layout']
+        prep.lib_selection = prep_data['meta']['lib_selection']
+        prep.mims = prep_data['meta']['mims']
+        prep.ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
+        prep.prep_id = prep_data['meta']['prep_id']
+        prep.sequencing_center = prep_data['meta']['sequencing_center']
+        prep.sequencing_contact = prep_data['meta']['sequencing_contact']
+        prep.storage_duration = prep_data['meta']['storage_duration']
+        prep.tags = prep_data['meta']['tags']
 
         if 'frag_size' in prep_data['meta']:
             module_logger.info(__name__ + " data has 'frag_size' present.")
-            prep._frag_size = prep_data['meta']['frag_size']
+            prep.frag_size = prep_data['meta']['frag_size']
 
         if 'srs_id' in prep_data['meta']:
             module_logger.info(__name__ + " data has 'srs_id' present.")
-            prep._srs_id = prep_data['meta']['srs_id']
+            prep.srs_id = prep_data['meta']['srs_id']
 
-        module_logger.debug("Returning loaded " + __name__)
+        module_logger.debug("Returning loaded %s", __name__)
 
         return prep
 
@@ -591,45 +595,14 @@ class WgsDnaPrep(Base):
         Returns:
             A WgsDnaPrep object with all the available OSDF data loaded into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % prep_id)
+        module_logger.debug("In load. Specified ID: %s", prep_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
-
         prep_data = session.get_osdf().get_node(prep_id)
+        prep = WgsDnaPrep.load_wgsDnaPrep(prep_data)
 
-        module_logger.info("Creating a template " + __name__ + ".")
-        prep = WgsDnaPrep()
-
-        module_logger.debug("Filling in " + __name__ + " details.")
-
-        # The attributes commmon to all iHMP nodes
-        prep._set_id(prep_data['id'])
-        prep._version = prep_data['ver']
-        prep._links = prep_data['linkage']
-
-        # The attributes that are particular to WgsDnaPrep documents
-        prep._comment = prep_data['meta']['comment']
-        prep._lib_layout = prep_data['meta']['lib_layout']
-        prep._lib_selection = prep_data['meta']['lib_selection']
-        prep._mims = prep_data['meta']['mims']
-        prep._ncbi_taxon_id = prep_data['meta']['ncbi_taxon_id']
-        prep._prep_id = prep_data['meta']['prep_id']
-        prep._sequencing_center = prep_data['meta']['sequencing_center']
-        prep._sequencing_contact = prep_data['meta']['sequencing_contact']
-        prep._storage_duration = prep_data['meta']['storage_duration']
-        prep._tags = prep_data['meta']['tags']
-
-        if 'frag_size' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'frag_size' present.")
-            prep._frag_size = prep_data['meta']['frag_size']
-
-        if 'srs_id' in prep_data['meta']:
-            module_logger.info(__name__ + " data has 'srs_id' present.")
-            prep._srs_id = prep_data['meta']['srs_id']
-
-        module_logger.debug("Returning loaded " + __name__)
-
+        module_logger.debug("Returning loaded %s.", __name__)
         return prep
 
     def save(self):
@@ -668,25 +641,33 @@ class WgsDnaPrep(Base):
             try:
                 self.logger.info("Attempting to save a new node.")
                 node_id = session.get_osdf().insert_node(prep_data)
-                self.logger.info("Save for WgsDnaPrep %s successful." % node_id)
-                self.logger.info("Setting ID for WgsDnaPrep %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
                 self._set_id(node_id)
                 self._version = 1
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while inserting WgsDnaPrep %s." +
-                                  "Reason: %s" % self._id, e)
+            except Exception as insert_exception:
+                self.logger.error("An error occurred while inserting %s %s."
+                                  "Reason: %s", __name__, self._id,
+                                  insert_exception
+                                 )
         else:
             prep_data = self._get_raw_doc()
 
             try:
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % self._id)
+                self.logger.info("Attempting to update %s with ID: %s.",
+                                 __name__, self._id
+                                )
                 session.get_osdf().edit_node(prep_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % self._id)
+                self.logger.info("Update for %s %s successful.",
+                                 __name__, self._id
+                                )
                 success = True
-            except Exception as e:
-                self.logger.error("An error occurred while updating " +
-                                  __name__ + " %s. Reason: %s" % self._id, e)
+            except Exception as update_exception:
+                self.logger.error(
+                    "An error occurred while updating %s %s. Reason: %s",
+                    __name__, self._id, update_exception
+                )
 
         return success
 
@@ -698,9 +679,9 @@ class WgsDnaPrep(Base):
 
         linkage_query = '"{}"[linkage.sequenced_from]'.format(self.id)
 
-        from WgsRawSeqSet import WgsRawSeqSet
-        from MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet
-        from ViralSeqSet import ViralSeqSet
+        from cutlass.WgsRawSeqSet import WgsRawSeqSet
+        from cutlass.MicrobTranscriptomicsRawSeqSet import MicrobTranscriptomicsRawSeqSet
+        from cutlass.ViralSeqSet import ViralSeqSet
 
         query = iHMPSession.get_session().get_osdf().oql_query
 

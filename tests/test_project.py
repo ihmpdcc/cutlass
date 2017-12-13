@@ -1,36 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Project module. """
+
 import unittest
 import json
-import sys
 
-from cutlass import iHMPSession
 from cutlass import Project
 from cutlass import MIXS, MixsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class ProjectTest(unittest.TestCase):
+    """ A unit test class for the Project module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the Project module. """
         success = False
         try:
             from cutlass import Project
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(Project is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a Project via the session. """
         success = False
         project = None
 
@@ -38,69 +47,30 @@ class ProjectTest(unittest.TestCase):
             project = self.session.create_project()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(project is None)
 
     def testName(self):
-        project = self.session.create_project()
-        success = False
-        test_name = "test name"
-
-        try:
-            project.name = test_name
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'name' setter.")
-
-        self.assertEqual(project.name, test_name,
-                         "Property getter for 'name' works.")
-
-    def testIntName(self):
+        """ Test the name property. """
         project = self.session.create_project()
 
-        with self.assertRaises(ValueError):
-            project.name = 3
+        self.util.stringTypeTest(self, project, "name")
 
-    def testListName(self):
-        project = self.session.create_project()
-
-        with self.assertRaises(ValueError):
-            project.name = [ "a", "b", "c" ]
-
-    def testNoneName(self):
-        project = self.session.create_project()
-
-        with self.assertRaises(ValueError):
-            project.name = None
+        self.util.stringPropertyTest(self, project, "name")
 
     def testDescription(self):
-        project = self.session.create_project()
-        success = False
-        test_description = "test description"
-
-        try:
-            project.description = test_description
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'description' setter.")
-
-        self.assertEqual(project.description, test_description,
-                         "Property getter for 'description' works.")
-
-    def testIntDescription(self):
+        """ Test the description property. """
         project = self.session.create_project()
 
-        with self.assertRaises(ValueError):
-            project.description = 3
+        self.util.stringTypeTest(self, project, "description")
+
+        self.util.stringPropertyTest(self, project, "description")
 
     def testToJson(self):
+        """ Test the to_json() method. """
         project = self.session.create_project()
         success = False
         name = "test_name"
@@ -113,7 +83,7 @@ class ProjectTest(unittest.TestCase):
         try:
             project_json = project.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -124,7 +94,7 @@ class ProjectTest(unittest.TestCase):
         try:
             project_data = json.loads(project_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -138,6 +108,7 @@ class ProjectTest(unittest.TestCase):
         self.assertEqual(project_data['meta']['description'],
                          description, "'description' in JSON had expected value.")
     def testId(self):
+        """ Test the id property. """
         project = self.session.create_project()
 
         self.assertTrue(project.id is None,
@@ -147,6 +118,7 @@ class ProjectTest(unittest.TestCase):
             project.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         project = self.session.create_project()
 
         self.assertTrue(project.version is None,
@@ -156,13 +128,16 @@ class ProjectTest(unittest.TestCase):
             project.version = "test"
 
     def testMixs(self):
+        """ Test the mixs property. """
         project = self.session.create_project()
 
         self.assertTrue(project.mixs is None,
                         "New template project has no MIXS data.")
 
-        invalid_test_mixs = { "a": 1,
-                              "b": 2 }
+        invalid_test_mixs = {
+            "a": 1,
+            "b": 2
+        }
 
         with self.assertRaises(MixsException):
             project.mixs = invalid_test_mixs
@@ -184,7 +159,7 @@ class ProjectTest(unittest.TestCase):
             "samp_collect_device": "samp_collect_device",
             "samp_mat_process": "samp_mat_process",
             "samp_size": "samp_size",
-            "source_mat_id": [ "a", "b", "c" ]
+            "source_mat_id": ["a", "b", "c"]
         }
 
         # Assume failure
@@ -193,7 +168,7 @@ class ProjectTest(unittest.TestCase):
         try:
             project.mixs = valid_mixs
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Valid MIXS data does not raise exception.")
@@ -205,13 +180,14 @@ class ProjectTest(unittest.TestCase):
                          "Retrieved MIXS data appears to be okay.")
 
     def testTags(self):
+        """ Test the tags property. """
         project = self.session.create_project()
 
         tags = project.tags
         self.assertTrue(type(tags) == list, "Project tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template project tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         project.tags = new_tags
         self.assertEqual(project.tags, new_tags, "Can set tags on a project.")
@@ -224,17 +200,17 @@ class ProjectTest(unittest.TestCase):
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
 
-
     def testAddTag(self):
+        """ Test the add_tag() method. """
         project = self.session.create_project()
 
         project.add_tag("test")
-        self.assertEqual(project.tags, [ "test" ], "Can add a tag to a project.")
+        self.assertEqual(project.tags, ["test"], "Can add a tag to a project.")
 
         json_str = project.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -244,10 +220,11 @@ class ProjectTest(unittest.TestCase):
         json_str = project.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = Project.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -256,54 +233,17 @@ class ProjectTest(unittest.TestCase):
         self.assertTrue(len(required) > 0,
                         "required_field() did not return empty value.")
 
-    def testSaveProject(self):
-        # Attempt to save the project at all points before and after adding
-        # the required fields
-        project = self.session.create_project()
-
-        project.name = "Test Project"
-
-        project.description = "Test description"
-
-        project.add_tag("First test tag")
-        fields = {
-            "biome": "ASDSADSA",
-            "body_product": "ASDFASF",
-            "collection_date": "SADSAGRGFEWR",
-            "env_package": "HJRJRE",
-            "feature": "EKPFOMEPW",
-            "geo_loc_name": "AEKEPDMPEWDE",
-            "lat_lon": "EPDEWIPDFMEW",
-            "material": "AMDPISACMSA",
-            "project_name": "ASDMSAPDSA",
-            "rel_to_oxygen": "WQPRJEP",
-            "samp_collect_device": "#@)D#J*)",
-            "samp_mat_process": "ASDSA",
-            "samp_size": "DF)GIP$R$GMPRWG",
-            "source_mat_id": ['asdfasfds', 'epowfjiegw']
-        }
-
-        self.assertFalse(project.save(),
-                         "Project not saved successfully, missing MIXS")
-        project.mixs = fields
-
-        # Make sure project does not delete if it does not exist
-        with self.assertRaises(Exception):
-            project.delete()
-        self.assertTrue(project.save() == True, "project saved successfully")
-
-        return project.id
-
     def testLoadSaveDeleteProject(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the project at all points before and after adding the required fields
         project = self.session.create_project()
         self.assertFalse(project.save(),
                          "Project not saved successfully, no required fields")
         project.name = "Test Project"
         self.assertFalse(
-             project.save(),
-             "Project not saved successfully, missing description, tags, and MIXS"
-             )
+            project.save(),
+            "Project not saved successfully, missing description, tags, and MIXS"
+        )
         project.description = "Test description"
         self.assertFalse(project.save(), "Project not saved successfully, missing tags and MIXS")
         project.add_tag("First test tag")
@@ -331,7 +271,7 @@ class ProjectTest(unittest.TestCase):
         # Make sure project does not delete if it does not exist
         with self.assertRaises(Exception):
             project.delete()
-        self.assertTrue(project.save() == True, "project saved successfully")
+        self.assertTrue(project.save() is True, "project saved successfully")
 
         # Load the project that was just saved from the OSDF instance
         project_loaded = self.session.create_project()

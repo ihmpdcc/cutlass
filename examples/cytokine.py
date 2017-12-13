@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import Cytokine
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(Cytokine.required_fields())
 
 cyto = Cytokine()
 
-cyto.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+cyto.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 cyto.study = "prediabetes"
 
 print("Creating a temp file for example/testing purposes.")
@@ -44,9 +46,9 @@ cyto.local_file = temp_file
 cyto.private_files = False
 
 # Cytokines are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps
-cyto.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b93c50" ] }
+cyto.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b93c50"]}
 
-cyto.tags = [ "cytokine", "ihmp" ]
+cyto.tags = ["cytokine", "ihmp"]
 cyto.add_tag("another")
 cyto.add_tag("and_another")
 

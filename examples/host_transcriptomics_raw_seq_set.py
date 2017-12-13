@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import HostTranscriptomicsRawSeqSet
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
@@ -29,7 +30,7 @@ print(HostTranscriptomicsRawSeqSet.required_fields())
 
 htrss = HostTranscriptomicsRawSeqSet()
 
-htrss.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+htrss.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 htrss.study = "prediabetes"
 
 print("Creating a temp file for example/testing purposes.")
@@ -48,9 +49,9 @@ htrss.local_file = temp_file
 htrss.private_files = False
 
 # HostTranscriptomicsRawSeqSets are 'sequenced_from' HostSeqPrep nodes
-htrss.links = { "sequenced_from": [ "88af6472fb03642dd5eaf8cddc70c8ec" ] }
+htrss.links = {"sequenced_from": ["88af6472fb03642dd5eaf8cddc70c8ec"]}
 
-htrss.tags = [ "host_transcriptomics_raw_seq_set", "ihmp" ]
+htrss.tags = ["host_transcriptomics_raw_seq_set", "ihmp"]
 htrss.add_tag("another")
 htrss.add_tag("and_another")
 

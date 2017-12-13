@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import Lipidome
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(Lipidome.required_fields())
 
 lip = Lipidome()
 
-lip.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+lip.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 lip.study = "prediabetes"
 lip.subtype = "host"
 
@@ -45,9 +47,9 @@ lip.local_file = temp_file
 lip.private_files = True
 
 # Lipidomes are 'derived_from' MicrobiomeAssayPreps and HostAssayPreps
-lip.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b93c50" ] }
+lip.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b93c50"]}
 
-lip.tags = [ "lipidome", "ihmp" ]
+lip.tags = ["lipidome", "ihmp"]
 lip.add_tag("another")
 lip.add_tag("and_another")
 
@@ -66,8 +68,7 @@ if lip.is_valid():
 
         print(lip2.to_json(indent=2))
 
-        #deletion_success = lip.delete()
-        deletion_success = True
+        deletion_success = lip.delete()
 
         if deletion_success:
             print("Deleted lipidome with ID %s" % lip_id)

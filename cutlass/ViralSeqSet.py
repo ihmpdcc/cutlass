@@ -21,7 +21,7 @@ module_logger.addHandler(logging.NullHandler())
 class ViralSeqSet(Base):
     """
     The class encapsulates iHMP viral sequence set data. It contains all
-    the fields required to save a such an object in OSDF.
+    the fields required to save such an object in OSDF.
 
     Attributes:
 
@@ -391,9 +391,9 @@ class ViralSeqSet(Base):
         Returns:
             Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
 
-        return ("checksums", "study", "tags")
+        return ("checksums", "local_file", "study", "tags")
 
     def delete(self):
         """
@@ -621,8 +621,8 @@ class ViralSeqSet(Base):
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 

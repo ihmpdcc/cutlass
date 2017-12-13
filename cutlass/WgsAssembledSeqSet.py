@@ -472,9 +472,9 @@ class WgsAssembledSeqSet(Base):
         Returns:
             Tuple of strings of the required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("assembler", "assembly_name", "checksums", "comment",
-                "format", "format_doc", "sequence_type", "size",
+                "format", "format_doc", "local_file", "sequence_type", "size",
                 "study", "tags", "urls")
 
     def _get_raw_doc(self):

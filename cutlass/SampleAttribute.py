@@ -213,7 +213,7 @@ class SampleAttribute(Base):
         Returns:
             Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
 
         return ("fecalcal", "study", "tags")
 

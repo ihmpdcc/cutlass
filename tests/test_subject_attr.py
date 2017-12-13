@@ -1,22 +1,32 @@
 #!/usr/bin/env python
 
+""" A unittest script for the SubjectAttribute module. """
+
 import unittest
 import json
 
 from cutlass import SubjectAttribute
+
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
 # pylint: disable=W0703, C1801
 
 class SubjectAttributeTest(unittest.TestCase):
+    """ A unit test class for the SubjectAttribute module. """
+
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the SubjectAttribute module. """
         success = False
         try:
             from cutlass import SubjectAttribute
@@ -28,6 +38,7 @@ class SubjectAttributeTest(unittest.TestCase):
         self.failIf(SubjectAttribute is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a SubjectAttribute via the session. """
         success = False
         subject_attr = None
 
@@ -42,6 +53,7 @@ class SubjectAttributeTest(unittest.TestCase):
         self.failIf(subject_attr is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a SubjectAttribute instance. """
         subject_attr = self.session.create_subject_attr()
         success = False
 
@@ -76,6 +88,7 @@ class SubjectAttributeTest(unittest.TestCase):
                          "'gallbladder' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         subject_attr = self.session.create_subject_attr()
 
         self.assertTrue(subject_attr.id is None,
@@ -85,6 +98,7 @@ class SubjectAttributeTest(unittest.TestCase):
             subject_attr.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         subject_attr = self.session.create_subject_attr()
 
         self.assertTrue(subject_attr.version is None,
@@ -94,6 +108,7 @@ class SubjectAttributeTest(unittest.TestCase):
             subject_attr.version = "test"
 
     def testTags(self):
+        """ Test the tags property. """
         subj_attr = self.session.create_subject_attr()
 
         tags = subj_attr.tags
@@ -116,6 +131,7 @@ class SubjectAttributeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         subj_attr = self.session.create_subject_attr()
 
         subj_attr.add_tag("test")
@@ -138,6 +154,7 @@ class SubjectAttributeTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = SubjectAttribute.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -147,940 +164,265 @@ class SubjectAttributeTest(unittest.TestCase):
                         "required_fields() did not return empty value.")
 
     # alcohol
-    def testIllegalAlcohol(self):
+    def testAlcohol(self):
+        """ Test the alcohol property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.alcohol = 1
+        self.util.stringTypeTest(self, subj_attr, "alcohol")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.alcohol = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.alcohol = {'a': 1, 'b': 2}
-
-    def testLegalAlcohol(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        alcohol = "vodka, 3"
-
-        try:
-            subj_attr.alcohol = alcohol
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'alcohol' setter.")
-
-        self.assertEqual(subj_attr.alcohol, alcohol,
-                         "Property getter for 'alcohol' works.")
+        self.util.stringPropertyTest(self, subj_attr, "alcohol")
 
     # aerobics
-    def testIllegalAerobics(self):
+    def testAerobics(self):
+        """ Test the aerobics property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.aerobics = 1
+        self.util.stringTypeTest(self, subj_attr, "aerobics")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.aerobics = ['a', 'b', 'c']
+        self.util.stringPropertyTest(self, subj_attr, "aerobics")
 
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.aerobics = {'a': 1, 'b': 2}
-
-    def testLegalAerobics(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        aerobics = "running, 60"
-
-        try:
-            subj_attr.aerobics = aerobics
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'aerobics' setter.")
-
-        self.assertEqual(subj_attr.aerobics, aerobics,
-                         "Property getter for 'aerobics' works.")
-
-    # allergies
-    def testIllegalAllergies(self):
+    def testAllergies(self):
+        """ Test the allergies property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test string argument
-        with self.assertRaises(Exception):
-            subj_attr.allergies = "hayfever"
+        self.util.boolTypeTest(self, subj_attr, "allergies")
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.allergies = 1
-
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.allergies = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.allergies = {'a': 1, 'b': 2}
-
-    def testLegalAllergies(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        allergies = True
-
-        try:
-            subj_attr.allergies = allergies
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'allergies' setter.")
-
-        self.assertEqual(subj_attr.allergies, allergies,
-                         "Property getter for 'allergies' works.")
+        self.util.boolPropertyTest(self, subj_attr, "allergies")
 
     # asthma
-    def testIllegalAsthma(self):
+    def testAsthma(self):
+        """ Test the asthma property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.asthma = 1
+        self.util.stringTypeTest(self, subj_attr, "asthma")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.asthma = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.asthma = {'a': 1, 'b': 2}
-
-    def testLegalAsthma(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        asthma = "yes, asthma for 15 years"
-
-        try:
-            subj_attr.asthma = asthma
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'asthma' setter.")
-
-        self.assertEqual(subj_attr.asthma, asthma,
-                         "Property getter for 'asthma' works.")
+        self.util.stringPropertyTest(self, subj_attr, "asthma")
 
     # cad (coronary artery disease)
-    def testIllegalCAD(self):
+    def testCAD(self):
+        """ Test the cad property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.cad = 1
+        self.util.stringTypeTest(self, subj_attr, "cad")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.cad = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.cad = {'a': 1, 'b': 2}
-
-    def testLegalCAD(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        cad = "no, never CAD"
-
-        try:
-            subj_attr.cad = cad
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'cad' setter.")
-
-        self.assertEqual(subj_attr.cad, cad,
-                         "Property getter for 'cad' works.")
+        self.util.stringPropertyTest(self, subj_attr, "cad")
 
     # chf (chronic heart failure)
-    def testIllegalCHF(self):
+    def testCHF(self):
+        """ Test the chf property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.chf = 1
+        self.util.stringTypeTest(self, subj_attr, "chf")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.chf = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.chf = {'a': 1, 'b': 2}
-
-    def testLegalCHF(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        chf = "no, never CHF"
-
-        try:
-            subj_attr.chf = chf
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'chf' setter.")
-
-        self.assertEqual(subj_attr.chf, chf,
-                         "Property getter for 'chf' works.")
+        self.util.stringPropertyTest(self, subj_attr, "chf")
 
     # comment
-    def testIllegalComment(self):
+    def testComment(self):
+        """ Test the comment property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.comment = 1
+        self.util.stringTypeTest(self, subj_attr, "comment")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.comment = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.comment = {'a': 1, 'b': 2}
-
-    def testLegalComment(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        comment = "some comment"
-
-        try:
-            subj_attr.comment = comment
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'comment' setter.")
-
-        self.assertEqual(subj_attr.comment, comment,
-                         "Property getter for 'comment' works.")
+        self.util.stringPropertyTest(self, subj_attr, "comment")
 
     # contact
-    def testIllegalContact(self):
+    def testContact(self):
+        """ Test the contact property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test string argument
-        with self.assertRaises(Exception):
-            subj_attr.contact = "contact"
+        self.util.boolTypeTest(self, subj_attr, "contact")
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.contact = 1
-
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.contact = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.contact = {'a': 1, 'b': 2}
-
-    def testLegalContact(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        contact = True
-
-        try:
-            subj_attr.contact = contact
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'contact' setter.")
-
-        self.assertEqual(subj_attr.contact, contact,
-                         "Property getter for 'contact' works.")
+        self.util.boolPropertyTest(self, subj_attr, "contact")
 
     # diabetes
-    def testIllegalDiabetes(self):
+    def testDiabetes(self):
+        """ Test the diabetes property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.diabetes = 1
+        self.util.stringTypeTest(self, subj_attr, "diabetes")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.diabetes = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.diabetes = {'a': 1, 'b': 2}
-
-    def testLegalDiabetes(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        diabetes = "yes, congenital"
-
-        try:
-            subj_attr.diabetes = diabetes
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'diabetes' setter.")
-
-        self.assertEqual(subj_attr.diabetes, diabetes,
-                         "Property getter for 'diabetes' works.")
+        self.util.stringPropertyTest(self, subj_attr, "diabetes")
 
     # education
-    def testIllegalEducation(self):
+    def testEducation(self):
+        """ Test the education property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.education = 1
+        self.util.stringTypeTest(self, subj_attr, "education")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.education = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.education = {'a': 1, 'b': 2}
-
-    def testLegalEducation(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        education = "school"
-
-        try:
-            subj_attr.education = education
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'education' setter.")
-
-        self.assertEqual(subj_attr.education, education,
-                         "Property getter for 'education' works.")
+        self.util.stringPropertyTest(self, subj_attr, "education")
 
     # family_history
-    def testIllegalFamilyHistory(self):
-        subj_attr = self.session.create_subject_attr()
-
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.family_history = 1
-
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.family_history = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.family_history = {'a': 1, 'b': 2}
-
     def testLegalFamilyHistory(self):
+        """ Test the family_history property. """
         subj_attr = self.session.create_subject_attr()
-        success = False
-        family_history = "family history"
 
-        try:
-            subj_attr.family_history = family_history
-            success = True
-        except Exception:
-            pass
+        self.util.stringTypeTest(self, subj_attr, "family_history")
 
-        self.assertTrue(success, "Able to use the 'family_history' setter.")
-
-        self.assertEqual(subj_attr.family_history, family_history,
-                         "Property getter for 'family_history' works.")
+        self.util.stringPropertyTest(self, subj_attr, "family_history")
 
     # father
-    def testIllegalFather(self):
+    def testFather(self):
+        """ Test the father property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.father = 1
+        self.util.stringTypeTest(self, subj_attr, "father")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.father = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.father = {'a': 1, 'b': 2}
-
-    def testLegalFather(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        father = "dad"
-
-        try:
-            subj_attr.father = father
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'father' setter.")
-
-        self.assertEqual(subj_attr.father, father,
-                         "Property getter for 'father' works.")
+        self.util.stringPropertyTest(self, subj_attr, "father")
 
     # gallbladder
-    def testIllegalGallbladder(self):
+    def testGallbladder(self):
+        """ Test the gallbladder property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.gallbladder = 1
+        self.util.stringTypeTest(self, subj_attr, "gallbladder")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.gallbladder = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.gallbladder = {'a': 1, 'b': 2}
-
-    def testLegalGallbladder(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        gallbladder = "yes, gallbladder disease for 1 year"
-
-        try:
-            subj_attr.gallbladder = gallbladder
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'gallbladder' setter.")
-
-        self.assertEqual(subj_attr.gallbladder, gallbladder,
-                         "Property getter for 'gallbladder' works.")
+        self.util.stringPropertyTest(self, subj_attr, "gallbladder")
 
     # hyperlipidemia
-    def testIllegalHyperlipidemia(self):
+    def testHyperlipidemia(self):
+        """ Test the hyperlipidemia property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.hyperlipidemia = 1
+        self.util.stringTypeTest(self, subj_attr, "hyperlipidemia")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.hyperlipidemia = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.hyperlipidemia = {'a': 1, 'b': 2}
-
-    def testLegalHyperlipidemia(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        hyperlipidemia = "yes, hyperlipidemia 10 years"
-
-        try:
-            subj_attr.hyperlipidemia = hyperlipidemia
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'hyperlipidemia' setter.")
-
-        self.assertEqual(subj_attr.hyperlipidemia, hyperlipidemia,
-                         "Property getter for 'hyperlipidemia' works.")
+        self.util.stringPropertyTest(self, subj_attr, "hyperlipidemia")
 
     # hypertension
-    def testIllegalHypertension(self):
+    def testHypertension(self):
+        """ Test the hypertension property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.hypertension = 1
+        self.util.stringTypeTest(self, subj_attr, "hypertension")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.hypertension = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.hypertension = {'a': 1, 'b': 2}
-
-    def testLegalHypertension(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        hypertension = "yes, hypertension 10 years"
-
-        try:
-            subj_attr.hypertension = hypertension
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'hypertension' setter.")
-
-        self.assertEqual(subj_attr.hypertension, hypertension,
-                         "Property getter for 'hypertension' works.")
+        self.util.stringPropertyTest(self, subj_attr, "hypertension")
 
     # illicit_drug
-    def testIllegalIllicitDrug(self):
+    def testIllicitDrug(self):
+        """ Test the illicit_drug property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.illicit_drug = 1
+        self.util.stringTypeTest(self, subj_attr, "illicit_drug")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.illicit_drug = ['a', 'b', 'c']
+        self.util.stringPropertyTest(self, subj_attr, "illicit_drug")
 
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.illicit_drug = {'a': 1, 'b': 2}
-
-    def testLegalIllicitDrug(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        illicit_drug = "no, did not inhale"
-
-        try:
-            subj_attr.illicit_drug = illicit_drug
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'illicit_drug' setter.")
-
-        self.assertEqual(subj_attr.illicit_drug, illicit_drug,
-                         "Property getter for 'illicit_drug' works.")
-
-    def testIllegalKidney(self):
+    def testKidney(self):
+        """ Test the kidney property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.kidney = 1
+        self.util.stringTypeTest(self, subj_attr, "kidney")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.kidney = ['a', 'b', 'c']
+        self.util.stringPropertyTest(self, subj_attr, "kidney")
 
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.kidney = {'a': 1, 'b': 2}
-
-    def testLegalKidney(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        kidney = "yes, kidney disease for 3 years"
-
-        try:
-            subj_attr.kidney = kidney
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'kidney' setter.")
-
-        self.assertEqual(subj_attr.kidney, kidney,
-                         "Property getter for 'kidney' works.")
-
-    def testIllegalLiver(self):
+    def testLiver(self):
+        """ Test the liver property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.liver = 1
+        self.util.stringTypeTest(self, subj_attr, "liver")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.liver = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.liver = {'a': 1, 'b': 2}
-
-    def testLegalLiver(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        liver = "yes, liver disease for 5 years"
-
-        try:
-            subj_attr.liver = liver
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'liver' setter.")
-
-        self.assertEqual(subj_attr.liver, liver,
-                         "Property getter for 'liver' works.")
+        self.util.stringPropertyTest(self, subj_attr, "liver")
 
     # lmp (last menstrual period)
-    def testIllegalLMP(self):
+    def testLMP(self):
+        """ Test the lmp property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.lmp = 1
+        self.util.stringTypeTest(self, subj_attr, "lmp")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.lmp = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.lmp = {'a': 1, 'b': 2}
-
-    def testLegalLMP(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        lmp = "N/A"
-
-        try:
-            subj_attr.lmp = lmp
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'lmp' setter.")
-
-        self.assertEqual(subj_attr.lmp, lmp,
-                         "Property getter for 'lmp' works.")
+        self.util.stringPropertyTest(self, subj_attr, "lmp")
 
     # mother
-    def testIllegalMother(self):
+    def testMother(self):
+        """ Test the mother property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.mother = 1
+        self.util.stringTypeTest(self, subj_attr, "mother")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.mother = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.mother = {'a': 1, 'b': 2}
-
-    def testLegalMother(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        mother = "mom"
-
-        try:
-            subj_attr.mother = mother
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'mother' setter.")
-
-        self.assertEqual(subj_attr.mother, mother,
-                         "Property getter for 'mother' works.")
+        self.util.stringPropertyTest(self, subj_attr, "mother")
 
     # osa (obstructive sleep apnea)
-    def testIllegalOSA(self):
+    def testOSA(self):
+        """ Test the osa (obstructive sleep anea) property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.osa = 1
+        self.util.stringTypeTest(self, subj_attr, "osa")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.osa = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.osa = {'a': 1, 'b': 2}
-
-    def testLegalOSA(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        osa = "yes, can't sleep for 2 years"
-
-        try:
-            subj_attr.osa = osa
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'osa' setter.")
-
-        self.assertEqual(subj_attr.osa, osa,
-                         "Property getter for 'osa' works.")
+        self.util.stringPropertyTest(self, subj_attr, "osa")
 
     # occupation
-    def testIllegalOccupation(self):
-        subj_attr = self.session.create_subject_attr()
-
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.occupation = 1
-
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.occupation = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.occupation = {'a': 1, 'b': 2}
-
     def testLegalOccupation(self):
+        """ Test the occupation property. """
         subj_attr = self.session.create_subject_attr()
-        success = False
-        occupation = "work"
 
-        try:
-            subj_attr.occupation = occupation
-            success = True
-        except Exception:
-            pass
+        self.util.stringTypeTest(self, subj_attr, "occupation")
 
-        self.assertTrue(success, "Able to use the 'occupation' setter.")
-
-        self.assertEqual(subj_attr.occupation, occupation,
-                         "Property getter for 'occupation' works.")
+        self.util.stringPropertyTest(self, subj_attr, "occupation")
 
     # pancreatitis
-    def testIllegalPancreatitis(self):
+    def testPancreatitis(self):
+        """ Test the pancreatitis property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.pancreatitis = 1
+        self.util.stringTypeTest(self, subj_attr, "pancreatitis")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.pancreatitis = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.pancreatitis = {'a': 1, 'b': 2}
-
-    def testLegalPancreatitis(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        pancreatitis = "no, never pancreatitis"
-
-        try:
-            subj_attr.pancreatitis = pancreatitis
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'pancreatitis' setter.")
-
-        self.assertEqual(subj_attr.pancreatitis, pancreatitis,
-                         "Property getter for 'pancreatitis' works.")
+        self.util.stringPropertyTest(self, subj_attr, "pancreatitis")
 
     # postmenopausal
-    def testIllegalPostmenopausal(self):
+    def testPostmenopausal(self):
+        """ Test the postmenopausal property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.postmenopausal = 1
+        self.util.stringTypeTest(self, subj_attr, "postmenopausal")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.postmenopausal = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.postmenopausal = {'a': 1, 'b': 2}
-
-    def testLegalPostmenopausal(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        postmenopausal = "no, never postmenopausal"
-
-        try:
-            subj_attr.postmenopausal = postmenopausal
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'postmenopausal' setter.")
-
-        self.assertEqual(subj_attr.postmenopausal, postmenopausal,
-                         "Property getter for 'postmenopausal' works.")
+        self.util.stringPropertyTest(self, subj_attr, "postmenopausal")
 
     # pvd (peripheral vascular disease)
-    def testIllegalPVD(self):
+    def testPVD(self):
+        """ Test the pvd (peripheral vascular disease) property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.pvd = 1
+        self.util.stringTypeTest(self, subj_attr, "pvd")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.pvd = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.pvd = {'a': 1, 'b': 2}
-
-    def testLegalPVD(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        pvd = "no, never pvd"
-
-        try:
-            subj_attr.pvd = pvd
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'pvd' setter.")
-
-        self.assertEqual(subj_attr.pvd, pvd,
-                         "Property getter for 'pvd' works.")
+        self.util.stringPropertyTest(self, subj_attr, "pvd")
 
     # rx (prescriptions)
-    def testIllegalRx(self):
+    def testRx(self):
+        """ Test the rx (prescriptions) property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.rx = 1
+        self.util.stringTypeTest(self, subj_attr, "rx")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.rx = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.rx = {'a': 1, 'b': 2}
-
-    def testLegalRx(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        rx = "prescriptions"
-
-        try:
-            subj_attr.rx = rx
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'rx' setter.")
-
-        self.assertEqual(subj_attr.rx, rx,
-                         "Property getter for 'rx' works.")
+        self.util.stringPropertyTest(self, subj_attr, "rx")
 
     # siblings
-    def testIllegalSiblings(self):
+    def testSiblings(self):
+        """ Test the siblings property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.siblings = 1
+        self.util.stringTypeTest(self, subj_attr, "siblings")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.siblings = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.siblings = {'a': 1, 'b': 2}
-
-    def testLegalSiblings(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        siblings = "brothers"
-
-        try:
-            subj_attr.siblings = siblings
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'siblings' setter.")
-
-        self.assertEqual(subj_attr.siblings, siblings,
-                         "Property getter for 'siblings' works.")
+        self.util.stringPropertyTest(self, subj_attr, "siblings")
 
     # survey_id
-    def testIllegalSurveyID(self):
+    def testSurveyID(self):
+        """ Test the survey_id property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test int argument
-        with self.assertRaises(Exception):
-            subj_attr.survey_id = 1
+        self.util.stringTypeTest(self, subj_attr, "survey_id")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.survey_id = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.survey_id = {'a': 1, 'b': 2}
-
-    def testLegalSurveyID(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        survey_id = "some survey id"
-
-        try:
-            subj_attr.survey_id = survey_id
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'survey_id' setter.")
-
-        self.assertEqual(subj_attr.survey_id, survey_id,
-                         "Property getter for 'survey_id' works.")
+        self.util.stringPropertyTest(self, subj_attr, "survey_id")
 
     # tobacco
-    def testIllegalTobacco(self):
+    def testTobacco(self):
+        """ Test the tobacco property. """
         subj_attr = self.session.create_subject_attr()
 
-        # Test string argument
-        with self.assertRaises(Exception):
-            subj_attr.tobacco = "smokes a lot"
+        self.util.intTypeTest(self, subj_attr, "tobacco")
 
-        # Test list argument
-        with self.assertRaises(Exception):
-            subj_attr.tobacco = ['a', 'b', 'c']
-
-        # Test dict argument
-        with self.assertRaises(Exception):
-            subj_attr.tobacco = {'a': 1, 'b': 2}
-
-    def testLegalTobacco(self):
-        subj_attr = self.session.create_subject_attr()
-        success = False
-        tobacco = 10
-
-        try:
-            subj_attr.tobacco = tobacco
-            success = True
-        except Exception:
-            pass
-
-        self.assertTrue(success, "Able to use the 'tobacco' setter.")
-
-        self.assertEqual(subj_attr.tobacco, tobacco,
-                         "Property getter for 'tobacco' works.")
+        self.util.intPropertyTest(self, subj_attr, "tobacco")
 
     def testLoadSaveDeleteSubjectAttribute(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the subject attribute at all points before and after
         # adding the required fields
 

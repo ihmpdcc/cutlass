@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+"""
+Models the HostWgsRawSeqSet object.
+"""
 
 import json
 import logging
 import os
 import string
-from itertools import count
-from iHMPSession import iHMPSession
-from Base import Base
-from aspera import aspera
-from Util import *
+from cutlass.iHMPSession import iHMPSession
+from cutlass.Base import Base
+from cutlass.aspera import aspera
+from cutlass.Util import *
+
+# pylint: disable=W0703, C1801
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,7 +31,7 @@ class HostWgsRawSeqSet(Base):
 
     aspera_server = "aspera.ihmpdcc.org"
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the HostWgsRawSeqSet class. This initializes the fields
         specific to the HostWgsRawSeqSet class, and inherits from the Base
@@ -63,6 +66,8 @@ class HostWgsRawSeqSet(Base):
         # Optional properties
         self._private_files = None
 
+        super(HostWgsRawSeqSet, self).__init__(*args, **kwargs)
+
     def validate(self):
         """
         Validates the current object's data/JSON against the current
@@ -88,7 +93,7 @@ class HostWgsRawSeqSet(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if self._private_files:
@@ -103,7 +108,7 @@ class HostWgsRawSeqSet(Base):
         if 'sequenced_from' not in self._links.keys():
             problems.append("Must add a 'sequenced_from' link to a host_seq_prep.")
 
-        self.logger.debug("Number of validation problems: %s." % len(problems))
+        self.logger.debug("Number of validation problems: %s.", len(problems))
 
         return problems
 
@@ -128,10 +133,10 @@ class HostWgsRawSeqSet(Base):
 
         valid = True
         if len(problems):
-            self.logger.error("There were %s problems." % str(len(problems)))
+            self.logger.error("There were %s problems.", len(problems))
             valid = False
 
-        self.logger.debug("Valid? %s" % str(valid))
+        self.logger.debug("Valid? %s", str(valid))
 
         return valid
 
@@ -188,8 +193,10 @@ class HostWgsRawSeqSet(Base):
 
     @property
     def exp_length(self):
-        """ int: The number of raw bases or color space calls expected for the read,
-                 includes both mate pairs and all technical portions. """
+        """
+        int: The number of raw bases or color space calls expected for the read,
+             includes both mate pairs and all technical portions.
+        """
         self.logger.debug("In 'exp_length' getter.")
 
         return self._exp_length
@@ -374,7 +381,7 @@ class HostWgsRawSeqSet(Base):
         if sequence_type in types:
             self._sequence_type = sequence_type
         else:
-            raise Exception("Sequence type must be either peptide or nucleotide")
+            raise Exception("Sequence type must be peptide or nucleotide")
 
     @property
     def size(self):
@@ -454,11 +461,11 @@ class HostWgsRawSeqSet(Base):
             None
 
         Returns:
-            None
+            Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "seq_model", "size", "study", "tags", "urls")
+                "local_file", "seq_model", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
         """
@@ -476,8 +483,8 @@ class HostWgsRawSeqSet(Base):
 
         doc = {
             'acl': {
-                'read': [ 'all' ],
-                'write': [ HostWgsRawSeqSet.namespace ]
+                'read': ['all'],
+                'write': [HostWgsRawSeqSet.namespace]
             },
             'linkage': self._links,
             'ns': HostWgsRawSeqSet.namespace,
@@ -498,26 +505,28 @@ class HostWgsRawSeqSet(Base):
         }
 
         if self._id is not None:
-           self.logger.debug(__name__ + " object has the OSDF id set.")
-           doc['id'] = self._id
+            self.logger.debug("%s object has the OSDF id set.", __name__)
+            doc['id'] = self._id
 
         if self._version is not None:
-           self.logger.debug(__name__ + " object has the OSDF version set.")
-           doc['ver'] = self._version
+            self.logger.debug("%s object has the OSDF version set.", __name__)
+            doc['ver'] = self._version
 
         # Handle optional properties
         if self._sequence_type is not None:
-           self.logger.debug(__name__ + " object has the sequence_type set.")
-           doc['meta']['sequence_type'] = self._sequence_type
+            self.logger.debug("%s object has the sequence_type set.", __name__)
+            doc['meta']['sequence_type'] = self._sequence_type
 
         if self._private_files is not None:
-            self.logger.debug("Object has the 'private_files' property set.")
+            self.logger.debug("%s object has the 'private_files' property set.",
+                              __name__
+                             )
             doc['meta']['private_files'] = self._private_files
 
         return doc
 
     @staticmethod
-    def search(query = "\"host_wgs_raw_seq_set\"[node_type]"):
+    def search(query="\"host_wgs_raw_seq_set\"[node_type]"):
         """
         Searches the OSDF database through all HostWgsRawSeqSet node types. Any
         criteria the user wishes to add is provided by the user in the query
@@ -545,7 +554,7 @@ class HostWgsRawSeqSet(Base):
         if query != '"host_wgs_raw_seq_set"[node_type]':
             query = '({}) && "host_wgs_raw_seq_set"[node_type]'.format(query)
 
-        module_logger.debug("Submitting OQL query: {}".format(query))
+        module_logger.debug("Submitting OQL query: %s", query)
 
         seqSet_data = session.get_osdf().oql_query("ihmp", query)
 
@@ -572,34 +581,34 @@ class HostWgsRawSeqSet(Base):
         Returns:
             Returns a HostWgsRawSeqSet instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         seq_set = HostWgsRawSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
-        seq_set._version = seq_set_data['ver']
-        seq_set._links = seq_set_data['linkage']
+        seq_set.version = seq_set_data['ver']
+        seq_set.links = seq_set_data['linkage']
 
         # Required fields
-        seq_set._checksums = seq_set_data['meta']['checksums']
-        seq_set._comment = seq_set_data['meta']['comment']
-        seq_set._exp_length = seq_set_data['meta']['exp_length']
-        seq_set._format = seq_set_data['meta']['format']
-        seq_set._format_doc = seq_set_data['meta']['format_doc']
-        seq_set._seq_model = seq_set_data['meta']['seq_model']
-        seq_set._size = seq_set_data['meta']['size']
-        seq_set._study = seq_set_data['meta']['study']
-        seq_set._tags = seq_set_data['meta']['tags']
+        seq_set.checksums = seq_set_data['meta']['checksums']
+        seq_set.comment = seq_set_data['meta']['comment']
+        seq_set.exp_length = seq_set_data['meta']['exp_length']
+        seq_set.format = seq_set_data['meta']['format']
+        seq_set.format_doc = seq_set_data['meta']['format_doc']
+        seq_set.seq_model = seq_set_data['meta']['seq_model']
+        seq_set.size = seq_set_data['meta']['size']
+        seq_set.study = seq_set_data['meta']['study']
+        seq_set.tags = seq_set_data['meta']['tags']
         seq_set._urls = seq_set_data['meta']['urls']
 
         # Optional fields
         if 'sequence_type' in seq_set_data['meta']:
-            seq_set._sequence_type = seq_set_data['meta']['sequence_type']
+            seq_set.sequence_type = seq_set_data['meta']['sequence_type']
 
         if 'private_files' in seq_set_data['meta']:
-            seq_set._private_files = seq_set_data['meta']['private_files']
+            seq_set.private_files = seq_set_data['meta']['private_files']
 
         module_logger.debug("Returning loaded " + __name__)
         return seq_set
@@ -618,14 +627,14 @@ class HostWgsRawSeqSet(Base):
             A HostWgsRawSeqSet object with all the available OSDF data loaded
             into it.
         """
-        module_logger.debug("In load. Specified ID: %s" % seq_set_id)
+        module_logger.debug("In load. Specified ID: %s", seq_set_id)
 
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         seq_set_data = session.get_osdf().get_node(seq_set_id)
         seq_set = HostWgsRawSeqSet.load_hostWgsRawSeqSet(seq_set_data)
 
-        module_logger.debug("Returning loaded %s." % __name__)
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return seq_set
 
@@ -635,17 +644,18 @@ class HostWgsRawSeqSet(Base):
         session = iHMPSession.get_session()
         study = self._study
 
-        study2dir = { "ibd": "ibd",
-                      "preg_preterm": "ptb",
-                      "prediabetes": "t2d"
-                    }
+        study2dir = {
+            "ibd": "ibd",
+            "preg_preterm": "ptb",
+            "prediabetes": "t2d"
+        }
 
         if study not in study2dir:
             raise ValueError("Invalid study. No directory mapping for %s" % study)
 
         study_dir = study2dir[study]
 
-        remote_base = os.path.basename(self._local_file);
+        remote_base = os.path.basename(self._local_file)
 
         valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
         remote_base = ''.join(c for c in remote_base if c in valid_chars)
@@ -653,7 +663,7 @@ class HostWgsRawSeqSet(Base):
 
         remote_path = "/".join(["/" + study_dir, "genome", "host", "wgs",
                                 "raw", remote_base])
-        self.logger.debug("Remote path for this file will be %s." % remote_path)
+        self.logger.debug("Remote path for this file will be %s.", remote_path)
 
         # Upload the file to the iHMP aspera server
         upload_result = aspera.upload_file(HostWgsRawSeqSet.aspera_server,
@@ -663,11 +673,11 @@ class HostWgsRawSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the sequence set. " + \
+            self.logger.error("Experienced an error uploading the sequence set. "
                               "Aborting save.")
             raise Exception("Unable to upload host WGS raw sequence set.")
         else:
-            self._urls = [ "fasp://" + HostWgsRawSeqSet.aspera_server + remote_path ]
+            self._urls = ["fasp://" + HostWgsRawSeqSet.aspera_server + remote_path]
 
     def save(self):
         """
@@ -701,12 +711,12 @@ class HostWgsRawSeqSet(Base):
         success = False
 
         if self._private_files:
-            self._urls = [ "<private>" ]
+            self._urls = ["<private>"]
         else:
             try:
                 self._upload_data()
-            except Exception as e:
-                self.logger.exception(e)
+            except Exception as upload_exception:
+                self.logger.exception(upload_exception)
                 # Don't bother continuing...
                 return False
 
@@ -714,11 +724,11 @@ class HostWgsRawSeqSet(Base):
 
         if self.id is None:
             # The document has not yet been saved
-            self.logger.info("About to insert a new " + __name__ + " OSDF node.")
+            self.logger.info("About to insert a new %s OSDF node.", __name__)
 
             # Get the JSON form of the data and load it
-            self.logger.debug("Converting " + __name__ + " to parsed JSON form.")
-            data = json.loads( self.to_json() )
+            self.logger.debug("Converting %s to parsed JSON form.", __name__)
+            data = json.loads(self.to_json())
             self.logger.info("Got the raw JSON document.")
 
             try:
@@ -727,29 +737,38 @@ class HostWgsRawSeqSet(Base):
                 self._set_id(node_id)
                 self._version = 1
 
-                self.logger.info("Save for " + __name__ + " %s successful." % node_id)
-                self.logger.info("Setting ID for " + __name__ + " %s." % node_id)
+                self.logger.info("Save for %s %s successful.", __name__, node_id)
+                self.logger.info("Setting ID for %s %s.", __name__, node_id)
 
                 success = True
-            except Exception as e:
-                self.logger.exception(e)
-                self.logger.error("An error occurred while saving " + __name__ + ". " +
-                                  "Reason: %s" % e)
+            except Exception as save_exception:
+                self.logger.exception(save_exception)
+                self.logger.error("An error occurred while saving %s. "
+                                  "Reason: %s", __name__, save_exception)
         else:
-            self.logger.info("%s already has an ID, so we do an update " +
-                             "(not an insert)." % __name__)
+            self.logger.info("%s already has an ID, so we do an update "
+                             "(not an insert).", __name__)
 
             try:
                 seq_set_data = self._get_raw_doc()
                 seq_set_id = self._id
-                self.logger.info("Attempting to update " + __name__ + " with ID: %s." % seq_set_id)
+                self.logger.info("Attempting to update %s with ID: %s.",
+                                 __name__, seq_set_id
+                                )
                 osdf.edit_node(seq_set_data)
-                self.logger.info("Update for " + __name__ + " %s successful." % seq_set_id)
+                self.logger.info("Update for %s %s successful.",
+                                 __name__, seq_set_id
+                                )
 
                 seq_set_data = osdf.get_node(seq_set_id)
                 latest_version = seq_set_data['ver']
 
-                self.logger.debug("The version of this %s is now: %s" % (__name__, str(latest_version)))
+                self.logger.debug(
+                    "The version of this %s is now: %s",
+                    __name__,
+                    str(latest_version)
+                )
+
                 self._version = latest_version
                 success = True
             except Exception as e:

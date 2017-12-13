@@ -1,54 +1,67 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+from pprint import pprint
 from cutlass import HostSeqPrep
 from cutlass import iHMPSession
-from pprint import pprint
-import sys
 
 username = "test"
 password = "test"
 
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
+
 session = iHMPSession(username, password)
 
 mims = {
-        "adapters": "test",
-        "annot_source": "test",
-        "assembly": "test",
-        "assembly_name": "test",
-        "biome": "test",
-        "collection_date": "test",
-        "env_package": "test",
-        "extrachrom_elements": "test",
-        "encoded_traits": "test",
-        "experimental_factor": "test",
-        "feature": "test",
-        "findex": "test",
-        "finishing_strategy": "test",
-        "geo_loc_name": "test",
-        "investigation_type": "test",
-        "lat_lon": "test",
-        "lib_const_meth": "test",
-        "lib_reads_seqd": "test",
-        "lib_screen": "test",
-        "lib_size": 2000,
-        "lib_vector": "test",
-        "material": "test",
-        "nucl_acid_amp": "test",
-        "nucl_acid_ext": "test",
-        "project_name": "test",
-        "rel_to_oxygen": "test",
-        "rindex": "test",
-        "samp_collect_device": "test",
-        "samp_mat_process": "test",
-        "samp_size": "test",
-        "seq_meth": "test",
-        "sop": ["a", "b", "c"],
-        "source_mat_id": ["a", "b", "c"],
-        "submitted_to_insdc": True,
-        "url": ["a", "b", "c"]
-    }
+    "adapters": "test",
+    "annot_source": "test",
+    "assembly": "test",
+    "assembly_name": "test",
+    "biome": "test",
+    "collection_date": "test",
+    "env_package": "test",
+    "extrachrom_elements": "test",
+    "encoded_traits": "test",
+    "experimental_factor": "test",
+    "feature": "test",
+    "findex": "test",
+    "finishing_strategy": "test",
+    "geo_loc_name": "test",
+    "investigation_type": "test",
+    "lat_lon": "test",
+    "lib_const_meth": "test",
+    "lib_reads_seqd": "test",
+    "lib_screen": "test",
+    "lib_size": 2000,
+    "lib_vector": "test",
+    "material": "test",
+    "nucl_acid_amp": "test",
+    "nucl_acid_ext": "test",
+    "project_name": "test",
+    "rel_to_oxygen": "test",
+    "rindex": "test",
+    "samp_collect_device": "test",
+    "samp_mat_process": "test",
+    "samp_size": "test",
+    "seq_meth": "test",
+    "sop": ["a", "b", "c"],
+    "source_mat_id": ["a", "b", "c"],
+    "submitted_to_insdc": True,
+    "url": ["a", "b", "c"]
+}
 
 print("Required fields: ")
 print(HostSeqPrep.required_fields())
@@ -64,9 +77,9 @@ test_prep.sequencing_contact = "test contact"
 test_prep.storage_duration = 3
 test_prep.ncbi_taxon_id = "NCBI123ABC"
 test_prep.prep_id = "test prep id"
-test_prep.links = { "prepared_from": [ "610a4911a5ca67de12cdc1e4b4011876" ] }
+test_prep.links = {"prepared_from": ["610a4911a5ca67de12cdc1e4b4011876"]}
 
-test_prep.tags = [ "test", "host_seq_prep", "ihmp" ]
+test_prep.tags = ["test", "host_seq_prep", "ihmp"]
 test_prep.add_tag("another")
 test_prep.add_tag("and_another")
 

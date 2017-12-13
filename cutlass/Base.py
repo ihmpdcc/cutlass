@@ -10,6 +10,8 @@ module_logger = logging.getLogger(__name__)
 # Add a NullHandler for the case if no logging is configured by the application
 module_logger.addHandler(logging.NullHandler())
 
+# pylint: disable=C0302, W0703, C1801
+
 class Base(object):
     """
     The parent class from which all objects inherit specific features from. This class
@@ -44,7 +46,7 @@ class Base(object):
         str: An alphanumeric indicating the specific ID assigned to the document
              in OSDF.
         """
-        self.logger.debug("In id getter.")
+        self.logger.debug("In 'id' getter.")
         return self._id
 
     def _set_id(self, node_id):
@@ -135,7 +137,7 @@ class Base(object):
         Exceptions:
             ValueError exception if the tag is already present
         """
-        self.logger.debug("In add_tag. New tag: %s" % tag)
+        self.logger.debug("In add_tag. New tag: %s", tag)
         if tag not in self._tags:
             self._tags.append(tag)
         else:
@@ -192,7 +194,7 @@ class Base(object):
         session = iHMPSession.get_session()
         self.logger.info("Got iHMP session.")
 
-        (valid, error_message) = session.get_osdf().validate_node(document)
+        (valid, _error_message) = session.get_osdf().validate_node(document)
 
         self.logger.debug("Valid? %s", str(valid))
 
@@ -265,16 +267,17 @@ class Base(object):
         success = False
 
         try:
-            self.logger.info("Deleting node with OSDF ID %s." % visit_node_id)
+            self.logger.info("Deleting node with OSDF ID %s.", visit_node_id)
             session.get_osdf().delete_node(visit_node_id)
             success = True
-        except Exception as e:
-            self.logger.exception(e)
+        except Exception as delete_exception:
+            self.logger.exception(delete_exception)
             self.logger.error("An error occurred when deleting %s.", self)
 
         return success
 
     def children(self, flatten=False):
+        """ Returns the children of this node. """
         self.logger.debug("In children.")
 
         # local imports to avoid cyclic imports

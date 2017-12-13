@@ -1,37 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Visit module. """
+
 import unittest
 import json
-import sys
 from datetime import date
 
-from cutlass import iHMPSession
 from cutlass import Visit
-from cutlass import MIXS, MixsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class VisitTest(unittest.TestCase):
+    """ A unit test class for the Visit module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the Visit module. """
         success = False
         try:
             from cutlass import Visit
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(Visit is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a Visit via the session. """
         success = False
         visit = None
 
@@ -39,13 +47,14 @@ class VisitTest(unittest.TestCase):
             visit = self.session.create_visit()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(visit is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a Visit instance. """
         visit = self.session.create_visit()
         success = False
         visit_number = 1
@@ -56,7 +65,7 @@ class VisitTest(unittest.TestCase):
         try:
             visit_json = visit.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -67,7 +76,7 @@ class VisitTest(unittest.TestCase):
         try:
             visit_data = json.loads(visit_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -80,6 +89,7 @@ class VisitTest(unittest.TestCase):
                          visit_number, "'visit_number' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         visit = self.session.create_visit()
 
         self.assertTrue(visit.id is None,
@@ -89,6 +99,7 @@ class VisitTest(unittest.TestCase):
             visit.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         visit = self.session.create_visit()
 
         self.assertTrue(visit.version is None,
@@ -97,21 +108,25 @@ class VisitTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             visit.version = "test"
 
-    def testIllegalVisitNum(self):
+    def testVisitNumNegative(self):
+        """ Test the visit_number property with an illegal negative value. """
         visit = self.session.create_visit()
 
         with self.assertRaises(Exception):
-            visit.visit_number = "random"
+            visit.visit_number = -1
 
-    def testLegalVisitNum(self):
+    def testVisitNum(self):
+        """ Test the visit_number property. """
         visit = self.session.create_visit()
         success = False
         visit_number = 1
 
+        self.util.intTypeTest(self, visit, "visit_number")
+
         try:
             visit.visit_number = visit_number
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the visit_number setter")
@@ -120,26 +135,25 @@ class VisitTest(unittest.TestCase):
                          "Property getter for 'visit_number' works.")
 
     def testIntervalNegative(self):
+        """ Test the interval property with an illegal negative value. """
         visit = self.session.create_visit()
 
         with self.assertRaises(Exception):
             visit.interval = -1
 
-    def testIntervalString(self):
-        visit = self.session.create_visit()
-
-        with self.assertRaises(Exception):
-            visit.interval = "random"
-
-    def testIntervalLegal(self):
+    def testInterval(self):
+        """ Test the interval property. """
         visit = self.session.create_visit()
         success = False
+
+        self.util.intTypeTest(self, visit, "interval")
+
         interval = 1
 
         try:
             visit.interval = interval
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the interval setter")
@@ -147,12 +161,14 @@ class VisitTest(unittest.TestCase):
         self.assertEqual(visit.interval, interval, "Property getter for 'interval' works.")
 
     def testIllegalDate(self):
+        """ Test the date property with an illegal value. """
         visit = self.session.create_visit()
 
         with self.assertRaises(Exception):
             visit.date = "random"
 
     def testIllegalFutureDate(self):
+        """ Test the date property with an illegal future date. """
         visit = self.session.create_visit()
         success = False
         today = date.today()
@@ -161,76 +177,53 @@ class VisitTest(unittest.TestCase):
         try:
             visit.date = next_year
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertFalse(success, "Visit class rejects future dates.")
 
     def testLegalDate(self):
+        """ Test the date property with a valid date string. """
         visit = self.session.create_visit()
+
         success = False
-        date = "2015-07-27"
+        test_date = "2015-07-27"
 
         try:
-            visit.date = date
+            visit.date = test_date
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the date setter")
 
-        self.assertEqual(visit.date, date, "Property getter for 'date' works.")
+        self.assertEqual(visit.date, test_date, "Property getter for 'date' works.")
 
-    def testIllegalVisitID(self):
+    def testVisitID(self):
+        """ Test the visit_id property. """
         visit = self.session.create_visit()
 
-        with self.assertRaises(Exception):
-            visit.visit_id = 1
+        self.util.stringTypeTest(self, visit, "visit_id")
 
-    def testLegalVisitID(self):
-        visit = self.session.create_visit()
-        success = False
-        new_id = "Test ID"
+        self.util.stringPropertyTest(self, visit, "visit_id")
 
-        try:
-            visit.visit_id = new_id
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the visit_id setter")
-
-        self.assertEqual(visit.visit_id, new_id, "Property getter for 'visit_id' works.")
-
-    def testIllegalClinicID(self):
+    def testClinicID(self):
+        """ Test the clinic_id property. """
         visit = self.session.create_visit()
 
-        with self.assertRaises(Exception):
-            visit.clinic_id = 1
+        self.util.stringTypeTest(self, visit, "clinic_id")
 
-    def testLegalClinicID(self):
-        visit = self.session.create_visit()
-        success = False
-        clinic_id = "Test ID"
-
-        try:
-            visit.clinic_id = clinic_id
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the clinic_id setter")
-
-        self.assertEqual(visit.clinic_id, clinic_id, "Property getter for 'clinic_id' works.")
+        self.util.stringPropertyTest(self, visit, "clinic_id")
 
     def testTags(self):
+        """ Test the tags property. """
         visit = self.session.create_visit()
 
         tags = visit.tags
         self.assertTrue(type(tags) == list, "Visit tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template visit tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         visit.tags = new_tags
         self.assertEqual(visit.tags, new_tags, "Can set tags on a visit.")
@@ -243,17 +236,17 @@ class VisitTest(unittest.TestCase):
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
 
-
     def testAddTag(self):
+        """ Test the add_tag() method. """
         visit = self.session.create_visit()
 
         visit.add_tag("test")
-        self.assertEqual(visit.tags, [ "test" ], "Can add a tag to a visit.")
+        self.assertEqual(visit.tags, ["test"], "Can add a tag to a visit.")
 
         json_str = visit.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -263,10 +256,11 @@ class VisitTest(unittest.TestCase):
         json_str = visit.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = Visit.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -276,6 +270,7 @@ class VisitTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteVisit(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the visit at all points before and after adding
         # the required fields
 
@@ -283,7 +278,7 @@ class VisitTest(unittest.TestCase):
 
         test_date = "2015-07-27"
         test_interval = 0
-        test_links = {"by":[]}
+        test_links = {"by": []}
         test_visit_number = 1
         test_visit_id = "1jdjei9384"
 
@@ -308,7 +303,7 @@ class VisitTest(unittest.TestCase):
         with self.assertRaises(Exception):
             visit.delete()
 
-        self.assertTrue(visit.save() == True,
+        self.assertTrue(visit.save() is True,
                         "Visit was not saved successfully")
 
         # Load the visit that was just saved from the OSDF instance

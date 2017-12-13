@@ -1,4 +1,10 @@
+"""
+Utility module for retrieving a node's children.
+"""
+
 import inspect
+
+# pylint: disable=C0302, W0703, C1801
 
 from .Annotation import Annotation
 from .Project import Project
@@ -40,6 +46,7 @@ dependency_methods = {
 # pylint: enable=C0330
 
 def generator_flatten(gen):
+    """ Flatten the result of the generator. """
     for item in gen:
         if inspect.isgenerator(item) or type(item) in (list, tuple):
             for value in generator_flatten(item):

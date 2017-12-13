@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
-from cutlass import Annotation
-from cutlass import iHMPSession
-from pprint import pprint
 import tempfile
 import sys
+from pprint import pprint
+from cutlass import Annotation
+from cutlass import iHMPSession
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -30,7 +32,7 @@ print(Annotation.required_fields())
 annot = Annotation()
 
 annot.annotation_pipeline = "the annotation pipeline"
-annot.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+annot.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 annot.format = "gff3"
 annot.format_doc = "the format url"
 annot.orf_process = "the orf process"
@@ -51,9 +53,9 @@ annot.annotation_source = "the annotation source"
 annot.private_files = False
 
 # Annotations are 'computed_from' a WgsAssembledSeqSet
-annot.links = { "computed_from": [ "419d64483ec86c1fb9a94025f3b94551" ] }
+annot.links = {"computed_from": ["419d64483ec86c1fb9a94025f3b94551"]}
 
-annot.tags = [ "annot", "ihmp" ]
+annot.tags = ["annot", "ihmp"]
 annot.add_tag("another")
 annot.add_tag("and_another")
 

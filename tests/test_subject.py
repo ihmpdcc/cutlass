@@ -1,36 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Subject module. """
+
 import unittest
 import json
-import sys
 
-from cutlass import iHMPSession
 from cutlass import Subject
 from cutlass import MIXS, MixsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class SubjectTest(unittest.TestCase):
+    """ A unit test class for the SubjectTest module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the Subject module. """
         success = False
         try:
             from cutlass import Subject
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(Subject is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a Subject via the session. """
         success = False
         subject = None
 
@@ -38,13 +47,14 @@ class SubjectTest(unittest.TestCase):
             subject = self.session.create_subject()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(subject is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a Subject instance. """
         subject = self.session.create_subject()
         success = False
         rand_subject_id = "1hwuejd837"
@@ -55,7 +65,7 @@ class SubjectTest(unittest.TestCase):
         try:
             subject_json = subject.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -66,7 +76,7 @@ class SubjectTest(unittest.TestCase):
         try:
             subject_data = json.loads(subject_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -80,6 +90,7 @@ class SubjectTest(unittest.TestCase):
                          "'rand_subject_id' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         subject = self.session.create_subject()
 
         self.assertTrue(subject.id is None,
@@ -89,6 +100,7 @@ class SubjectTest(unittest.TestCase):
             subject.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         subject = self.session.create_subject()
 
         self.assertTrue(subject.version is None,
@@ -98,12 +110,14 @@ class SubjectTest(unittest.TestCase):
             subject.version = "test"
 
     def testIllegalGender(self):
+        """ Test the gender property with an illegal value. """
         subject = self.session.create_subject()
 
         with self.assertRaises(Exception):
             subject.gender = "random"
 
     def testLegalGender(self):
+        """ Test the gender property with a legal value. """
         subject = self.session.create_subject()
         success = False
         gender = "male"
@@ -111,7 +125,7 @@ class SubjectTest(unittest.TestCase):
         try:
             subject.gender = gender
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the gender setter")
@@ -121,12 +135,14 @@ class SubjectTest(unittest.TestCase):
                          "Property getter for 'gender' works.")
 
     def testIllegalRace(self):
+        """ Test the race property with an illegal value. """
         subject = self.session.create_subject()
 
         with self.assertRaises(Exception):
             subject.race = "random"
 
     def testLegalRace(self):
+        """ Test the race property with a legal value. """
         subject = self.session.create_subject()
         success = False
         race = "asian"
@@ -134,7 +150,7 @@ class SubjectTest(unittest.TestCase):
         try:
             subject.race = race
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the race setter")
@@ -142,6 +158,7 @@ class SubjectTest(unittest.TestCase):
         self.assertEqual(subject.race, race, "Property getter for 'race' works.")
 
     def testTags(self):
+        """ Test the tags property. """
         subject = self.session.create_subject()
 
         tags = subject.tags
@@ -149,7 +166,7 @@ class SubjectTest(unittest.TestCase):
                         "Subject tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template subject tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         subject.tags = new_tags
         self.assertEqual(subject.tags, new_tags, "Can set tags on a subject.")
@@ -163,15 +180,16 @@ class SubjectTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         subject = self.session.create_subject()
 
         subject.add_tag("test")
-        self.assertEqual(subject.tags, [ "test" ], "Can add a tag to a subject.")
+        self.assertEqual(subject.tags, ["test"], "Can add a tag to a subject.")
 
         json_str = subject.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -181,10 +199,11 @@ class SubjectTest(unittest.TestCase):
         json_str = subject.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = Subject.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -194,6 +213,8 @@ class SubjectTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSubject(self):
+        """ Extensive test for the load, edit, save and delete functions. """
+
         # Attempt to save the subject at all points before and after
         # adding the required fields
 
@@ -201,7 +222,7 @@ class SubjectTest(unittest.TestCase):
 
         test_rand_subject_id = "128ieurjnf"
         test_gender = "male"
-        test_links = {"participates_in":[]}
+        test_links = {"participates_in": []}
         test_tag = "New tag added to subject"
 
         self.assertFalse(subject.save(),
@@ -222,7 +243,7 @@ class SubjectTest(unittest.TestCase):
         with self.assertRaises(Exception):
             subject.delete()
 
-        self.assertTrue(subject.save() == True,
+        self.assertTrue(subject.save() is True,
                         "Subject was not saved successfully")
 
         # Load the subject that was just saved from the OSDF instance

@@ -1,36 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Sample module. """
+
 import unittest
 import json
-import sys
 
-from cutlass import iHMPSession
 from cutlass import Sample
 from cutlass import MIXS, MixsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class SampleTest(unittest.TestCase):
+    """" A unit test class for the Sample module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the Sample module. """
         success = False
         try:
             from cutlass import Sample
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(Sample is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a Sample via the session. """
         success = False
         sample = None
 
@@ -38,120 +47,81 @@ class SampleTest(unittest.TestCase):
             sample = self.session.create_sample()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(sample is None)
 
     def testFmaBodySite(self):
-        sample = self.session.create_sample()
-        success = False
-        fma_body_site = "test site"
-
-        try:
-            sample.fma_body_site = fma_body_site
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'fma_body_site' setter.")
-
-        self.assertEqual(
-                sample.fma_body_site,
-                fma_body_site,
-                "Property getter for 'fma_body_site' works."
-                )
-
-    def testFmaBodySiteInt(self):
+        """ Test the fma_body_site property. """
         sample = self.session.create_sample()
 
-        with self.assertRaises(ValueError):
-            sample.fma_body_site = 3
+        self.util.stringTypeTest(self, sample, "fma_body_site")
 
-    def testFmaBodySiteList(self):
-        sample = self.session.create_sample()
-
-        with self.assertRaises(ValueError):
-            sample.fma_body_site = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, sample, "fma_body_site")
 
     def testIllegalBodySite(self):
+        """ Test the body_site property with an illegal value. """
         sample = self.session.create_sample()
         with self.assertRaises(Exception):
             sample.body_site = "random"
 
     def testLegalBodySite(self):
+        """ Test the body_site property with a legal value. """
         sample = self.session.create_sample()
         success = False
         body_site = "wound"
         try:
             sample.body_site = body_site
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the body_site setter")
 
         self.assertEqual(
-                sample.body_site,
-                body_site,
-                "Property getter for 'body_site' works."
-                )
+            sample.body_site,
+            body_site,
+            "Property getter for 'body_site' works."
+        )
 
-    def testNameInt(self):
+    def testName(self):
+        """ Test the name property. """
         sample = self.session.create_sample()
-        with self.assertRaises(Exception):
-            sample.name = 3
 
-    def testNameList(self):
-        sample = self.session.create_sample()
-        with self.assertRaises(Exception):
-            sample.name = [ "a", "b", "c" ]
+        self.util.stringTypeTest(self, sample, "name")
 
-    def testLegalName(self):
-        sample = self.session.create_sample()
-        success = False
-        name = "test_name"
-
-        try:
-            sample.name = name
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the body_site setter")
-
-        self.assertEqual(
-                sample.name,
-                name,
-                "Property getter for 'name' works."
-                )
+        self.util.stringPropertyTest(self, sample, "name")
 
     def testIllegalSupersite(self):
+        """ Test the supersite property with an illegal value. """
         sample = self.session.create_sample()
 
         with self.assertRaises(Exception):
             sample.supersite = "hear"
 
     def testLegalSupersite(self):
+        """ Test the supersite property with a legal value. """
         sample = self.session.create_sample()
         success = False
         supersite = "heart"
         try:
             sample.supersite = supersite
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the supersite setter")
 
         self.assertEqual(
-                sample.supersite,
-                supersite,
-                "Property getter for 'supersite' works."
-                )
+            sample.supersite,
+            supersite,
+            "Property getter for 'supersite' works."
+        )
 
     def testToJson(self):
+        """ Test the generation of JSON from a Sample instance. """
         sample = self.session.create_sample()
         success = False
         fma_body_site = "test_fma_body_site"
@@ -162,7 +132,7 @@ class SampleTest(unittest.TestCase):
         try:
             sample_json = sample.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -173,7 +143,7 @@ class SampleTest(unittest.TestCase):
         try:
             sample_data = json.loads(sample_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -186,9 +156,11 @@ class SampleTest(unittest.TestCase):
         self.assertEqual(sample_data['meta']['fma_body_site'],
                          fma_body_site,
                          "'fma_body_site' in JSON had expected value."
-                         )
+                        )
 
-    def testNameInJson(self):
+    def testDataInJson(self):
+        """ Test if the correct data is in the generated JSON. """
+
         sample = self.session.create_sample()
         success = False
         fma_body_site = "test_fma_body_site"
@@ -202,7 +174,7 @@ class SampleTest(unittest.TestCase):
         try:
             sample_json = sample.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -213,7 +185,7 @@ class SampleTest(unittest.TestCase):
         try:
             sample_data = json.loads(sample_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -226,9 +198,10 @@ class SampleTest(unittest.TestCase):
         self.assertEqual(sample_data['meta']['name'],
                          name,
                          "'name' in JSON had expected value."
-                         )
+                        )
 
     def testId(self):
+        """ Test the id property. """
         sample = self.session.create_sample()
 
         self.assertTrue(sample.id is None,
@@ -238,6 +211,7 @@ class SampleTest(unittest.TestCase):
             sample.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         sample = self.session.create_sample()
 
         self.assertTrue(sample.version is None,
@@ -247,13 +221,16 @@ class SampleTest(unittest.TestCase):
             sample.version = "test"
 
     def testMixs(self):
+        """ Test the mixs property. """
         sample = self.session.create_sample()
 
         self.assertTrue(sample.mixs is None,
                         "New template sample has no MIXS data.")
 
-        invalid_test_mixs = { "a": 1,
-                              "b": 2 }
+        invalid_test_mixs = {
+            "a": 1,
+            "b": 2
+        }
 
         with self.assertRaises(MixsException):
             sample.mixs = invalid_test_mixs
@@ -275,7 +252,7 @@ class SampleTest(unittest.TestCase):
             "samp_collect_device": "samp_collect_device",
             "samp_mat_process": "samp_mat_process",
             "samp_size": "samp_size",
-            "source_mat_id": [ "a", "b", "c" ]
+            "source_mat_id": ["a", "b", "c"]
         }
 
         # Assume failure
@@ -284,7 +261,7 @@ class SampleTest(unittest.TestCase):
         try:
             sample.mixs = valid_mixs
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Valid MIXS data does not raise exception.")
@@ -296,13 +273,14 @@ class SampleTest(unittest.TestCase):
                          "Retrieved MIXS data appears to be okay.")
 
     def testTags(self):
+        """ Test the tags property. """
         sample = self.session.create_sample()
 
         tags = sample.tags
         self.assertTrue(type(tags) == list, "Sample tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template sample tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         sample.tags = new_tags
         self.assertEqual(sample.tags, new_tags, "Can set tags on a sample.")
@@ -315,17 +293,17 @@ class SampleTest(unittest.TestCase):
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
 
-
     def testAddTag(self):
+        """ Test the add_tag() method. """
         sample = self.session.create_sample()
 
         sample.add_tag("test")
-        self.assertEqual(sample.tags, [ "test" ], "Can add a tag to a sample.")
+        self.assertEqual(sample.tags, ["test"], "Can add a tag to a sample.")
 
         json_str = sample.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -335,10 +313,11 @@ class SampleTest(unittest.TestCase):
         json_str = sample.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = Sample.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -348,13 +327,15 @@ class SampleTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSample(self):
+        """ Extensive test for the load, edit, save and delete functions. """
+
         # Attempt to save the sample at all points before and after adding
         # the required fields
         sample = self.session.create_sample()
         self.assertFalse(
-                sample.save(),
-                "Sample not saved successfully, no required fields"
-                )
+            sample.save(),
+            "Sample not saved successfully, no required fields"
+        )
 
         sample.fma_body_site = "Test FMA BODY SITE "
 
@@ -363,9 +344,9 @@ class SampleTest(unittest.TestCase):
             "Sample not saved successfully, missing fma_body_site, tags, and MIXS"
             )
 
-        sample.links = {"collected_during":[]}
+        sample.links = {"collected_during": []}
 
-        sample.add_tag("First test tag")
+        sample.add_tag("test")
         fields = {
             "biome": "ASDSADSA",
             "body_product": "ASDFASF",
@@ -390,7 +371,7 @@ class SampleTest(unittest.TestCase):
         with self.assertRaises(Exception):
             sample.delete()
 
-        self.assertTrue(sample.save() == True, "Sample was saved successfully")
+        self.assertTrue(sample.save() is True, "Sample was saved successfully")
 
         # Load the sample that was just saved from the OSDF instance
         sample_loaded = self.session.create_sample()

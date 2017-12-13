@@ -460,7 +460,7 @@ class SixteenSRawSeqSet(Base):
         module_logger.debug("In required_fields.")
 
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "seq_model", "size", "study", "tags")
+                "local_file", "seq_model", "size", "study", "tags")
 
     def _get_raw_doc(self):
         """

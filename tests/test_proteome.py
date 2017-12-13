@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Proteome module. """
+
 import unittest
 import json
 from datetime import date
@@ -13,20 +15,21 @@ from CutlassTestUtil import CutlassTestUtil
 # pylint: disable=W0703, C1801
 
 class ProteomeTest(unittest.TestCase):
-    """ Unit tests for the cutlass Proteome class """
+    """ A unit test class for the cutlass Proteome class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
 
         cls.util = CutlassTestUtil()
 
     def testImport(self):
-        """ Test the import of the Proteome module. """
+        """ Test the importation of the Proteome module. """
         success = False
         try:
             from cutlass import Proteome
@@ -225,7 +228,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "reference")
 
     def testSampleName(self):
-        """ Test the sample name property. """
+        """ Test the sample_name property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "sample_name")
@@ -233,7 +236,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "sample_name")
 
     def testShortLabel(self):
-        """ Test the short label property. """
+        """ Test the short_label property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "short_label")
@@ -249,7 +252,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "title")
 
     def testExpDescription(self):
-        """ Test the exp description property. """
+        """ Test the exp_description property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "exp_description")
@@ -257,7 +260,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "exp_description")
 
     def testSampleDescription(self):
-        """ Test the sample description property. """
+        """ Test the sample_description property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "sample_description")
@@ -265,7 +268,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "sample_description")
 
     def testInstrumentName(self):
-        """ Test the instrument name property. """
+        """ Test the instrument_name property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "instrument_name")
@@ -289,7 +292,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "software")
 
     def testPrivateFiles(self):
-        """ Test the private files property. """
+        """ Test the private_files property. """
         proteome = self.session.create_proteome()
 
         self.util.boolTypeTest(self, proteome, "private_files")
@@ -297,7 +300,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.boolPropertyTest(self, proteome, "private_files")
 
     def testProcessingMethod(self):
-        """ Test the processing method property. """
+        """ Test the processing_method property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "processing_method")
@@ -305,7 +308,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "processing_method")
 
     def testSearchEngine(self):
-        """ Test the search engine property. """
+        """ Test the search_engine property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "search_engine")
@@ -313,7 +316,7 @@ class ProteomeTest(unittest.TestCase):
         self.util.stringPropertyTest(self, proteome, "search_engine")
 
     def testXMLGeneration(self):
-        """ Test the XML generation property. """
+        """ Test the xml_generation property. """
         proteome = self.session.create_proteome()
 
         self.util.stringTypeTest(self, proteome, "xml_generation")
@@ -397,7 +400,7 @@ class ProteomeTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
-        """ Test the required_fields() method. """
+        """ Test the required_fields() static method. """
         required = Proteome.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -491,7 +494,7 @@ class ProteomeTest(unittest.TestCase):
         proteome.local_raw_file = temp_file
         proteome.local_result_file = temp_file
 
-        self.assertTrue(proteome.save() == True,
+        self.assertTrue(proteome.save() is True,
                         "Proteome was not saved successfully")
 
         # Load the proteome that was just saved from the OSDF instance

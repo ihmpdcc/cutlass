@@ -144,6 +144,7 @@ class Project(Base):
         Returns:
             Tuple of strings of required properties.
         """
+        module_logger.debug("In required_fields.")
         fields = ('name', 'description', 'mixs', 'tags')
         return fields
 

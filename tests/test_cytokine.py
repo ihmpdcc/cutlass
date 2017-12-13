@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Cytokine module. """
+
 import unittest
 import json
 import tempfile
@@ -12,19 +14,20 @@ from CutlassTestUtil import CutlassTestUtil
 # pylint: disable=W0703, C1801
 
 class CytokineTest(unittest.TestCase):
-    """ Unit tests for the cutlass Cytokine class """
+    """ A unit test class for the Cytokine module. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
-        """ Test the import of the Cytokine module. """
+        """ Test the importation of the Cytokine module. """
         success = False
         try:
             from cutlass import Cytokine
@@ -314,7 +317,7 @@ class CytokineTest(unittest.TestCase):
         with self.assertRaises(Exception):
             cyto.delete()
 
-        self.assertTrue(cyto.save() == True, "Cytokine was saved successfully")
+        self.assertTrue(cyto.save() is True, "Cytokine was saved successfully")
 
         # Load the cytokine that was just saved from the OSDF instance
         cyto_loaded = self.session.create_cytokine()

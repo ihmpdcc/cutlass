@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
+""" A unittest script for the MIMS module. """
+
 import unittest
 from cutlass import MIMS
 
 class MimsTest(unittest.TestCase):
-    """ Unit tests for the cutlass MIMS class """
+    """ Unit tests for the cutlass MIMS class. """
 
     def testRequiredFields(self):
-        """ Test the required_fields() method. """
+        """ Test the required_fields() static method. """
 
         required = MIMS.required_fields()
 

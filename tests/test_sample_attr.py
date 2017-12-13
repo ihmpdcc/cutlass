@@ -1,35 +1,44 @@
 #!/usr/bin/env python
 
+""" A unittest script for the SampleAttribute module. """
+
 import unittest
 import json
-import sys
 
-from cutlass import iHMPSession
 from cutlass import SampleAttribute
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class SampleAttributeTest(unittest.TestCase):
+    """ A unit test class for the SampleAttribute module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the SampleAttribute module. """
         success = False
         try:
             from cutlass import SampleAttribute
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(SampleAttribute is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a SampleAttribute via the session. """
         success = False
         attrib = None
 
@@ -37,44 +46,22 @@ class SampleAttributeTest(unittest.TestCase):
             attrib = self.session.create_sample_attr()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(attrib is None)
 
     def testFecalCal(self):
-        attrib = self.session.create_sample_attr()
-        success = False
-        fecalcal = "test fecalcal"
-
-        try:
-            attrib.fecalcal = fecalcal
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'fecalcal' setter.")
-
-        self.assertEqual(
-                attrib.fecalcal,
-                fecalcal,
-                "Property getter for 'fecalcal' works."
-                )
-
-    def testFecalCalInt(self):
+        """ Test the fecalcal property. """
         attrib = self.session.create_sample_attr()
 
-        with self.assertRaises(ValueError):
-            attrib.fecalcal = 3
+        self.util.stringTypeTest(self, attrib, "fecalcal")
 
-    def testFecalCalList(self):
-        attrib = self.session.create_sample_attr()
-
-        with self.assertRaises(ValueError):
-            attrib.fecalcal = [ "a", "b", "c" ]
+        self.util.stringPropertyTest(self, attrib, "fecalcal")
 
     def testToJson(self):
+        """ Test the generation of JSON from a SampleAttribute instance. """
         attrib = self.session.create_sample_attr()
         success = False
 
@@ -87,7 +74,7 @@ class SampleAttributeTest(unittest.TestCase):
         try:
             attrib_json = attrib.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -98,7 +85,7 @@ class SampleAttributeTest(unittest.TestCase):
         try:
             attrib_data = json.loads(attrib_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -111,9 +98,10 @@ class SampleAttributeTest(unittest.TestCase):
         self.assertEqual(attrib_data['meta']['fecalcal'],
                          fecalcal,
                          "'fecalcal' in JSON had expected value."
-                         )
+                        )
 
     def testDataInJson(self):
+        """ Test if the correct data is in the generated JSON. """
         attrib = self.session.create_sample_attr()
         success = False
 
@@ -126,7 +114,7 @@ class SampleAttributeTest(unittest.TestCase):
         try:
             attrib_json = attrib.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -137,7 +125,7 @@ class SampleAttributeTest(unittest.TestCase):
         try:
             attrib_data = json.loads(attrib_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -150,9 +138,10 @@ class SampleAttributeTest(unittest.TestCase):
         self.assertEqual(attrib_data['meta']['fecalcal'],
                          fecalcal,
                          "'fecalcal' in JSON had expected value."
-                         )
+                        )
 
     def testId(self):
+        """ Test the id property. """
         attrib = self.session.create_sample_attr()
 
         self.assertTrue(attrib.id is None,
@@ -162,6 +151,7 @@ class SampleAttributeTest(unittest.TestCase):
             attrib.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         attrib = self.session.create_sample_attr()
 
         self.assertTrue(attrib.version is None,
@@ -171,15 +161,16 @@ class SampleAttributeTest(unittest.TestCase):
             attrib.version = "test"
 
     def testTags(self):
+        """ Test the tags property. """
         attrib = self.session.create_sample_attr()
 
         tags = attrib.tags
         self.assertTrue(type(tags) == list,
                         "SampleAttribute tags() method returns a list.")
         self.assertEqual(len(tags), 0,
-                        "Template sample attribute tags list is empty.")
+                         "Template sample attribute tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         attrib.tags = new_tags
         self.assertEqual(attrib.tags, new_tags,
@@ -194,16 +185,17 @@ class SampleAttributeTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         attrib = self.session.create_sample_attr()
 
         attrib.add_tag("test")
-        self.assertEqual(attrib.tags, [ "test" ],
+        self.assertEqual(attrib.tags, ["test"],
                          "Can add a tag to a sample attribute.")
 
         json_str = attrib.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -213,10 +205,11 @@ class SampleAttributeTest(unittest.TestCase):
         json_str = attrib.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = SampleAttribute.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -226,24 +219,25 @@ class SampleAttributeTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteAnnotation(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the sample at all points before and after adding
         # the required fields
         attrib = self.session.create_sample_attr()
 
         self.assertFalse(
-                attrib.save(),
-                "SampleAttribute not saved successfully, no required fields"
-                )
+            attrib.save(),
+            "SampleAttribute not saved successfully, no required fields"
+        )
 
         attrib.fecalcal = "test fecalcal"
 
         self.assertFalse(
             attrib.save(),
             "SampleAttribute not saved successfully, missing some required fields."
-            )
+        )
 
         # SampleAttribute nodes are "associated_with" sample nodes
-        attrib.links = {"associated_with": [ "610a4911a5ca67de12cdc1e4b4011876"] }
+        attrib.links = {"associated_with": ["610a4911a5ca67de12cdc1e4b4011876"]}
 
         attrib.study = "prediabetes"
 
@@ -253,7 +247,7 @@ class SampleAttributeTest(unittest.TestCase):
         with self.assertRaises(Exception):
             attrib.delete()
 
-        self.assertTrue(attrib.save() == True,
+        self.assertTrue(attrib.save() is True,
                         "SampleAttribute was saved successfully.")
 
         # Load the annotation that was just saved from the OSDF instance

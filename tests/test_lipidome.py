@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Lipidome module. """
+
 import unittest
 import json
 import tempfile
@@ -19,6 +21,7 @@ class LipidomeTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
@@ -99,7 +102,7 @@ class LipidomeTest(unittest.TestCase):
             lip.id = "test"
 
     def testPrivateFiles(self):
-        """ Test the private files property. """
+        """ Test the private_files property. """
         lip = self.session.create_lipidome()
 
         self.util.boolTypeTest(self, lip, "private_files")
@@ -226,7 +229,7 @@ class LipidomeTest(unittest.TestCase):
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
-        """ Test the required_fields() method. """
+        """ Test the required_fields() static method. """
         required = Lipidome.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -247,6 +250,7 @@ class LipidomeTest(unittest.TestCase):
 
     def testLoadSaveDeleteLipidome(self):
         """ Extensive test for the load, edit, save and delete functions. """
+
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
         # Attempt to save the lipidome at all points before and after adding
@@ -281,7 +285,7 @@ class LipidomeTest(unittest.TestCase):
         with self.assertRaises(Exception):
             lip.delete()
 
-        self.assertTrue(lip.save() == True, "Lipidome was saved successfully")
+        self.assertTrue(lip.save() is True, "Lipidome was saved successfully")
 
         # Load the lipidome that was just saved from the OSDF instance
         lip_loaded = self.session.create_lipidome()

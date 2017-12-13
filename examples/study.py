@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+from pprint import pprint
 from cutlass import Study
 from cutlass import iHMPSession
-from pprint import pprint
 
 username = "test"
 password = "test"
+
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -22,10 +36,10 @@ test_study.center = "Stanford University"
 test_study.contact = "Test contact"
 test_study.srp_id = "Test SRP ID"
 
-test_study.tags = [ "study", "ihmp" ]
+test_study.tags = ["study", "ihmp"]
 test_study.add_tag("another")
 test_study.add_tag("and_another")
-test_study.links = { "part_of": [ "610a4911a5ca67de12cdc1e4b40018e1" ] }
+test_study.links = {"part_of": ["610a4911a5ca67de12cdc1e4b40018e1"]}
 
 print(test_study.to_json(indent=2))
 

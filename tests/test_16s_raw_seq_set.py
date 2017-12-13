@@ -1,44 +1,53 @@
 #!/usr/bin/env python
 
+""" A unittest script for the SixteenSRawSeqSet module. """
+
 import unittest
 import json
 import random
 import string
 import tempfile
-import sys
 
-from cutlass import iHMPSession
 from cutlass import SixteenSRawSeqSet
 
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
+# pylint: disable=W0703, C1801
+
 def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    """
+    Generate a random string using alphanumeric characters. Default size is 6.
+    """
     return ''.join(random.choice(chars) for _ in range(size))
 
 class SixteenSRawSeqSetTest(unittest.TestCase):
+    """ A unit test class for the SixteenSRawSeqSet class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the SixteenSRawSeqSet module. """
         success = False
         try:
             from cutlass import SixteenSRawSeqSet
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(SixteenSRawSeqSet is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a SixteenSRawSeqSet via the session. """
         success = False
         sixteenSRawSeqSet = None
 
@@ -46,13 +55,14 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
             sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(sixteenSRawSeqSet is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a SixteenSRawSeqSet instance. """
         seq_set = self.session.create_16s_raw_seq_set()
         success = False
 
@@ -67,7 +77,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         try:
             sixteenSRawSeqSet_json = seq_set.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -79,7 +89,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         try:
             sixteenSRawSeqSet_data = json.loads(sixteenSRawSeqSet_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -96,24 +106,27 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          private_files, "'private_files' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         self.assertTrue(sixteenSRawSeqSet.id is None,
-                        "New template sixteenSRawSeqSet has no ID.")
+                        "New template SixteenSRawSeqSet has no ID.")
 
         with self.assertRaises(AttributeError):
             sixteenSRawSeqSet.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         sixteenSRawSeqSet = self.session.create_16s_raw_seq_set()
 
         self.assertTrue(sixteenSRawSeqSet.version is None,
-                        "New template sixteenSRawSeqSet has no version.")
+                        "New template SixteenSRawSeqSet has no version.")
 
         with self.assertRaises(ValueError):
             sixteenSRawSeqSet.version = "test"
 
     def testComment(self):
+        """ Test the comment property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "comment")
@@ -121,6 +134,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "comment")
 
     def testExpLength(self):
+        """ Test the exp_length property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.intTypeTest(self, seq_set, "exp_length")
@@ -128,20 +142,22 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, seq_set, "exp_length")
 
     def testExpLengthNegative(self):
+        """ Test the exp_length property with an illegal negative value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             seq_set.exp_length = -1
 
     def testChecksumsLegal(self):
+        """ Test the checksums property with a legal value. """
         seq_set = self.session.create_16s_raw_seq_set()
         success = False
-        checksums = {"md5":"asdf32qrfrae"}
+        checksums = {"md5": "asdf32qrfrae"}
 
         try:
-            seq_set.checksums= checksums
+            seq_set.checksums = checksums
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the 'checksums' setter")
@@ -151,6 +167,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testFormat(self):
+        """ Test the format property with a legal value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "format")
@@ -161,7 +178,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         try:
             seq_set.format = test_format
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the format setter")
@@ -170,19 +187,22 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'format' works.")
 
     def testFormatIllegal(self):
+        """ Test the format property with an illegal value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             seq_set.format = "asbdasidsa"
 
     def testFormatDoc(self):
+        """ Test the format_doc property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "format_doc")
 
         self.util.stringPropertyTest(self, seq_set, "format_doc")
 
-    def testSequenceType(self):
+    def testSequenceTypeLegal(self):
+        """ Test the sequence_type property with a legal value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "sequence_type")
@@ -193,7 +213,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         try:
             seq_set.sequence_type = sequence_type
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the sequence_type setter")
@@ -202,12 +222,14 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "Property getter for 'sequence_type' works.")
 
     def testSequenceTypeIllegal(self):
+        """ Test the sequence_type property with an illegal value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             seq_set.sequence_type = "asbdasidsa"
 
     def testSeqModel(self):
+        """ Test the seq_model property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "seq_model")
@@ -215,6 +237,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         self.util.stringPropertyTest(self, seq_set, "seq_model")
 
     def testSize(self):
+        """ Test the size property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.intTypeTest(self, seq_set, "size")
@@ -222,12 +245,14 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         self.util.intPropertyTest(self, seq_set, "size")
 
     def testSizeNegative(self):
+        """ Test the size property with an illegal negative value. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         with self.assertRaises(Exception):
             seq_set.size = -1
 
     def testStudy(self):
+        """ Test the study property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         self.util.stringTypeTest(self, seq_set, "study")
@@ -239,15 +264,16 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                           "study property works.")
 
     def testTags(self):
+        """ Test the tags property. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         tags = seq_set.tags
         self.assertTrue(type(tags) == list,
                         "SixteenSRawSeqSet tags() method returns a list.")
         self.assertEqual(len(tags), 0,
-                        "Template seq_set tags list is empty.")
+                         "Template seq_set tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         seq_set.tags = new_tags
         self.assertEqual(seq_set.tags, new_tags,
@@ -262,16 +288,17 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         seq_set = self.session.create_16s_raw_seq_set()
 
         seq_set.add_tag("test")
-        self.assertEqual(seq_set.tags, [ "test" ],
-                        "Can add a tag to a sixteenSRawSeqSet.")
+        self.assertEqual(seq_set.tags, ["test"],
+                         "Can add a tag to a SixteenSRawSeqSet.")
 
         json_str = seq_set.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -281,10 +308,11 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         json_str = seq_set.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = SixteenSRawSeqSet.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -294,9 +322,11 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteSixteenSRawSeqSet(self):
+        """ Extensive test for the load, edit, save and delete functions. """
+
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
-        # Attempt to save the sixteenSRawSeqSet at all points before and
+        # Attempt to save the SixteenSRawSeqSet at all points before and
         # after adding the required fields
 
         seq_set = self.session.create_16s_raw_seq_set()
@@ -313,9 +343,9 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         tag = "Test tag"
 
         self.assertFalse(
-                seq_set.save(),
-                "SixteenSRawSeqSet not saved successfully, no required fields"
-                )
+            seq_set.save(),
+            "SixteenSRawSeqSet not saved successfully, no required fields"
+        )
 
         seq_set.comment = test_comment
 
@@ -345,7 +375,7 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
         with self.assertRaises(Exception):
             seq_set.delete()
 
-        self.assertTrue(seq_set.save() == True,
+        self.assertTrue(seq_set.save() is True,
                         "SixteenSRawSeqSet was not saved successfully")
 
         # Load the sixteenSRawSeqSet that was just saved from the OSDF instance
@@ -354,21 +384,22 @@ class SixteenSRawSeqSetTest(unittest.TestCase):
 
         # Check all fields were saved and loaded successfully
         self.assertEqual(
-                seq_set.comment,
-                ssrss_loaded.comment,
-                "SixteenSRawSeqSet comment not saved & loaded successfully"
-                )
+            seq_set.comment,
+            ssrss_loaded.comment,
+            "SixteenSRawSeqSet comment not saved & loaded successfully"
+        )
+
         self.assertEqual(
-                seq_set.size,
-                ssrss_loaded.size,
-                "SixteenSRawSeqSet mimarks not saved & loaded successfully"
-                )
+            seq_set.size,
+            ssrss_loaded.size,
+            "SixteenSRawSeqSet mimarks not saved & loaded successfully"
+        )
 
         # SixteenSRawSeqSet is deleted successfully
         self.assertTrue(seq_set.delete(),
                         "SixteenSRawSeqSet was not deleted successfully")
 
-        # The sixteenSRawSeqSet of the initial ID should not load successfully
+        # The SixteenSRawSeqSet of the initial ID should not load successfully
         load_test = self.session.create_16s_raw_seq_set()
         with self.assertRaises(Exception):
             load_test = load_test.load(seq_set.id)

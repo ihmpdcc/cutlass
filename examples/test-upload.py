@@ -1,10 +1,13 @@
 #!/usr/bin/python
 
+# pylint: disable=C0111, C0325
+
 # Upload a contrived ihmpdcc test dataset using osdf-python and cutlass.
 
 import argparse
 import logging
 import pprint
+import sys
 from cutlass import iHMPSession, mixs, mims, mimarks
 
 ## globals
@@ -27,12 +30,14 @@ def tag_and_validate_and_save(n):
     n.add_tag(args.tag)
     errs = n.validate()
     valid = n.is_valid()
-    # check consistency 
+    # check consistency
     n_errs = len(errs)
     if valid and (n_errs > 0):
-        print("ERROR - node " + n + ".is_valid() returned true, but validate() returned" + str(n_errs) + "error(s)")
+        print("ERROR - node " + n + ".is_valid() returned true, but " + \
+              "validate() returned" + str(n_errs) + "error(s)")
     if (not valid) and (n_errs == 0):
-        print("ERROR - node " + n + ".is_valid() returned false, but validate() returned no errors")
+        print("ERROR - node " + n + ".is_valid() returned false, " + \
+              "but validate() returned no errors")
     if (n_errs > 0):
         print("validate returned " + ",".join(errs))
     if valid:
@@ -109,7 +114,7 @@ st1.name = "Data upload test study #1"
 st1.description = "Study #1 from data upload test script"
 st1.center = "Broad Institute"
 st1.contact = "Sam Researcher"
-st1.links = { "part_of" : [ proj["id"] ], "subset_of" : [] }
+st1.links = {"part_of" : [proj["id"]], "subset_of": []}
 st1.subtype = "ibd"
 tag_and_validate_and_save(st1)
 
@@ -120,14 +125,14 @@ sub1 = s.create_subject()
 sub1.gender = "male"
 sub1.race = "native_hawaiian"
 sub1.rand_subject_id = "S12345"
-sub1.links = { "participates_in": [ st1.id ] }
+sub1.links = {"participates_in": [st1.id]}
 tag_and_validate_and_save(sub1)
 
 sub2 = s.create_subject()
 sub2.gender = "female"
 sub2.race = "hispanic_or_latino"
 sub2.rand_subject_id = "S123456"
-sub2.links = { "participates_in": [ st1.id ] }
+sub2.links = {"participates_in": [st1.id]}
 tag_and_validate_and_save(sub2)
 
 # --------------------------------------------
@@ -138,7 +143,7 @@ sub1_v1.visit_id = 'sub1_v1'
 sub1_v1.visit_number = 1
 sub1_v1.date = '2015-07-03'
 sub1_v1.interval = 0
-sub1_v1.links = { "by": [ sub1.id ] }
+sub1_v1.links = {"by": [sub1.id]}
 tag_and_validate_and_save(sub1_v1)
 
 sub1_v2 = s.create_visit()
@@ -148,7 +153,7 @@ sub1_v2.visit_number = 2
 sub1_v2.date = '2015-06-24'
 # and this value is therefore incorrect:
 sub1_v2.interval = 2
-sub1_v2.links = { "by": [ sub1.id ] }
+sub1_v2.links = {"by": [sub1.id]}
 tag_and_validate_and_save(sub1_v2)
 
 sub2_v1 = s.create_visit()
@@ -156,7 +161,7 @@ sub2_v1.visit_id = 'sub2_v1'
 sub2_v1.visit_number = 1
 sub2_v1.date = '2015-04-18'
 sub2_v1.interval = 0
-sub2_v1.links = { "by": [ sub2.id ] }
+sub2_v1.links = {"by": [sub2.id]}
 tag_and_validate_and_save(sub2_v1)
 
 # --------------------------------------------
@@ -164,8 +169,8 @@ tag_and_validate_and_save(sub2_v1)
 # --------------------------------------------
 samp1 = s.create_sample()
 samp1.body_site = "blood"
-samp1.links = { "collected_during": [ sub1_v1.id ] }
-mixs1 =  {
+samp1.links = {"collected_during": [sub1_v1.id]}
+mixs1 = {
     "collection_date": sub1_v1.date,
     "env_package": "human-associated",
     "project_name": proj["meta"]["name"]
@@ -177,8 +182,8 @@ tag_and_validate_and_save(samp1)
 
 samp2 = s.create_sample()
 samp2.body_site = "scalp"
-samp2.links = { "collected_during": [ sub1_v2.id ] }
-mixs2 =  {
+samp2.links = {"collected_during": [sub1_v2.id]}
+mixs2 = {
     "collection_date": sub1_v2.date,
     "env_package": "human-associated",
     "project_name": proj["meta"]["name"]
@@ -190,8 +195,8 @@ tag_and_validate_and_save(samp2)
 
 samp3 = s.create_sample()
 samp3.body_site = "knee"
-samp3.links = { "collected_during": [ sub2_v1.id ] }
-mixs3 =  {
+samp3.links = {"collected_during": [sub2_v1.id]}
+mixs3 = {
     "collection_date": sub2_v1.date,
     "env_package": "human-associated",
     "project_name": proj["meta"]["name"]
@@ -213,7 +218,7 @@ wdp1.prep_id = ""
 wdp1.sequencing_center = "CVS MinuteClinic"
 wdp1.sequencing_contact = "www.cvs.com"
 wdp1.storage_duration = 365
-wdp1.links = { "prepared_from": [ samp1.id ] }
+wdp1.links = {"prepared_from": [samp1.id]}
 mims1 = {
     "lib_size": 1000
 }
@@ -226,7 +231,7 @@ tag_and_validate_and_save(wdp1)
 # --------------------------------------------
 wrss1 = s.create_wgs_raw_seq_set()
 wrss1.comment = "No comment."
-wrss1.checksums = { "md5": "f93343fc70e322e802c23b2ad7b88595" }
+wrss1.checksums = {"md5": "f93343fc70e322e802c23b2ad7b88595"}
 wrss1.exp_length = 100
 wrss1.format = "fastq"
 wrss1.format_doc = ""
@@ -234,7 +239,7 @@ wrss1.seq_model = "Illumina"
 wrss1.size = 8213126
 wrss1.study = "prediabetes"
 wrss1.local_file = "jc-test-SRS144692-singletons.fastq"
-wrss1.links = { "sequenced_from": [ wdp1.id ] }
+wrss1.links = {"sequenced_from": [wdp1.id]}
 wrss1.subtype = ""
 tag_and_validate_and_save(wrss1)
 
@@ -250,7 +255,7 @@ ssdp1.prep_id = ""
 ssdp1.sequencing_center = "Target Pharmacy"
 ssdp1.sequencing_contact = "www.target.com"
 ssdp1.storage_duration = 365
-ssdp1.links = { "prepared_from": [ samp2.id ] }
+ssdp1.links = {"prepared_from": [samp2.id]}
 mimarks1 = {
     "lib_size": 1000
 }
@@ -262,11 +267,11 @@ tag_and_validate_and_save(ssdp1)
 # 1 SixteenSRawSeqSet
 # --------------------------------------------
 ssrs1 = s.create_16s_raw_seq_set()
-ssrs1.links = { "sequenced_from": [ssdp1.id] }
+ssrs1.links = {"sequenced_from": [ssdp1.id]}
 ssrs1.comment = "No comment."
 #ssrs1.checksums = { "md5": "7b6f24c63aafda8ad216510dbf9bb736" }
 # deliberately wrong checksum:
-ssrs1.checksums = { "md5": "7b6f24c63aafda8ad216510dbf9bb738" }
+ssrs1.checksums = {"md5": "7b6f24c63aafda8ad216510dbf9bb738"}
 ssrs1.exp_length = 100
 ssrs1.format = "fasta"
 ssrs1.format_doc = ""
@@ -281,9 +286,9 @@ tag_and_validate_and_save(ssrs1)
 # --------------------------------------------
 ssts1 = s.create_16s_trimmed_seq_set()
 print("got 16S trimmed seq set")
-ssts1.links = { "computed_from": [ssrs1.id] }
+ssts1.links = {"computed_from": [ssrs1.id]}
 ssts1.comment = "No comment."
-ssts1.checksums = { "md5": "a96da8096797a1039886a4534f2e3491" }
+ssts1.checksums = {"md5": "a96da8096797a1039886a4534f2e3491"}
 ssts1.format = "fasta"
 ssts1.format_doc = ""
 #ssts1.size = 604342
@@ -294,4 +299,3 @@ ssts1.study = "ibd"
 ssts1.local_file = "jc-test-SRR201889-trimmed.fa"
 print("saving 16S trimmed seq set")
 tag_and_validate_and_save(ssts1)
-

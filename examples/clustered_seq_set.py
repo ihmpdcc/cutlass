@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
+import sys
+import tempfile
 import logging
+from pprint import pprint
 from cutlass import ClusteredSeqSet
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
 
 def set_logging():
+    """ Setup logging. """
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
@@ -29,7 +31,7 @@ print(ClusteredSeqSet.required_fields())
 
 css = ClusteredSeqSet()
 
-css.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+css.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 css.clustering_process = "awesome clustering tool 1.0"
 css.comment = "Test clustered seq set comment"
 css.format = "peptide_fsa"
@@ -49,9 +51,9 @@ css.format_doc = "the format url"
 css.private_files = False
 
 # ClusteredSeqSet nodes are 'computed_from' Annotation nodes
-css.links = { "computed_from": [ "88af6472fb03642dd5eaf8cddc2f3405" ] }
+css.links = {"computed_from": ["88af6472fb03642dd5eaf8cddc2f3405"]}
 
-css.tags = [ "clustered_seq_set", "ihmp" ]
+css.tags = ["clustered_seq_set", "ihmp"]
 css.add_tag("another")
 css.add_tag("and_another")
 

@@ -93,7 +93,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         problems = []
 
         if not valid:
-            self.logger.info("Validation did not succeed for " + __name__ + ".")
+            self.logger.info("Validation did not succeed for %s.", __name__)
             problems.append(error_message)
 
         if self._private_files:
@@ -458,9 +458,9 @@ class HostTranscriptomicsRawSeqSet(Base):
         Returns:
             None
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("checksums", "comment", "exp_length", "format", "format_doc",
-                "seq_model", "size", "study", "tags", "urls")
+                "local_file", "seq_model", "size", "study", "tags", "urls")
 
     def _get_raw_doc(self):
         """
@@ -578,10 +578,10 @@ class HostTranscriptomicsRawSeqSet(Base):
         Returns:
             Returns a HostTranscriptomicsRawSeqSet instance.
         """
-        module_logger.info("Creating a template " + __name__ + ".")
+        module_logger.info("Creating a template %s.", __name__)
         seq_set = HostTranscriptomicsRawSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         seq_set._set_id(seq_set_data['id'])
@@ -598,6 +598,7 @@ class HostTranscriptomicsRawSeqSet(Base):
         seq_set.size = seq_set_data['meta']['size']
         seq_set.tags = seq_set_data['meta']['tags']
         seq_set.study = seq_set_data['meta']['study']
+
         # We need to use the private attribute here because there is no
         # public setter.
         seq_set._urls = seq_set_data['meta']['urls']
@@ -673,12 +674,11 @@ class HostTranscriptomicsRawSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the data. " + \
+            self.logger.error("Experienced an error uploading the data. "
                               "Aborting save.")
             raise Exception("Unable to load host transcriptomics raw sequence set.")
         else:
             self._urls = ["fasp://" + HostTranscriptomicsRawSeqSet.aspera_server + remote_path]
-
 
     def save(self):
         """
@@ -771,5 +771,5 @@ class HostTranscriptomicsRawSeqSet(Base):
                                   update_exception
                                  )
 
-        self.logger.debug("Returning " + str(success))
+        self.logger.debug("Returning %s", str(success))
         return success

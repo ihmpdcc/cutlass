@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the ProteomeNonPride module. """
+
 import unittest
 import json
 from datetime import date
@@ -13,13 +15,14 @@ from CutlassTestUtil import CutlassTestUtil
 # pylint: disable=W0703, C1801
 
 class ProteomeNonPrideTest(unittest.TestCase):
-    """ Unit tests for the cutlass ProteomeNonPride class """
+    """ Unit tests for the cutlass ProteomeNonPride class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
 
@@ -486,7 +489,7 @@ class ProteomeNonPrideTest(unittest.TestCase):
         proteome.source = test_source
         proteome.title = test_title
 
-        self.assertTrue(proteome.save() == True,
+        self.assertTrue(proteome.save() is True,
                         "ProteomeNonPride was saved successfully")
 
         # Load the proteome_nonpride that was just saved from the OSDF instance

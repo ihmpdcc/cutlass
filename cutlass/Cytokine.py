@@ -396,7 +396,7 @@ class Cytokine(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "study", "tags")
+        return ("checksums", "local_file", "study", "tags")
 
     def delete(self):
         """
@@ -416,7 +416,7 @@ class Cytokine(Base):
 
         if self._id is None:
             self.logger.warn("Attempt to delete a %s with no ID.", __name__)
-            raise Exception("Cytokine does not have an ID.")
+            raise Exception("%s does not have an ID." % __name__)
 
         cytokine_id = self._id
 

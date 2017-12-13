@@ -1,41 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the WgsDnaPrep module. """
+
 import unittest
 import json
-import random
-import string
-import sys
 
-from cutlass import iHMPSession
 from cutlass import WgsDnaPrep
 from cutlass import MIMS, MimsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
 
-def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+# pylint: disable=W0703, C1801
 
 class WgsDnaPrepTest(unittest.TestCase):
+    """ A unit test class for the WgsDnaPrep class. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the WgsDnaPrep module. """
         success = False
         try:
             from cutlass import WgsDnaPrep
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(WgsDnaPrep is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a WgsDnaPrep via the session. """
         success = False
         wgsDnaPrep = None
 
@@ -43,13 +47,14 @@ class WgsDnaPrepTest(unittest.TestCase):
             wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(wgsDnaPrep is None)
 
     def testToJson(self):
+        """ Test the generation of JSON from a WgsDnaPrep instance. """
         wgsDnaPrep = self.session.create_object("wgs_dna_prep")
         success = False
         comment = "Test comment"
@@ -60,7 +65,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         try:
             wgsDnaPrep_json = wgsDnaPrep.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -71,7 +76,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         try:
             wgsDnaPrep_data = json.loads(wgsDnaPrep_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -83,219 +88,133 @@ class WgsDnaPrepTest(unittest.TestCase):
                          comment, "'comment' in JSON had expected value.")
 
     def testId(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+        """ Test the id property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertTrue(wgsDnaPrep.id is None,
-                        "New template wgsDnaPrep has no ID.")
+        self.assertTrue(prep.id is None,
+                        "New template WgsDnaPrep has no ID.")
 
         with self.assertRaises(AttributeError):
-            wgsDnaPrep.id = "test"
+            prep.id = "test"
 
     def testVersion(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+        """ Test the version property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertTrue(wgsDnaPrep.version is None,
-                        "New template wgsDnaPrep has no version.")
+        self.assertTrue(prep.version is None,
+                        "New template WgsDnaPrep has no version.")
 
         with self.assertRaises(ValueError):
-            wgsDnaPrep.version = "test"
+            prep.version = "test"
 
-    def testIllegalComment(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+    def testComment(self):
+        """ Test the comment property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        with self.assertRaises(Exception):
-            wgsDnaPrep.comment = 1
+        self.util.stringTypeTest(self, prep, "comment")
 
-    def testLegalComment(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        comment = "This is a test comment"
+        self.util.stringPropertyTest(self, prep, "comment")
 
-        try:
-            wgsDnaPrep.comment = comment
-            success = True
-        except:
-            pass
+    def testFragSize(self):
+        """ Test the frag_size property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertTrue(success, "Able to use the comment setter")
+        self.util.intTypeTest(self, prep, "frag_size")
 
-        self.assertEqual(wgsDnaPrep.comment, comment,
-                         "Property getter for 'comment' works.")
+        self.util.intPropertyTest(self, prep, "frag_size")
 
-    def testIllegalFragSize(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+    def testFragSizeNegative(self):
+        """ Test the frag_size property with an illegal negative value. """
+        prep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
-            wgsDnaPrep.frag_size = "wrong frag size variable type"
+            prep.frag_size = -1
 
-    def testLegalFragSize(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        frag_size = 1020
+    def testLibLayout(self):
+        """ Test the lib_layout property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        try:
-            wgsDnaPrep.frag_size = frag_size
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, prep, "lib_layout")
 
-        self.assertTrue(success, "Able to use the frag_size setter")
+        self.util.stringPropertyTest(self, prep, "lib_layout")
 
-        self.assertEqual(wgsDnaPrep.frag_size, frag_size,
-                         "Property getter for 'frag_size' works.")
+    def testLibSelection(self):
+        """ Test the lib_selection property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-    def testLegalLibLayout(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        lib_layout = "A test Lib Layout for the test class"
+        self.util.stringTypeTest(self, prep, "lib_selection")
 
-        try:
-            wgsDnaPrep.lib_layout = lib_layout
-            success = True
-        except:
-            pass
+        self.util.stringPropertyTest(self, prep, "lib_selection")
 
-        self.assertTrue(success, "Able to use the lib_layout setter")
+    def testNCBITaxonID(self):
+        """ Test the ncbi_taxon_id property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertEqual(wgsDnaPrep.lib_layout, lib_layout,
-                         "Property getter for 'lib_layout' works.")
+        self.util.stringTypeTest(self, prep, "ncbi_taxon_id")
 
-    def testLegalLibSelection(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        lib_selection = "A test Lib selection for the test class"
+        self.util.stringPropertyTest(self, prep, "ncbi_taxon_id")
 
-        try:
-            wgsDnaPrep.lib_selection = lib_selection
-            success = True
-        except:
-            pass
+    def testPrepID(self):
+        """ Test the prep_id property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertTrue(success, "Able to use the lib_selection setter")
+        self.util.stringTypeTest(self, prep, "prep_id")
 
-        self.assertEqual(wgsDnaPrep.lib_selection, lib_selection,
-                         "Property getter for 'lib_selection' works.")
+        self.util.stringPropertyTest(self, prep, "prep_id")
 
-    def testLegalNCBITaxonID(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        ncbi_taxon_id = "A test NCBI Taxon ID for the test class"
+    def testSequencingCenter(self):
+        """ Test the sequencing_center property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        try:
-            wgsDnaPrep.ncbi_taxon_id = ncbi_taxon_id
-            success = True
-        except:
-            pass
+        self.util.stringTypeTest(self, prep, "sequencing_center")
 
-        self.assertTrue(success, "Able to use the ncbi_taxon_id setter")
+        self.util.stringPropertyTest(self, prep, "sequencing_center")
 
-        self.assertEqual(wgsDnaPrep.ncbi_taxon_id, ncbi_taxon_id,
-                         "Property getter for 'ncbi_taxon_id' works.")
+    def testSequencingContact(self):
+        """ Test the sequencing_contact property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-    def testLegalPrepID(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        prep_id = "A test prep id for the test class"
+        self.util.stringTypeTest(self, prep, "sequencing_contact")
 
-        try:
-            wgsDnaPrep.prep_id = prep_id
-            success = True
-        except:
-            pass
+        self.util.stringPropertyTest(self, prep, "sequencing_contact")
 
-        self.assertTrue(success, "Able to use the prep_id setter")
+    def testSRSID(self):
+        """ Test the srs_id property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertEqual(wgsDnaPrep.prep_id, prep_id, "Property getter for 'prep_id' works.")
+        self.util.stringTypeTest(self, prep, "srs_id")
 
-    def testLegalSequencingCenter(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        sequencing_center = "A test seq center for the test class"
+        self.util.stringPropertyTest(self, prep, "srs_id")
 
-        try:
-            wgsDnaPrep.sequencing_center = sequencing_center
-            success = True
-        except:
-            pass
+    def testStorageDuration(self):
+        """ Test the storage_duration property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        self.assertTrue(success, "Able to use the sequencing_center setter")
+        self.util.intTypeTest(self, prep, "storage_duration")
 
-        self.assertEqual(wgsDnaPrep.sequencing_center, sequencing_center,
-                         "Property getter for 'sequencing_center' works.")
+        self.util.intPropertyTest(self, prep, "storage_duration")
 
-    def testLegalSequencingContact(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        sequencing_contact = "A test seq contact for the test class"
-
-        try:
-            wgsDnaPrep.sequencing_contact = sequencing_contact
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the sequencing_contact setter")
-
-        self.assertEqual(wgsDnaPrep.sequencing_contact, sequencing_contact,
-                         "Property getter for 'sequencing_contact' works.")
-
-    def testLegalSRSID(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        srs_id = "A test prep id for the test class"
-
-        try:
-            wgsDnaPrep.srs_id = srs_id
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the srs_id setter")
-
-        self.assertEqual(wgsDnaPrep.srs_id, srs_id,
-                         "Property getter for 'srs_id' works.")
-
-    def testIllegalSRSID(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+    def testStorageDurationNegative(self):
+        """ Test the storage_duration property with an illegal negative value. """
+        prep = self.session.create_object("wgs_dna_prep")
 
         with self.assertRaises(Exception):
-            wgsDnaPrep.srs_id = 1
-
-    def testLegalStorageDuration(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-        success = False
-        storage_duration = 12
-
-        try:
-            wgsDnaPrep.storage_duration = storage_duration
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use the storage_duration setter")
-
-        self.assertEqual(wgsDnaPrep.storage_duration, storage_duration,
-                         "Property getter for 'storage_duration' works.")
-
-    def testIllegalStorageDuration(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
-
-        with self.assertRaises(Exception):
-            wgsDnaPrep.storage_duration = "ASDASDSAD"
+            prep.storage_duration = -1
 
     def testTags(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+        """ Test the tags property. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        tags = wgsDnaPrep.tags
+        tags = prep.tags
         self.assertTrue(type(tags) == list, "WgsDnaPrep tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template wgsDnaPrep tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
-        wgsDnaPrep.tags = new_tags
-        self.assertEqual(wgsDnaPrep.tags, new_tags, "Can set tags on a wgsDnaPrep.")
+        prep.tags = new_tags
+        self.assertEqual(prep.tags, new_tags, "Can set tags on a WgsDnaPrep.")
 
-        json_str = wgsDnaPrep.to_json()
+        json_str = prep.to_json()
         doc = json.loads(json_str)
         self.assertTrue('tags' in doc['meta'],
                         "JSON representation has 'tags' field in 'meta'.")
@@ -303,37 +222,40 @@ class WgsDnaPrepTest(unittest.TestCase):
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
 
-
     def testAddTag(self):
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+        """ Test the add_tag() method. """
+        prep = self.session.create_object("wgs_dna_prep")
 
-        wgsDnaPrep.add_tag("test")
-        self.assertEqual(wgsDnaPrep.tags, [ "test" ], "Can add a tag to a wgsDnaPrep.")
+        prep.add_tag("test")
+        self.assertEqual(prep.tags, ["test"], "Can add a tag to a wgsDnaPrep.")
 
-        json_str = wgsDnaPrep.to_json()
+        json_str = prep.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
         with self.assertRaises(ValueError):
-            wgsDnaPrep.add_tag("test")
+            prep.add_tag("test")
 
-        json_str = wgsDnaPrep.to_json()
+        json_str = prep.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testMims(self):
+        """ Test the mims property. """
         wgsDnaPrep = self.session.create_object("wgs_dna_prep")
 
         self.assertTrue(wgsDnaPrep.mims is None,
                         "New template wgsDnaPrep has no MIMS data.")
 
-        invalid_test_mims = { "a": 1,
-                              "b": 2 }
+        invalid_test_mims = {
+            "a": 1,
+            "b": 2
+        }
 
         with self.assertRaises(MimsException):
             wgsDnaPrep.mims = invalid_test_mims
@@ -342,42 +264,42 @@ class WgsDnaPrepTest(unittest.TestCase):
                         "Template wgsDnaPrep has no MIMS after invalid set attempt.")
 
         valid_mims = {
-              "adapters": "test_adapters",
-              "annot_source": "test_annot_source",
-              "assembly": "test_assembly",
-              "assembly_name": "test_assembly_name",
-              "biome": "test_biome",
-              "collection_date": "test_collection_date",
-              "env_package": "test_env_package",
-              "extrachrom_elements": "test_extrachrom_elements",
-              "encoded_traits": "test_encoded_traits",
-              "experimental_factor": "test_experimental_factor",
-              "feature": "test_feature",
-              "findex": "test_findex",
-              "finishing_strategy": "test_finishing_strategy",
-              "geo_loc_name": "test_geo_loc_name",
-              "investigation_type": "test_investigation_type",
-              "lat_lon": "test_lat_long",
-              "lib_const_meth": "test_lib_const_meth",
-              "lib_reads_seqd": "test_lib_reads_seqd",
-              "lib_screen": "test_lib_screen",
-              "lib_size": 2000,
-              "lib_vector": "test_lib_vector",
-              "material": "test_material",
-              "nucl_acid_amp": "test_nucl_acid_amp",
-              "nucl_acid_ext": "test_nucl_acid_ext",
-              "project_name": "test_project_name",
-              "rel_to_oxygen": "test_rel_to_oxygen",
-              "rindex": "test_rindex",
-              "samp_collect_device": "test_samp_collect_device",
-              "samp_mat_process": "test_samp_map_process",
-              "samp_size": "test_samp_size",
-              "seq_meth": "test_seq_meth",
-              "sop": [ "a", "b", "c" ],
-              "source_mat_id": [ "a", "b", "c" ],
-              "submitted_to_insdc": True,
-              "url": ["a", "b", "c" ]
-            }
+            "adapters": "test_adapters",
+            "annot_source": "test_annot_source",
+            "assembly": "test_assembly",
+            "assembly_name": "test_assembly_name",
+            "biome": "test_biome",
+            "collection_date": "test_collection_date",
+            "env_package": "test_env_package",
+            "extrachrom_elements": "test_extrachrom_elements",
+            "encoded_traits": "test_encoded_traits",
+            "experimental_factor": "test_experimental_factor",
+            "feature": "test_feature",
+            "findex": "test_findex",
+            "finishing_strategy": "test_finishing_strategy",
+            "geo_loc_name": "test_geo_loc_name",
+            "investigation_type": "test_investigation_type",
+            "lat_lon": "test_lat_long",
+            "lib_const_meth": "test_lib_const_meth",
+            "lib_reads_seqd": "test_lib_reads_seqd",
+            "lib_screen": "test_lib_screen",
+            "lib_size": 2000,
+            "lib_vector": "test_lib_vector",
+            "material": "test_material",
+            "nucl_acid_amp": "test_nucl_acid_amp",
+            "nucl_acid_ext": "test_nucl_acid_ext",
+            "project_name": "test_project_name",
+            "rel_to_oxygen": "test_rel_to_oxygen",
+            "rindex": "test_rindex",
+            "samp_collect_device": "test_samp_collect_device",
+            "samp_mat_process": "test_samp_map_process",
+            "samp_size": "test_samp_size",
+            "seq_meth": "test_seq_meth",
+            "sop": ["a", "b", "c"],
+            "source_mat_id": ["a", "b", "c"],
+            "submitted_to_insdc": True,
+            "url": ["a", "b", "c"]
+        }
 
         # Assume failure
         success = False
@@ -385,7 +307,7 @@ class WgsDnaPrepTest(unittest.TestCase):
         try:
             wgsDnaPrep.mims = valid_mims
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Valid MIMS data does not raise exception.")
@@ -397,6 +319,7 @@ class WgsDnaPrepTest(unittest.TestCase):
                          "Retrieved MIMS data appears to be okay.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = WgsDnaPrep.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -406,109 +329,111 @@ class WgsDnaPrepTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteWgsDnaPrep(self):
-        # attempt to save the wgsDnaPrep at all points before and after adding the required fields
-        # project_id = super(WgsDnaPrepTest, self).testSaveProject()
+        """ Extensive test for the load, edit, save and delete functions. """
+        # attempt to save the prep at all points before and after adding
+        # the required fields
 
-        wgsDnaPrep = self.session.create_object("wgs_dna_prep")
+        prep = self.session.create_object("wgs_dna_prep")
 
         test_comment = "Test comment"
         frag_size = 10
         lib_layout = "asdfads"
         lib_selection = "asdfhewofue"
         mims = {
-              "adapters": "test_adapters",
-              "annot_source": "test_annot_source",
-              "assembly": "test_assembly",
-              "assembly_name": "test_assembly_name",
-              "biome": "test_biome",
-              "collection_date": "test_collection_date",
-              "env_package": "test_env_package",
-              "extrachrom_elements": "test_extrachrom_elements",
-              "encoded_traits": "test_encoded_traits",
-              "experimental_factor": "test_experimental_factor",
-              "feature": "test_feature",
-              "findex": "test_findex",
-              "finishing_strategy": "test_finishing_strategy",
-              "geo_loc_name": "test_geo_loc_name",
-              "investigation_type": "test_investigation_type",
-              "lat_lon": "test_lat_long",
-              "lib_const_meth": "test_lib_const_meth",
-              "lib_reads_seqd": "test_lib_reads_seqd",
-              "lib_screen": "test_lib_screen",
-              "lib_size": 2000,
-              "lib_vector": "test_lib_vector",
-              "material": "test_material",
-              "nucl_acid_amp": "test_nucl_acid_amp",
-              "nucl_acid_ext": "test_nucl_acid_ext",
-              "project_name": "test_project_name",
-              "rel_to_oxygen": "test_rel_to_oxygen",
-              "rindex": "test_rindex",
-              "samp_collect_device": "test_samp_collect_device",
-              "samp_mat_process": "test_samp_map_process",
-              "samp_size": "test_samp_size",
-              "seq_meth": "test_seq_meth",
-              "sop": [ "a", "b", "c" ],
-              "source_mat_id": [ "a", "b", "c" ],
-              "submitted_to_insdc": True,
-              "url": ["a", "b", "c" ]
-            }
+            "adapters": "test_adapters",
+            "annot_source": "test_annot_source",
+            "assembly": "test_assembly",
+            "assembly_name": "test_assembly_name",
+            "biome": "test_biome",
+            "collection_date": "test_collection_date",
+            "env_package": "test_env_package",
+            "extrachrom_elements": "test_extrachrom_elements",
+            "encoded_traits": "test_encoded_traits",
+            "experimental_factor": "test_experimental_factor",
+            "feature": "test_feature",
+            "findex": "test_findex",
+            "finishing_strategy": "test_finishing_strategy",
+            "geo_loc_name": "test_geo_loc_name",
+            "investigation_type": "test_investigation_type",
+            "lat_lon": "test_lat_long",
+            "lib_const_meth": "test_lib_const_meth",
+            "lib_reads_seqd": "test_lib_reads_seqd",
+            "lib_screen": "test_lib_screen",
+            "lib_size": 2000,
+            "lib_vector": "test_lib_vector",
+            "material": "test_material",
+            "nucl_acid_amp": "test_nucl_acid_amp",
+            "nucl_acid_ext": "test_nucl_acid_ext",
+            "project_name": "test_project_name",
+            "rel_to_oxygen": "test_rel_to_oxygen",
+            "rindex": "test_rindex",
+            "samp_collect_device": "test_samp_collect_device",
+            "samp_mat_process": "test_samp_map_process",
+            "samp_size": "test_samp_size",
+            "seq_meth": "test_seq_meth",
+            "sop": ["a", "b", "c"],
+            "source_mat_id": ["a", "b", "c"],
+            "submitted_to_insdc": True,
+            "url": ["a", "b", "c"]
+        }
+
         ncbi_taxon_id = "sadfadsfawefw"
         prep_id = "asdsadewqrewq"
         sequencing_center = "center for sequencing"
         sequencing_contact = "me right now"
         srs_id = "the id for the srs"
         storage_duration = 10
-        test_links = {"prepared_from":[]}
+        test_links = {"prepared_from": []}
 
-        self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully, no required fields")
+        self.assertFalse(prep.save(), "WgsDnaPrep not saved successfully, no required fields")
 
-        wgsDnaPrep.comment = test_comment
+        prep.comment = test_comment
 
-        self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
+        self.assertFalse(prep.save(), "WgsDnaPrep not saved successfully")
 
-        wgsDnaPrep.frag_size = frag_size
+        prep.frag_size = frag_size
 
-        self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
+        self.assertFalse(prep.save(), "WgsDnaPrep not saved successfully")
 
-        wgsDnaPrep.links = test_links
+        prep.links = test_links
 
-        self.assertFalse(wgsDnaPrep.save(), "WgsDnaPrep not saved successfully")
+        self.assertFalse(prep.save(), "WgsDnaPrep not saved successfully")
 
-        wgsDnaPrep.lib_layout = lib_layout
-        wgsDnaPrep.lib_selection = lib_selection
-        wgsDnaPrep.mims = mims
-        wgsDnaPrep.ncbi_taxon_id = ncbi_taxon_id
-        wgsDnaPrep.prep_id = prep_id
-        wgsDnaPrep.sequencing_center = sequencing_center
-        wgsDnaPrep.sequencing_contact = sequencing_contact
-        wgsDnaPrep.srs_id = srs_id
-        wgsDnaPrep.storage_duration = storage_duration
+        prep.lib_layout = lib_layout
+        prep.lib_selection = lib_selection
+        prep.mims = mims
+        prep.ncbi_taxon_id = ncbi_taxon_id
+        prep.prep_id = prep_id
+        prep.sequencing_center = sequencing_center
+        prep.sequencing_contact = sequencing_contact
+        prep.srs_id = srs_id
+        prep.storage_duration = storage_duration
 
-        # make sure wgsDnaPrep does not delete if it does not exist
+        # make sure prep does not delete if it does not exist
         with self.assertRaises(Exception):
-            wgsDnaPrep.delete()
+            prep.delete()
 
-        self.assertTrue(wgsDnaPrep.save() == True, "WgsDnaPrep was not saved successfully")
+        self.assertTrue(prep.save() is True, "WgsDnaPrep was not saved successfully")
 
-        # load the wgsDnaPrep that was just saved from the OSDF instance
-        wgsDnaPrep_loaded = self.session.create_object("wgs_dna_prep")
-        wgsDnaPrep_loaded = wgsDnaPrep_loaded.load(wgsDnaPrep.id)
+        # load the prep that was just saved from the OSDF instance
+        prep_loaded = self.session.create_object("wgs_dna_prep")
+        prep_loaded = prep_loaded.load(prep.id)
 
         # check all fields were saved and loaded successfully
-        self.assertEqual(wgsDnaPrep.comment,
-                wgsDnaPrep_loaded.comment,
-                "WgsDnaPrep comment not saved & loaded successfully")
-        self.assertEqual(wgsDnaPrep.mims["biome"],
-                wgsDnaPrep_loaded.mims["biome"],
-                "WgsDnaPrep mims not saved & loaded successfully")
+        self.assertEqual(prep.comment,
+                         prep_loaded.comment,
+                         "WgsDnaPrep comment not saved & loaded successfully")
+        self.assertEqual(prep.mims["biome"],
+                         prep_loaded.mims["biome"],
+                         "WgsDnaPrep mims not saved & loaded successfully")
 
-        # wgsDnaPrep is deleted successfully
-        self.assertTrue(wgsDnaPrep.delete(), "WgsDnaPrep was not deleted successfully")
+        # prep is deleted successfully
+        self.assertTrue(prep.delete(), "WgsDnaPrep was not deleted successfully")
 
-        # the wgsDnaPrep of the initial ID should not load successfully
+        # the prep of the initial ID should not load successfully
         load_test = self.session.create_object("wgs_dna_prep")
         with self.assertRaises(Exception):
-            load_test = load_test.load(wgsDnaPrep.id)
+            load_test = load_test.load(prep.id)
 
 if __name__ == '__main__':
     unittest.main()

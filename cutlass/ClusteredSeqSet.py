@@ -512,13 +512,13 @@ class ClusteredSeqSet(Base):
             self.logger.debug("Object has the 'format_doc' property set.")
             doc['meta']['format_doc'] = self._format_doc
 
-        if self._sop is not None:
-            self.logger.debug("Object has the 'sop' property set.")
-            doc['meta']['sop'] = self._sop
-
         if self._private_files is not None:
             self.logger.debug("Object has the 'private_files' property set.")
             doc['meta']['private_files'] = self._private_files
+
+        if self._sop is not None:
+            self.logger.debug("Object has the 'sop' property set.")
+            doc['meta']['sop'] = self._sop
 
         return doc
 
@@ -533,8 +533,8 @@ class ClusteredSeqSet(Base):
             Tuple of strings of required properties.
         """
         module_logger.debug("In required fields.")
-        return ("checksums", "comment", "format", "clustering_process",
-                "sequence_type", "size", "study", "tags")
+        return ("checksums", "clustering_process", "comment", "format",
+                "local_file", "sequence_type", "size", "study", "tags")
 
     def delete(self):
         """
@@ -553,8 +553,8 @@ class ClusteredSeqSet(Base):
         self.logger.debug("In delete.")
 
         if self._id is None:
-            self.logger.warn("Attempt to delete a ClusteredSeqSet with no ID.")
-            raise Exception("ClusteredSeqSet does not have an ID.")
+            self.logger.warn("Attempt to delete a %s with no ID.", __name__)
+            raise Exception("%s does not have an ID." % __name__)
 
         clustered_seq_set_id = self._id
 
@@ -632,10 +632,10 @@ class ClusteredSeqSet(Base):
         Returns:
             Returns a ClusteredSeqSet instance.
         """
-        module_logger.info("Creating a template ClusteredSeqSet.")
+        module_logger.info("Creating a template %s.", __name__)
         css = ClusteredSeqSet()
 
-        module_logger.debug("Filling in " + __name__ + " details.")
+        module_logger.debug("Filling in %s details.", __name__)
 
         # The attributes commmon to all iHMP nodes
         css._set_id(css_data['id'])
@@ -689,7 +689,7 @@ class ClusteredSeqSet(Base):
         css_data = session.get_osdf().get_node(seq_set_id)
         css = ClusteredSeqSet.load_clustered_seq_set(css_data)
 
-        module_logger.debug("Returning loaded ClusteredSeqSet.")
+        module_logger.debug("Returning loaded %s.", __name__)
 
         return css
 
@@ -727,7 +727,7 @@ class ClusteredSeqSet(Base):
                                            remote_path)
 
         if not upload_result:
-            self.logger.error("Experienced an error uploading the data. " + \
+            self.logger.error("Experienced an error uploading the data. "
                               "Aborting save.")
             raise Exception("Unable to load clustered sequence set.")
         else:
@@ -821,7 +821,7 @@ class ClusteredSeqSet(Base):
                 success = True
             except Exception as update_exception:
                 self.logger.exception(update_exception)
-                self.logger.error("An error occurred while updating " + \
+                self.logger.error("An error occurred while updating "
                                   "%s %s. Reason: %s.", __name__,
                                   self._id, update_exception)
 

@@ -1,36 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the Study module. """
+
 import unittest
 import json
-import sys
 
-from cutlass import iHMPSession
 from cutlass import Study
 from cutlass import MIXS, MixsException
 
 from CutlassTestConfig import CutlassTestConfig
+from CutlassTestUtil import CutlassTestUtil
+
+# pylint: disable=W0703, C1801
 
 class StudyTest(unittest.TestCase):
+    """ A unit test class for the Study module. """
 
     session = None
+    util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
+        cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the import of the Study module. """
         success = False
         try:
             from cutlass import Study
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(Study is None)
 
     def testSessionCreate(self):
+        """ Test the creation of a Study via the session. """
         success = False
         study = None
 
@@ -38,81 +47,43 @@ class StudyTest(unittest.TestCase):
             study = self.session.create_study()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(study is None)
 
     def testName(self):
-        study = self.session.create_study()
-        success = False
-        test_name = "test name"
-
-        try:
-            study.name = test_name
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'name' setter.")
-
-        self.assertEqual(study.name, test_name,
-                         "Property getter for 'name' works.")
-
-    def testIntName(self):
+        """ Test the name property. """
         study = self.session.create_study()
 
-        with self.assertRaises(ValueError):
-            study.name = 3
+        self.util.stringTypeTest(self, study, "name")
 
-    def testListName(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.name = [ "a", "b", "c" ]
-
-    def testNoneName(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.name = None
+        self.util.stringPropertyTest(self, study, "name")
 
     def testDescription(self):
-        study = self.session.create_study()
-        success = False
-        test_description = "test description"
-
-        try:
-            study.description = test_description
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'description' setter.")
-
-        self.assertEqual(study.description, test_description,
-                         "Property getter for 'description' works.")
-
-    def testIntDescription(self):
+        """ Test the description property. """
         study = self.session.create_study()
 
-        with self.assertRaises(ValueError):
-            study.description = 3
+        self.util.stringTypeTest(self, study, "description")
+
+        self.util.stringPropertyTest(self, study, "description")
 
     def testIllegalSubtype(self):
+        """ Test the subtype property with an illegal value. """
         study = self.session.create_study()
         with self.assertRaises(Exception):
             study.subtype = "random"
 
     def testLegalSubtype(self):
+        """ Test the subtype property with a legal value. """
         study = self.session.create_study()
         success = False
         subtype = "prediabetes"
         try:
             study.subtype = subtype
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the subtype setter")
@@ -121,18 +92,20 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'subtype' works.")
 
     def testIllegalCenter(self):
+        """ Test the center property with an illegal value. """
         study = self.session.create_study()
         with self.assertRaises(Exception):
             study.center = "random"
 
     def testLegalCenter(self):
+        """ Test the center property with a legal value. """
         study = self.session.create_study()
         success = False
         center = "Broad Institute"
         try:
             study.center = center
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the center setter")
@@ -141,74 +114,23 @@ class StudyTest(unittest.TestCase):
                          "Property getter for 'center' works.")
 
     def testSRPID(self):
-        study = self.session.create_study()
-        success = False
-        test_srp_id = "test srp_id"
-
-        try:
-            study.srp_id = test_srp_id
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'srp_id' setter.")
-
-        self.assertEqual(study.srp_id, test_srp_id,
-                         "Property getter for 'srp_id' works.")
-
-    def testIntSRPID(self):
+        """ Test the srp_id property. """
         study = self.session.create_study()
 
-        with self.assertRaises(ValueError):
-            study.srp_id = 3
+        self.util.stringTypeTest(self, study, "srp_id")
 
-    def testListSRPID(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.srp_id = [ "a", "b", "c" ]
-
-    def testNoneSRPID(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.srp_id = None
+        self.util.stringPropertyTest(self, study, "srp_id")
 
     def testContact(self):
-        study = self.session.create_study()
-        success = False
-        test_contact = "test contact"
-
-        try:
-            study.contact = test_contact
-            success = True
-        except:
-            pass
-
-        self.assertTrue(success, "Able to use 'contact' setter.")
-
-        self.assertEqual(study.contact, test_contact,
-                         "Property getter for 'contact' works.")
-
-    def testIntContact(self):
+        """ Test the contact property. """
         study = self.session.create_study()
 
-        with self.assertRaises(ValueError):
-            study.contact = 3
+        self.util.stringTypeTest(self, study, "contact")
 
-    def testListContact(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.contact = [ "a", "b", "c" ]
-
-    def testNoneContact(self):
-        study = self.session.create_study()
-
-        with self.assertRaises(ValueError):
-            study.contact = None
+        self.util.stringPropertyTest(self, study, "contact")
 
     def testToJson(self):
+        """ Test the to_json() method. """
         study = self.session.create_study()
         success = False
         name = "Tested name"
@@ -219,7 +141,7 @@ class StudyTest(unittest.TestCase):
         try:
             study_json = study.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -230,7 +152,7 @@ class StudyTest(unittest.TestCase):
         try:
             study_data = json.loads(study_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success, "to_json() did not throw an exception.")
@@ -243,6 +165,7 @@ class StudyTest(unittest.TestCase):
                          name, "'name' in JSON had expected value.")
 
     def testId(self):
+        """ Test the id property. """
         study = self.session.create_study()
 
         self.assertTrue(study.id is None,
@@ -252,6 +175,7 @@ class StudyTest(unittest.TestCase):
             study.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         study = self.session.create_study()
 
         self.assertTrue(study.version is None,
@@ -261,13 +185,14 @@ class StudyTest(unittest.TestCase):
             study.version = "test"
 
     def testTags(self):
+        """ Test the tags property. """
         study = self.session.create_study()
 
         tags = study.tags
         self.assertTrue(type(tags) == list, "Study tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template study tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         study.tags = new_tags
         self.assertEqual(study.tags, new_tags, "Can set tags on a study.")
@@ -280,17 +205,17 @@ class StudyTest(unittest.TestCase):
         self.assertEqual(doc['meta']['tags'], new_tags,
                          "JSON representation had correct tags after setter.")
 
-
     def testAddTag(self):
+        """ Test the add_tag() method. """
         study = self.session.create_study()
 
         study.add_tag("test")
-        self.assertEqual(study.tags, [ "test" ], "Can add a tag to a study.")
+        self.assertEqual(study.tags, ["test"], "Can add a tag to a study.")
 
         json_str = study.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -300,10 +225,11 @@ class StudyTest(unittest.TestCase):
         json_str = study.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = Study.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -313,6 +239,7 @@ class StudyTest(unittest.TestCase):
                         "required_field() did not return empty value.")
 
     def testLoadSaveDeleteStudy(self):
+        """ Extensive test for the load, edit, save and delete functions. """
         # Attempt to save the study at all points before and after
         # adding the required fields
 
@@ -321,9 +248,9 @@ class StudyTest(unittest.TestCase):
         test_name = "Test name"
         test_description = "Test description"
         test_contact = "Test contacts"
-        test_links = {"part_of":[]}
+        test_links = {"part_of": []}
         test_center = "Jackson Laboratory"
-        test_tag = "New tag added to study"
+        test_tag = "test"
         test_subtype = "prediabetes"
 
         self.assertFalse(study.save(),
@@ -347,7 +274,7 @@ class StudyTest(unittest.TestCase):
         with self.assertRaises(Exception):
             study.delete()
 
-        self.assertTrue(study.save() == True,
+        self.assertTrue(study.save() is True,
                         "Study was not saved successfully")
 
         # Load the study that was just saved from the OSDF instance

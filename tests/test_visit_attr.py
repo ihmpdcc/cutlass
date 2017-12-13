@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the VisitAttribute module. """
+
 import unittest
 
 from CutlassTestConfig import CutlassTestConfig
@@ -15,13 +17,14 @@ class VisitAttributeTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
 
         cls.util = CutlassTestUtil()
 
     def testImport(self):
-        """ Test the import of the VisitAttribute module. """
+        """ Test the importation of the VisitAttribute module. """
         success = False
         try:
             from cutlass import VisitAttribute
@@ -33,7 +36,7 @@ class VisitAttributeTest(unittest.TestCase):
         self.failIf(VisitAttribute is None)
 
     def testSessionCreate(self):
-        """ Test the import of a VisitAttribute module. """
+        """ Test the creation of a VisitAttribute via the session. """
         success = False
         attr = None
 

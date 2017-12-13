@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# pylint: disable=C0111, C0325
+
+import logging
+import sys
+from pprint import pprint
 from cutlass import iHMPSession
 from cutlass import VisitAttribute
 
@@ -26,7 +31,7 @@ va.survey_id = "test survey id"
 va.study = "prediabetes"
 va.add_tag("test")
 va.add_tag("visit_attr")
-va.links = { "associated_with":  [ "610a4911a5ca67de12cdc1e4b400f121" ] }
+va.links = {"associated_with":  ["610a4911a5ca67de12cdc1e4b400f121"]}
 
 va.disease_study_status = "test disease status"
 va.disease_name = "test disease name"

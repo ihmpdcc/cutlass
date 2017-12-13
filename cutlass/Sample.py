@@ -233,8 +233,9 @@ class Sample(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
+        module_logger.debug("In required_fields.")
         fields = ('fma_body_site', 'mixs', 'tags')
         return fields
 

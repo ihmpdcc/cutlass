@@ -1,15 +1,27 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+from pprint import pprint
 from cutlass import SampleAttribute
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
 
 username = "test"
 password = "test"
+
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -22,9 +34,9 @@ attrib.fecalcal = "test fecalcal"
 attrib.study = "prediabetes"
 
 # SampleAttributes are 'associated_with' samples
-attrib.links = { "associated_with": [ "610a4911a5ca67de12cdc1e4b4011876" ] }
+attrib.links = {"associated_with": ["610a4911a5ca67de12cdc1e4b4011876"]}
 
-attrib.tags = [ "sample_attr", "ihmp" ]
+attrib.tags = ["sample_attr", "ihmp"]
 attrib.add_tag("sample")
 
 print(attrib.to_json(indent=2))

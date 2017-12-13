@@ -430,9 +430,9 @@ class SixteenSDnaPrep(Base):
         Args:
             None
         Returns:
-            None
+            Tuple of strings of required properties.
         """
-        module_logger.debug("In required fields.")
+        module_logger.debug("In required_fields.")
         return ("comment", "lib_layout", "lib_selection", "mimarks",
                 "ncbi_taxon_id", "prep_id", "sequencing_center",
                 "sequencing_contact", "storage_duration", "tags")

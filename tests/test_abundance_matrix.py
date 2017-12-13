@@ -1,39 +1,45 @@
 #!/usr/bin/env python
 
+""" A unittest script for the AbundanceMatrix module. """
+
 import unittest
 import json
-import sys
 import tempfile
 
-from cutlass import iHMPSession
 from cutlass import AbundanceMatrix
 
 from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
+# pylint: disable=W0703, C1801
+
 class AbundanceMatrixTest(unittest.TestCase):
+    """ A unit test class for the AbundanceMatrix class. """
 
     session = None
     util = None
 
     @classmethod
     def setUpClass(cls):
+        """ Setup for the unittest. """
         # Establish the session for each test method
         cls.session = CutlassTestConfig.get_session()
         cls.util = CutlassTestUtil()
 
     def testImport(self):
+        """ Test the importation of the AbundanceMatrix module. """
         success = False
         try:
             from cutlass import AbundanceMatrix
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(AbundanceMatrix is None)
 
     def testSessionCreate(self):
+        """ Test the creation of an AbundanceMatrix via the session. """
         success = False
         matrix = None
 
@@ -41,21 +47,22 @@ class AbundanceMatrixTest(unittest.TestCase):
             matrix = self.session.create_abundance_matrix()
 
             success = True
-        except:
+        except Exception:
             pass
 
         self.failUnless(success)
         self.failIf(matrix is None)
 
     def testChecksumsLegal(self):
+        """ Test the checksums property. """
         matrix = self.session.create_abundance_matrix()
         success = False
-        checksums = {"md5":"d8e8fca2dc0f896fd7cb4cb0031ba249"}
+        checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
 
         try:
-            matrix.checksums= checksums
+            matrix.checksums = checksums
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use the checksums setter")
@@ -64,6 +71,7 @@ class AbundanceMatrixTest(unittest.TestCase):
                          "Property getter for 'checksums' works.")
 
     def testComment(self):
+        """ Test the comment property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.stringTypeTest(self, matrix, "comment")
@@ -71,6 +79,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.stringPropertyTest(self, matrix, "comment")
 
     def testFormat(self):
+        """ Test the format property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.stringTypeTest(self, matrix, "format")
@@ -78,6 +87,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.stringPropertyTest(self, matrix, "format")
 
     def testFormatDoc(self):
+        """ Test the format_doc property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.stringTypeTest(self, matrix, "format_doc")
@@ -85,6 +95,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.stringPropertyTest(self, matrix, "format_doc")
 
     def testMatrixType(self):
+        """ Test the matrix_type property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.stringTypeTest(self, matrix, "matrix_type")
@@ -92,6 +103,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.stringPropertyTest(self, matrix, "matrix_type")
 
     def testPrivateFiles(self):
+        """ Test the private_files property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.boolTypeTest(self, matrix, "private_files")
@@ -99,6 +111,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.boolPropertyTest(self, matrix, "private_files")
 
     def testSize(self):
+        """ Test the size property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.intTypeTest(self, matrix, "size")
@@ -106,12 +119,14 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.intPropertyTest(self, matrix, "size")
 
     def testSizeNegative(self):
+        """ Test the size property with an illegal negative value. """
         matrix = self.session.create_abundance_matrix()
 
         with self.assertRaises(ValueError):
             matrix.size = -1
 
     def testStudy(self):
+        """ Test the study property. """
         matrix = self.session.create_abundance_matrix()
 
         self.util.stringTypeTest(self, matrix, "study")
@@ -119,6 +134,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.util.stringPropertyTest(self, matrix, "study")
 
     def testToJson(self):
+        """ Test the generation of JSON from an AbundanceMatrix instance. """
         matrix = self.session.create_abundance_matrix()
         success = False
 
@@ -145,7 +161,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         try:
             matrix_json = matrix.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -156,7 +172,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         try:
             matrix_data = json.loads(matrix_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -170,44 +186,46 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.assertEqual(matrix_data['meta']['comment'],
                          comment,
                          "'comment' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['format'],
                          format_,
                          "'format' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['matrix_type'],
                          matrix_type,
                          "'matrix_type' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['size'],
                          size,
                          "'size' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['study'],
                          study,
                          "'study' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['sop'],
                          sop,
                          "'sop' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['private_files'],
                          private_files,
                          "'private_files' in JSON had expected value."
-                         )
+                        )
 
     def testDataInJson(self):
+        """ Test if the correct data is in the generated JSON. """
+
         matrix = self.session.create_abundance_matrix()
         success = False
 
@@ -230,7 +248,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         try:
             matrix_json = matrix.to_json()
             success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(success, "Able to use 'to_json'.")
@@ -241,7 +259,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         try:
             matrix_data = json.loads(matrix_json)
             parse_success = True
-        except:
+        except Exception:
             pass
 
         self.assertTrue(parse_success,
@@ -254,34 +272,35 @@ class AbundanceMatrixTest(unittest.TestCase):
         self.assertEqual(matrix_data['meta']['comment'],
                          comment,
                          "'comment' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['format'],
                          format_,
                          "'format' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['format_doc'],
                          format_doc,
                          "'format_doc' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['matrix_type'],
                          matrix_type,
                          "'matrix_type' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['size'],
                          size,
                          "'size' in JSON had expected value."
-                         )
+                        )
 
         self.assertEqual(matrix_data['meta']['study'],
                          study,
                          "'study' in JSON had expected value."
-                         )
+                        )
 
     def testId(self):
+        """ Test the id property. """
         matrix = self.session.create_abundance_matrix()
 
         self.assertTrue(matrix.id is None,
@@ -291,6 +310,7 @@ class AbundanceMatrixTest(unittest.TestCase):
             matrix.id = "test"
 
     def testVersion(self):
+        """ Test the version property. """
         matrix = self.session.create_abundance_matrix()
 
         self.assertTrue(matrix.version is None,
@@ -300,13 +320,14 @@ class AbundanceMatrixTest(unittest.TestCase):
             matrix.version = "test"
 
     def testTags(self):
+        """ Test the tags property. """
         matrix = self.session.create_abundance_matrix()
 
         tags = matrix.tags
         self.assertTrue(type(tags) == list, "AbundanceMatrix tags() method returns a list.")
         self.assertEqual(len(tags), 0, "Template abundance matrix tags list is empty.")
 
-        new_tags = [ "tagA", "tagB" ]
+        new_tags = ["tagA", "tagB"]
 
         matrix.tags = new_tags
         self.assertEqual(matrix.tags, new_tags, "Can set tags on an abundance matrix.")
@@ -320,15 +341,16 @@ class AbundanceMatrixTest(unittest.TestCase):
                          "JSON representation had correct tags after setter.")
 
     def testAddTag(self):
+        """ Test the add_tag() method. """
         matrix = self.session.create_abundance_matrix()
 
         matrix.add_tag("test")
-        self.assertEqual(matrix.tags, [ "test" ], "Can add a tag to a matrix.")
+        self.assertEqual(matrix.tags, ["test"], "Can add a tag to a matrix.")
 
         json_str = matrix.to_json()
         doc = json.loads(json_str)
 
-        self.assertEqual(doc['meta']['tags'], [ "test" ],
+        self.assertEqual(doc['meta']['tags'], ["test"],
                          "JSON representation had correct tags after add_tag().")
 
         # Try adding the same tag yet again, shouldn't get a duplicate
@@ -338,10 +360,11 @@ class AbundanceMatrixTest(unittest.TestCase):
         json_str = matrix.to_json()
         doc2 = json.loads(json_str)
 
-        self.assertEqual(doc2['meta']['tags'], [ "test" ],
+        self.assertEqual(doc2['meta']['tags'], ["test"],
                          "JSON document did not end up with duplicate tags.")
 
     def testRequiredFields(self):
+        """ Test the required_fields() static method. """
         required = AbundanceMatrix.required_fields()
 
         self.assertEqual(type(required), tuple,
@@ -351,29 +374,31 @@ class AbundanceMatrixTest(unittest.TestCase):
                         "required_fields() did not return empty value.")
 
     def testLoadSaveDeleteAbundanceMatrix(self):
+        """ Extensive test for the load, edit, save and delete functions. """
+
         temp_file = tempfile.NamedTemporaryFile(delete=False).name
 
-        # Attempt to save the sample at all points before and after adding
-        # the required fields
+        # Attempt to save the abundance matrix at all points before and after
+        # adding the required fields
         matrix = self.session.create_abundance_matrix()
 
         self.assertFalse(
-                matrix.save(),
-                "AbundanceMatrix not saved successfully, no required fields"
-                )
+            matrix.save(),
+            "AbundanceMatrix not saved successfully, no required fields"
+        )
 
         matrix.comment = "test_comment"
 
         self.assertFalse(
             matrix.save(),
             "AbundanceMatrix not saved successfully, missing some required fields."
-            )
+        )
 
         # AbundanceMatrix nodes can link to 16s_trimmed_seq_set, wgs_assembled_seq_set,
         # wgs_raw_seq_set, or another abundance_matrix.
-        matrix.links = {"computed_from": ["9bb18fe313e7fe94bf243da07e0032e4" ]}
+        matrix.links = {"computed_from": ["9bb18fe313e7fe94bf243da07e0032e4"]}
 
-        matrix.checksums = { "md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
+        matrix.checksums = {"md5": "d8e8fca2dc0f896fd7cb4cb0031ba249"}
         matrix.format = "tbl"
         matrix.format_doc = "Test format_doc"
         matrix.matrix_type = "microb_lipidomic"
@@ -387,7 +412,7 @@ class AbundanceMatrixTest(unittest.TestCase):
         with self.assertRaises(Exception):
             matrix.delete()
 
-        self.assertTrue(matrix.save() == True, "AbundanceMatrix was saved successfully")
+        self.assertTrue(matrix.save() is True, "AbundanceMatrix was saved successfully")
 
         # Load the matrix that was just saved from the OSDF instance
         matrix_loaded = self.session.create_abundance_matrix()

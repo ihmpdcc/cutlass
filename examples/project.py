@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+from pprint import pprint
 from cutlass import Project
 from cutlass import iHMPSession
-from pprint import pprint
 
 username = "test"
 password = "test"
+
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -17,21 +31,21 @@ print(Project.required_fields())
 proj = Project()
 
 mixs_data = {
-      "biome": "blah",
-      "body_product": "blah",
-      "collection_date": "blah",
-      "env_package": "blah",
-      "feature": "blah",
-      "geo_loc_name": "blah",
-      "lat_lon": "blah",
-      "material": "blah",
-      "project_name": "blah",
-      "rel_to_oxygen": "blah",
-      "samp_collect_device": "blah",
-      "samp_mat_process": "blah",
-      "samp_size": "blah",
-      "source_mat_id": [ "a", "b", "c" ]
-    }
+    "biome": "blah",
+    "body_product": "blah",
+    "collection_date": "blah",
+    "env_package": "blah",
+    "feature": "blah",
+    "geo_loc_name": "blah",
+    "lat_lon": "blah",
+    "material": "blah",
+    "project_name": "blah",
+    "rel_to_oxygen": "blah",
+    "samp_collect_device": "blah",
+    "samp_mat_process": "blah",
+    "samp_size": "blah",
+    "source_mat_id": ["a", "b", "c"]
+}
 
 proj.name = "Test name"
 proj.description = "Test description"
@@ -40,7 +54,7 @@ proj.contact = "Test contact"
 proj.srp_id = "Test SRP ID"
 proj.mixs = mixs_data
 
-proj.tags = [ "test", "project", "ihmp" ]
+proj.tags = ["test", "project", "ihmp"]
 proj.add_tag("another")
 proj.add_tag("and_another")
 
@@ -57,7 +71,7 @@ if proj.is_valid():
 
         deletion_success = proj.delete()
 
-       if deletion_success:
+        if deletion_success:
             print("Deleted project with ID %s" % project_id)
         else:
             print("Deletion of project %s failed." % project_id)

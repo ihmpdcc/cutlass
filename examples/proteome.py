@@ -1,23 +1,28 @@
 #!/usr/bin/env python
 
-import json
+# pylint: disable=C0111, C0325
+
 import logging
+import sys
+import tempfile
+from pprint import pprint
 from cutlass import Proteome
 from cutlass import iHMPSession
-from pprint import pprint
-import tempfile
-import sys
-
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
 
 username = "test"
 password = "test"
+
+def set_logging():
+    """ Setup logging. """
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
+
+set_logging()
 
 session = iHMPSession(username, password)
 
@@ -27,7 +32,7 @@ print(Proteome.required_fields())
 proteome = Proteome()
 
 proteome.analyzer = "the analyzer"
-proteome.checksums = { "md5": "72bdc024d83226ccc90fbd2177e78d56" }
+proteome.checksums = {"md5": "72bdc024d83226ccc90fbd2177e78d56"}
 proteome.comment = "test comment. Hello world!"
 proteome.detector = "the detector"
 proteome.instrument_name = "name of instrument"
@@ -57,9 +62,9 @@ proteome.local_protid_file = protid_temp_file
 proteome.local_protmod_file = protmod_temp_file
 
 # Proteomes are 'derived_from' an assay prep
-proteome.links = { "derived_from": [ "419d64483ec86c1fb9a94025f3b92d21" ] }
+proteome.links = {"derived_from": ["419d64483ec86c1fb9a94025f3b92d21"]}
 
-proteome.tags = [ "proteome", "ihmp" ]
+proteome.tags = ["proteome", "ihmp"]
 proteome.add_tag("another")
 proteome.add_tag("and_another")
 
