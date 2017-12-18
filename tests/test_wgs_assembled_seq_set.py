@@ -4,8 +4,6 @@
 
 import unittest
 import json
-import random
-import string
 import tempfile
 
 from cutlass import WgsAssembledSeqSet
@@ -14,12 +12,6 @@ from CutlassTestConfig import CutlassTestConfig
 from CutlassTestUtil import CutlassTestUtil
 
 # pylint: disable=W0703, C1801
-
-def rand_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    """
-    Generate a random string using alphanumeric characters. Default size is 6.
-    """
-    return ''.join(random.choice(chars) for _ in range(size))
 
 class WgsAssembledSeqSetTest(unittest.TestCase):
     """ A unit test class for the WgsAssembledSeqSet class. """

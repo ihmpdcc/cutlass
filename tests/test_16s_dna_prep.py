@@ -4,8 +4,6 @@
 
 import unittest
 import json
-import random
-import string
 
 from cutlass import SixteenSDnaPrep
 from cutlass import MIMARKS, MimarksException
