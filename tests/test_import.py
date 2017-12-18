@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the individual importation of cutlass modules. """
+
 import unittest
 
 # pylint: disable=W0703, C1801
@@ -111,19 +113,6 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(Cytokine is None)
 
-    def testImportHostSeqPrep(self):
-        """ Test the import of the HostSeqPrep module. """
-        success = False
-
-        try:
-            from cutlass import HostSeqPrep
-            success = True
-        except Exception:
-            pass
-
-        self.failUnless(success)
-        self.failIf(HostSeqPrep is None)
-
     def testImportHostAssayPrep(self):
         """ Test the import of the HostAssayPrep module. """
         success = False
@@ -137,6 +126,32 @@ class ImportTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(HostAssayPrep is None)
 
+    def testImportHostEpigeneticsRawSeqSet(self):
+        """ Test the import of the HostEpigeneticsRawSeqSet module. """
+        success = False
+
+        try:
+            from cutlass import HostEpigeneticsRawSeqSet
+            success = True
+        except Exception:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostEpigeneticsRawSeqSet is None)
+
+    def testImportHostSeqPrep(self):
+        """ Test the import of the HostSeqPrep module. """
+        success = False
+
+        try:
+            from cutlass import HostSeqPrep
+            success = True
+        except Exception:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostSeqPrep is None)
+
     def testImportHostTranscriptomicsRawSeqSet(self):
         """ Test the import of the HostTranscriptomicsRawSeqSet module. """
         success = False
@@ -149,6 +164,19 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(HostTranscriptomicsRawSeqSet is None)
+
+    def testImportHostVariantCall(self):
+        """ Test the import of the HostVariantCall module. """
+        success = False
+
+        try:
+            from cutlass import HostVariantCall
+            success = True
+        except Exception:
+            pass
+
+        self.failUnless(success)
+        self.failIf(HostVariantCall is None)
 
     def testImportHostWgsRawSeqSet(self):
         """ Test the import of the HostWgsRawSeqSet module. """
@@ -330,6 +358,19 @@ class ImportTest(unittest.TestCase):
 
         self.failUnless(success)
         self.failIf(SampleAttribute is None)
+
+    def testImportSerology(self):
+        """ Test the import of the Serology module. """
+        success = False
+
+        try:
+            from cutlass import Serology
+            success = True
+        except Exception:
+            pass
+
+        self.failUnless(success)
+        self.failIf(Serology is None)
 
     def testImportStudy(self):
         """ Test the import of the Study module. """

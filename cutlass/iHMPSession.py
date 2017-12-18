@@ -67,8 +67,10 @@ class iHMPSession(object):
             "clustered_seq_set"                  : "ClusteredSeqSet",
             "cytokine"                           : "Cytokine",
             "host_assay_prep"                    : "HostAssayPrep",
+            "host_epigenetics_raw_seq_set"       : "HostEpigeneticsRawSeqSet",
             "host_seq_prep"                      : "HostSeqPrep",
             "host_transcriptomics_raw_seq_set"   : "HostTranscriptomicsRawSeqSet",
+            "host_variant_call"                  : "HostVariantCall",
             "host_wgs_raw_seq_set"               : "HostWgsRawSeqSet",
             "lipidome"                           : "Lipidome",
             "metabolome"                         : "Metabolome",
@@ -79,6 +81,7 @@ class iHMPSession(object):
             "proteome_nonpride"                  : "ProteomeNonPride",
             "sample"                             : "Sample",
             "sample_attr"                        : "SampleAttribute",
+            "serology"                           : "Serology",
             "study"                              : "Study",
             "subject"                            : "Subject",
             "subject_attr"                       : "SubjectAttribute",
@@ -210,7 +213,7 @@ class iHMPSession(object):
     @enforce_int
     def port(self, port):
         """
-        The port setter
+        The port setter.
 
         Args:
             port (int): The new port for OSDF access.
@@ -237,7 +240,7 @@ class iHMPSession(object):
     @enforce_string
     def server(self, server):
         """
-        The server setter
+        The server setter.
 
         Args:
             server (str): The new server for OSDF access.
@@ -264,7 +267,7 @@ class iHMPSession(object):
     @enforce_bool
     def ssl(self, ssl):
         """
-        The ssl setter
+        The ssl setter.
 
         Args:
             ssl (bool): Whether to use encryption (SSL) or not.
@@ -291,7 +294,7 @@ class iHMPSession(object):
     @enforce_string
     def username(self, username):
         """
-        The username setter
+        The username setter.
 
         Args:
             username (str): The new username for OSDF access.

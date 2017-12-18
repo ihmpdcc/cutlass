@@ -5,7 +5,9 @@ from .ClusteredSeqSet import ClusteredSeqSet
 from .Cytokine import Cytokine
 from .HostSeqPrep import HostSeqPrep
 from .HostAssayPrep import HostAssayPrep
+from .HostEpigeneticsRawSeqSet import HostEpigeneticsRawSeqSet
 from .HostTranscriptomicsRawSeqSet import HostTranscriptomicsRawSeqSet
+from .HostVariantCall import HostVariantCall
 from .HostWgsRawSeqSet import HostWgsRawSeqSet
 from .Lipidome import Lipidome
 from .Metabolome import Metabolome
@@ -16,6 +18,7 @@ from .Proteome import Proteome
 from .ProteomeNonPride import ProteomeNonPride
 from .Sample import Sample
 from .SampleAttribute import SampleAttribute
+from .Serology import Serology
 from .SixteenSDnaPrep import SixteenSDnaPrep
 from .SixteenSRawSeqSet import SixteenSRawSeqSet
 from .SixteenSTrimmedSeqSet import SixteenSTrimmedSeqSet

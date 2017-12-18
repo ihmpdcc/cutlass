@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+""" A unittest script for the importation of all cutlass modules. """
+
 import unittest
 from cutlass import *
 
@@ -41,17 +43,25 @@ class ImportAllTest(unittest.TestCase):
         """ Test the import of the Cytokine module. """
         self.failIf(Cytokine is None)
 
-    def testImportHostSeqPrep(self):
-        """ Test the import of the HostSeqPrep module. """
-        self.failIf(HostSeqPrep is None)
-
     def testImportHostAssayPrep(self):
         """ Test the import of the HostAssayPrep module. """
         self.failIf(HostAssayPrep is None)
 
+    def testImportHostEpigeneticsRawSeqSet(self):
+        """ Test the import of the HostEpigeneticsRawSeqSet module. """
+        self.failIf(HostEpigeneticsRawSeqSet is None)
+
+    def testImportHostSeqPrep(self):
+        """ Test the import of the HostSeqPrep module. """
+        self.failIf(HostSeqPrep is None)
+
     def testImportHostTranscriptomicsRawSeqSet(self):
         """ Test the import of the HostTranscriptomicsRawSeqSet module. """
         self.failIf(HostTranscriptomicsRawSeqSet is None)
+
+    def testImportHostVariantCall(self):
+        """ Test the import of the HostVariantCall module. """
+        self.failIf(HostVariantCall is None)
 
     def testImportHostWgsRawSeqSet(self):
         """ Test the import of the HostWgsRawSeqSet module. """
@@ -104,6 +114,10 @@ class ImportAllTest(unittest.TestCase):
     def testImportSampleAttribute(self):
         """ Test the import of the SampleAttribute module. """
         self.failIf(SampleAttribute is None)
+
+    def testImportSerology(self):
+        """ Test the import of the Serology module. """
+        self.failIf(Serology is None)
 
     def testImportSession(self):
         """ Test the import of the iHMPSession module. """
