@@ -1,3 +1,13 @@
+cutlass 1.0.0
+
+  * Added serology, host_epigenetics_raw_seq_set and host_variant_call nodes,
+    tests, and examples.
+  * Removed obsolete rand_generator function from some files.
+  * Addressed many linting issues identified by pylint.
+  * Numerous documentation/pydoc improvements
+
+ - Victor <victor73@github.com>  Mon, 18 Dec 2017 17:00:00 -0400
+
 cutlass 0.30
 
   * Support for the ProteomeNonPride node type. 
