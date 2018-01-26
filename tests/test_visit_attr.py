@@ -74,6 +74,24 @@ class VisitAttributeTest(unittest.TestCase):
 
         self.util.stringTypeTest(self, attr, "comment")
 
+        self.util.stringPropertyTest(self, attr, "comment")
+
+    def testMotherChild(self):
+        """ Test the mother_child property. """
+        attr = self.session.create_visit_attr()
+
+        self.util.stringTypeTest(self, attr, "mother_child")
+
+        self.util.stringPropertyTest(self, attr, "mother_child")
+
+    def testTimeDuringPregnancy(self):
+        """ Test the time_during_pregnancy property. """
+        attr = self.session.create_visit_attr()
+
+        self.util.stringTypeTest(self, attr, "time_during_pregnancy")
+
+        self.util.stringPropertyTest(self, attr, "time_during_pregnancy")
+
     def testClinicalPatientAge(self):
         """ Test the age property. """
         attr = self.session.create_visit_attr()

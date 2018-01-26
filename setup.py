@@ -3,7 +3,7 @@ from distutils.core import setup
 
 # Utility function to read files. Used for the long_description.
 def read(fname):
-    """Reads the description of the package from the README.md file. """
+    """ Reads the description of the package from the README.md file. """
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 def get_version():

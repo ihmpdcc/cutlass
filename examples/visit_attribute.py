@@ -29,12 +29,14 @@ va = VisitAttribute()
 va.comment = "test comment"
 va.survey_id = "test survey id"
 va.study = "prediabetes"
+va.mother_child = "mother"
+va.time_during_pregnancy = "first_trimester"
 va.add_tag("test")
 va.add_tag("visit_attr")
-va.links = {"associated_with":  ["610a4911a5ca67de12cdc1e4b400f121"]}
+va.links = {"associated_with": ["610a4911a5ca67de12cdc1e4b400f121"]}
 
-va.disease_study_status = "test disease status"
-va.disease_name = "test disease name"
+va.disease_study_status = "affected"
+va.disease_name = "obesity"
 va.disease_description = "test disease description"
 va.disease_nci_id = "NCI id"
 va.disease_mesh_id = "MESH id"

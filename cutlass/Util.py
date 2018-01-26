@@ -8,6 +8,8 @@ import os
 import sys
 import inspect
 
+# pylint: disable=C0123,C0111
+
 DATE_FORMAT = '%Y-%m-%d'
 PYTHON_MIN_VERSION = (2, 7, 0)
 PYTHON_MAX_VERSION = (3, 0, 0)

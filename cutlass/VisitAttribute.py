@@ -8,7 +8,7 @@ from cutlass.DiseaseMeta import DiseaseMeta
 from cutlass.Base import Base
 from cutlass.Util import *
 
-# pylint: disable=W0703, C1801, R0912
+# pylint: disable=W0703, W0201, W0212, C1801, R0912
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)
@@ -28,8 +28,10 @@ class VisitAttribute(Base):
 
     __dict = {
         'comment': [str, None],
+        'mother_child': [str, None],
         'survey_id': [str, None],
         'study': [str, None],
+        'time_during_pregnancy': [str, None],
 
         # These are the disease metadata fields
         'disease_comment': ["DiseaseMeta.comment", None],
@@ -192,10 +194,10 @@ class VisitAttribute(Base):
         'dinner_food':       [str, "dietary_log_today"],
         'dinner_amt':        [str, "dietary_log_today"],
         'other_food_intake': [str, "dietary_log_today"]
-        # pylint: enable=C0326
     }
 
     @staticmethod
+    # pylint: disable=W0211,W0613
     def _getx(self, propname, *args):
         if propname in self.__dict:
             propType = self.__dict[propname][0]
@@ -212,11 +214,13 @@ class VisitAttribute(Base):
         return value
 
     @staticmethod
+    # pylint: disable=W0211
     def _setx(self, value, n):
         self._d[n] = value
 
     @staticmethod
     def _bindRead(name):
+        # pylint: disable=C0111
         def getXXXX(self, *args):
             return VisitAttribute._getx(self, name, *args)
 
@@ -225,6 +229,7 @@ class VisitAttribute(Base):
 
     @staticmethod
     def _bindWrite(name, t):
+        # pylint: disable=C0111
         def setXXXX(self, val):
             func = VisitAttribute._setx
 
@@ -246,7 +251,14 @@ class VisitAttribute(Base):
         setXXXX.__name__ = name
         return setXXXX
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        """
+        Constructor for the VisitAttribute class. This initializes the fields
+        specific to the VisitAttribute class, and inherits from the Base class.
+
+        Args:
+            None
+        """
         self.logger = logging.getLogger(self.__module__ + '.' + self.__class__.__name__)
 
         self.logger.addHandler(logging.NullHandler())
@@ -271,6 +283,8 @@ class VisitAttribute(Base):
             t = spec[0]
             x = property(VisitAttribute._bindRead(propname), VisitAttribute._bindWrite(propname, t))
             setattr(self.__class__, propname, x)
+
+        super(VisitAttribute, self).__init__(*args, **kwargs)
 
     def __setattr__(self, name, value):
         if name == "_d":
@@ -345,8 +359,8 @@ class VisitAttribute(Base):
 
             # Handle any special cases that we need too.
             if (section == "excercise" or
-               (propname.startswith('breakfast') or propname.startswith('lunch') or
-                propname.startswith('dinner'))):
+                    (propname.startswith('breakfast') or propname.startswith('lunch') or
+                     propname.startswith('dinner'))):
                 (propbase, propkey) = propname.split('_', 1)
 
                 propval = attrib_metadata.get(section, {}).get(propbase, {}).get(propkey)
@@ -369,8 +383,10 @@ class VisitAttribute(Base):
 
             disease_props = dict(('disease_%s' % key, value) for key, value in
                                  attrib_data['meta']['disease']['study_disease'].iteritems())
+
             # This will have a double "disease" on it so we need to correct it.
-            disease_props['disease_ontology_id'] = disease_props.pop('disease_disease_ontology_id')
+            disease_props['disease_ontology_id'] = \
+                disease_props.pop('disease_disease_ontology_id')
 
             map(lambda key: setattr(attrib, key, disease_props.get(key)), disease_props.keys())
 

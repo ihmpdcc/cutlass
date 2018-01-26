@@ -1,3 +1,11 @@
+cutlass 1.0.1
+
+  * Support for mother_child, and time_during_pregnancy properties
+    in VisitAttribute.
+  * Minor pylint issues correct with VisitAttribute class.
+
+ - Victor <victor73@github.com>  Fri, 26 Jan 2018 17:00:00 -0400
+
 cutlass 1.0.0
 
   * Added serology, host_epigenetics_raw_seq_set and host_variant_call nodes,
