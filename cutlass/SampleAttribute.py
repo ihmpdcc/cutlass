@@ -7,7 +7,7 @@ import json
 import logging
 from cutlass.iHMPSession import iHMPSession
 from cutlass.Base import Base
-from cutlass.Util import *
+from cutlass.Util import enforce_string
 
 # pylint: disable=W0703, C1801
 
@@ -47,6 +47,11 @@ class SampleAttribute(Base):
         self._fecalcal = None
         self._study = None
 
+        # Optional properties
+        self._sample_desc = None
+        self._sample_type = None
+        self._subproject = None
+
         super(SampleAttribute, self).__init__(*args, **kwargs)
 
     @property
@@ -74,6 +79,54 @@ class SampleAttribute(Base):
         self._fecalcal = fecalcal
 
     @property
+    def sample_desc(self):
+        """
+        str: Optional sample description property to indicate sample source/omic type.
+        """
+        self.logger.debug("In 'sample_desc' getter.")
+        return self._sample_desc
+
+    @sample_desc.setter
+    @enforce_string
+    def sample_desc(self, sample_desc):
+        """
+        Optional sample description to indicate sample source/omic type.
+
+        Args:
+            sample_desc (str): The sample description.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'sample_desc' setter.")
+
+        self._sample_desc = sample_desc
+
+    @property
+    def sample_type(self):
+        """
+        str: Optional sample type property.
+        """
+        self.logger.debug("In 'sample_type' getter.")
+        return self._sample_type
+
+    @sample_type.setter
+    @enforce_string
+    def sample_type(self, sample_type):
+        """
+        The sample type.
+
+        Args:
+            sample_type (str): The sample type.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'sample_type' setter.")
+
+        self._sample_type = sample_type
+
+    @property
     def study(self):
         """
         str: One of the 3 studies that are part of the iHMP.
@@ -96,6 +149,32 @@ class SampleAttribute(Base):
         self.logger.debug("In 'study' setter.")
 
         self._study = study
+
+    @property
+    def subproject(self):
+        """
+        str: Optional subproject the sample belongs to, currently limited to
+        VCU but controlled vocabulary could be expanded to include more
+        projects.
+        """
+        self.logger.debug("In 'subproject' getter.")
+        return self._subproject
+
+    @subproject.setter
+    @enforce_string
+    def subproject(self, subproject):
+        """
+        The sample subproject.
+
+        Args:
+            subproject (str): The subproject that the sample belongs to.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'subproject' setter.")
+
+        self._subproject = subproject
 
     def validate(self):
         """
@@ -194,12 +273,25 @@ class SampleAttribute(Base):
         }
 
         if self._id is not None:
-            self.logger.debug(__name__ + " object has the OSDF id set.")
+            self.logger.debug("%s object has the OSDF id set.", __name__)
             attrib_doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug(__name__ + " object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             attrib_doc['ver'] = self._version
+
+        # Handle SampleAttribute optional properties
+        if self.sample_desc is not None:
+            self.logger.debug("%s object has the 'sample_desc' property set.", __name__)
+            attrib_doc['meta']['sample_desc'] = self.sample_desc
+
+        if self.sample_type is not None:
+            self.logger.debug("%s object has the 'sample_type' property set.", __name__)
+            attrib_doc['meta']['sample_type'] = self.sample_type
+
+        if self.subproject is not None:
+            self.logger.debug("%s object has the 'subproject' property set.", __name__)
+            attrib_doc['meta']['subproject'] = self.subproject
 
         return attrib_doc
 
@@ -327,6 +419,16 @@ class SampleAttribute(Base):
         attrib.study = attrib_data['meta']['study']
         attrib.tags = attrib_data['meta']['tags']
 
+        # Handle SampleAttribute optional properties
+        if 'sample_desc' in attrib_data['meta']:
+            attrib.sample_desc = attrib_data['meta']['sample_desc']
+
+        if 'sample_type' in attrib_data['meta']:
+            attrib.sample_type = attrib_data['meta']['sample_type']
+
+        if 'subproject' in attrib_data['meta']:
+            attrib.subproject = attrib_data['meta']['subproject']
+
         module_logger.debug("Returning loaded %s.", __name__)
 
         return attrib
@@ -334,9 +436,9 @@ class SampleAttribute(Base):
     @staticmethod
     def load(attrib_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to
-        this object.  If the provided ID does not exist, then an error message
-        is provided stating the project does not exist.
+        Loads the data for the specified ID from the OSDF instance to
+        this object. If the provided ID does not exist, then an error message
+        is provided stating the object does not exist.
 
         Args:
             attrib_id (str): The OSDF ID for the document to load.
@@ -350,22 +452,9 @@ class SampleAttribute(Base):
         session = iHMPSession.get_session()
         module_logger.info("Got iHMP session.")
         attrib_data = session.get_osdf().get_node(attrib_id)
+        attrib = SampleAttribute.load_sample_attr(attrib_data)
 
-        module_logger.info("Creating a template %s.", __name__)
-        attrib = SampleAttribute()
-
-        module_logger.debug("Filling in %s details.", __name__)
-
-        # Node required fields
-        attrib._set_id(attrib_data['id'])
-        attrib.links = attrib_data['linkage']
-        attrib.version = attrib_data['ver']
-
-        # Required fields
-        attrib.fecalcal = attrib_data['meta']['fecalcal']
-        attrib.study = attrib_data['meta']['study']
-        attrib.tags = attrib_data['meta']['tags']
-
+        module_logger.debug("Returning loaded %s.", __name__)
         return attrib
 
     def save(self):

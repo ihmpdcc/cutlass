@@ -53,6 +53,14 @@ class SampleTest(unittest.TestCase):
         self.failUnless(success)
         self.failIf(sample is None)
 
+    def testIntSampleId(self):
+        """ Test the int_sample_id property. """
+        sample = self.session.create_sample()
+
+        self.util.stringTypeTest(self, sample, "int_sample_id")
+
+        self.util.stringPropertyTest(self, sample, "int_sample_id")
+
     def testFmaBodySite(self):
         """ Test the fma_body_site property. """
         sample = self.session.create_sample()
@@ -338,13 +346,14 @@ class SampleTest(unittest.TestCase):
         )
 
         sample.fma_body_site = "Test FMA BODY SITE "
+        sample.name = "Test name"
 
         self.assertFalse(
             sample.save(),
-            "Sample not saved successfully, missing fma_body_site, tags, and MIXS"
+            "Sample not saved successfully, missing tags, and MIXS."
             )
 
-        sample.links = {"collected_during": []}
+        sample.links = {"collected_during": ["610a4911a5ca67de12cdc1e4b400f121"]}
 
         sample.add_tag("test")
         fields = {
@@ -366,6 +375,9 @@ class SampleTest(unittest.TestCase):
         self.assertFalse(sample.save(),
                          "Sample not saved successfully, missing MIXS")
         sample.mixs = fields
+
+        # An optional field...
+        sample.int_sample_id = "test_sample_id"
 
         # Make sure sample does not delete if it does not exist
         with self.assertRaises(Exception):

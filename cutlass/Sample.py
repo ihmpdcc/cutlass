@@ -13,7 +13,7 @@ from cutlass.HostSeqPrep import HostSeqPrep
 from cutlass.MicrobiomeAssayPrep import MicrobiomeAssayPrep
 from cutlass.HostAssayPrep import HostAssayPrep
 from cutlass.SampleAttribute import SampleAttribute
-from cutlass.Util import *
+from cutlass.Util import enforce_dict, enforce_string
 
 # pylint: disable=W0703, C1801
 
@@ -53,6 +53,7 @@ class Sample(Base):
 	    # Optional properties
         self._body_site = None
         self._fma_body_site = None
+        self._int_sample_id = None
         self._mixs = None
         self._name = None
         self._supersite = None
@@ -196,6 +197,31 @@ class Sample(Base):
         self.logger.debug("In 'fma_body_site' setter.")
 
         self._fma_body_site = fma_body_site
+
+    @property
+    def int_sample_id(self):
+        """
+        str: Optional center-specific sample identifier.
+        """
+        self.logger.debug("In 'int_sample_id' getter.")
+
+        return self._int_sample_id
+
+    @int_sample_id.setter
+    @enforce_string
+    def int_sample_id(self, int_sample_id):
+        """
+        The setter for the center-specific sample identifier.
+
+        Args:
+            int_sample_id (str): The center-specific sample ID.
+
+        Returns:
+            None
+        """
+        self.logger.debug("In 'int_sample_id' setter.")
+
+        self._int_sample_id = int_sample_id
 
     @property
     def mixs(self):
@@ -366,9 +392,9 @@ class Sample(Base):
     @staticmethod
     def load(sample_id):
         """
-        Loads the data for the specified input ID from the OSDF instance to
+        Loads the data for the specified ID from the OSDF instance to
         this object. If the provided ID does not exist, then an error message
-        is provided stating the project does not exist.
+        is provided stating the object does not exist.
 
         Args:
             sample_id (str): The OSDF ID for the document to load.
@@ -448,15 +474,20 @@ class Sample(Base):
         module_logger.debug("Filling in %s details.", __name__)
 
         sample._set_id(sample_data['id'])
-        # ver, not version for the key
-        sample.version = sample_data['ver']
-        sample.tags = sample_data['meta']['tags']
-        sample.mixs = sample_data['meta']['mixs']
         sample.links = sample_data['linkage']
-        sample.fma_body_site = sample_data['meta']['fma_body_site']
+        sample.version = sample_data['ver']
 
+        # Sample required fields
+        sample.fma_body_site = sample_data['meta']['fma_body_site']
+        sample.mixs = sample_data['meta']['mixs']
+        sample.tags = sample_data['meta']['tags']
+
+        # Handle Sample optional properties
         if 'body_site' in sample_data['meta']:
             sample.body_site = sample_data['meta']['body_site']
+
+        if 'int_sample_id' in sample_data['meta']:
+            sample.int_sample_id = sample_data['meta']['int_sample_id']
 
         if 'name' in sample_data['meta']:
             sample.name = sample_data['meta']['name']
@@ -500,23 +531,28 @@ class Sample(Base):
         }
 
         if self._id is not None:
-            self.logger.debug("Sample object has the OSDF id set.")
+            self.logger.debug("%s object has the OSDF id set.", __name__)
             sample_doc['id'] = self._id
 
         if self._version is not None:
-            self.logger.debug("Sample object has the OSDF version set.")
+            self.logger.debug("%s object has the OSDF version set.", __name__)
             sample_doc['ver'] = self._version
 
+        # Handle Sample optional properties
         if self._body_site is not None:
-            self.logger.debug("Sample object has the body site set.")
+            self.logger.debug("%s object has the 'body_site' property set.", __name__)
             sample_doc['meta']['body_site'] = self._body_site
 
+        if self._int_sample_id is not None:
+            self.logger.debug("%s object has the 'int_sample_id' property set.", __name__)
+            sample_doc['meta']['name'] = self._name
+
         if self._name is not None:
-            self.logger.debug("Sample object has the name set.")
+            self.logger.debug("%s object has the 'name' property set.", __name__)
             sample_doc['meta']['name'] = self._name
 
         if self._supersite is not None:
-            self.logger.debug("Sample object has the supersite set.")
+            self.logger.debug("%s object has the 'supersite' property set.", __name__)
             sample_doc['meta']['supersite'] = self._supersite
             sample_doc['meta']['subtype'] = self._supersite
 

@@ -31,6 +31,7 @@ va.survey_id = "test survey id"
 va.study = "prediabetes"
 va.mother_child = "mother"
 va.time_during_pregnancy = "first_trimester"
+va.subproject = "earlyPregStudy"
 va.add_tag("test")
 va.add_tag("visit_attr")
 va.links = {"associated_with": ["610a4911a5ca67de12cdc1e4b400f121"]}
@@ -207,9 +208,9 @@ if va.is_valid():
         va_id = va.id
         print("Succesfully saved VisitAttribute ID: %s" % va_id)
 
-        #va2 = VisitAttribute.load(va_id)
+        va2 = VisitAttribute.load(va_id)
 
-        #print(va2.to_json(indent=2))
+        print(va2.to_json(indent=2))
 
         deletion_success = va.delete()
 

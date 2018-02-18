@@ -6,7 +6,8 @@ import logging
 from cutlass.iHMPSession import iHMPSession
 from cutlass.DiseaseMeta import DiseaseMeta
 from cutlass.Base import Base
-from cutlass.Util import *
+from cutlass.Util import enforce_bool, enforce_dict, enforce_float, \
+                         enforce_int, enforce_list, enforce_string
 
 # pylint: disable=W0703, W0201, W0212, C1801, R0912
 
@@ -29,8 +30,9 @@ class VisitAttribute(Base):
     __dict = {
         'comment': [str, None],
         'mother_child': [str, None],
-        'survey_id': [str, None],
         'study': [str, None],
+        'survey_id': [str, None],
+        'subproject': [str, None],
         'time_during_pregnancy': [str, None],
 
         # These are the disease metadata fields

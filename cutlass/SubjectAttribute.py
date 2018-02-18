@@ -6,7 +6,7 @@ import json
 import logging
 from cutlass.iHMPSession import iHMPSession
 from cutlass.Base import Base
-from cutlass.Util import *
+from cutlass.Util import enforce_bool, enforce_int, enforce_string
 
 # pylint: disable=W0703, C1801, C0302
 
@@ -70,9 +70,10 @@ class SubjectAttribute(Base):
         self._postmenopausal = None
         self._pvd = None
         self._rx = None
-        self._survey_id = None
         self._siblings = None
         self._study = None
+        self._subproject = None
+        self._survey_id = None
         self._tobacco = None
 
         super(SubjectAttribute, self).__init__(*args, **kwargs)
@@ -819,6 +820,34 @@ class SubjectAttribute(Base):
         self._study = study
 
     @property
+    def subproject(self):
+        """
+        str: The optional subproject the subject belongs to.
+        """
+        self.logger.debug("In 'subproject' getter.")
+
+        return self._subproject
+
+    @subproject.setter
+    @enforce_string
+    def subproject(self, subproject):
+        """
+        The setter for the optional subproject the subject belongs to, currently
+        limited to VCU but controlled vocabulary could be expanded to incude
+        more projects.
+
+        Args:
+            subproject (str): 
+
+        Returns:
+            None
+        """
+
+        self.logger.debug("In 'subproject' setter.")
+
+        self._subproject = subproject
+
+    @property
     def survey_id(self):
         """
         str: Center specific survey identifier.
@@ -1080,13 +1109,17 @@ class SubjectAttribute(Base):
             self.logger.debug("%s object has rx set.", __name__)
             doc['meta']['rx'] = self._rx
 
-        if self._survey_id is not None:
-            self.logger.debug("%s object has survey_id set.", __name__)
-            doc['meta']['survey_id'] = self._survey_id
-
         if self._siblings is not None:
             self.logger.debug("%s object has siblings set.", __name__)
             doc['meta']['siblings'] = self._siblings
+
+        if self._subproject is not None:
+            self.logger.debug("%s object has subproject set.", __name__)
+            doc['meta']['subproject'] = self._subproject
+
+        if self._survey_id is not None:
+            self.logger.debug("%s object has survey_id set.", __name__)
+            doc['meta']['survey_id'] = self._survey_id
 
         if self._tobacco is not None:
             self.logger.debug("%s object has tobacco set.", __name__)
@@ -1295,11 +1328,14 @@ class SubjectAttribute(Base):
         if 'rx' in attrib_data['meta']:
             attrib.rx = attrib_data['meta']['rx']
 
-        if 'survey_id' in attrib_data['meta']:
-            attrib.survey_id = attrib_data['meta']['survey_id']
-
         if 'siblings' in attrib_data['meta']:
             attrib.siblings = attrib_data['meta']['siblings']
+
+        if 'subproject' in attrib_data['meta']:
+            attrib.subproject = attrib_data['meta']['subproject']
+
+        if 'survey_id' in attrib_data['meta']:
+            attrib.survey_id = attrib_data['meta']['survey_id']
 
         if 'tobacco' in attrib_data['meta']:
             attrib.tobacco = attrib_data['meta']['tobacco']

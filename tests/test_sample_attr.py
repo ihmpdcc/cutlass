@@ -60,6 +60,30 @@ class SampleAttributeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, attrib, "fecalcal")
 
+    def testSampleDesc(self):
+        """ Test the sample_desc property. """
+        attrib = self.session.create_sample_attr()
+
+        self.util.stringTypeTest(self, attrib, "sample_desc")
+
+        self.util.stringPropertyTest(self, attrib, "sample_desc")
+
+    def testSampleType(self):
+        """ Test the sample_type property. """
+        attrib = self.session.create_sample_attr()
+
+        self.util.stringTypeTest(self, attrib, "sample_type")
+
+        self.util.stringPropertyTest(self, attrib, "sample_type")
+
+    def testSubproject(self):
+        """ Test the subproject property. """
+        attrib = self.session.create_sample_attr()
+
+        self.util.stringTypeTest(self, attrib, "subproject")
+
+        self.util.stringPropertyTest(self, attrib, "subproject")
+
     def testToJson(self):
         """ Test the generation of JSON from a SampleAttribute instance. """
         attrib = self.session.create_sample_attr()
@@ -106,8 +130,14 @@ class SampleAttributeTest(unittest.TestCase):
         success = False
 
         fecalcal = "test fecalcal"
+        sample_desc = "DNA: mom-vaginal"
+        sample_type = "BC1D"
+        subproject = "earlyPregStudy"
 
         attrib.fecalcal = fecalcal
+        attrib.sample_desc = sample_desc
+        attrib.sample_type = sample_type
+        attrib.subproject = subproject
 
         attrib_json = None
 
@@ -138,6 +168,21 @@ class SampleAttributeTest(unittest.TestCase):
         self.assertEqual(attrib_data['meta']['fecalcal'],
                          fecalcal,
                          "'fecalcal' in JSON had expected value."
+                        )
+
+        self.assertEqual(attrib_data['meta']['sample_desc'],
+                         sample_desc,
+                         "'sample_desc' in JSON had expected value."
+                        )
+
+        self.assertEqual(attrib_data['meta']['sample_type'],
+                         sample_type,
+                         "'sample_type' in JSON had expected value."
+                        )
+
+        self.assertEqual(attrib_data['meta']['subproject'],
+                         subproject,
+                         "'subproject' in JSON had expected value."
                         )
 
     def testId(self):
@@ -242,6 +287,10 @@ class SampleAttributeTest(unittest.TestCase):
         attrib.study = "prediabetes"
 
         attrib.add_tag("test")
+
+        # Add some of the optional properties
+        attrib.sample_desc = "DNA: mom-vaginal"
+        attrib.sample_type = "BC1D"
 
         # Make sure annotation does not delete if it does not exist
         with self.assertRaises(Exception):

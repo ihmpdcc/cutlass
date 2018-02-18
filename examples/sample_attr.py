@@ -38,6 +38,9 @@ attrib.links = {"associated_with": ["610a4911a5ca67de12cdc1e4b4011876"]}
 
 attrib.tags = ["sample_attr", "ihmp"]
 attrib.add_tag("sample")
+attrib.sample_desc = "DNA: mom-vaginal"
+attrib.sample_type = "BC1D"
+attrib.subproject = "earlyPregStudy"
 
 print(attrib.to_json(indent=2))
 

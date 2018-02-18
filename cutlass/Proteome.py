@@ -9,7 +9,7 @@ import string
 from cutlass.iHMPSession import iHMPSession
 from cutlass.Base import Base
 from cutlass.aspera import aspera
-from cutlass.Util import *
+from cutlass.Util import enforce_bool, enforce_dict, enforce_past_date, enforce_list, enforce_string
 
 # pylint: disable=C0302, W0703, C1801
 

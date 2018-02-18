@@ -84,6 +84,22 @@ class VisitAttributeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, attr, "mother_child")
 
+    def testSubproject(self):
+        """ Test the subproject property. """
+        attr = self.session.create_visit_attr()
+
+        self.util.stringTypeTest(self, attr, "subproject")
+
+        self.util.stringPropertyTest(self, attr, "subproject")
+
+    def testSurveyID(self):
+        """ Test the survey_id property. """
+        attr = self.session.create_visit_attr()
+
+        self.util.stringTypeTest(self, attr, "survey_id")
+
+        self.util.stringPropertyTest(self, attr, "survey_id")
+
     def testTimeDuringPregnancy(self):
         """ Test the time_during_pregnancy property. """
         attr = self.session.create_visit_attr()

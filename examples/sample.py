@@ -53,6 +53,7 @@ sample.date = "2000-01-01"
 sample.interval = 4
 sample.fma_body_site = "head"
 sample.clinic_id = "Test clinic ID"
+sample.int_sample_id = "test_sample_id"
 
 sample.tags = ["test", "sample", "ihmp"]
 sample.add_tag("another")
@@ -72,7 +73,7 @@ if sample.is_valid():
 
         sample2 = Sample.load(sample_id)
 
-        print(sample.to_json(indent=4))
+        print(sample2.to_json(indent=4))
 
         deletion_success = sample.delete()
 

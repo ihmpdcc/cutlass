@@ -403,6 +403,15 @@ class SubjectAttributeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, subj_attr, "siblings")
 
+    # subproject
+    def testSubproject(self):
+        """ Test the subproject property. """
+        subj_attr = self.session.create_subject_attr()
+
+        self.util.stringTypeTest(self, subj_attr, "subproject")
+
+        self.util.stringPropertyTest(self, subj_attr, "subproject")
+
     # survey_id
     def testSurveyID(self):
         """ Test the survey_id property. """
@@ -462,6 +471,7 @@ class SubjectAttributeTest(unittest.TestCase):
         subj_attr.rx = "None"
         subj_attr.siblings = "Brother and sister"
         subj_attr.survey_id = "ABC123"
+        subj_attr.subproject = "earlyPregStudy"
 
         self.assertFalse(subj_attr.save(), "SubjectAttribute not saved successfully")
 
@@ -495,6 +505,8 @@ class SubjectAttributeTest(unittest.TestCase):
                          "SubjectAttribute comment not saved & loaded successfully")
         self.assertEqual(subj_attr.contact, subj_attr_loaded.contact,
                          "SubjectAttribute contact not saved & loaded successfully")
+        self.assertEqual(subj_attr.subproject, subj_attr_loaded.subproject,
+                         "SubjectAttribute subproject not saved & loaded successfully")
         self.assertEqual(subj_attr.tags[0], subj_attr_loaded.tags[0],
                          "SubjectAttribute tags not saved & loaded successfully")
 
