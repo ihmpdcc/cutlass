@@ -7,9 +7,9 @@ import logging
 from itertools import count
 from cutlass.iHMPSession import iHMPSession
 from cutlass.Base import Base
-from cutlass.Util import *
+from cutlass.Util import enforce_int, enforce_string
 
-# pylint: disable=C0302, W0703, R0192
+# pylint: disable=C0302, W0703
 
 # Create a module logger named after the module
 module_logger = logging.getLogger(__name__)

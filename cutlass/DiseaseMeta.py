@@ -1,6 +1,6 @@
 import json
 import logging
-from Util import *
+from Util import enforce_string
 
 class DiseaseMeta(object):
     def __init__(self):

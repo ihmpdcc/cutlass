@@ -56,6 +56,7 @@ class SubjectAttribute(Base):
         self._education = None
         self._family_history = None
         self._father = None
+        self._ga_at_delivery = None
         self._gallbladder = None
         self._hyperlipidemia = None
         self._hypertension = None
@@ -68,6 +69,7 @@ class SubjectAttribute(Base):
         self._osa = None
         self._pancreatitis = None
         self._postmenopausal = None
+        self._preg_term = None
         self._pvd = None
         self._rx = None
         self._siblings = None
@@ -400,6 +402,33 @@ class SubjectAttribute(Base):
         self._father = father
 
     @property
+    def ga_at_delivery(self):
+        """
+        str: Gestational age at delivery, in weeks. There are three
+        possible values: "<37wk", ">37wk" and "unknown".
+        """
+        self.logger.debug("In 'ga_at_delivery' getter.")
+
+        return self._ga_at_delivery
+
+    @ga_at_delivery.setter
+    @enforce_string
+    def ga_at_delivery(self, ga_at_delivery):
+        """
+        The setter for the gestational age at delivery.
+
+        Args:
+            ga_at_delivery (str): "<37wk", ">37wk", or "unknown".
+
+        Returns:
+            None
+        """
+
+        self.logger.debug("In 'ga_at_delivery' setter.")
+
+        self._ga_at_delivery = ga_at_delivery
+
+    @property
     def gallbladder(self):
         """
         str: Does the subject have gallbladder disease?
@@ -412,7 +441,7 @@ class SubjectAttribute(Base):
     @enforce_string
     def gallbladder(self, gallbladder):
         """
-        The setter for the gallbladder disaese data.
+        The setter for the gallbladder disease data.
 
         Args:
             gallbladder (str): Yes/No, duration, clarification.
@@ -712,6 +741,32 @@ class SubjectAttribute(Base):
         self.logger.debug("In 'postmenopausal' setter.")
 
         self._postmenopausal = postmenopausal
+
+    @property
+    def preg_term(self):
+        """
+        str: Status of pregnancy ("preterm": <37wk, "full term": >= 37wk, or "NA").
+        """
+        self.logger.debug("In 'preg_term' getter.")
+
+        return self._preg_term
+
+    @preg_term.setter
+    @enforce_string
+    def preg_term(self, preg_term):
+        """
+        The setter for the status of pregnancy.
+
+        Args:
+            preg_term (str): The status of pregnancy.
+
+        Returns:
+            None
+        """
+
+        self.logger.debug("In 'preg_term' setter.")
+
+        self._preg_term = preg_term
 
     @property
     def pvd(self):
@@ -1030,55 +1085,59 @@ class SubjectAttribute(Base):
             doc['meta']['chf'] = self._chf
 
         if self._comment is not None:
-            self.logger.debug(__name__ + " object has comment set.")
+            self.logger.debug("%s object has comment set.", __name__)
             doc['meta']['comment'] = self._comment
 
         if self._contact is not None:
-            self.logger.debug(__name__ + " object has contact set.")
+            self.logger.debug("%s object has contact set.", __name__)
             doc['meta']['contact'] = self._contact
 
         if self._diabetes is not None:
-            self.logger.debug(__name__ + " object has diabetes set.")
+            self.logger.debug("%s object has diabetes set.", __name__)
             doc['meta']['diabetes'] = self._diabetes
 
         if self._education is not None:
-            self.logger.debug(__name__ + " object has education set.")
+            self.logger.debug("%s object has education set.", __name__)
             doc['meta']['education'] = self._education
 
         if self._family_history is not None:
-            self.logger.debug(__name__ + " object has family_history set.")
+            self.logger.debug("%s object has family_history set.", __name__)
             doc['meta']['family_history'] = self._family_history
 
         if self._father is not None:
-            self.logger.debug(__name__ + " object has father set.")
+            self.logger.debug("%s object has father set.", __name__)
             doc['meta']['father'] = self._father
 
+        if self._ga_at_delivery is not None:
+            self.logger.debug("%s object has ga_at_delivery set.", __name__)
+            doc['meta']['ga_at_delivery'] = self._ga_at_delivery
+
         if self._gallbladder is not None:
-            self.logger.debug(__name__ + " object has gallbladder set.")
+            self.logger.debug("%s object has gallbladder set.", __name__)
             doc['meta']['gallbladder'] = self._gallbladder
 
         if self._hyperlipidemia is not None:
-            self.logger.debug(__name__ + " object has hyperlipidemia set.")
+            self.logger.debug("%s object has hyperlipidemia set.", __name__)
             doc['meta']['hyperlipidemia'] = self._hyperlipidemia
 
         if self._hypertension is not None:
-            self.logger.debug(__name__ + " object has hypertension set.")
+            self.logger.debug("%s object has hypertension set.", __name__)
             doc['meta']['hypertension'] = self._hypertension
 
         if self._illicit_drug is not None:
-            self.logger.debug(__name__ + " object has illicit_drug set.")
+            self.logger.debug("%s object has illicit_drug set.", __name__)
             doc['meta']['illicit_drug'] = self._illicit_drug
 
         if self._kidney is not None:
-            self.logger.debug(__name__ + " object has kidney set.")
+            self.logger.debug("%s object has kidney set.", __name__)
             doc['meta']['kidney'] = self._kidney
 
         if self._liver is not None:
-            self.logger.debug(__name__ + " object has liver set.")
+            self.logger.debug("%s object has liver set.", __name__)
             doc['meta']['liver'] = self._liver
 
         if self._lmp is not None:
-            self.logger.debug(__name__ + " object has lmp set.")
+            self.logger.debug("%s object has lmp set.", __name__)
             doc['meta']['lmp'] = self._lmp
 
         if self._mother is not None:
@@ -1100,6 +1159,10 @@ class SubjectAttribute(Base):
         if self._postmenopausal is not None:
             self.logger.debug("%s object has postmenopausal set.", __name__)
             doc['meta']['postmenopausal'] = self._postmenopausal
+
+        if self._preg_term is not None:
+            self.logger.debug("%s object has preg_term set.", __name__)
+            doc['meta']['preg_term'] = self._preg_term
 
         if self._pvd is not None:
             self.logger.debug("%s object has pvd set.", __name__)
@@ -1286,6 +1349,9 @@ class SubjectAttribute(Base):
         if 'father' in attrib_data['meta']:
             attrib.father = attrib_data['meta']['father']
 
+        if 'ga_at_delivery' in attrib_data['meta']:
+            attrib.ga_at_delivery = attrib_data['meta']['ga_at_delivery']
+
         if 'gallbladder' in attrib_data['meta']:
             attrib.gallbladder = attrib_data['meta']['gallbladder']
 
@@ -1321,6 +1387,9 @@ class SubjectAttribute(Base):
 
         if 'postmenopausal' in attrib_data['meta']:
             attrib.postmenopausal = attrib_data['meta']['postmenopausal']
+
+        if 'preg_term' in attrib_data['meta']:
+            attrib.preg_term = attrib_data['meta']['preg_term']
 
         if 'pvd' in attrib_data['meta']:
             attrib.pvd = attrib_data['meta']['pvd']

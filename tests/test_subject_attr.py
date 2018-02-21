@@ -270,6 +270,15 @@ class SubjectAttributeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, subj_attr, "father")
 
+    # ga_at_delivery
+    def testGaAtDelivery(self):
+        """ Test the ga_at_delivery property. """
+        subj_attr = self.session.create_subject_attr()
+
+        self.util.stringTypeTest(self, subj_attr, "ga_at_delivery")
+
+        self.util.stringPropertyTest(self, subj_attr, "ga_at_delivery")
+
     # gallbladder
     def testGallbladder(self):
         """ Test the gallbladder property. """
@@ -376,6 +385,15 @@ class SubjectAttributeTest(unittest.TestCase):
 
         self.util.stringPropertyTest(self, subj_attr, "postmenopausal")
 
+    # preg_term
+    def testPregTerm(self):
+        """ Test the preg_term property. """
+        subj_attr = self.session.create_subject_attr()
+
+        self.util.stringTypeTest(self, subj_attr, "preg_term")
+
+        self.util.stringPropertyTest(self, subj_attr, "preg_term")
+
     # pvd (peripheral vascular disease)
     def testPVD(self):
         """ Test the pvd (peripheral vascular disease) property. """
@@ -455,6 +473,7 @@ class SubjectAttributeTest(unittest.TestCase):
         subj_attr.education = "Yes, high school"
         subj_attr.family_history = "Yes, cancer"
         subj_attr.father = "Dad"
+        subj_attr.ga_at_delivery = "<37wk"
         subj_attr.gallbladder = "Yes, 2 years"
         subj_attr.hyperlipidemia = "Yes, 3 years"
         subj_attr.hypertension = "Yes, 4 years"
@@ -467,6 +486,7 @@ class SubjectAttributeTest(unittest.TestCase):
         subj_attr.osa = "Yes, 6 years"
         subj_attr.pancreatitis = "Yes, 7 years"
         subj_attr.postmenopausal = "N/A"
+        subj_attr.preg_term = "preterm"
         subj_attr.pvd = "Yes, 8 years"
         subj_attr.rx = "None"
         subj_attr.siblings = "Brother and sister"
@@ -505,6 +525,10 @@ class SubjectAttributeTest(unittest.TestCase):
                          "SubjectAttribute comment not saved & loaded successfully")
         self.assertEqual(subj_attr.contact, subj_attr_loaded.contact,
                          "SubjectAttribute contact not saved & loaded successfully")
+        self.assertEqual(subj_attr.ga_at_delivery, subj_attr_loaded.ga_at_delivery,
+                         "SubjectAttribute ga_at_delivery not saved & loaded successfully")
+        self.assertEqual(subj_attr.preg_term, subj_attr_loaded.preg_term,
+                         "SubjectAttribute preg_term not saved & loaded successfully")
         self.assertEqual(subj_attr.subproject, subj_attr_loaded.subproject,
                          "SubjectAttribute subproject not saved & loaded successfully")
         self.assertEqual(subj_attr.tags[0], subj_attr_loaded.tags[0],
