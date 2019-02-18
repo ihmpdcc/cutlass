@@ -6,6 +6,7 @@
 #   W0401 = Wildcard import
 #   W0613 = Unused argument
 #   C0301 = Line too long
+#   C0325 = Unnecessary parens after %r keyword
 #   C0103 = Invalid name
 #   R0201 = Method could be a function
 #   R0903 = Too few public methods
@@ -22,4 +23,4 @@
 # Already an error when wildcard imports are used
 #   W0614 = Unused import from wildcard
 
-disable=W0401, W0614, R0902, R0903, R0904, RO912, R0913, R0914, R0915, C0103
+disable=W0401, W0614, R0902, R0903, R0904, RO912, R0913, R0914, R0915, C0103, C0325
