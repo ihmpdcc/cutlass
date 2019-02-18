@@ -1,3 +1,5 @@
+""" Setup script for installation. """
+
 import os
 from distutils.core import setup
 

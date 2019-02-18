@@ -1,3 +1,11 @@
+cutlass 1.0.4
+
+  * Configuration for editorconfig.
+  * Configuration for pylint.
+  * Docstrings for generate_pass.py
+
+ - Victor <victor73@github.com>  Sun, 17 Feb 2019 16:00:00 -0400
+
 cutlass 1.0.3
 
   * Support for preg_term and ga_at_delivery fields in SubjectAttribute.
@@ -35,7 +43,7 @@ cutlass 1.0.0
 
 cutlass 0.30
 
-  * Support for the ProteomeNonPride node type. 
+  * Support for the ProteomeNonPride node type.
   * Numerous formatting and other changes identified by pylint corrected.
   * Merged PR #29 from @carze fixing the handling of optional properties
     in the VisitAttribute class.
@@ -145,7 +153,7 @@ cutlass 0.19
  * Fixed minor issue with test_aspera.py unit test and moved round-trip test
    script to tests/bin subdirectory to avoid conflict with unittest module and
    test discovery.
- 
+
  - Victor <victor73@github.com>  Tue, 14 Jun 2016 12:00:00 -0400
 
 cutlass 0.18
@@ -290,7 +298,7 @@ cutlass 0.3
    class.
 
  - Victor <victor73@github.com>  Mon, 14 Sep 2015 12:00:00 -0400
- 
+
 cutlass 0.2
 
  * Merged pull request providing search() implementation for each
