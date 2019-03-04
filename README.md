@@ -52,8 +52,10 @@ directory to your PYTHONPATH environment variable if it isn't already there:
 Then invoke easy_install with the --install-dir option. Note the final '.', which tells
 easy_install where to look for the setup.py script.
 
+  <pre>
   $ easy_install --install-dir /tmp .
-
+  </pre>
+  
 ### Using pip
 
 Another tool that is commonly used to install Python modules is pip. To use pip to 
